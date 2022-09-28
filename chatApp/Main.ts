@@ -1,8 +1,7 @@
-import { User } from "./Objects/User";
-import { QueryInterface } from "./Database/QueryInterface"
+import {Queries} from "./Database/Queries";
 
 class Main {
-    public static test() {
+    public static main() {
 
     }
 }
