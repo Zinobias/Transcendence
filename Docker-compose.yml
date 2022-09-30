@@ -4,7 +4,7 @@ services:
     container_name: front_end
     build: frontEnd
     ports:
-      - ${PORT}:${PORT}
+      - "${PORT}:${PORT}"
 
   chat_app:
     container_name: chat
@@ -17,8 +17,8 @@ services:
   db:
     container_name: db
     image: postgres
-    ports: 
-      - '5432:5432'
+    #ports: 
+     # - '5432:5432'
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
