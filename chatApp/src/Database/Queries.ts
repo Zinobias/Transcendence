@@ -209,11 +209,9 @@ export class Queries {
     /**
      * Add a new message to a channel
      * @param channelId channel to add message to
-     * @param message message to add
-     * @param userId user that send the message
-     * @param timestamp time the message was sent at
+     * @param message object containing all information about the message
      */
-    addChannelMessage(channelId: number, message: string, userId: number, timestamp: number) {
+    addChannelMessage(channelId: number, message: Message) {
 
     }
 
