@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  frontend:
+    container_name: front_end
+    build: frontEnd
+    ports:
+      - ${PORT}:${PORT}
+
+  chat_app:
+    container_name: chat
+    build: chatApp
+
+  game_app:
+    container_name: game_app
+    build: gameApp
+
+  db:
+    container_name: db
+    image: postgres
+    ports: 
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
