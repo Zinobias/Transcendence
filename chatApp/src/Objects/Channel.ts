@@ -108,4 +108,11 @@ export class Channel {
             .filter(a => a.userId === userId)
             .length == 1
     }
+
+    public canJoin(userId: number): boolean {
+        return this.settings
+            .filter(a => a.setting == SettingType.BANNED)
+            .filter(a => a.userId == userId)
+            .length == 0
+    }
 }
