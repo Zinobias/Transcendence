@@ -1,15 +1,33 @@
-import { User } from "./User";
-import { Message } from "./Message";
-import { Setting } from "./Setting";
+import {User} from "./User";
+import {Message} from "./Message";
+import {Setting} from "./Setting";
+import {SettingType} from "../Enums/SettingType";
 
 export class Channel {
-    private readonly _channelId: number;
+    private static _channels: Channel[] = [];
+
+    private static addChannel(channel: Channel): void {
+        this._channels.push(channel)
+    }
+
+    public static getChannel(channelId: number): Channel {
+        let channels = this._channels.filter(a => a._channelId == channelId);
+        if (channels.length == 1)
+            return channels[0];
+        return undefined;
+    }
+
+    public static removeChannel(channelId: number) {
+        this._channels = this._channels.filter(a => a._channelId != channelId);
+    }
+
+    private _channelId: number;
     private readonly _owner: number;
     private readonly _otherOwner: number;
     private _channelName: string;
-    private readonly _users: User[];
+    private _users: User[];
     private readonly _messages: Message[];
-    private readonly _settings: Setting[];
+    private _settings: Setting[];
 
     constructor(channelId: number, owner: number, channelName: string, users: User[], messages: Message[], settings: Setting[], otherOwner?: number) {
         this._channelId = channelId;
@@ -22,39 +40,72 @@ export class Channel {
             this._otherOwner = otherOwner;
     }
 
-    get channelId(): number {
+    public set channelId(value: number) {
+        this._channelId = value;
+    }
+
+    public get channelId(): number {
         return this._channelId;
     }
 
-    get owner(): number {
+    public get owner(): number {
         return this._owner;
     }
 
-    get otherOwner(): number {
+    public get otherOwner(): number {
         return this._otherOwner;
     }
 
-    get channelName(): string {
+    public get channelName(): string {
         return this._channelName;
     }
 
-    set channelName(value: string) {
+    public set channelName(value: string) {
         this._channelName = value;
     }
 
-    get users(): User[] {
+    public get users(): User[] {
         return this._users;
     }
 
-    get messages(): Message[] {
+    public addUser(user: User) {
+        this._users.push(user);
+    }
+
+    public removeUser(userId: number) {
+        this._users = this._users.filter(a => a.userId != userId)
+    }
+
+    public hasUser(userId: number): boolean {
+        return this._users.filter(a => a.userId == userId).length == 1
+    }
+
+    public get messages(): Message[] {
         return this._messages;
     }
 
-    get settings(): Setting[] {
+    public get settings(): Setting[] {
         return this._settings;
     }
 
-    addSetting(setting: Setting) {
+    public addSetting(setting: Setting) {
         this._settings.push(setting);
+    }
+
+    public removeSetting(userId: number, settingType: SettingType) {
+        this._settings = this._settings.filter(a => (!(a.userId == userId && a.setting === settingType)))
+    }
+
+    public isOwner(userId: number): boolean {
+        return this.owner == userId || this.otherOwner == userId;
+    }
+
+    public isAdmin(userId: number): boolean {
+        if (this.isOwner(userId))
+            return true;
+        return this.settings
+            .filter(a => a.setting === SettingType.ADMIN)
+            .filter(a => a.userId === userId)
+            .length == 1
     }
 }

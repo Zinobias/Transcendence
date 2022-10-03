@@ -2,6 +2,7 @@ import {Setting} from "../Objects/Setting";
 import {Channel} from "../Objects/Channel";
 import {User} from "../Objects/User";
 import {Message} from "../Objects/Message";
+import {SettingType} from "../Enums/SettingType";
 
 
 export class Queries {
@@ -111,11 +112,18 @@ export class Queries {
     //ChatChannels table
     /**
      * Store a new channel in the database
-     * @param owner
-     * @param owner2
-     * @param channelName
+     * @param channel the channel to be created
+     * returns the id of the newly created channel
      */
-    createChannel(owner: number, owner2: number, channelName: string): void {
+    createChannel(channel: Channel): number {
+        return -1;
+    }
+
+    /**
+     * Remove a channel
+     * @param channel_id channel to remove
+     */
+    removeChannel(channel_id: number) {
 
     }
 
@@ -155,9 +163,11 @@ export class Queries {
 
     /**
      * Remove a setting
-     * @param setting setting to remove
+     * @param channelId channel to remove setting from
+     * @param userId user to remove setting for
+     * @param settingType setting type to remove
      */
-    removeSetting(setting: Setting): void {
+    removeSetting(channelId: number, userId: number, settingType: SettingType): void {
 
     }
 
@@ -222,5 +232,4 @@ export class Queries {
     getChannelMessages(channelId: number): Message[] {
         return [];
     }
-
 }
