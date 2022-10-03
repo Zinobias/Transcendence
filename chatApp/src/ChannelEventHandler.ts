@@ -160,7 +160,7 @@ export class ChannelEventHandler {
   private static getUser(userId: number, source: string): User {
     let user: User = User.getUser(userId);
     if (user == null) {
-      Logger.warn("Received invalid creator id [" + userId + "] from " + source)
+      Logger.warn("Received invalid user id [" + userId + "] from " + source)
       return undefined;
     }
     return user;
