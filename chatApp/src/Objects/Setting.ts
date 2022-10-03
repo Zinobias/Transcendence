@@ -5,11 +5,13 @@ export class Setting {
     private readonly _userId: number;
     private readonly _from: number;
     private readonly _until: number;
+    private readonly _actorId: number
 
-    constructor(setting: SettingType, channelId: number, userId: number, from: number, until: number) {
+    constructor(setting: SettingType, channelId: number, userId: number, actorId: number, from: number, until: number) {
         this._setting = setting;
         this._channelId = channelId;
         this._userId = userId;
+        this._actorId = actorId;
         this._from = from;
         this._until = until;
     }

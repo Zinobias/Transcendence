@@ -1,4 +1,21 @@
 export class User {
+    private static _users: User[] = [];
+
+    private static addUser(user: User): void {
+        this._users.push(user)
+    }
+
+    public static getUser(userId: number): User {
+        let users = this._users.filter(a => a._userId == userId);
+        if (users.length == 1)
+            return users[0];
+        return undefined;
+    }
+
+    public static removeUser(userId: number) {
+        this._users = this._users.filter(a => a._userId != userId);
+    }
+
     private readonly _userId: number;
     private readonly _loginId: string;
     private _name: string;
@@ -11,6 +28,7 @@ export class User {
         this._name = name;
         this._avatar = avatar;
         this._blocked = blocked;
+        User.addUser(this);
     }
 
     get userId(): number {
