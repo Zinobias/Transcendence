@@ -36,6 +36,15 @@ export class Queries {
     }
 
     /**
+     * Changes the username for a user
+     * @param userId user to change the name for
+     * @param newName string to set the new name to
+     */
+    setUserName(userId: number, newName: string) {
+
+    }
+
+    /**
      * Get a user from their login id
      * @param loginId login id of the user
      */
@@ -95,8 +104,9 @@ export class Queries {
      * Stores a friend request
      * @param fromUserId user that created the request
      * @param toUserId user that the request should be sent to
+     * @param confirmed boolean indicating if the friend request was accepted
      */
-    addFriendRequest(fromUserId: number, toUserId: number): void {
+    addFriendRequest(fromUserId: number, toUserId: number, confirmed: boolean): void {
 
     }
 

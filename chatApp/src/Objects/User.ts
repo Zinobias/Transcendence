@@ -1,3 +1,5 @@
+import {Friend} from "./Friend";
+
 export class User {
     private static _users: User[] = [];
 
@@ -20,14 +22,16 @@ export class User {
     private readonly _loginId: string;
     private _name: string;
     private _avatar: object;
-    private readonly _blocked: User[];
+    private _blocked: User[];
+    private _friends: Friend[];
 
-    constructor(userId: number, loginId: string, name: string, avatar: object, blocked: User[]) {
+    constructor(userId: number, loginId: string, name: string, avatar: object, blocked: User[], friends: Friend[]) {
         this._userId = userId;
         this._loginId = loginId;
         this._name = name;
         this._avatar = avatar;
         this._blocked = blocked;
+        this._friends = friends;
         User.addUser(this);
     }
 
@@ -60,8 +64,34 @@ export class User {
     }
 
     block(user: User) {
-        if (this._blocked.filter(blockedUser => blockedUser === user).length >= 1)
+        if (this._blocked.filter(a => a._userId == user._userId).length >= 1)
             return
         this._blocked.push(user);
+    }
+
+    hasBlocked(user: User) {
+        return this._blocked.filter(a => a._userId == user._userId).length == 1;
+    }
+
+    unblock(user: User) {
+        this._blocked = this._blocked.filter(a => a._userId != user._userId);
+    }
+
+    get friends(): Friend[] {
+        return this._friends
+    }
+
+    friend(friend: Friend) {
+        if (this._friends.filter(a => a._userId == friend._userId).length >= 1)
+            return
+        this._friends.push(friend);
+    }
+
+    isFriends(friend: Friend) {
+        return this._friends.filter(a => a._userId == friend._userId).length == 1;
+    }
+
+    unfriend(friend: Friend) {
+        this._friends = this._friends.filter(a => a._userId != friend._userId);
     }
 }
