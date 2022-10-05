@@ -88,10 +88,14 @@ export class User {
     }
 
     isFriends(friend: Friend) {
-        return this._friends.filter(a => a._userId == friend._userId).length == 1;
+        return this._friends.filter(a => a._userId == friend._userId && a.confirmed).length == 1;
     }
 
-    unfriend(friend: Friend) {
+    hasRequest(friend: Friend) {
+        return this._friends.filter(a => a._userId == friend._userId && !a.confirmed).length == 1;
+    }
+
+    unfriend(friend: User) {
         this._friends = this._friends.filter(a => a._userId != friend._userId);
     }
 }

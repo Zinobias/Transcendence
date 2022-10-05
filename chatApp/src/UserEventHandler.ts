@@ -83,7 +83,7 @@ export class ChannelEventHandler {
         Queries.getInstance().removeBlockedUser(user.userId, blockedUser.userId)
     }
 
-    @EventPattern('user_friend_user') //TODO finish implementing friends so they can be requests
+    @EventPattern('user_friend_user')
     userFriendUser(data: UserFriendUser) {
         let user: User = ChannelEventHandler.getUser(data.user_id, "user_friend_user")
         if (user == null)
@@ -93,27 +93,77 @@ export class ChannelEventHandler {
             return;
 
         let friend = new Friend(friendUser, false);
-        if (user.isFriends(friend)) { //TODO check req
+        if (user.hasRequest(friend)) {
+            Logger.warn("User [" + user.userId + "] is already friends with [" + friend.userId + "]")
+            return;
+        }
+        if (user.isFriends(friend)) {
             Logger.warn("User [" + user.userId + "] is already friends with [" + friend.userId + "]")
             return;
         }
 
         user.friend(friend)
-        Queries.getInstance().addFriendRequest(user.userId, friendUser.userId, false)
+        Queries.getInstance().addFriend(user.userId, friendUser.userId, false)
     }
 
-    @EventPattern('user_accept_friend_user') //TODO finish implementing friends so they can be requests
+    @EventPattern('user_cancel_friend')
+    userCancelFriendUser(data: UserFriendUser) {
+        let user: User = ChannelEventHandler.getUser(data.user_id, "user_cancel_friend")
+        if (user == null)
+            return;
+        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_cancel_friend")
+        if (friendUser == null)
+            return;
+
+        let friend = new Friend(friendUser, false);
+        if (!user.hasRequest(friend)) {
+            Logger.warn("User [" + user.userId + "] is already friends with [" + friend.userId + "]")
+            return;
+        }
+
+        user.unfriend(friend)
+        Queries.getInstance().removeFriend(user.userId, friendUser.userId);
+    }
+
+    @EventPattern('user_accept_friend_user')
     userAcceptFriendUser(data: UserAcceptFriendUser) {
         let user: User = ChannelEventHandler.getUser(data.user_id, "user_accept_friend_user")
         if (user == null)
             return;
+        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_accept_friend_user")
+        if (friendUser == null)
+            return;
+
+        let friend = new Friend(friendUser, false);
+        if (!user.hasRequest(friend)) {
+            Logger.warn("User [" + user.userId + "] has no active request for [" + friend.userId + "]")
+            return;
+        }
+        friend.confirmed = true;
+        friendUser.friend(new Friend(user, true))
+        Queries.getInstance().addFriend(user.userId, friendUser.userId, true)
+        Queries.getInstance().addFriend(friendUser.userId, user.userId, true)
     }
 
-    @EventPattern('user_remove_friend') //TODO finish implementing friends so they can be requests
+    @EventPattern('user_remove_friend')
     userRemoveFriend(data: UserRemoveFriend) {
         let user: User = ChannelEventHandler.getUser(data.user_id, "user_remove_friend")
         if (user == null)
             return;
+        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_remove_friend")
+        if (friendUser == null)
+            return;
+
+        let friend = new Friend(friendUser, false);
+        if (!user.isFriends(friend)) {
+            Logger.warn("User [" + user.userId + "] is already friends with [" + friend.userId + "]")
+            return;
+        }
+
+        user.unfriend(friend)
+        friendUser.unfriend(user);
+        Queries.getInstance().removeFriend(user.userId, friendUser.userId);
+        Queries.getInstance().removeFriend(friendUser.userId, user.userId);
     }
 
     //EZ ERRORS:

@@ -106,7 +106,7 @@ export class Queries {
      * @param toUserId user that the request should be sent to
      * @param confirmed boolean indicating if the friend request was accepted
      */
-    addFriendRequest(fromUserId: number, toUserId: number, confirmed: boolean): void {
+    addFriend(fromUserId: number, toUserId: number, confirmed: boolean): void {
 
     }
 
