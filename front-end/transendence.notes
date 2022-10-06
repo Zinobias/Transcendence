@@ -16,6 +16,21 @@ to take advantage of the newest features of the language.[4]
 
 == WEB DEV STUFF ==
 
+HTML Block and Inline Elements:
+
+Block-level Elements: 
+- A block-level element always starts on a new line, and the browsers automatically add some 
+space (a margin) before and after the element.
+- A block-level element always takes up the full width available (stretches out to the 
+left and right as far as it can).
+- The <p> element defines a paragraph in an HTML document.
+- The <div> element defines a division or a section in an HTML document.
+
+Inline Elements: 
+- An inline element does not start on a new line.
+- An inline element only takes up as much width as necessary.
+- This is a <span> element inside a paragraph.
+
 DOM:
 
 The Document Object Model (DOM) is a programming interface for web documents. 
@@ -139,6 +154,24 @@ something called coroutines. A coroutine is a function which can pause its execu
 to the main loop until some event occurs. It is an alternative approach for using callback functions, 
 which makes it easier to 
 write, understand and maintain.
+
+METHOD:
+A method is a function which is a property of an object. 
+There are two kinds of methods: 
+- instance methods which are built-in tasks performed by an object instance, 
+- or static methods which are tasks that are called directly on an object constructor.
+
+ARROW FUNCTIONS:
+An arrow function expression is a compact alternative to a traditional function expression, but is 
+limited and can't be used in all situations.
+
+Arrow functions in ES6 have at least two limitations: 
+- Arrow functions don't have their own bindings to this, arguments or super, and should not be used as methods.
+- Arrow functions don't have access to the new.target keyword.
+- Arrow functions aren't suitable for call, apply and bind methods, which generally rely on establishing a scope.
+- Arrow functions cannot be used as constructors.
+- Arrow functions cannot use yield, within its body.
+These two limitations aside, arrow functions could theoretically replace regular functions almost anywhere. 
 
 == JAVASCRIPT Video In The Loop ==
 
