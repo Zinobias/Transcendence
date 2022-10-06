@@ -1,5 +1,5 @@
 import { playerData, Entity, Ball, Vec2 , gameResult, gameEndedEvent, playerPaddle, gameFrameUpdate} from "./game-object-interfaces";
-import { EventEmitter2 } from "@nestjs/event-emitter";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 
 enum Direction {
 	up = 1,
@@ -51,6 +51,9 @@ export class Game {
 		return ;
 	}
 
+	// DTO for this should be
+	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
+	@OnEvent("game.player.move")
 	private movePlayer(UID : string, direction : Direction ) : void {
 		let target = this.playerPaddles.get(UID) ?? {height : 5};
 
@@ -115,6 +118,7 @@ export class Game {
 		this.ball.color.b = 211;
 		this.ball.color.g = 211;
 		this.ball.color.r = 211;
+		//this.color = Color(211, 211 ,211);
 		this.ball.pos.x = 0;
 		this.ball.pos.y = 0;
 		if (this.ball.velocityVector) {
@@ -123,3 +127,13 @@ export class Game {
 		}
 	}
 }
+
+/*
+ Events to keep track of and to document :
+
+ game.frameUpdate
+ game.ended
+ game.player.move
+ TODO: write those events:
+-	game.entity.move
+ */
