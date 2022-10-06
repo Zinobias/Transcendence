@@ -1,18 +1,30 @@
 // Basic Vec2
-export interface Vec2 {
-	x : number;
-	y : number;
+export class Vec2 {
+	public x : number;
+	public y : number;
+	constructor();
+	constructor(x : number, y : number); 
+	constructor(src : Vec2);
+
+	public constructor(src ?: Vec2 | number , y ?: number) {
+		if (src instanceof Vec2) {
+			this.x = src.x;
+			this.y = src.y;
+		}
+		else  {
+			this.x = src ?? 0;
+			this.y = y ?? 0;
+		}
+	};
 }
 
 // Colors in R G B
-export interface Color {
-	r : number;
-	g : number;
-	b : number;
+export class Color {
+	constructor(public r : number, public g : number, public b : number) {}
 }
 
 // Base class for an Entity object.
-export interface Entity {
+export abstract class Entity {
 	pos 				: Vec2;
 	velocityVector? 	: Vec2;
 	onHit?(ball : Ball) : any; 
@@ -20,11 +32,11 @@ export interface Entity {
 }
 
 // The ball object in the game.
-export interface Ball extends Entity {
+export class Ball extends Entity {
 	color : Color;
 }
 
-export interface playerPaddle extends Entity {
+export class playerPaddle extends Entity {
 	height : number;
 }
 
@@ -50,13 +62,14 @@ export class gameEndedEvent {
 	payload: gameResult;
 }
 
+// TODO: might change the constructor(s) for the events..
 export class gameFrameUpdate {
+	gameID: number;
+	payload: Entity[];
 	constructor(event : gameFrameUpdate){
 		this.gameID = event.gameID;
 		this.payload = event.payload;
 	};
-	gameID: number;
-	payload: Entity[];
 }
 
 // Game metaData & core methods.
