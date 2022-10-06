@@ -65,13 +65,15 @@ export class Ball extends Entity {
 	constructor () {
 		super("ball");
 		this.color = new Color(211, 211, 211);
+		this.velocityVector = new Vec2(-1, 0);
+		[this.pos.x, this.pos.y] = [0, 0];
 	}
 }
 
 /**
  * The pong player objects.
  */
-export class playerPaddle extends Entity {
+export class PlayerPaddle extends Entity {
 	constructor(private _height : number) {
 		super('player_paddle');
 	}
@@ -80,13 +82,13 @@ export class playerPaddle extends Entity {
 	// Getters
 	get height() { return (this._height); }
 
-	// TODO: Maybe add a set heigt if we want to create some fun powerup that reduces the paddle height.
+	// TODO: Maybe add a set height if we want to create some fun powerup that reduces the paddle height.
 }
 
 /**
  * UserID & the player's current score.
  */
-export interface playerData {
+export interface PlayerData {
 	uid 	:	 string;
 	score 	:	 number;
 }
@@ -94,24 +96,32 @@ export interface playerData {
 /**
  * Results of the game.
  */
-export interface gameResult {
-	readonly player1	: 	playerData;
-	readonly player2	: 	playerData;
+export interface GameResult {
+	readonly player1	: 	PlayerData;
+	readonly player2	: 	PlayerData;
 	gameID				:	number;
 	winnerUID			:	string;
 }
 
 
 /**
+ * object for the gameEndedEvent
+ */
+export interface GameEndedData {
+	gameID : number;
+	payload : GameResult;
+}
+
+/**
  * Event for when a game has 
  */
-export class gameEndedEvent {
-	constructor(event : gameEndedEvent){
-		this._gameID = event.gameID;
-		this._payload = event.payload;
+export class GameEndedEvent {
+	constructor(gameEndedData : GameEndedData){
+		this._gameID = gameEndedData.gameID;
+		this._payload = gameEndedData.payload;
 	};
 	private _gameID: number;
-	private _payload: gameResult;
+	private _payload: GameResult;
 
 	// ------------------------------------------------------------------------------------------------
 	// Getters
@@ -121,10 +131,27 @@ export class gameEndedEvent {
 }
 
 // TODO: might change the constructor(s) for the events..
-export class gameFrameUpdate {
-	constructor(event : gameFrameUpdate){
-		this._gameID = event.gameID;
-		this._payload = event.payload;
+
+/**
+ * object for the gameFrameUpdate event
+ */
+export interface GameFrameData {
+	gameID : number;
+	payload : Entity[];
+}
+
+export class GameFrameUpdateEvent {
+
+	/**
+	 * 
+	 * @param event Objects interface 
+	 * @gameFrameData gameFrameData {
+	 * 	gameID : number
+	 * 	payload : Entity[]; }
+	 */
+	constructor(frameData : GameFrameData){
+		this._gameID = frameData.gameID;
+		this._payload = frameData.payload;
 	};
 	private _gameID: number;
 	private _payload: Entity[];

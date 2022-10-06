@@ -1,4 +1,4 @@
-import { playerData, Entity, Ball , gameResult, gameEndedEvent, playerPaddle, gameFrameUpdate} from "./game-object-interfaces";
+import { PlayerData, Entity, Ball , GameResult, GameEndedEvent, PlayerPaddle, GameFrameUpdateEvent} from "./game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { Vec2 } from "./vectorLib/vector-lib";
 enum Direction {
@@ -9,13 +9,13 @@ enum Direction {
 }
 export class Game {
 	public	readonly gameId 	: number;
-	private readonly player1	: playerData;
-	private readonly player2 	: playerData;
+	private readonly player1	: PlayerData;
+	private readonly player2 	: PlayerData;
 	private entities 			: Entity[];
-	private	playerPaddles		: Map<string, playerPaddle>;
+	private	playerPaddles		: Map<string, PlayerPaddle>;
 	private ball 				: Ball;
 	private boardDimensions 	: Vec2;
-	private results 			: gameResult;
+	private results 			: GameResult;
 	private readonly gameMode	: string;
 	constructor(private eventEmitter: EventEmitter2, PlayersUIDs : string[], gameMode : string, gameID : number) {
 		this.gameMode = gameMode;
@@ -42,7 +42,7 @@ export class Game {
 		// TODO: Send gameFinishedEvent to the frontEnd service.
 		// TODO: Find a way to properly clean up the class out of memory.
 		this.eventEmitter.emit('game.ended', 
-			new gameEndedEvent({
+			new GameEndedEvent({
 			gameID: this.gameId,
 			payload: this.results,
 		}),
@@ -54,15 +54,18 @@ export class Game {
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	@OnEvent("game.player.move")
 	private movePlayer(UID : string, direction : Direction ) : void {
-		let target = this.playerPaddles.get(UID) ?? {height : 5};
+		let target = this.playerPaddles.get(UID);
 
+		if (target === undefined)
+			return ;
+		// TODO: Set incremental value to something that feels responsive and makes sense.
 		switch (direction) {
 			case Direction.up: {
-				target.height += 1;
+				target.pos.y += 1;
 				break ;
 			}
 			case Direction.down: {
-				target.height -= 1;
+				target.pos.y -= 1;
 				break ;
 			}
 			default :
@@ -86,7 +89,7 @@ export class Game {
 			// TODO: Move the paddles. (Should be handled by an event handler), have to make sure to not interfere with the ball calculation.
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
 			this.eventEmitter.emit('game.frameUpdate', 
-			new gameFrameUpdate({
+			new GameFrameUpdateEvent({
 			gameID: this.gameId,
 			payload: this.entities,
 		}),
@@ -114,16 +117,7 @@ export class Game {
 	}
 
 	private createDefaultBall() : void{
-		this.ball.color.b = 211;
-		this.ball.color.g = 211;
-		this.ball.color.r = 211;
-		//this.color = Color(211, 211 ,211);
-		this.ball.pos.x = 0;
-		this.ball.pos.y = 0;
-		if (this.ball.velocityVector) {
-			this.ball.velocityVector.x = -1;
-			this.ball.velocityVector.y = 0;
-		}
+		this.ball.color.setColors(211, 211, 211);
 	}
 }
 
