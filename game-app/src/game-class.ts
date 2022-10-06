@@ -1,6 +1,6 @@
-import { playerData, Entity, Ball, Vec2 , gameResult, gameEndedEvent, playerPaddle, gameFrameUpdate} from "./game-object-interfaces";
+import { playerData, Entity, Ball , gameResult, gameEndedEvent, playerPaddle, gameFrameUpdate} from "./game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-
+import { Vec2 } from "./vectorLib/vector-lib";
 enum Direction {
 	up = 1,
 	down = -1,
@@ -17,7 +17,6 @@ export class Game {
 	private boardDimensions 	: Vec2;
 	private results 			: gameResult;
 	private readonly gameMode	: string;
-
 	constructor(private eventEmitter: EventEmitter2, PlayersUIDs : string[], gameMode : string, gameID : number) {
 		this.gameMode = gameMode;
 		this.gameId = gameID;

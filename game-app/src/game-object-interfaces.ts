@@ -1,22 +1,4 @@
-// Basic Vec2
-export class Vec2 {
-	public x : number;
-	public y : number;
-	constructor();
-	constructor(x : number, y : number); 
-	constructor(src : Vec2);
-
-	public constructor(src ?: Vec2 | number , y ?: number) {
-		if (src instanceof Vec2) {
-			this.x = src.x;
-			this.y = src.y;
-		}
-		else  {
-			this.x = src ?? 0;
-			this.y = y ?? 0;
-		}
-	};
-}
+import { Vec2 } from "./vectorLib/vector-lib";
 
 // Colors in R G B
 export class Color {
