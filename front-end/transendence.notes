@@ -1,0 +1,178 @@
+
+lil tutorial:
+https://reactjs.org/tutorial/tutorial.html
+
+react api:
+https://reactjs.org/docs/react-api.html#createelement
+
+npm (Node Package Manager) 
+npm installs with nodejs (just with brew)
+
+== BABEL ==
+
+Babel is a free and open-source JavaScript transcompiler that is mainly used to convert ECMAScript 2015+ (ES6+) 
+code into backwards-compatible JavaScript code that can be run by older JavaScript engines. It allows web developers 
+to take advantage of the newest features of the language.[4]
+
+== WEB DEV STUFF ==
+
+DOM:
+
+The Document Object Model (DOM) is a programming interface for web documents. 
+It represents the page so that programs can change the document structure, 
+style, and content. The DOM represents the document as nodes and objects; 
+that way, programming languages can interact with the page.
+
+A web page is a document that can be either displayed in the browser window or 
+as the HTML source. In both cases, it is the same document but the Document 
+Object Model (DOM) representation allows it to be manipulated. As an 
+object-oriented representation of the web page, it can be modified with a 
+scripting language such as JavaScript.
+
+DOM Nodes:
+
+https://www.w3schools.com/js/js_htmldom_navigation.asp
+
+According to the W3C HTML DOM standard, everything in an HTML document is a node
+- The entire document is a document node
+- Every HTML element is an element node
+- The text inside HTML elements are text nodes
+- Every HTML attribute is an attribute node (deprecated)
+- All comments are comment nodes
+
+With the HTML DOM, all nodes in the node tree can be accessed by JavaScript.
+New nodes can be created, and all nodes can be modified or deleted.
+
+Node Relationships:
+
+The nodes in the node tree have a hierarchical relationship to each other.
+The terms parent, child, and sibling are used to describe the relationships.
+- In a node tree, the top node is called the root (or root node)
+- Every node has exactly one parent, except the root (which has no parent)
+- A node can have a number of children
+- Siblings (brothers or sisters) are nodes with the same parent
+
+Navigating Between Nodes:
+
+You can use the following node properties to navigate between nodes with JavaScript
+- parentNode
+- childNodes[nodenumber]
+- firstChild
+- lastChild
+- nextSibling
+- previousSibling
+
+DOM Root Nodes:
+
+There are two special properties that allow access to the full document
+- document.body - The body of the document
+- document.documentElement - The full document
+
+
+== REACT ==
+
+Create React App:
+npx create-react-app my-app
+cd my-app
+npm start
+
+Create React App doesn’t handle backend logic or databases; it just creates a frontend build pipeline, 
+so you can use it with any backend you want. Under the hood, it uses Babel and webpack, but you don’t 
+need to know anything about them.
+
+When you’re ready to deploy to production, running npm run build will create an optimized build of your app 
+in the build folder.
+
+React DOM:
+https://reactjs.org/docs/react-dom.html
+
+The react-dom package provides DOM-specific methods that can be used at the top level of your app and as an 
+escape hatch to get outside the React model if you need to.
+
+== BASIC JAVASCRIPT ==
+
+FUNCTIONS:
+In JavaScript, you have to return from inside functions. If you forget to write return, your function will 
+return undefined.
+
+To define an anonymous function, we can alternatively use the following syntax
+
+var greet = function(name) {
+    return "Hello " + name + "!";
+}
+console.log(greet("Eric"));      // prints out Hello Eric!
+
+POP-UP BOXES:
+There are three types of pop-up boxes in javascript: confirm, alert, and prompt. 
+confirm("Hi!");
+prompt("Bye!");
+alert("Hello");
+
+CALLBACKS:
+Callbacks in JavaScript are functions that are passed as arguments to other functions. This is a very 
+important feature of asynchronous programming, and it enables the function that receives the callback 
+to call our code when it finishes a long task, while allowing us to continue the execution of the code.
+
+For example:
+var callback = function() {
+    console.log("Done!");
+}
+setTimeout(callback, 5000);
+
+PROMISE OBJECT:
+A Promise is a native JavaScript object which has two traits: 1. It receives a single argument 
+which is a function. This function needs to have two arguments, a resolve function and a reject function. 
+The code written inside the promise needs to use one of these two functions. 2. It can be waited on 
+using the then method (and other similar methods), or the await statement. 
+
+An asynchronous function is defined by a function, which instead of returning the value it was supposed 
+to return, it returns a Promise object, which will eventually resolve and give the user the answer.
+
+REJECTING PROMISES:
+In a synchronous flow, if we want to tell the user that something went wrong so he can catch an exception, 
+we throw an exception using the throw argument. When using promises, we need to trigger the reject 
+function instead.
+
+COROUTINE:
+The async and await keywords in JavaScript are used to make asynchronous programming easy, by introducing 
+something called coroutines. A coroutine is a function which can pause its execution and return control 
+to the main loop until some event occurs. It is an alternative approach for using callback functions, 
+which makes it easier to 
+write, understand and maintain.
+
+== JAVASCRIPT Video In The Loop ==
+
+Tasks:
+A while loop like while(true) blocks the rendering, but setTimeout(loop, 0) doesn’t don't render in tasks.
+We take one taks and execute it and if a new task is added it goes to the end of the queue.
+
+setTimeout() --> this get's called way more than the request and we dont want that rendering happens between 
+                tasks and that's why we don't want that, bad for perfomance and sometimes a render is not 
+                even needed, it's NOT DESIGNED FOR ANIMATION
+
+Animation Callbacks:
+Happen until completion (the one we started + the ones that where in the queue when we started nothing more), 
+we take one and finish it and then another can get added
+
+requestAnimationFrame() -> run code in the rendering steps, rendering can happen between tasks but there can
+                            be like a million tasks between a render, only renders when nessecary
+                            comes before processing the CSS file and painting process
+
+function callback() {
+    moveBoxForwardOnePiece();
+    requestAnimationFrame(callback); --> only renders when really nessecary, GOOD
+    setTimeout(callback, 0); --> get's called too much, BAD
+}
+callback();
+
+getComputedStyle(box).transform; --> force and earlier render
+
+Microtasks:
+Happen until completion and you can constantly add new microtasks to the queue without the one that started 
+first needing to be done. It block rendering cause the eventhandler can not continue until ALL of them are 
+done, and that is why it blocks rendering
+
+they happen whenever JavaScript finishes executing, so when the stack is empty, this can happen pretty much 
+all the time like half way through a task or in the render part.
+
+Promises use microtasks
