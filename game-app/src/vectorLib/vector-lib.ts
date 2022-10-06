@@ -1,15 +1,18 @@
-// Basic Vec2
+// Basic Vec2 library
 
 /**
  * Simple 2 dimensional vector with x & y coordinates. With a small Vec2Math library included.
  */
 export class Vec2 {
-	public x : number;
-	public y : number;
+	private _x : number;
+	private _y : number;
+
+    // ------------------------------------------------------------------------------------------------
+	// Constructors
 	constructor();
 	constructor(x : number, y : number); 
     /**
-     * Copies Vec2
+     * Copy constructor
      * @param src Vec2 to copy.
      */
 	constructor(src : Vec2);
@@ -25,6 +28,18 @@ export class Vec2 {
 		}
 	};
 
+    // ------------------------------------------------------------------------------------------------
+	// Setters
+    set x (x : number) { this._x = x; }
+    set y (y : number) { this._y = y; }
+    
+    // ------------------------------------------------------------------------------------------------
+	// Getters
+    get x () { return ( this._x );}
+    get y () { return ( this._y );}
+
+    // ------------------------------------------------------------------------------------------------
+	// Simple Vec2 library
      /**
      * Adds two vectors together
      * @param v1 Vec2 base
