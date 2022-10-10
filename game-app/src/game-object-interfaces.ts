@@ -1,4 +1,5 @@
 import { Vec2 } from "./vectorLib/vector-lib";
+import {GameConfig, Direction} from "./enums" ;
 
 // Colors in R G B
 export class Color {
@@ -74,13 +75,25 @@ export class Ball extends Entity {
  * The pong player objects.
  */
 export class PlayerPaddle extends Entity {
-	constructor(private _height : number) {
+	private	_keyPressUp 	: boolean;
+	private	_keyPressDown 	: boolean;
+
+	constructor(private _height : number, _playerNumber : number) {
 		super('player_paddle');
+		[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT * 0.5, _playerNumber == 1 ? 0 : GameConfig.BOARD_WIDTH];
+		[this._keyPressDown, this._keyPressUp ]= [false, false];
 	}
 
 	// ------------------------------------------------------------------------------------------------
 	// Getters
 	get height() { return (this._height); }
+	get keyPressUp() { return this._keyPressUp;}
+	get keyPressDown() { return this._keyPressDown;}
+
+	// ------------------------------------------------------------------------------------------------
+	// Setters
+	set keyPressUp(state : boolean) { this._keyPressUp = state;}
+	set keyPressDown(state : boolean) { this._keyPressDown = state;}
 
 	// TODO: Maybe add a set height if we want to create some fun powerup that reduces the paddle height.
 }
@@ -144,9 +157,9 @@ export class GameFrameUpdateEvent {
 
 	/**
 	 * 
-	 * @param event Objects interface 
+	 * @param frameData Objects interface 
 	 * @gameFrameData gameFrameData {
-	 * 	gameID : number
+	 * 	gameID : number;
 	 * 	payload : Entity[]; }
 	 */
 	constructor(frameData : GameFrameData){
@@ -160,5 +173,39 @@ export class GameFrameUpdateEvent {
 	// Getters
 	get	gameID() { return (this._gameID); }
 	get	payload() { return (this._payload); }
+
+}
+
+interface MoveStateData {
+	readonly playerNumber : number;
+	readonly newState : MoveStatePaddle;
+}
+
+export enum MoveStatePaddle {
+	keyPressUp = 0,
+	keyReleaseUp = 1,
+	keyPressDown = 2,
+	keyReleaseDown = 3,
+}
+export class GamePlayerMoveEvent {
+
+	/**
+	 * 
+	 * @param moveStateData Objects interface 
+	 * @gameFrameData gameFrameData {
+	 * 	playerNumber : number;
+	 * 	newState : number; }
+	 */
+	constructor(moveStateData : MoveStateData){
+		this._playerNumber = moveStateData.playerNumber;
+		this._newState = moveStateData.newState;
+	};
+	private _playerNumber	: number;
+	private _newState		: number;
+
+	// ------------------------------------------------------------------------------------------------
+	// Getters
+	get	playerNumber() { return (this._playerNumber); }
+	get	newState() { return (this._newState); }
 
 }

@@ -54,7 +54,7 @@ export class Vec2 {
      * Calculates the dotproduct of v1 and v2
      * @param v1 Vec2 base
      * @param v2 Vec2 to add
-     * @returns dotProduct of V1 & v2
+     * @returns dotProduct of V1 & v2 a number
      */
     static getDotProduct(v1 : Vec2, v2 : Vec2) : number {
         return ((v1.x * v2.x) + (v1.y * v2.y));
