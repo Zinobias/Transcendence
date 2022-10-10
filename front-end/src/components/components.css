@@ -33,3 +33,59 @@
     color: white;
     transition: 0.2 all;
 }
+
+.input__submit:hover {
+    background-color: #b6537b;
+}
+
+.input__submit:active {
+    transform: scale(0.8);
+}
+
+.todos {
+    color: white;
+    display: flex;
+    justify-content: space-evenly;
+    width: 90%;
+    flex-wrap: wrap;
+}
+
+.todos__single {
+    display: flex;
+    width: 40%;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 25px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.todos__single--text {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    font-size: 20px;
+}
+
+.icon {
+    margin-left: 10px;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+@media (max-width: 1200px) {
+    .todos__single {
+        width: 40%;
+    }
+}
+
+@media (max-width: 700px) {
+    .input {
+        width: 95%;
+    }
+    .todos {
+        width: 95%;
+    }
+    .todos__single {
+        width: 100%;
+    }
+}

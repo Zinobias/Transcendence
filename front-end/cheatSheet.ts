@@ -33,7 +33,13 @@ if (typeof age === "string") {
     console.log("Is a string");
 }
 
-interface Panini { // interface
+/*
+    The interface contains only the declaration of the methods and fields, 
+    but not the implementation. We cannot use it to build anything. 
+    A class inherits an interface, and the class which implements interface 
+    defines all members of the interface.
+*/
+interface Panini { 
     a: string;
     b: string;
 };

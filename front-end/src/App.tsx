@@ -1,6 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import './App.css';
 import InputField from './components/InputField';
+import TodoList from './components/TodoList';
+import { Todo } from './interfaces';
 
 /*
   NOTES:
@@ -13,14 +15,35 @@ import InputField from './components/InputField';
 
   spining element:
   <span className='spin-test'></span>
+
+  synthetic Events:
+  React uses synthetic events to handle events from button, input and form elements.
+  A synthetic event is a shell around the native DOM event with additional 
+  information for React.  Sometimes you have to use event.preventDefault(); in your application.
 */
 
 
 const App: React.FC = () => {
+  // useState is a hook that helps us manage state in function-based components in React
+  const [todo, setTodo] = useState<string>("");
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault(); // preventDefault is called on the event when submitting the form to prevent a browser reload/refresh.
+
+    if (todo) {
+      // The JavaScript spread operator (...) allows us to quickly copy all or part of 
+      // an existing array or object into another array or object.
+      setTodos([...todos, { id: Date.now(), todo}]); // add the input to the array
+      setTodo(""); // empty the input field
+    }
+  };
+
   return (
     <div className="App"> 
-      <span className="heading">Transendence</span>
-      <InputField />
+      <span className="heading">Transcendence</span>
+      <InputField todo={todo} setTodo={setTodo} handleAdd={handleAdd}/>
+      <TodoList todos={todos} setTodos={setTodos}/>
     </div>
   );
 }
