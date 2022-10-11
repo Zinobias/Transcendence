@@ -8,12 +8,22 @@ export enum Direction {
 /**
  * Defined values for the game in pixels.
  */
+
+
+const GAME_SCALAR : number = 1;
+
 export enum GameConfig {
-	PADDLE_HEIGHT   = 28,
-    PADDLE_STEP_SIZE = 4,
-    PADDLE_SIZE     = 28,
-	BOARD_WIDTH     = 512,
-    BOARD_HEIGHT    = 256,
+	PADDLE_HEIGHT           = 28                       * GAME_SCALAR,
+    PADDLE_STEP_SIZE        = 4                        * GAME_SCALAR,
+    PADDLE_SIZE             = 28                       * GAME_SCALAR,
+
+	BOARD_WIDTH             = 512                      * GAME_SCALAR,
+    BOARD_HEIGHT            = 256                      * GAME_SCALAR,
+
+    DEFAULT_BALL_RADIUS     = 8                        * GAME_SCALAR,
+    DEFAULT_BALL_SPEED      = 1                        * GAME_SCALAR, // max 7
+    DEFAULT_BALL_MAX_SPEED  = DEFAULT_BALL_SPEED * 7   * GAME_SCALAR, // in either direction.
+    DEFAULT_BALL_INCREMENT  = 1                        * GAME_SCALAR,
 }
 
 // height 28 pixels

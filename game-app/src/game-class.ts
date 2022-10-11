@@ -12,6 +12,8 @@ export class Game {
 	private	playerPaddles		: [string, PlayerPaddle][];
 	private ball 				: Ball;
 	private results 			: GameResult;
+	private _player1Serves		: Boolean;
+	private	_toServe			: Boolean;
 
 	constructor(
 			private eventEmitter		: EventEmitter2, 
@@ -25,6 +27,7 @@ export class Game {
 		this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(GameConfig.PADDLE_HEIGHT, 2)];
 		this.entities.push(this.playerPaddles[0][1], this.playerPaddles[1][1]);
 		this.ballFactory();
+		this.eventEmitter.addListener("game.player.move" + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
 		this.start();
 	};
 
@@ -39,13 +42,15 @@ export class Game {
 			payload: this.results,
 		}),
 		);
+		this.eventEmitter.removeListener("game.player.move" + this.gameID, this.setPlayerMovementState); 
 		return ;
 	}
 	// DTO for this should be
 	// TODO: Hook to frontend for user input.
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	
-	@OnEvent("game.player.move", {async: true})
+	// somehow want to listen to this event.
+	//@OnEvent("game.player.move", {async: true})
 	private setPlayerMovementState(payload: GamePlayerMoveEvent) {
 		let		playerPaddle : PlayerPaddle = payload.playerNumber === 1 ? this.playerPaddles[0][1] : this.playerPaddles[1][1];
 
@@ -82,6 +87,10 @@ export class Game {
 		if (this.playerPaddles[1][1].keyPressDown === true)
 			this.playerPaddles[1][1].pos.y -= this.playerPaddles[0][1].pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_SIZE * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 	}
+
+	/**
+	 * Moves the ball and checks for intersections with entities.
+	 */
 	private moveBall() : void {
 		// NOTE TO ME:
 		// Dont need to overcomplicate, it's 2d
@@ -96,7 +105,9 @@ export class Game {
 			
 			
 		}
+	
 	}
+
 	// Entrypoint for the game class.
 	private async start() {
 		this.loop();
@@ -105,14 +116,47 @@ export class Game {
 
 
 	/**
+	 * Checks whether a player has scored a point.
+	 */
+	private checkBallPosition() {
+		if (this.ball.pos.x >= GameConfig.BOARD_WIDTH / 2) {
+			this.player1.score += 1;
+			this._player1Serves = false;
+			this._toServe = true;
+		}
+		else if (this.ball.pos.x <= -GameConfig.BOARD_WIDTH / 2) {
+			this.player2.score += 1;
+			this._player1Serves = true;
+			this._toServe = true;
+		}
+		if (this.ball.pos.x >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.x <= -GameConfig.BOARD_HEIGHT / 2)
+			if (this.ball.velocityVector) {
+				this.ball.pos.x = this.ball.pos.x >= GameConfig.BOARD_HEIGHT / 2 ? GameConfig.BOARD_HEIGHT / 2 : -GameConfig.BOARD_HEIGHT / 2
+				this.ball.velocityVector.y *= -1;
+			}
+	}
+
+
+	private		serveBall() {
+		this._toServe = false;
+		[this.ball.pos.x, this.ball.pos.y] = [0, 0];
+		if (this.ball.velocityVector) 
+			[this.ball.velocityVector.x, this.ball.velocityVector.y] = [this._player1Serves === true ? 1 : -1, 0];
+	}
+	
+	/**
 	 * Every tic for the game should be one gameLoop.
 	 * every 1/30th of a second.
 	 */
 	private  loop() {
 		let loopState : Boolean = true;
-		let	player1Serves : Boolean = true;
 	
 		while (loopState === true) {
+			if (this._toServe === true)
+				this.serveBall();
+			this.movePlayer(); // not sure about order of moveplayer & ball yet.
+			this.moveBall();
+			this.checkBallPosition();
 			/*
 				steps :
 				1. Serve the ball if neccessary. Or move ball.
@@ -126,20 +170,21 @@ export class Game {
 			// TODO: Move the paddles. (Should be handled by an event handler), have to make sure to not interfere with the ball calculation.
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
 			//this.moveBall(); should also serve
-			this.movePlayer();
 			this.eventEmitter.emit('game.frameUpdate', 
 			new GameFrameUpdateEvent({
 			gameID:	 this.gameID,
 			payload: this.entities,
 		}),
 		);
+		if (this.player1.score === 11 || this.player2.score === 11)
+			loopState = false;
 		}
 		// sets the game result.
 		this.results = {
-			player1: this.player1,
-			player2: this.player2,
-			gameID: this.gameID,
-			winnerUID : this.player1.score > this.player2.score ? this.player1.uid : this.player2.uid,
+			player1		: this.player1,
+			player2		: this.player2,
+			gameID		: this.gameID,
+			winnerUID 	: this.player1.score > this.player2.score ? this.player1.uid : this.player2.uid,
 		};
 	}
 	// ------------------------------------------------------------------
@@ -153,17 +198,8 @@ export class Game {
 		]);
 		ballFactoryMap.get(this.gameMode)?.();
 	}
-	private createDefaultBall() : void{
-		this.ball.color.setColors(211, 211, 211);
+	private createDefaultBall() : void {
+		this.ball = new Ball(); // probably do not need to create a new one here?
+		this.entities.push(this.ball);
 	}
 }
-
-/*
- Events to keep track of and to document :
-
- game.frameUpdate
- game.ended
- game.player.move
- TODO: write those events:
--	game.entity.move
- */

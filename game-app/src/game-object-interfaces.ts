@@ -34,6 +34,7 @@ export abstract class Entity {
 	protected 	_pos 				: Vec2;
 	protected	_velocityVector? 	: Vec2;
 	private		_type 				: string;
+	private		_radius				: number;
 
 	/**
 	 * Type of the object.
@@ -47,6 +48,8 @@ export abstract class Entity {
 	// Getters
 	get pos() { return (this._pos); }
 	get type() { return (this._type); }
+	get radius() { return (this._radius); }
+
 	/** 
 	 * @return Take care for the return value, can be undefined.
 	 */
@@ -56,19 +59,38 @@ export abstract class Entity {
 	// Setters
 	set velocityVector(newVelocityVector : Vec2 | undefined) { this._velocityVector = newVelocityVector instanceof Vec2 ? new Vec2(newVelocityVector.x, newVelocityVector.y) : undefined; }
 	set pos(newPos : Vec2) { this._pos = newPos; }
+	set radius(radius : number) { this._radius = radius; }
+
 }
 
 /**
  * The ball object for the pong game.
+ * Creates a DEFAULT ball. As specified in the GameConfig
+ * With the Color set to silver.
  */
 export class Ball extends Entity {
-	color : Color;
+	private _color : Color;
+	//private _radius	: number;
+	private _speed : number;
+
 	constructor () {
 		super("ball");
-		this.color = new Color(211, 211, 211);
-		this.velocityVector = new Vec2(-1, 0);
+		this._color = new Color(211, 211, 211);
+		this.velocityVector = new Vec2(1, 0);
 		[this.pos.x, this.pos.y] = [0, 0];
+		this.radius = GameConfig.DEFAULT_BALL_RADIUS;
+		this.speed = GameConfig.DEFAULT_BALL_SPEED;
 	}
+
+	get color() {return this._color;};
+	//get radius() {return this._radius;};
+	get speed() {return this._speed;};
+
+
+	set color(color : Color) {this._color = color;};
+	//set radius(radius : number) {this._radius = radius;};
+	set speed(speed : number) {this.speed = speed;};
+
 }
 
 /**
@@ -80,7 +102,7 @@ export class PlayerPaddle extends Entity {
 
 	constructor(private _height : number, _playerNumber : number) {
 		super('player_paddle');
-		[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT * 0.5, _playerNumber == 1 ? 0 : GameConfig.BOARD_WIDTH];
+		[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
 	}
 
