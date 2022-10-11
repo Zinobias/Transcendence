@@ -16,7 +16,7 @@
 }
 
 .input__box:focus {
-    box-shadow: 0 0 10px 2000px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px 2000px rgba(0, 0, 0, 0.2);
     outline: none;
 }
 
@@ -29,9 +29,10 @@
     right: 0;
     border: none;
     font-size: 15px;
-    background-color: #712745;
+    background-color: #dbb2c1;
     color: white;
     transition: 0.2 all;
+    cursor: pointer;
 }
 
 .input__submit:hover {
@@ -64,6 +65,18 @@
     padding: 5px;
     border: none;
     font-size: 20px;
+}
+  
+.todos__single--input {
+    flex: 1;
+    color: #7d7d7d;
+    padding: 3px;
+    border: none;
+    font-size: 15px;
+}
+
+.todos__single--input:focus {
+    outline: none;
 }
 
 .icon {
