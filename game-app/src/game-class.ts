@@ -119,17 +119,17 @@ export class Game {
 	 * Checks whether a player has scored a point.
 	 */
 	private checkBallPosition() {
-		if (this.ball.pos.x >= GameConfig.BOARD_WIDTH / 2) {
+		if (this.ball.pos.x + this.ball.radius >= GameConfig.BOARD_WIDTH / 2) {
 			this.player1.score += 1;
 			this._player1Serves = false;
 			this._toServe = true;
 		}
-		else if (this.ball.pos.x <= -GameConfig.BOARD_WIDTH / 2) {
+		else if (this.ball.pos.x - this.ball.radius <= -GameConfig.BOARD_WIDTH / 2) {
 			this.player2.score += 1;
 			this._player1Serves = true;
 			this._toServe = true;
 		}
-		if (this.ball.pos.x >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.x <= -GameConfig.BOARD_HEIGHT / 2)
+		if (this.ball.pos.x + this.ball.radius >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.x - this.ball.radius <= -GameConfig.BOARD_HEIGHT / 2)
 			if (this.ball.velocityVector) {
 				this.ball.pos.x = this.ball.pos.x >= GameConfig.BOARD_HEIGHT / 2 ? GameConfig.BOARD_HEIGHT / 2 : -GameConfig.BOARD_HEIGHT / 2
 				this.ball.velocityVector.y *= -1;
