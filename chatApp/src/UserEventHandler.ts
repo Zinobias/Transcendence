@@ -15,7 +15,7 @@ import {Queries} from "./Database/Queries";
 import {Friend} from "./Objects/Friend";
 
 @Controller()
-export class ChannelEventHandler {
+export class UserEventHandler {
     constructor(private readonly appService: AppService) {
     }
 
@@ -26,7 +26,7 @@ export class ChannelEventHandler {
 
     @EventPattern('user_edit_name')
     userEditName(data: UserEditName) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_edit_name")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_edit_name")
         if (user == null)
             return;
         if (!data.new_name.match("[a-zA-Z0-9]{3,16}")) {
@@ -40,19 +40,20 @@ export class ChannelEventHandler {
 
     @EventPattern('user_edit_avatar')
     userEditAvatar(data: UserEditAvatar) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_edit_avatar")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_edit_avatar")
         if (user == null)
             return;
         Logger.warn("NOT IMPLEMENTED YET user_edit_avatar")
+        // return of("success").pipe();
         // user.avatar = data.new_avatar //TODO Decide avatar format
     }
 
     @EventPattern('user_block_user')
     userBlockUser(data: UserBlockUser) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_block_user")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_block_user")
         if (user == null)
             return;
-        let blockedUser: User = ChannelEventHandler.getUser(data.blocked_id, "user_block_user")
+        let blockedUser: User = UserEventHandler.getUser(data.blocked_id, "user_block_user")
         if (blockedUser == null)
             return;
 
@@ -67,10 +68,10 @@ export class ChannelEventHandler {
 
     @EventPattern('user_unblock_user')
     userUnblockUser(data: UserUnblockUser) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_unblock_user")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_unblock_user")
         if (user == null)
             return;
-        let blockedUser: User = ChannelEventHandler.getUser(data.blocked_id, "user_unblock_user")
+        let blockedUser: User = UserEventHandler.getUser(data.blocked_id, "user_unblock_user")
         if (blockedUser == null)
             return;
 
@@ -85,10 +86,10 @@ export class ChannelEventHandler {
 
     @EventPattern('user_friend_user')
     userFriendUser(data: UserFriendUser) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_friend_user")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_friend_user")
         if (user == null)
             return;
-        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_friend_user")
+        let friendUser: User = UserEventHandler.getUser(data.friend_id, "user_friend_user")
         if (friendUser == null)
             return;
 
@@ -108,10 +109,10 @@ export class ChannelEventHandler {
 
     @EventPattern('user_cancel_friend')
     userCancelFriendUser(data: UserFriendUser) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_cancel_friend")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_cancel_friend")
         if (user == null)
             return;
-        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_cancel_friend")
+        let friendUser: User = UserEventHandler.getUser(data.friend_id, "user_cancel_friend")
         if (friendUser == null)
             return;
 
@@ -127,10 +128,10 @@ export class ChannelEventHandler {
 
     @EventPattern('user_accept_friend_user')
     userAcceptFriendUser(data: UserAcceptFriendUser) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_accept_friend_user")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_accept_friend_user")
         if (user == null)
             return;
-        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_accept_friend_user")
+        let friendUser: User = UserEventHandler.getUser(data.friend_id, "user_accept_friend_user")
         if (friendUser == null)
             return;
 
@@ -147,10 +148,10 @@ export class ChannelEventHandler {
 
     @EventPattern('user_remove_friend')
     userRemoveFriend(data: UserRemoveFriend) {
-        let user: User = ChannelEventHandler.getUser(data.user_id, "user_remove_friend")
+        let user: User = UserEventHandler.getUser(data.user_id, "user_remove_friend")
         if (user == null)
             return;
-        let friendUser: User = ChannelEventHandler.getUser(data.friend_id, "user_remove_friend")
+        let friendUser: User = UserEventHandler.getUser(data.friend_id, "user_remove_friend")
         if (friendUser == null)
             return;
 
