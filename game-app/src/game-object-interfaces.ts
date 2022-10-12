@@ -1,5 +1,6 @@
 import { Vec2 } from "./vectorLib/vector-lib";
 import {GameConfig, Direction} from "./enums" ;
+import { getRandomInt } from "./utils";
 
 // Colors in R G B
 export class Color {
@@ -34,21 +35,30 @@ export abstract class Entity {
 	protected 	_pos 				: Vec2;
 	protected	_velocityVector? 	: Vec2;
 	private		_type 				: string;
-	private		_radius				: number;
+	private		_height				: number;
+	private		_width				: number;
 
 	/**
 	 * Type of the object.
 	 * @param type Type of the object, important. no case, and underscores to seperate words.
 	 */
-	constructor(type : string) {
+
+	constructor(type: string);
+	constructor(type: string, height : number, width : number);
+
+	constructor(type : string, height? : number, width? : number) {
 		this._type = type;
+		if (width && height)
+			[this._width, this._height] = [width, height];
 	}
 
 	// ------------------------------------------------------------------------------------------------
 	// Getters
 	get pos() { return (this._pos); }
 	get type() { return (this._type); }
-	get radius() { return (this._radius); }
+	get height() { return (this._height); }
+	get width() { return (this._width); }
+
 
 	/** 
 	 * @return Take care for the return value, can be undefined.
@@ -59,7 +69,9 @@ export abstract class Entity {
 	// Setters
 	set velocityVector(newVelocityVector : Vec2 | undefined) { this._velocityVector = newVelocityVector instanceof Vec2 ? new Vec2(newVelocityVector.x, newVelocityVector.y) : undefined; }
 	set pos(newPos : Vec2) { this._pos = newPos; }
-	set radius(radius : number) { this._radius = radius; }
+	set height(height : number) { this._height = this.height; }
+	set width(width : number) { this._width = this.width; }
+
 
 }
 
@@ -78,8 +90,9 @@ export class Ball extends Entity {
 		this._color = new Color(211, 211, 211);
 		this.velocityVector = new Vec2(1, 0);
 		[this.pos.x, this.pos.y] = [0, 0];
-		this.radius = GameConfig.DEFAULT_BALL_RADIUS;
-		this.speed = GameConfig.DEFAULT_BALL_SPEED;
+		this.height = GameConfig.DEFAULT_BALL_RADIUS;
+		this.width = GameConfig.DEFAULT_BALL_RADIUS;
+		//this.speed = GameConfig.DEFAULT_BALL_SPEED;
 	}
 
 	get color() {return this._color;};
@@ -100,15 +113,22 @@ export class PlayerPaddle extends Entity {
 	private	_keyPressUp 	: boolean;
 	private	_keyPressDown 	: boolean;
 
-	constructor(private _height : number, _playerNumber : number) {
+	constructor(_playerNumber : number) {
 		super('player_paddle');
-		[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
+		//[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
+		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2, -GameConfig.PADDLE_WIDTH / 2];
+		[this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
+		this.onHit = (ball : Ball ) => {
+			if (ball.velocityVector) {
+				ball.velocityVector.x *= -1.3;
+				ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, GameConfig.BOARD_HEIGHT / 2);
+			}
+		}
 	}
 
 	// ------------------------------------------------------------------------------------------------
 	// Getters
-	get height() { return (this._height); }
 	get keyPressUp() { return this._keyPressUp;}
 	get keyPressDown() { return this._keyPressDown;}
 

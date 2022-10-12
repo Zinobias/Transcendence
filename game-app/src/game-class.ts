@@ -23,8 +23,8 @@ export class Game {
 		) {
 		[this.player1.uid, this.player2.uid] = [ PlayersUIDs[0], PlayersUIDs[1]];
 		[this.player1.score, this.player2.score] = [0, 0];
-		this.playerPaddles[0] = [this.player1.uid, new PlayerPaddle(GameConfig.PADDLE_HEIGHT, 1)];
-		this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(GameConfig.PADDLE_HEIGHT, 2)];
+		this.playerPaddles[0] = [this.player1.uid, new PlayerPaddle(1)];
+		this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(2)];
 		this.entities.push(this.playerPaddles[0][1], this.playerPaddles[1][1]);
 		this.ballFactory();
 		this.eventEmitter.addListener("game.player.move" + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
@@ -95,19 +95,21 @@ export class Game {
 		// NOTE TO ME:
 		// Dont need to overcomplicate, it's 2d
 		// Just compare x & y
+		//if (this.ball.velocityVector) {
+		//	let	newPos : Vec2 = new Vec2(this.ball.pos.x + this.ball.velocityVector?.x, this.ball.pos.y + this.ball.velocityVector?.y);
+		//	let dotProduct = Vec2.getDotProduct(newPos, this.playerPaddles[0][1].pos);
+		//	if (dotProduct) {
+
+		//	}
+		//	dotProduct = Vec2.getDotProduct(newPos, this.playerPaddles[1][1].pos);
+			
+			
+		//}
 		if (this.ball.velocityVector) {
-			let	newPos : Vec2 = new Vec2(this.ball.pos.x + this.ball.velocityVector?.x, this.ball.pos.y + this.ball.velocityVector?.y);
-			let dotProduct = Vec2.getDotProduct(newPos, this.playerPaddles[0][1].pos);
-			if (dotProduct) {
-
-			}
-			dotProduct = Vec2.getDotProduct(newPos, this.playerPaddles[1][1].pos);
-			
-			
+			this.ball.pos.x += this.ball.velocityVector?.x;
+			this.ball.pos.y += this.ball.velocityVector?.y;
 		}
-	
 	}
-
 	// Entrypoint for the game class.
 	private async start() {
 		this.loop();
@@ -118,20 +120,22 @@ export class Game {
 	/**
 	 * Checks whether a player has scored a point.
 	 */
+
 	private checkBallPosition() {
-		if (this.ball.pos.x + this.ball.radius >= GameConfig.BOARD_WIDTH / 2) {
+		if (this.ball.pos.x + this.ball.width / 2 >= GameConfig.BOARD_WIDTH / 2) {
 			this.player1.score += 1;
 			this._player1Serves = false;
 			this._toServe = true;
 		}
-		else if (this.ball.pos.x - this.ball.radius <= -GameConfig.BOARD_WIDTH / 2) {
+		else if (this.ball.pos.x - this.ball.width / 2 <= -GameConfig.BOARD_WIDTH / 2) {
 			this.player2.score += 1;
 			this._player1Serves = true;
 			this._toServe = true;
 		}
-		if (this.ball.pos.x + this.ball.radius >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.x - this.ball.radius <= -GameConfig.BOARD_HEIGHT / 2)
+
+		if (this.ball.pos.y + this.ball.height / 2 >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.y - this.ball.height / 2 <= -GameConfig.BOARD_HEIGHT / 2)
 			if (this.ball.velocityVector) {
-				this.ball.pos.x = this.ball.pos.x >= GameConfig.BOARD_HEIGHT / 2 ? GameConfig.BOARD_HEIGHT / 2 : -GameConfig.BOARD_HEIGHT / 2
+				this.ball.pos.x = this.ball.pos.x >= GameConfig.BOARD_HEIGHT / 2 ? -(this.ball.height / 2) + GameConfig.BOARD_HEIGHT / 2 : (this.ball.height / 2) - (GameConfig.BOARD_HEIGHT / 2)
 				this.ball.velocityVector.y *= -1;
 			}
 	}
@@ -145,8 +149,35 @@ export class Game {
 	}
 	
 	/**
-	 * Every tic for the game should be one gameLoop.
-	 * every 1/30th of a second.
+	 * 
+	 * @param rect2 rectangle to compare the ball with.
+	 * @returns True if a collision occurs.
+	 */
+	private	checkBallHit(rect2 : Entity ) : Boolean {
+		if (
+			this.ball.pos.x - this.ball.width 	/ 2	<= rect2.pos.x + rect2.width  / 2 	&& 	
+			this.ball.pos.x + this.ball.width 	/ 2 >= rect2.pos.x - rect2.width  / 2 	&& 	
+			this.ball.pos.y - this.ball.height 	/ 2 <= rect2.pos.y + rect2.height / 2 	&& 
+			this.ball.pos.y + this.ball.height 	/ 2 >= rect2.pos.y - rect2.height / 2)	
+			return true;
+		else
+			return (false);
+	}
+
+	/**
+	 * Goes through all entities to see if they collide with the ball.
+	 * on collission calls the corresponding onhit method of the Entity class.
+	 */
+	private checkIntersections() {
+		for (var entity of this.entities) {
+			if (this.checkBallHit(entity) === true)
+				if (entity.onHit)
+					entity.onHit(this.ball);
+		}
+	}
+
+	/**
+	 * Basic gameloop.
 	 */
 	private  loop() {
 		let loopState : Boolean = true;
@@ -154,9 +185,10 @@ export class Game {
 		while (loopState === true) {
 			if (this._toServe === true)
 				this.serveBall();
-			this.movePlayer(); // not sure about order of moveplayer & ball yet.
-			this.moveBall();
-			this.checkBallPosition();
+			this.movePlayer(); // first thing to do, handle player input.
+			this.moveBall(); // move ball
+			this.checkIntersections(); // checks for intersections.
+			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
 			/*
 				steps :
 				1. Serve the ball if neccessary. Or move ball.
