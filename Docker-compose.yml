@@ -8,7 +8,7 @@ services:
 
   chat_app:
     container_name: chat
-    build: chatApp
+    build: chat-app
 
 #  game_app:
 #    container_name: game_app
