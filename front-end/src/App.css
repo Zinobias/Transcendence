@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
+
+.App {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #dbb2c1;
+  font-family: 'Silkscreen', cursive;
+}
+
+.heading {
+  color: white;
+  text-transform: uppercase;
+  font-size: 50px;
+  margin: 30px 0;
+  z-index: 1;
+  text-align: center;
+  font-weight: bold;
+  /*
+  animation: disco 1s linear infinite;
+  animation-timing-function: ease-in-out;
+  */
+}
+
+.spin-test {
+  width: 100px;
+  height: 100px;
+  background-color: #0CB1C4;
+}
+
+/* @media rule to include a block of CSS properties only if a certain condition is true. */
+
+@media (max-width: 880px) {
+  .heading {
+    margin: 15px 0;
+    font-size: 35px;
+  }
+}
+
+/*
+The prefers-reduced-motion CSS media feature is used to detect if the user has requested that 
+the system minimize the amount of non-essential motion it uses.
+
+no-preference -> indicates that the user has made no preference known to the system.
+
+reduce -> indicates that user has notified the system that they prefer an interface 
+that removes or replaces the types of motion-based animation that trigger discomfort 
+for those with vestibular motion disorders.
+*/
+
+@media (prefers-reduced-motion: no-preference) {
+  .spin-test {
+    animation: test-animation infinite 20s linear;
+  }
+}
+
+/*
+  The @keyframes CSS at-rule controls the intermediate steps in a CSS animation sequence 
+  by defining styles for keyframes (or waypoints) along the animation sequence. 
+  This gives more control over the intermediate steps of the animation sequence than transitions.
+*/
+
+@keyframes test-animation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes disco {
+  0%{
+    color:#9400D3;
+  }
+  
+  20%{
+    color:#0000FF;
+  }
+  
+  40%{
+    color:#00FF00;
+  }
+  
+  60%{
+    color:#FFF000;
+  }
+  
+  80%{
+    color:#FF7F00;
+  }
+  
+  100%{
+    color:#FF0000;
+  }
+}
