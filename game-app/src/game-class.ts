@@ -198,10 +198,7 @@ export class Game {
 				5. loop.
 				
 			*/
-			// TODO: Calculate new ball position, and check for intersections. If intersecting, call onHit of the intersected entity.
-			// TODO: Move the paddles. (Should be handled by an event handler), have to make sure to not interfere with the ball calculation.
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
-			//this.moveBall(); should also serve
 			this.eventEmitter.emit('game.frameUpdate', 
 			new GameFrameUpdateEvent({
 			gameID:	 this.gameID,
