@@ -1,13 +1,27 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
+import socketIOClient from "socket.io-client";
 import './App.css';
 import { Link} from 'react-router-dom';
 import LinkButton from './components/LinkButton';
 import Task from './components/DiscoPong';
 import DiscoPong from './components/DiscoPong';
 
+
+const ENDPOINT = "http://chat-app:8080";
+
 const App: React.FC = () => {
 
   const [myBool, setmyBool] = useState(true);
+  const [response, setResponse] = useState("");
+
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT);
+    socket.on("msgToClient", data => {
+      socket.emit("msgToServer", "test");
+      console.log(data);
+      setResponse(data);
+    });
+  }, []);
 
   function toggleBool() {
     setmyBool(!myBool)

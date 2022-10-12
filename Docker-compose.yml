@@ -1,10 +1,10 @@
 version: "3.8"
 services:
-#  frontend:
-#    container_name: front_end
-#    build: frontEnd
-#    ports:
-#      - "${PORT}:${PORT}"
+ frontend:
+   container_name: front_end
+   build: frontEnd
+   ports:
+     - "${PORT}:${PORT}"
 
   chat_app:
     container_name: chat
