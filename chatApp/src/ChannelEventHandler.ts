@@ -19,7 +19,6 @@ import {SettingType} from "./Enums/SettingType";
 @Controller()
 export class ChannelEventHandler {
   constructor(private readonly appService: AppService) {}
-
   @EventPattern('channel_create')
   channelCreate(data: ChannelCreate) {
     let channel: Channel;
