@@ -1,28 +1,98 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 
-.App {
+/*
+  SOME NOTES
+  background-color: #dbb2c1; -->  PINK
+*/
+
+/*
+  GENERAL TEXT STYLES
+*/
+
+.app {
   width: 100vw;
   height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #dbb2c1;
+  background-color: #646464;
   font-family: 'Silkscreen', cursive;
 }
 
+.app__text {
+  padding: 5px;
+}
+
 .heading {
-  color: white;
   text-transform: uppercase;
   font-size: 50px;
   margin: 30px 0;
   z-index: 1;
   text-align: center;
   font-weight: bold;
-  /*
+  text-shadow:  1px 1px 0px #CE5937,
+                2px 2px 0px #5dce64;
+}
+
+.discoheading {
+  text-transform: uppercase;
+  font-size: 50px;
+  margin: 30px 0;
+  z-index: 1;
+  text-align: center;
+  font-weight: bold;
   animation: disco 1s linear infinite;
   animation-timing-function: ease-in-out;
-  */
 }
+
+/*
+  NAVIATION MENU STYLES
+*/
+
+#nav {
+  width:60%;
+  border: 2px solid black;
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  font-family: 'Silkscreen', cursive;
+  color: black;
+  text-shadow:  1px 1px 0px #CE5937,
+                2px 2px 0px #5dce64;
+}
+
+#nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+    min-width: 200px;
+}
+
+#nav ul li {
+  display: inline-block;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+#nav ul li:hover a {
+  transform: scale(1.2);
+}
+
+
+#nav ul li a, visited {
+    display: inline-block;
+    color: black;
+    text-decoration: none;
+}
+
+/*
+  MEDIA AND ANIMATION STUFF
+*/
 
 .spin-test {
   width: 100px;
@@ -31,6 +101,7 @@
 }
 
 /* @media rule to include a block of CSS properties only if a certain condition is true. */
+
 
 @media (max-width: 880px) {
   .heading {

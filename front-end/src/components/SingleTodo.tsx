@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Todo } from "../interfaces";
 import { AiFillEdit, AiFillDelete } from 'react-icons/ai'
-import "./components.css"
+import './Taskify.css';
 
 
 interface Props {

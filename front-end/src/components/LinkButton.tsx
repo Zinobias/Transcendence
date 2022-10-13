@@ -1,13 +1,16 @@
 
 import React from 'react'
 import { Routes, Route } from 'react-router-dom';
-import Task from './DiscoPong'
-import App from '../App'
+import Chat from './Chat'
+import Profile from './Profile'
+import Game from './Game'
 
 const LinkButton: React.FC  = () => {
     return (
         <Routes>
-            <Route path='/task' element={<Task />} />
+            <Route path='/chat' element={<Chat />} />
+            <Route path='/profile' element={<Profile />} />
+            <Route path='/game' element={<Game />} />
       </Routes>
     )
 };
