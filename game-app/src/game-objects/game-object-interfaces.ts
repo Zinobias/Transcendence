@@ -1,6 +1,6 @@
-import { Vec2 } from "./vectorLib/vector-lib";
-import {GameConfig, Direction} from "./enums" ;
-import { getRandomInt } from "./utils";
+import { Vec2 } from "../vectorLib/vector-lib";
+import {GameConfig, Direction} from "../enums" ;
+import { getRandomInt } from "../utils";
 
 // Colors in R G B
 export class Color {
@@ -158,96 +158,9 @@ export interface GameResult {
 	winnerUID			:	string;
 }
 
-
-/**
- * object for the gameEndedEvent
- */
-export interface GameEndedData {
-	gameID : number;
-	payload : GameResult;
-}
-
-/**
- * Event for when a game has 
- */
-export class GameEndedEvent {
-	constructor(gameEndedData : GameEndedData){
-		this._gameID = gameEndedData.gameID;
-		this._payload = gameEndedData.payload;
-	};
-	private _gameID: number;
-	private _payload: GameResult;
-
-	// ------------------------------------------------------------------------------------------------
-	// Getters
-	get	gameID() { return (this._gameID); }
-	get	payload() { return (this._payload); }
-
-}
-
-// TODO: might change the constructor(s) for the events..
-
-/**
- * object for the gameFrameUpdate event
- */
-export interface GameFrameData {
-	gameID : number;
-	payload : Entity[];
-}
-
-export class GameFrameUpdateEvent {
-
-	/**
-	 * 
-	 * @param frameData Objects interface 
-	 * @gameFrameData gameFrameData {
-	 * 	gameID : number;
-	 * 	payload : Entity[]; }
-	 */
-	constructor(frameData : GameFrameData){
-		this._gameID = frameData.gameID;
-		this._payload = frameData.payload;
-	};
-	private _gameID: number;
-	private _payload: Entity[];
-
-	// ------------------------------------------------------------------------------------------------
-	// Getters
-	get	gameID() { return (this._gameID); }
-	get	payload() { return (this._payload); }
-
-}
-
-interface MoveStateData {
-	readonly playerNumber : number;
-	readonly newState : MoveStatePaddle;
-}
-
 export enum MoveStatePaddle {
 	keyPressUp = 0,
 	keyReleaseUp = 1,
 	keyPressDown = 2,
 	keyReleaseDown = 3,
-}
-export class GamePlayerMoveEvent {
-
-	/**
-	 * 
-	 * @param moveStateData Objects interface 
-	 * @gameFrameData gameFrameData {
-	 * 	playerNumber : number;
-	 * 	newState : number; }
-	 */
-	constructor(moveStateData : MoveStateData){
-		this._playerNumber = moveStateData.playerNumber;
-		this._newState = moveStateData.newState;
-	};
-	private _playerNumber	: number;
-	private _newState		: number;
-
-	// ------------------------------------------------------------------------------------------------
-	// Getters
-	get	playerNumber() { return (this._playerNumber); }
-	get	newState() { return (this._newState); }
-
 }

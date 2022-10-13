@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { OnEvent } from '@nestjs/event-emitter';
 import { Payload } from '@nestjs/microservices';
-import supertest from 'supertest';
 import { AppService } from './app.service';
 import { createGameDTO } from './dto/dto';
-import { Game } from './game-class';
-import { GameFrameUpdateEvent } from './game-object-interfaces';
+import { GameFrameUpdateEvent } from './event-objects/events.objects';
 
 @Controller()
 export class AppController {

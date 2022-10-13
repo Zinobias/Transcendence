@@ -1,8 +1,7 @@
-import { PlayerData, Entity, Ball , GameResult, GameEndedEvent, PlayerPaddle, GameFrameUpdateEvent, GamePlayerMoveEvent, MoveStatePaddle} from "./game-object-interfaces";
+import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle} from "./game-objects/game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-import { Vec2 } from "./vectorLib/vector-lib";
 import {GameConfig, Direction} from "./enums" ;
-import { HttpException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedEvent } from "./event-objects/events.objects";
 
 
 export class Game {
