@@ -79,13 +79,13 @@ export class Game {
 	 */	
 	private movePlayer() : void {
 		if (this.playerPaddles[0][1].keyPressUp === true)
-			this.playerPaddles[0][1].pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0][1].pos.y + (GameConfig.PADDLE_SIZE * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[0][1].pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0][1].pos.y + (GameConfig.PADDLE_HEIGHT * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[0][1].keyPressDown === true)
-			this.playerPaddles[0][1].pos.y -= this.playerPaddles[0][1].pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_SIZE * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[0][1].pos.y -= this.playerPaddles[0][1].pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[1][1].keyPressUp === true)
-			this.playerPaddles[1][1].pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0][1].pos.y + (GameConfig.PADDLE_SIZE * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1][1].pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0][1].pos.y + (GameConfig.PADDLE_HEIGHT * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[1][1].keyPressDown === true)
-			this.playerPaddles[1][1].pos.y -= this.playerPaddles[0][1].pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_SIZE * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1][1].pos.y -= this.playerPaddles[0][1].pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 	}
 
 	/**
@@ -155,10 +155,10 @@ export class Game {
 	 */
 	private	checkBallHit(rect2 : Entity ) : Boolean {
 		if (
-			this.ball.pos.x - this.ball.width 	/ 2	<= rect2.pos.x + rect2.width  / 2 	&& 	
-			this.ball.pos.x + this.ball.width 	/ 2 >= rect2.pos.x - rect2.width  / 2 	&& 	
-			this.ball.pos.y - this.ball.height 	/ 2 <= rect2.pos.y + rect2.height / 2 	&& 
-			this.ball.pos.y + this.ball.height 	/ 2 >= rect2.pos.y - rect2.height / 2)	
+			!(this.ball.pos.x - this.ball.width 	/ 2	>= rect2.pos.x + rect2.width  / 2) 	&& 	
+			!(this.ball.pos.x + this.ball.width 	/ 2 <= rect2.pos.x - rect2.width  / 2) 	&& 	
+			!(this.ball.pos.y - this.ball.height 	/ 2 >= rect2.pos.y + rect2.height / 2) 	&& 
+			!(this.ball.pos.y + this.ball.height 	/ 2 <= rect2.pos.y - rect2.height / 2))	
 			return true;
 		else
 			return (false);
