@@ -2,7 +2,7 @@ import { PlayerData, Entity, Ball , GameResult, GameEndedEvent, PlayerPaddle, Ga
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { Vec2 } from "./vectorLib/vector-lib";
 import {GameConfig, Direction} from "./enums" ;
-import { HttpException, InternalServerErrorException } from "@nestjs/common";
+import { HttpException, Injectable, InternalServerErrorException } from "@nestjs/common";
 
 
 export class Game {

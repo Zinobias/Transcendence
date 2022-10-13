@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
+import { Game } from './game-class';
 
 @Module({
   imports: [
