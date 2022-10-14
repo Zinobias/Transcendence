@@ -19,5 +19,4 @@ RUN npm install react-scripts@3.4.1 -g
 
 # Installed all dependencies, now we copy over the sourcecode
 COPY . .
-EXPOSE 3000 8080
 CMD ["npm", "start"]

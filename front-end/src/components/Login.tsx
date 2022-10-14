@@ -16,7 +16,7 @@ const   Login: React.FC<Props> = ({setmyBool}) => {
     
     return (
         <> 
-            <span className="heading">Disco Pong</span>
+            <span className="dheading">Disco Pong</span>
             <form className="loginform">
                 <label className="loginform__label">Email</label>
                 <input type="text" placeholder="email" className="loginform__input"/>
