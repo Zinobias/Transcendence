@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from 'react';
+import React, { ReactNode, useState, useEffect, useContext } from 'react';
 import socketIOClient from "socket.io-client";
 import './App.css';
 import Login from './components/Login';
@@ -10,15 +10,14 @@ const ENDPOINT = "http://localhost:8080";
 const App: React.FC = () => {
 
   const [myBool, setmyBool] = useState<boolean>(true);
-  const [response, setResponse] = useState("");
-
-  //console.log("test");
-  // const socket = socketIOClient(ENDPOINT);
-  // socket.emit("msgToServer", "test");
-  // socket.on("msgToClient",data => {
-  //   console.log(data);
-  //   setResponse(data);
-  // });
+  const socket = useContext(SocketContext);
+  
+  //strict mode makes useEffect fire twice in developer mode
+  useEffect(() => {
+	  socket.on("msgToClient", data => {
+		  console.log(data + "client");
+	  });
+  }, [])
 
   return (
     <SocketContext.Provider value={socket}>
