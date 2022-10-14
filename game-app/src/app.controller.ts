@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { AppService } from './app.service';
 import { createGameDTO } from './dto/dto';
 import { GameFrameUpdateEvent } from './event-objects/events.objects';
@@ -8,7 +8,6 @@ import { GameFrameUpdateEvent } from './event-objects/events.objects';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
-
 
   @Post('/createGame')
   async createGameInstance(@Body() DTO : createGameDTO ) {

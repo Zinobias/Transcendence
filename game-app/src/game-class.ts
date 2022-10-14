@@ -27,7 +27,7 @@ export class Game {
 		this.entities.push(this.playerPaddles[0][1], this.playerPaddles[1][1]);
 		this.ballFactory();
 		this.eventEmitter.addListener("game.player.move" + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
-		this.start();
+		this.start(); // prob put this in the calling function.
 	};
 
 	private gameFinishedHandler() {
@@ -178,9 +178,10 @@ export class Game {
 	/**
 	 * Basic gameloop.
 	 */
-	private  loop() {
+	private async loop() {
 		let loopState : Boolean = true;
 		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+		
 
 		while (loopState === true) {
 			if (this._toServe === true)
@@ -205,7 +206,7 @@ export class Game {
 				payload: this.entities,
 			}),
 			);
-			sleep(3.33);
+			await sleep(3.33);
 			if (this.player1.score === 11 || this.player2.score === 11)
 				loopState = false;
 		}
