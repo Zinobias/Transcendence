@@ -21,7 +21,7 @@ import { SettingType } from './Enums/SettingType';
 export class ChannelEventHandler {
   @EventPattern('channel_create')
   channelCreate(data: ChannelCreate) {
-	console.log("testing debug etc");
+    console.log('testing debug etc');
     const user: User = ChannelEventHandler.getUser(
       data.creator_id,
       'channel_create',
@@ -231,7 +231,7 @@ export class ChannelEventHandler {
 
   //EZ ERRORS:
 
-  private static getChannel(channelId: number, source: string): Channel {
+  public static getChannel(channelId: number, source: string): Channel {
     const channel: Channel = Channel.getChannel(channelId);
     if (channel == null) {
       Logger.warn(
@@ -242,7 +242,7 @@ export class ChannelEventHandler {
     return channel;
   }
 
-  private static getUser(userId: number, source: string): User {
+  public static getUser(userId: number, source: string): User {
     const user: User = User.getUser(userId);
     if (user == null) {
       Logger.warn('Received invalid user id [' + userId + '] from ' + source);
@@ -259,7 +259,7 @@ export class ChannelEventHandler {
    * @param invert if this check should be inverted
    * @private
    */
-  private static userInChannel(
+  public static userInChannel(
     channel: Channel,
     userId: number,
     source: string,
@@ -282,7 +282,7 @@ export class ChannelEventHandler {
     return false;
   }
 
-  private static notAdmin(
+  public static notAdmin(
     channel: Channel,
     actorId: number,
     source: string,
@@ -299,7 +299,7 @@ export class ChannelEventHandler {
     return false;
   }
 
-  private static notOwner(
+  public static notOwner(
     channel: Channel,
     actorId: number,
     source: string,

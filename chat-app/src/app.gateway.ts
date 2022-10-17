@@ -12,7 +12,16 @@ import { ChannelEventHandler } from './ChannelEventHandler';
 import { Channel } from './Objects/Channel';
 import { Queries } from './Database/Queries';
 import { SettingType } from './Enums/SettingType';
-import { ChannelCreate, ChannelJoin, ChannelLeave, ChannelPromote, ChannelDemote, ChannelKick, ChannelBan, ChannelDisband } from './Events/ChannelEvents';
+import {
+  ChannelCreate,
+  ChannelJoin,
+  ChannelLeave,
+  ChannelPromote,
+  ChannelDemote,
+  ChannelKick,
+  ChannelBan,
+  ChannelDisband,
+} from './Events/ChannelEvents';
 import { Setting } from './Objects/Setting';
 import { User } from './Objects/User';
 
@@ -47,7 +56,7 @@ export class AppGateway
 
   @SubscribeMessage('channel_create')
   channelCreate(data: ChannelCreate) {
-	console.log("testing debug etc");
+    console.log('testing debug etc');
     const user: User = ChannelEventHandler.getUser(
       data.creator_id,
       'channel_create',
@@ -341,6 +350,4 @@ export class AppGateway
     }
     return false;
   }
-  
 }
-
