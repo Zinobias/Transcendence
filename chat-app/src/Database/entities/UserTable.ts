@@ -2,6 +2,11 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity({ name: 'users' })
 export class UserTable {
+  constructor(loginId: string, userName: string) {
+    this.loginId = loginId;
+    this.userName = userName;
+  }
+
   @PrimaryGeneratedColumn()
   userId: number;
 

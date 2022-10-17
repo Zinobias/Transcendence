@@ -2,8 +2,8 @@ import { Entity, Column } from 'typeorm';
 
 @Entity({ name: 'games' })
 export class games {
-  @Column()
-  userId: number;
+  @Column()/pa
+  gameId: number;
 
   @Column()
   user1: number;

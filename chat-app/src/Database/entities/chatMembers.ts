@@ -2,9 +2,9 @@ import { Entity, Column } from 'typeorm';
 
 @Entity()
 export class ChatMembers {
-  @Column()
+  @Column()/p
   chanelId: number;
 
-  @Column()
+  @Column()/p
   userId: number;
 }

@@ -1,20 +1,29 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { Setting } from '../../Objects/Setting';
+import { SettingType } from '../../Enums/SettingType';
 
 @Entity()
 export class ChatChannelSettings {
-  @Column()
+  constructor(setting: Setting) {
+    this.chanelId = setting.channelId;
+    this.affectedUser = setting.userId;
+    this.from = setting.from;
+    this.until = setting.until;
+    this.setting = setting.setting;
+  }
+
+  @PrimaryColumn()
   chanelId: number;
 
-  @Column()
+  @PrimaryColumn()
   affectedUser: number;
 
   @Column('longtext')
-  from: string;
+  from: number;
 
   @Column('longtext')
-  until: string;
+  until: number;
 
-  @Column()
-  setting: Setting;
+  @PrimaryColumn()
+  setting: SettingType;
 }

@@ -68,7 +68,7 @@ export class UserEventHandler {
 
     if (user.hasBlocked(blockedUser)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           '] has already blocked user [' +
           blockedUser.userId +
@@ -96,7 +96,7 @@ export class UserEventHandler {
 
     if (!user.hasBlocked(blockedUser)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           "] hasn't blocked user [" +
           blockedUser.userId +
@@ -125,7 +125,7 @@ export class UserEventHandler {
     const friend = new Friend(friendUser, false);
     if (user.hasRequest(friend)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           '] is already friends with [' +
           friend.userId +
@@ -135,7 +135,7 @@ export class UserEventHandler {
     }
     if (user.isFriends(friend)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           '] is already friends with [' +
           friend.userId +
@@ -164,7 +164,7 @@ export class UserEventHandler {
     const friend = new Friend(friendUser, false);
     if (!user.hasRequest(friend)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           '] is already friends with [' +
           friend.userId +
@@ -193,7 +193,7 @@ export class UserEventHandler {
     const friend = new Friend(friendUser, false);
     if (!user.hasRequest(friend)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           '] has no active request for [' +
           friend.userId +
@@ -223,7 +223,7 @@ export class UserEventHandler {
     const friend = new Friend(friendUser, false);
     if (!user.isFriends(friend)) {
       Logger.warn(
-        'User [' +
+        'UserTable [' +
           user.userId +
           '] is already friends with [' +
           friend.userId +

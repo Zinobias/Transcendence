@@ -268,7 +268,7 @@ export class ChannelEventHandler {
   ): boolean {
     if (invert) {
       if (!channel.hasUser(userId)) {
-        Logger.warn('User [' + userId + '] should be in channel for ' + source);
+        Logger.warn('UserTable [' + userId + '] should be in channel for ' + source);
         return false;
       }
       return true;
@@ -276,7 +276,7 @@ export class ChannelEventHandler {
 
     if (channel.hasUser(userId)) {
       Logger.warn(
-        'User [' + userId + '] should not be in channel for ' + source,
+        'UserTable [' + userId + '] should not be in channel for ' + source,
       );
       return true;
     }

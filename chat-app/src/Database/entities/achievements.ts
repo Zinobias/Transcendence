@@ -2,9 +2,9 @@ import { Entity, Column } from 'typeorm';
 
 @Entity()
 export class achievements {
-  @Column()
+  @Column()/p
   userId: number;
 
-  @Column()
+  @Column()/p
   achievement: string;
 }
