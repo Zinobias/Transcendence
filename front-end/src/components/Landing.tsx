@@ -1,6 +1,6 @@
 import React from "react";
 import { Link} from 'react-router-dom';
-import LinkButton from './LinkButton';
+import LinkButton from './Routing';
 
 const Landing: React.FC = () => {
     return (

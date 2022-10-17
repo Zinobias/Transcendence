@@ -52,3 +52,19 @@
 .loginform__button:hover {
     transform: scale(1.1);
 }
+
+.chatrooms {
+    width: 60%;
+    height: 40%;
+    border: 2px solid black;
+    margin: 20px;
+    border: 2px solid black;
+}
+
+.chatwindow {
+    width: 60%;
+    height: 60%;
+    border: 2px solid black;
+    margin: 20px;
+    border: 2px solid black;
+}
