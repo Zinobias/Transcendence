@@ -21,6 +21,7 @@ import { SettingType } from './Enums/SettingType';
 export class ChannelEventHandler {
   @EventPattern('channel_create')
   channelCreate(data: ChannelCreate) {
+	console.log("testing debug etc");
     const user: User = ChannelEventHandler.getUser(
       data.creator_id,
       'channel_create',
