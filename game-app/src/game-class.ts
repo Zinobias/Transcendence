@@ -27,7 +27,7 @@ export class Game {
 		this.entities.push(this.playerPaddles[0][1], this.playerPaddles[1][1]);
 		this.ballFactory();
 		this.eventEmitter.addListener("game.player.move" + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
-		this.start();
+		this.start(); // prob put this in the calling function.
 	};
 
 	private gameFinishedHandler() {
@@ -178,9 +178,11 @@ export class Game {
 	/**
 	 * Basic gameloop.
 	 */
-	private  loop() {
+	private async loop() {
 		let loopState : Boolean = true;
-	
+		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+		
+
 		while (loopState === true) {
 			if (this._toServe === true)
 				this.serveBall();
@@ -189,23 +191,24 @@ export class Game {
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
 			/*
-				steps :
-				1. Serve the ball if neccessary. Or move ball.
-				2. Move ball & Move paddle. TODO: See which to do first.
-				3. Check for intersections.
-				4. Transmit frameData to frontend to render.
-				5. loop.
-				
+			steps :
+			1. Serve the ball if neccessary. Or move ball.
+			2. Move ball & Move paddle. TODO: See which to do first.
+			3. Check for intersections.
+			4. Transmit frameData to frontend to render.
+			5. loop.
+			
 			*/
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
 			this.eventEmitter.emit('game.frameUpdate', 
 			new GameFrameUpdateEvent({
-			gameID:	 this.gameID,
-			payload: this.entities,
-		}),
-		);
-		if (this.player1.score === 11 || this.player2.score === 11)
-			loopState = false;
+				gameID:	 this.gameID,
+				payload: this.entities,
+			}),
+			);
+			await sleep(3.33);
+			if (this.player1.score === 11 || this.player2.score === 11)
+				loopState = false;
 		}
 		// sets the game result.
 		this.results = {

@@ -5,5 +5,4 @@ WORKDIR /usr/src/app
 COPY ["package.json", "package-lock.json*", "tsconfig.json", "./"]
 RUN npm install
 COPY [".", "./"]
-EXPOSE 8080
 CMD ["npm", "start"]

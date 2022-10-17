@@ -1,14 +1,16 @@
 version: "3.8"
 services:
- frontend:
-   container_name: front_end
-   build: frontEnd
-   ports:
-     - "${PORT}:${PORT}"
+  frontend:
+    container_name: front_end
+    build: front-end
+    ports:
+      - 3000:3000
 
   chat_app:
     container_name: chat
     build: chat-app
+    ports:
+      - 8080:8080
 
 #  game_app:
 #    container_name: game_app
