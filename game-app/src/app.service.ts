@@ -5,7 +5,12 @@ import { Game } from './game-class';
 
 @Injectable()
 export class AppService {
-	private readonly eventEmitter : EventEmitter2;
+
+	/**
+	 * 
+	 * @param eventEmitter Constructor injection. Gets injected by the module.
+	 */
+	constructor(private eventEmitter : EventEmitter2) {};
 
 	/**
 	 * Will create a game instance.
