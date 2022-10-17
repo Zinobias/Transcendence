@@ -19,10 +19,8 @@ import { SettingType } from './Enums/SettingType';
 
 @Controller()
 export class ChannelEventHandler {
-  constructor(private readonly appService: AppService) {}
   @EventPattern('channel_create')
   channelCreate(data: ChannelCreate) {
-    let channel: Channel;
     const user: User = ChannelEventHandler.getUser(
       data.creator_id,
       'channel_create',
@@ -39,7 +37,7 @@ export class ChannelEventHandler {
       usersArr.push(user2);
     }
 
-    channel = new Channel(
+    const channel: Channel = new Channel(
       -1,
       data.creator_id,
       data.channel_name,

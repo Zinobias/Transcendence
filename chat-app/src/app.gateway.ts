@@ -8,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
+import { ChannelEventHandler } from './ChannelEventHandler';
 
 @WebSocketGateway({
   cors: {
@@ -27,6 +28,7 @@ export class AppGateway
 
   afterInit(server: Server) {
     this.logger.log('Init');
+    new ChannelEventHandler();
   }
 
   handleDisconnect(client: Socket) {
