@@ -1,6 +1,6 @@
 import React from "react";
-import { Link} from 'react-router-dom';
-import LinkButton from './Routing';
+import { Link } from 'react-router-dom';
+import Routing from './Routing';
 
 const Landing: React.FC = () => {
     return (
@@ -13,7 +13,7 @@ const Landing: React.FC = () => {
               <li><Link to='/chat'>Chat</Link></li>
             </ul>
           </div>
-            <LinkButton />       
+            <Routing />       
           </div>   
         </>
       );
