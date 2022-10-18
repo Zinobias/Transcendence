@@ -16,10 +16,11 @@ const Routing: React.FC  = () => {
             {/* <Route path='/discopong' element={!sessionStorage.getItem("user") ? <Login /> : <NavBar />}> */}
             <Route path='/discopong' element={<NavBar />}>   
                 <Route index element={<Leaderboard />} />
-                <Route path='chat' element={<Chat />} />
                 <Route path='leaderboard' element={<Leaderboard />} />
                 <Route path='game' element={<Game />} />
-                <Route path='chat_window' element={<ChatWindow />} />
+                <Route path='chat' element={<Chat />}>
+                    <Route path='chat_window' element={<ChatWindow />} />
+                </Route>
             </Route>
 
         </Routes>

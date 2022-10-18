@@ -7,20 +7,17 @@
 .loginform {
     display:flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
 .loginform__label {
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 1px;
 }
 
 .loginform__input {
     width:100%;
     padding:10px;
-    margin:5px;
     background: transparent;
     border: 2px solid black;
     box-sizing: border-box;
@@ -54,9 +51,8 @@
 }
 
 .chatrooms {
-    width: 60%;
-    height: 40%;
-    border: 2px solid black;
+    width: 80%;
+    height: 50%;
     margin: 20px;
     border: 2px solid black;
 }
@@ -66,5 +62,4 @@
     height: 60%;
     border: 2px solid black;
     margin: 20px;
-    border: 2px solid black;
 }

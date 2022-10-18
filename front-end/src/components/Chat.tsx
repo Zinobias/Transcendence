@@ -18,7 +18,7 @@ const   Chat: React.FC = () => {
 			channel_name: "test",
 			creator2_id: 2,
 		});
-		navigate('/chat_window');
+		navigate('chat_window');
         //socket.emit("msgToServer", "test");
     };
 
