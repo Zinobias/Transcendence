@@ -1,19 +1,28 @@
 
 import React from 'react'
 import { Routes, Route } from 'react-router-dom';
+import Login from './Login';
 import Chat from './Chat'
-import Profile from './Profile'
+import Leaderboard from './Leaderboard';
 import Game from './Game'
 import ChatWindow from './ChatWindow';
+import NavBar from './NavBar';
 
 const Routing: React.FC  = () => {
+    
     return (
         <Routes>
-            <Route path='/chat' element={<Chat />} />
-            <Route path='/profile' element={<Profile />} />
-            <Route path='/game' element={<Game />} />
-            <Route path='/chat_window' element={<ChatWindow />} />
-      </Routes>
+            <Route path='/' element={<Login />} />
+            {/* <Route path='/discopong' element={!sessionStorage.getItem("user") ? <Login /> : <NavBar />}> */}
+            <Route path='/discopong' element={<NavBar />}>   
+                <Route index element={<Leaderboard />} />
+                <Route path='chat' element={<Chat />} />
+                <Route path='leaderboard' element={<Leaderboard />} />
+                <Route path='game' element={<Game />} />
+                <Route path='chat_window' element={<ChatWindow />} />
+            </Route>
+
+        </Routes>
     )
 };
 
