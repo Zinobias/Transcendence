@@ -1,9 +1,15 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Message } from '../../Objects/Message';
 
 @Entity()
-export class chat_message {
-  @Column()/pa
-  message: number;
+export class chatMessage {
+  constructor(message: Message) {
+    this.message = message.message;
+    this.userId = message.sender;
+    this.timestamp = message.timestamp;
+  }
+  @PrimaryGeneratedColumn()
+  messageId: number;
 
   @Column()
   chanelId: number;
@@ -14,6 +20,6 @@ export class chat_message {
   @Column()
   message: string;
 
-  @Column({ type: 'timestamp' })
-  timestamp: Date;
+  @Column()
+  timestamp: number;
 }

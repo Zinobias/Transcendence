@@ -1,10 +1,14 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class ChatMembers {
-  @Column()/p
+  constructor(channelId: number, userId: number) {
+    this.chanelId = channelId;
+    this.userId = userId;
+  }
+  @PrimaryColumn()
   chanelId: number;
 
-  @Column()/p
+  @PrimaryColumn()
   userId: number;
 }
