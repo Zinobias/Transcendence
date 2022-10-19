@@ -96,6 +96,7 @@ export class Queries {
     const blocked_user_repository = myDataSource.getRepository(Blocked);
     const find_user = await blocked_user_repository.findOneBy({
       userId: userId,
+      blockId: blockedUser,
     });
     await blocked_user_repository.remove(find_user);
   }
