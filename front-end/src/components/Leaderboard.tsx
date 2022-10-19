@@ -1,11 +1,11 @@
 import React from "react";
 
-const   Profile: React.FC = () => {
+const   Leaderboard: React.FC = () => {
     return (
         <div className="app__text">
-            Profile
+            Leaderboard
         </div>
     )
 };
 
-export default Profile;
+export default Leaderboard;

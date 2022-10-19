@@ -1,7 +1,7 @@
 import React from "react";
 import { Todo } from "../interfaces";
-import './Taskify.css';
 import SingleTodo from "./SingleTodo";
+import './Taskify.css';
 
 interface Props {
     todos: Todo[];

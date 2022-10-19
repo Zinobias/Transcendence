@@ -1,31 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import '../App.css'
 import './Components.css';
-import { useAuth0 } from '@auth0/auth0-react';
 
 /*
     NOTES
-
     <input type="password" placeholder="password"/>
 */
 
-interface Props {
-    setmyBool: React.Dispatch<React.SetStateAction<boolean>>;
-}
+const   Login: React.FC = () => {
+    const [user, setUser] = useState<string>("");
+    const navigate = useNavigate();
 
-const   Login: React.FC<Props> = ({setmyBool}) => {
-    
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault()
+        // sessionStorage.setItem("user", user);
+        navigate('/discopong');
+    };
+
+    // if (sessionStorage.getItem("user")) {
+    //     navigate('/discopong');
+    // }
+
     return (
-        <> 
-            <span className="heading">Disco Pong</span>
-            <form className="loginform">
-                <label className="loginform__label">Email</label>
-                <input type="text" placeholder="email" className="loginform__input"/>
-                <label className="loginform__label">password</label>
-                <input type="text" placeholder="password" className="loginform__input"/>
-                <button className="loginform__button" onClick={() => setmyBool(false)}>LOGIN</button>
-            </form>
-        </>
+        <div className="grid-container">
+            <span className="grid__header">Disco Pong</span>      
+            <div className="grid__login">
+                <form className="loginform">
+                    <label className="loginform__label">Username</label>
+                    <input value={user} onChange={e => setUser(e.target.value)} className="loginform__input"/>
+                    <button className="loginform__button" onClick={(e) => handleLogin(e)}>LOGIN</button>
+                </form>     
+            </div>
+        </div>
       )
+
 };
 
 export default Login;
