@@ -12,7 +12,7 @@ export class chatMessage {
   messageId: number;
 
   @Column()
-  chanelId: number;
+  channelId: number;
 
   @Column()
   userId: number;

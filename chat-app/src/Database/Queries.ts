@@ -11,8 +11,6 @@ import { ChatChannels } from './entities/chatChannels';
 import { ChatChannelSettings } from './entities/chatChannelSettings';
 import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
-import { EntityTarget } from '../common/EntityTarget';
-import { find } from 'rxjs';
 import {chatMessage} from "./entities/chatMessages";
 
 export class Queries {
@@ -310,7 +308,7 @@ export class Queries {
    */
   async addChannelMessage(channelId: number, message: Message) {
     const chat = myDataSource.getRepository(chatMessage);
-    await chat.update({ chanelId: channelId }, { new chatMessage(message)});
+    await chat.update({ channelId: channelId }, { new chatMessage(message)});
   }
 
   /**
@@ -319,7 +317,7 @@ export class Queries {
    */
   getChannelMessages(channelId: number): Message[] {
     const message = myDataSource.getRepository(chatMessage);
-    const find = await message.findBy({ chanelId: channelId });
+    const find = await message.findBy({ channelId: channelId });
     const messageList: Message[] = [];
     for (const [i, result] of find.entries())
       messageList.push(new Message(result.message, result.userId, result.timestamp));
