@@ -1,15 +1,30 @@
 
-import React from 'react'
-import { Routes, Route } from 'react-router-dom';
+import React, {useContext} from 'react'
+import {Routes, Route, useParams} from 'react-router-dom';
 import Login from './Login';
 import Chat from './Chat'
 import Leaderboard from './Leaderboard';
 import Game from './Game'
 import ChatWindow from './ChatWindow';
 import NavBar from './NavBar';
-
+import {SocketContext} from "./Socket";
+export class AuthData {
+    constructor(code: string) {
+        this.code = code;
+    }
+    code: string;
+}
 const Routing: React.FC  = () => {
-    
+    const socket = useContext(SocketContext);
+    let b = window.location.href.includes("?code");
+    if (b) {
+        let number = window.location.href.lastIndexOf("code=");
+        let str = window.location.href.substring(number + 5);
+        console.log(str)
+        console.log("EMITTING")
+        socket.emit("auth", new AuthData(str))
+    }
+
     return (
         <Routes>
             <Route path='/' element={<Login />} />

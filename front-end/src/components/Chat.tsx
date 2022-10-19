@@ -14,7 +14,7 @@ const   Chat: React.FC = () => {
 		e.preventDefault()
 		console.log("click 1");
 		socket.emit("channel_create", {
-			creatoer_id: 1,
+			creator_id: 1,
 			channel_name: "test",
 			creator2_id: 2,
 		});

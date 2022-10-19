@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import {redirect, useNavigate} from 'react-router-dom';
 import '../App.css'
 import './Components.css';
 
@@ -10,12 +10,13 @@ import './Components.css';
 
 const   Login: React.FC = () => {
     const [user, setUser] = useState<string>("");
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault()
         // sessionStorage.setItem("user", user);
-        navigate('/discopong');
+        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-97cf4334b48e0666383ad5f7509c011b62e838ecb24c7b90a2b38cf2594759d7&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code'
+        // navigate('/discopong');
     };
 
     // if (sessionStorage.getItem("user")) {
