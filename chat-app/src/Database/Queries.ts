@@ -1,8 +1,17 @@
 import { Setting } from '../Objects/Setting';
 import { Channel } from '../Objects/Channel';
 import { User } from '../Objects/User';
+import { UserTable } from './entities/UserTable';
+import { Blocked } from './entities/blocked';
 import { Message } from '../Objects/Message';
 import { SettingType } from '../Enums/SettingType';
+import { myDataSource } from './DataSource';
+import { Friends } from './entities/friends';
+import { ChatChannels } from './entities/chatChannels';
+import { ChatChannelSettings } from './entities/chatChannelSettings';
+import { ChatMembers } from './entities/chatMembers';
+import { Friend } from '../Objects/Friend';
+import { chatMessage } from './entities/chatMessages';
 
 export class Queries {
   private static _instance: Queries;
@@ -20,28 +29,40 @@ export class Queries {
    * @param loginId login id for the user
    * @param userName name for the user
    */
-  addUser(loginId: string, userName: string): void {}
+  async addUser(loginId: string, userName: string) {
+    const userRepository = myDataSource.getRepository(UserTable);
+    await userRepository.save(new UserTable(loginId, userName));
+    console.log('user added');
+  }
 
   /**
    * Sets a new avatar for a user
    * @param userId user to get the avatar for
    * @param image image to store as the avatar
    */
-  setUserAvatar(userId: number, image: object): void {}
+  async setUserAvatar(userId: number, image: object) {
+    const userRepository = myDataSource.getRepository(UserTable);
+    await userRepository.update({ userId: userId }, { avatar: image });
+  }
 
   /**
    * Changes the username for a user
    * @param userId user to change the name for
    * @param newName string to set the new name to
    */
-  setUserName(userId: number, newName: string) {}
+  async setUserName(userId: number, newName: string) {
+    const userRepository = myDataSource.getRepository(UserTable);
+    await userRepository.update({ userId: userId }, { userName: newName });
+  }
 
   /**
    * Get a user from their login id
    * @param loginId login id of the user
    */
-  getUser(loginId: string): User {
-    return undefined;
+  async getUser(loginId: string): Promise<User> {
+    const userRepository = myDataSource.getRepository(UserTable);
+    const findUser = await userRepository.findOneBy({ loginId: loginId });
+    return User.getUser(findUser.userId);
   }
 
   //Blocked users table
@@ -49,8 +70,14 @@ export class Queries {
    * Get all blocked users for specified user
    * @param userId user to get blocked users for
    */
-  getBlockedUsers(userId: number): User[] {
-    return [];
+  async getBlockedUsers(userId: number): Promise<User[]> {
+    const blockUserRepository = myDataSource.getRepository(Blocked);
+    const findUser = await blockUserRepository.findBy({ userId: userId });
+    const blockedUsers: User[] = [];
+    for (const [, result] of findUser.entries()) {
+      blockedUsers.push(User.getUser(result.blockId));
+    }
+    return blockedUsers;
   }
 
   /**
@@ -58,14 +85,24 @@ export class Queries {
    * @param userId user to store the blocked user for
    * @param blockedUser blocked user
    */
-  addBlockedUser(userId: number, blockedUser: number): void {}
+  async addBlockedUser(userId: number, blockedUser: number): Promise<void> {
+    const blocked_user_repository = myDataSource.getRepository(Blocked);
+    await blocked_user_repository.save(new Blocked(userId, blockedUser));
+  }
 
   /**
    * Remove a stored blocked user
    * @param userId user to remove blocked user from
    * @param blockedUser user to remove
    */
-  removeBlockedUser(userId: number, blockedUser: number): void {}
+  async removeBlockedUser(userId: number, blockedUser: number): Promise<void> {
+    const blocked_user_repository = myDataSource.getRepository(Blocked);
+    const find_user = await blocked_user_repository.findOneBy({
+      userId: userId,
+      blockId: blockedUser,
+    });
+    await blocked_user_repository.remove(find_user);
+  }
 
   //Friends table
   /**
@@ -75,16 +112,18 @@ export class Queries {
    * @param accepted boolean indicating if it should retrieve friends, or friend requests
    *  (if accepted is true, it returns active friends, if false it returns friend requests)
    */
-  getFriends(userId: number, accepted: boolean): User[] {
-    return [];
+  async getFriends(userId: number, accepted: boolean): Promise<Friend[]> {
+    const friends = myDataSource.getRepository(Friends);
+    const find_friend = await friends.findBy({
+      userId: userId,
+      active: accepted,
+    });
+    const friendList: Friend[] = [];
+    for (const [, result] of find_friend.entries()) {
+      friendList.push(<Friend>Friend.getUser(result.userId));
+    }
+    return friendList;
   }
-
-  /**
-   * Makes friendId a friend of userId
-   * @param userId user to set as a friend
-   * @param friendId user who gets the friend added
-   */
-  setFriend(userId: number, friendId: number): void {}
 
   /**
    * Stores a friend request
@@ -92,14 +131,24 @@ export class Queries {
    * @param toUserId user that the request should be sent to
    * @param confirmed boolean indicating if the friend request was accepted
    */
-  addFriend(fromUserId: number, toUserId: number, confirmed: boolean): void {}
+  async addFriend(
+    fromUserId: number,
+    toUserId: number,
+    confirmed: boolean,
+  ): Promise<void> {
+    const friends_repository = myDataSource.getRepository(Friends);
+    await friends_repository.save(new Friends(fromUserId, toUserId, confirmed));
+  }
 
   /**
    * Remove a friend from a user
-   * @param userId User to remove the friend from
-   * @param friendId User to remove from userId's friend list
+   * @param userId UserTable to remove the friend from
+   * @param friendId UserTable to remove from userId's friend list
    */
-  removeFriend(userId: number, friendId: number): void {}
+  async removeFriend(userId: number, friendId: number): Promise<void> {
+    const friends_repository = myDataSource.getRepository(Friends);
+    await friends_repository.delete({ userId: userId, friendId: friendId });
+  }
 
   //ChatChannels table
   /**
@@ -107,43 +156,69 @@ export class Queries {
    * @param channel the channel to be created
    * returns the id of the newly created channel
    */
-  createChannel(channel: Channel): number {
-    return -1;
+  async createChannel(channel: Channel): Promise<number> {
+    const addChannel = myDataSource.getRepository(ChatChannels);
+    await addChannel.save(new ChatChannels(channel));
+    return channel.channelId;
   }
 
   /**
    * Remove a channel
    * @param channel_id channel to remove
    */
-  removeChannel(channel_id: number) {}
+  async removeChannel(channel_id: number) {
+    const channel = myDataSource.getRepository(ChatChannels);
+    await channel.delete({ channelId: channel_id });
+  }
 
   /**
    * Get active channels for a user
    * @param owner user to get channels for
    */
-  getActiveChannels(owner: number): Channel {
-    return undefined;
+  async getActiveChannels(owner: number): Promise<Channel[]> {
+    const channel = myDataSource.getRepository(ChatChannels);
+    const find_channel = await channel.findBy({
+      ownerId: owner,
+      closed: false,
+    });
+    const channelList: Channel[] = [];
+    for (const [, result] of find_channel.entries()) {
+      channelList.push(Channel.getChannel(result.channelId));
+    }
+    return channelList;
   }
 
   /**
    * Disable a channel
    * @param channelId channel to disable
    */
-  disableChannel(channelId: number): void {}
+  async disableChannel(channelId: number): Promise<void> {
+    const disable = myDataSource.getRepository(ChatChannels);
+    await disable.update({ channelId: channelId }, { closed: true });
+  }
 
   /**
    * Set the name of a channel
    * @param channelId channel to update
    * @param channelName new channel name
    */
-  setChannelName(channelId: number, channelName: string): void {}
+  async setChannelName(channelId: number, channelName: string) {
+    const setChannel = myDataSource.getRepository(ChatChannels);
+    await setChannel.update(
+      { channelId: channelId },
+      { channelName: channelName },
+    );
+  }
 
   //ChannelSettings table
   /**
    * Store a setting
    * @param setting setting to store
    */
-  addSetting(setting: Setting): void {}
+  async addSetting(setting: Setting) {
+    const set_setting = myDataSource.getRepository(ChatChannelSettings);
+    await set_setting.save(new ChatChannelSettings(setting));
+  }
 
   /**
    * Remove a setting
@@ -151,19 +226,42 @@ export class Queries {
    * @param userId user to remove setting for
    * @param settingType setting type to remove
    */
-  removeSetting(
+  async removeSetting(
     channelId: number,
     userId: number,
     settingType: SettingType,
-  ): void {}
+  ) {
+    const setting = myDataSource.getRepository(ChatChannelSettings);
+    const find = setting.findBy({
+      channelId: channelId,
+      affectedUser: userId,
+      setting: settingType,
+    });
+    await setting.remove(await find);
+  }
 
   /**
    * Get settings for a channel
    * @param channelId channel to get the settings for
    * @param userId optional user to get the settings for
    */
-  getSettings(channelId: number, userId?: number): Setting[] {
-    return [];
+  async getSettings(channelId: number, userId?: number): Promise<Channel[]> {
+    const setting = myDataSource.getRepository(ChatChannelSettings);
+    let find_setting;
+    if (userId == undefined) {
+      find_setting = await setting.findBy({
+        channelId: channelId,
+      });
+    } else {
+      find_setting = await setting.findBy({
+        channelId: channelId,
+        affectedUser: userId,
+      });
+    }
+    const channelList: Channel[] = [];
+    for (const [, result] of find_setting.entries())
+      channelList.push(Channel.getChannel(result.channelId));
+    return channelList;
   }
 
   //ChannelMembers
@@ -172,29 +270,49 @@ export class Queries {
    * @param channelId channel to add member to
    * @param userId user to add to the channel
    */
-  addChannelMember(channelId: number, userId: number): void {}
+  async addChannelMember(channelId: number, userId: number) {
+    const channel = myDataSource.getRepository(ChatMembers);
+    await channel.save(new ChatMembers(channelId, userId));
+  }
 
   /**
    * Remove a user from a channel
    * @param channelId channel to remove member from
    * @param userId user to remove from the channel
    */
-  removeChannelMember(channelId: number, userId: number): void {}
+  async removeChannelMember(channelId: number, userId: number) {
+    const channel = myDataSource.getRepository(ChatMembers);
+    const find_channel = channel.findOneBy({
+      channelId: channelId,
+      userId: userId,
+    });
+    await channel.delete(await find_channel);
+  }
 
   /**
    * Get all users in a channel
    * @param channelId channel to get users for
    */
-  getChannelMembers(channelId: number): User[] {
-    return [];
+  async getChannelMembers(channelId: number): Promise<User[]> {
+    const user = myDataSource.getRepository(ChatMembers);
+    const find = await user.findBy({ channelId: channelId });
+    const channelList: User[] = [];
+    for (const [, result] of find.entries())
+      channelList.push(User.getUser(result.userId));
+    return channelList;
   }
 
   /**
    * Get all channels a user is a member of
    * @param userId user to get channels for
    */
-  getChannels(userId: number): Channel[] {
-    return [];
+  async getChannels(userId: number): Promise<Channel[]> {
+    const user = myDataSource.getRepository(ChatMembers);
+    const find = await user.findBy({ userId: userId });
+    const channelList: Channel[] = [];
+    for (const [, result] of find.entries())
+      channelList.push(Channel.getChannel(result.channelId));
+    return channelList;
   }
 
   //ChannelMessages
@@ -203,13 +321,23 @@ export class Queries {
    * @param channelId channel to add message to
    * @param message object containing all information about the message
    */
-  addChannelMessage(channelId: number, message: Message) {}
+  async addChannelMessage(channelId: number, message: Message) {
+    const chat = myDataSource.getRepository(chatMessage);
+    await chat.insert(new chatMessage(channelId, message));
+  }
 
   /**
    * Get all messages in a channel
    * @param channelId channel to get messages from
    */
-  getChannelMessages(channelId: number): Message[] {
-    return [];
+  async getChannelMessages(channelId: number): Promise<Message[]> {
+    const message = myDataSource.getRepository(chatMessage);
+    const find = await message.findBy({ channelId: channelId });
+    const messageList: Message[] = [];
+    for (const [, result] of find.entries())
+      messageList.push(
+        new Message(result.message, result.userId, result.timestamp),
+      );
+    return messageList;
   }
 }
