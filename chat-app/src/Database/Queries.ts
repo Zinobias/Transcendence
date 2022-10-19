@@ -40,7 +40,10 @@ export class Queries {
    * @param userId user to get the avatar for
    * @param image image to store as the avatar
    */
-  setUserAvatar(userId: number, image: object): void {}
+  async setUserAvatar(userId: number, image: object) {
+    const userRepository = myDataSource.getRepository(UserTable);
+    await userRepository.update({ userId: userId }, { avatar: image });
+  }
 
   /**
    * Changes the username for a user
