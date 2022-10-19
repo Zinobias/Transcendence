@@ -4,22 +4,22 @@ import { Channel } from '../../Objects/Channel';
 @Entity()
 export class ChatChannels {
   constructor(channel: Channel) {
-    this.chanelId = channel.channelId;
+    this.channelId = channel.channelId;
     this.ownerId = channel.owner;
     this.owner2id = channel.otherOwner;
-    this.chanelName = channel.channelName;
+    this.channelName = channel.channelName;
   }
   @PrimaryGeneratedColumn()
-  chanelId: number;
+  channelId: number;
 
-  @Column()
+  @Column() //TODO: needs to be a foreign key
   ownerId: number;
 
-  @Column()
+  @Column() //TODO: needs to be a foreign key and nullable
   owner2id: number;
 
   @Column()
-  chanelName: string;
+  channelName: string;
 
   @Column()
   closed: boolean;

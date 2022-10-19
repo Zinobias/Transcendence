@@ -1,14 +1,14 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'games' })
 export class games {
-  @Column()/pa
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   gameId: number;
 
-  @Column()
+  @Column() //TODO: needs to be a foreign key
   user1: number;
 
-  @Column()
+  @Column() //TODO: needs to be a foreign key
   user2: number;
 
   @Column()

@@ -12,10 +12,10 @@ export class ChatChannelSettings {
     this.setting = setting.setting;
   }
 
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   channelId: number;
 
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   affectedUser: number;
 
   @Column('longtext')

@@ -12,10 +12,10 @@ export class chatMessage {
   @PrimaryGeneratedColumn()
   messageId: number;
 
-  @Column()
+  @Column() //TODO: needs to be a foreign key
   channelId: number;
 
-  @Column()
+  @Column() //TODO: needs to be a foreign key
   userId: number;
 
   @Column()

@@ -8,10 +8,10 @@ export class Friends {
     this.active = active;
   }
 
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   userId: number;
 
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   friendId: number;
 
   @Column()

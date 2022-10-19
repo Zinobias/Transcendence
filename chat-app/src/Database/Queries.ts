@@ -168,7 +168,7 @@ export class Queries {
    */
   async removeChannel(channel_id: number) {
     const channel = myDataSource.getRepository(ChatChannels);
-    await channel.delete({ chanelId: channel_id });
+    await channel.delete({ channelId: channel_id });
   }
 
   /**
@@ -183,7 +183,7 @@ export class Queries {
     });
     const channelList: Channel[] = [];
     for (const [, result] of find_channel.entries()) {
-      channelList.push(Channel.getChannel(result.chanelId));
+      channelList.push(Channel.getChannel(result.channelId));
     }
     return channelList;
   }
@@ -194,7 +194,7 @@ export class Queries {
    */
   async disableChannel(channelId: number): Promise<void> {
     const disable = myDataSource.getRepository(ChatChannels);
-    await disable.update({ chanelId: channelId }, { closed: true });
+    await disable.update({ channelId: channelId }, { closed: true });
   }
 
   /**
@@ -205,8 +205,8 @@ export class Queries {
   async setChannelName(channelId: number, channelName: string) {
     const setChannel = myDataSource.getRepository(ChatChannels);
     await setChannel.update(
-      { chanelId: channelId },
-      { chanelName: channelName },
+      { channelId: channelId },
+      { channelName: channelName },
     );
   }
 
@@ -249,7 +249,7 @@ export class Queries {
     const setting = myDataSource.getRepository(ChatChannelSettings);
     let find_setting;
     if (userId == undefined) {
-      find_setting = await setting.findBy( {
+      find_setting = await setting.findBy({
         channelId: channelId,
       });
     } else {
@@ -283,7 +283,7 @@ export class Queries {
   async removeChannelMember(channelId: number, userId: number) {
     const channel = myDataSource.getRepository(ChatMembers);
     const find_channel = channel.findOneBy({
-      chanelId: channelId,
+      channelId: channelId,
       userId: userId,
     });
     await channel.delete(await find_channel);
@@ -295,7 +295,7 @@ export class Queries {
    */
   async getChannelMembers(channelId: number): Promise<User[]> {
     const user = myDataSource.getRepository(ChatMembers);
-    const find = await user.findBy({ chanelId: channelId });
+    const find = await user.findBy({ channelId: channelId });
     const channelList: User[] = [];
     for (const [, result] of find.entries())
       channelList.push(User.getUser(result.userId));
@@ -311,7 +311,7 @@ export class Queries {
     const find = await user.findBy({ userId: userId });
     const channelList: Channel[] = [];
     for (const [, result] of find.entries())
-      channelList.push(Channel.getChannel(result.chanelId));
+      channelList.push(Channel.getChannel(result.channelId));
     return channelList;
   }
 

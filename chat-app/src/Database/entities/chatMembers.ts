@@ -3,12 +3,12 @@ import { Entity, PrimaryColumn } from 'typeorm';
 @Entity()
 export class ChatMembers {
   constructor(channelId: number, userId: number) {
-    this.chanelId = channelId;
+    this.channelId = channelId;
     this.userId = userId;
   }
   @PrimaryColumn()
-  chanelId: number;
+  channelId: number; //TODO: needs to be a foreign key as well
 
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key
   userId: number;
 }

@@ -6,9 +6,9 @@ export class Blocked {
     this.userId = userId;
     this.blockId = blockId;
   }
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   userId: number;
 
-  @PrimaryColumn()
+  @PrimaryColumn() //TODO: needs to be a foreign key as well
   blockId: number;
 }
