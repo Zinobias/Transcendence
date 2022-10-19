@@ -8,7 +8,6 @@ import {
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
-import { ChannelEventHandler } from './ChannelEventHandler';
 import { Channel } from './Objects/Channel';
 import { Queries } from './Database/Queries';
 import { SettingType } from './Enums/SettingType';
@@ -43,7 +42,6 @@ export class AppGateway
 
   afterInit(server: Server) {
     this.logger.log('Init');
-    new ChannelEventHandler();
   }
 
   handleDisconnect(client: Socket) {
@@ -55,17 +53,14 @@ export class AppGateway
   }
 
   @SubscribeMessage('channel_create')
-  channelCreate(data: ChannelCreate) {
+  async channelCreate(data: ChannelCreate) {
     console.log('testing debug etc');
-    const user: User = ChannelEventHandler.getUser(
-      data.creator_id,
-      'channel_create',
-    );
+    const user: User = AppGateway.getUser(data.creator_id, 'channel_create');
     if (user == null) return;
     const usersArr: User[] = [User.getUser(data.creator_id)];
 
     if (data.creator2_id != -1) {
-      const user2: User = ChannelEventHandler.getUser(
+      const user2: User = AppGateway.getUser(
         data.creator2_id,
         'channel_create',
       );
@@ -81,7 +76,7 @@ export class AppGateway
       [],
       [],
     );
-    const channelId = Queries.getInstance().createChannel(channel);
+    const channelId = await Queries.getInstance().createChannel(channel);
     if (channelId == -1) {
       Logger.warn(
         'Received invalid channel [' + channelId + '] from channel_create',
@@ -94,18 +89,14 @@ export class AppGateway
 
   @SubscribeMessage('channel_join')
   handleJoin(data: ChannelJoin) {
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_join',
     );
     if (channel == null) return;
-    const user: User = ChannelEventHandler.getUser(
-      data.user_id,
-      'channel_join',
-    );
+    const user: User = AppGateway.getUser(data.user_id, 'channel_join');
     if (user == null) return;
-    if (ChannelEventHandler.userInChannel(channel, user.userId, 'channel_join'))
-      return;
+    if (AppGateway.userInChannel(channel, user.userId, 'channel_join')) return;
 
     if (!channel.canJoin(data.user_id)) {
       //TODO some message to front end saying user can't join since they're banned
@@ -118,19 +109,12 @@ export class AppGateway
 
   @SubscribeMessage('channel_leave')
   handleLeave(data: ChannelLeave) {
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_leave',
     );
     if (channel == null) return;
-    if (
-      ChannelEventHandler.userInChannel(
-        channel,
-        data.user_id,
-        'channel_leave',
-        true,
-      )
-    )
+    if (AppGateway.userInChannel(channel, data.user_id, 'channel_leave', true))
       return;
 
     channel.removeUser(data.user_id);
@@ -139,18 +123,12 @@ export class AppGateway
 
   @SubscribeMessage('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
   handlePromote(data: ChannelPromote) {
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_promote',
     );
     if (channel == null) return;
-    if (
-      ChannelEventHandler.userInChannel(
-        channel,
-        data.user_id,
-        'channel_promote',
-      )
-    )
+    if (AppGateway.userInChannel(channel, data.user_id, 'channel_promote'))
       return;
 
     const setting: Setting = new Setting(
@@ -167,22 +145,14 @@ export class AppGateway
 
   @SubscribeMessage('channel_demote')
   handleDemote(data: ChannelDemote) {
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_demote',
     );
     if (channel == null) return;
-    if (
-      ChannelEventHandler.userInChannel(
-        channel,
-        data.user_id,
-        'channel_demote',
-        true,
-      )
-    )
+    if (AppGateway.userInChannel(channel, data.user_id, 'channel_demote', true))
       return;
-    if (ChannelEventHandler.notAdmin(channel, data.user_id, 'channel_kick'))
-      return;
+    if (AppGateway.notAdmin(channel, data.user_id, 'channel_kick')) return;
 
     channel.removeSetting(data.user_id, SettingType.ADMIN);
     Queries.getInstance().removeSetting(
@@ -195,22 +165,14 @@ export class AppGateway
   @SubscribeMessage('channel_kick')
   handleKick(data: ChannelKick) {
     //TODO send a message to the frontend to notify kicked user somewhere (if we want to do that?)
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_kick',
     );
     if (channel == null) return;
-    if (
-      ChannelEventHandler.userInChannel(
-        channel,
-        data.user_id,
-        'channel_kick',
-        true,
-      )
-    )
+    if (AppGateway.userInChannel(channel, data.user_id, 'channel_kick', true))
       return;
-    if (ChannelEventHandler.notOwner(channel, data.user_id, 'channel_kick'))
-      return;
+    if (AppGateway.notOwner(channel, data.user_id, 'channel_kick')) return;
 
     channel.removeUser(data.user_id);
     Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
@@ -219,22 +181,14 @@ export class AppGateway
   @SubscribeMessage('channel_ban')
   handleBan(data: ChannelBan) {
     //TODO send a message to the frontend to notify banned user somewhere (if we want to do that?)
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_ban',
     );
     if (channel == null) return;
-    if (
-      ChannelEventHandler.userInChannel(
-        channel,
-        data.user_id,
-        'channel_ban',
-        true,
-      )
-    )
+    if (AppGateway.userInChannel(channel, data.user_id, 'channel_ban', true))
       return;
-    if (ChannelEventHandler.notAdmin(channel, data.user_id, 'channel_ban'))
-      return;
+    if (AppGateway.notAdmin(channel, data.user_id, 'channel_ban')) return;
 
     channel.removeUser(data.user_id);
     Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
@@ -254,7 +208,7 @@ export class AppGateway
   @SubscribeMessage('channel_disband')
   handleDisband(data: ChannelDisband) {
     //TODO send a message to the frontend to notify all other users (if we want to do that?)
-    const channel: Channel = ChannelEventHandler.getChannel(
+    const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_disband',
     );
