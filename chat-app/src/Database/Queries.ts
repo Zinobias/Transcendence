@@ -71,7 +71,7 @@ export class Queries {
     const blockUserRepository = myDataSource.getRepository(Blocked);
     const findUser = await blockUserRepository.findBy({ userId: userId });
     const blockedUsers: User[] = [];
-    for (const [i, result] of findUser.entries()) {
+    for (const [, result] of findUser.entries()) {
       blockedUsers.push(User.getUser(result.blockId));
     }
     return blockedUsers;
@@ -116,7 +116,7 @@ export class Queries {
       active: accepted,
     });
     const friendList: Friend[] = [];
-    for (const [i, result] of find_friend.entries()) {
+    for (const [, result] of find_friend.entries()) {
       friendList.push(<Friend>Friend.getUser(result.userId));
     }
     return friendList;
@@ -179,7 +179,7 @@ export class Queries {
       closed: false,
     });
     const channelList: Channel[] = [];
-    for (const [i, result] of find_channel.entries()) {
+    for (const [, result] of find_channel.entries()) {
       channelList.push(Channel.getChannel(result.chanelId));
     }
     return channelList;
