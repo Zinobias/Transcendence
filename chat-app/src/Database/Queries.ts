@@ -320,9 +320,9 @@ export class Queries {
   getChannelMessages(channelId: number): Message[] {
     const message = myDataSource.getRepository(chatMessage);
     const find = await message.findBy({ chanelId: channelId });
-    const messageList: Message[];
+    const messageList: Message[] = [];
     for (const [i, result] of find.entries())
-      messageList.push(result.message); // ask to stijn to create a getter to get all messages
+      messageList.push(new Message(result.message, result.userId, result.timestamp));
     return messageList;
   }
 }
