@@ -247,10 +247,17 @@ export class Queries {
    */
   async getSettings(channelId: number, userId?: number): Promise<Channel[]> {
     const setting = myDataSource.getRepository(ChatChannelSettings);
-    const find_setting = await setting.findBy({
-      channelId: channelId,
-      affectedUser: userId,
-    });
+    let find_setting;
+    if (userId == undefined) {
+      find_setting = await setting.findBy( {
+        channelId: channelId,
+      });
+    } else {
+      find_setting = await setting.findBy({
+        channelId: channelId,
+        affectedUser: userId,
+      });
+    }
     const channelList: Channel[] = [];
     for (const [, result] of find_setting.entries())
       channelList.push(Channel.getChannel(result.channelId));
