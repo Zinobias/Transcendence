@@ -29,9 +29,9 @@ export class Queries {
    * @param loginId login id for the user
    * @param userName name for the user
    */
-  async addUser(login_id: string, user_name: string) {
+  async addUser(loginId: string, userName: string) {
     const userRepository = myDataSource.getRepository(UserTable);
-    await userRepository.save(new UserTable(login_id, user_name));
+    await userRepository.save(new UserTable(loginId, userName));
     console.log('user added');
   }
 
