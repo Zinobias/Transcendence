@@ -11,7 +11,7 @@ import { ChatChannels } from './entities/chatChannels';
 import { ChatChannelSettings } from './entities/chatChannelSettings';
 import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
-import {chatMessage} from "./entities/chatMessages";
+import { chatMessage } from './entities/chatMessages';
 
 export class Queries {
   private static _instance: Queries;
@@ -228,7 +228,11 @@ export class Queries {
     settingType: SettingType,
   ) {
     const setting = myDataSource.getRepository(ChatChannelSettings);
-    const find = setting.findBy({ chanelId: channelId, affectedUser: userId , setting: settingType })
+    const find = setting.findBy({
+      channelId: channelId,
+      affectedUser: userId,
+      setting: settingType,
+    });
     await setting.remove(await find);
   }
 
@@ -238,14 +242,14 @@ export class Queries {
    * @param userId optional user to get the settings for
    */
   async getSettings(channelId: number, userId?: number): Promise<Channel[]> {
-    //userid is unused. join with the user
     const setting = myDataSource.getRepository(ChatChannelSettings);
     const find_setting = await setting.findBy({
-      chanelId: channelId,
+      channelId: channelId,
+      affectedUser: userId,
     });
     const channelList: Channel[] = [];
-    for (const [i, result] of find_setting.entries())
-      channelList.push(Channel.getChannel(result.chanelId));
+    for (const [, result] of find_setting.entries())
+      channelList.push(Channel.getChannel(result.channelId));
     return channelList;
   }
 
@@ -282,7 +286,7 @@ export class Queries {
     const user = myDataSource.getRepository(ChatMembers);
     const find = await user.findBy({ chanelId: channelId });
     const channelList: User[] = [];
-    for (const [i, result] of find.entries())
+    for (const [, result] of find.entries())
       channelList.push(User.getUser(result.userId));
     return channelList;
   }
@@ -295,7 +299,7 @@ export class Queries {
     const user = myDataSource.getRepository(ChatMembers);
     const find = await user.findBy({ userId: userId });
     const channelList: Channel[] = [];
-    for (const [i, result] of find.entries())
+    for (const [, result] of find.entries())
       channelList.push(Channel.getChannel(result.chanelId));
     return channelList;
   }
@@ -308,19 +312,21 @@ export class Queries {
    */
   async addChannelMessage(channelId: number, message: Message) {
     const chat = myDataSource.getRepository(chatMessage);
-    await chat.update({ channelId: channelId }, { new chatMessage(message)});
+    await chat.insert(new chatMessage(channelId, message));
   }
 
   /**
    * Get all messages in a channel
    * @param channelId channel to get messages from
    */
-  getChannelMessages(channelId: number): Message[] {
+  async getChannelMessages(channelId: number): Promise<Message[]> {
     const message = myDataSource.getRepository(chatMessage);
     const find = await message.findBy({ channelId: channelId });
     const messageList: Message[] = [];
-    for (const [i, result] of find.entries())
-      messageList.push(new Message(result.message, result.userId, result.timestamp));
+    for (const [, result] of find.entries())
+      messageList.push(
+        new Message(result.message, result.userId, result.timestamp),
+      );
     return messageList;
   }
 }

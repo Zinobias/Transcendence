@@ -3,7 +3,8 @@ import { Message } from '../../Objects/Message';
 
 @Entity()
 export class chatMessage {
-  constructor(message: Message) {
+  constructor(channelId: number, message: Message) {
+    this.channelId = channelId;
     this.message = message.message;
     this.userId = message.sender;
     this.timestamp = message.timestamp;

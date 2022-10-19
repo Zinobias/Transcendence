@@ -5,7 +5,7 @@ import { SettingType } from '../../Enums/SettingType';
 @Entity()
 export class ChatChannelSettings {
   constructor(setting: Setting) {
-    this.chanelId = setting.channelId;
+    this.channelId = setting.channelId;
     this.affectedUser = setting.userId;
     this.from = setting.from;
     this.until = setting.until;
@@ -13,7 +13,7 @@ export class ChatChannelSettings {
   }
 
   @PrimaryColumn()
-  chanelId: number;
+  channelId: number;
 
   @PrimaryColumn()
   affectedUser: number;
