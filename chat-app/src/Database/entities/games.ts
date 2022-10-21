@@ -1,15 +1,28 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
+import { UserTable } from './UserTable';
 
 @Entity({ name: 'games' })
 export class games {
-  @PrimaryColumn() //TODO: needs to be a foreign key as well
+  @PrimaryColumn()
   gameId: number;
 
-  @Column() //TODO: needs to be a foreign key
+  @PrimaryColumn()
   user1: number;
 
-  @Column() //TODO: needs to be a foreign key
+  @PrimaryColumn()
   user2: number;
+
+  @ManyToOne(() => games) //TODO: needs to be a foreign key as well
+  @JoinColumn({ name: 'gameId' })
+  game: games;
+
+  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @JoinColumn({ name: 'user1' })
+  userT: UserTable;
+
+  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @JoinColumn({ name: 'user2' })
+  user2T: UserTable;
 
   @Column()
   user1score: number;
