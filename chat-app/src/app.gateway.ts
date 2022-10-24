@@ -24,6 +24,16 @@ import {
 import { Setting } from './Objects/Setting';
 import { User } from './Objects/User';
 import { AuthData } from './Events/OtherEvents';
+import { response } from 'express';
+
+export interface AuthToken {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  refresh_token: string;
+  scope: string;
+  created_at: number;
+}
 
 @WebSocketGateway({
   cors: {
@@ -54,33 +64,35 @@ export class AppGateway
   }
 
   @SubscribeMessage('auth')
-  async auth(data: AuthData) {
-    console.log('Received auth request');
-    let mycode = data.code;
-    if (data.code == undefined) {
-      mycode =
-        'a1a139f5738a2dee4793544240b85439bf4b2f869f0d1af7c13978292e34935c';
-    }
-    console.log(mycode);
-    fetch('https://api.intra.42.fr/v2', {
+  auth(client: Socket, data: AuthData) {
+    fetch('https://api.intra.42.fr/v2/oauth/token', {
       method: 'Post',
       body: JSON.stringify({
-        code: mycode,
-        redirect_uri: 'http://localhost:3000',
+        grant_type: 'authorization_code',
         client_id:
           'u-s4t2ud-97cf4334b48e0666383ad5f7509c011b62e838ecb24c7b90a2b38cf2594759d7',
         client_secret:
           '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',
+        code: data.code,
+        redirect_uri: 'http://localhost:3000',
       }),
       headers: { 'Content-Type': 'application/json' },
-    })
-      .then((response) => console.log(response))
-      // .then((data) => {
-      //   console.log('data:::' + data);
-      // })
-      .catch((err) => {
-        console.log('err:::' + err.message);
+    }).then((response) => {
+      response.json().then((result: AuthToken) => {
+        console.log(result.access_token);
+        fetch('https://api.intra.42.fr/v2/me', {
+          method: 'Get',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + result.access_token,
+          },
+        }).then((secondResponse) => {
+          secondResponse.json().then((secondResult) => {
+            console.log(secondResult.id);
+          });
+        });
       });
+    });
   }
 
   @SubscribeMessage('channel_create')
@@ -233,6 +245,7 @@ export class AppGateway
       data.until,
     );
     channel.addSetting(setting);
+    Queries.getInstance().addSetting(setting);
     Queries.getInstance().addSetting(setting);
   }
 

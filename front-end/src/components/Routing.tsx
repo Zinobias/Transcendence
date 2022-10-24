@@ -20,9 +20,10 @@ const Routing: React.FC  = () => {
     if (b) {
         let number = window.location.href.lastIndexOf("code=");
         let str = window.location.href.substring(number + 5);
-        console.log(str)
+        let authData = new AuthData(str);
+        console.log(authData.code)
         console.log("EMITTING")
-        socket.emit("auth", new AuthData(str))
+        socket.emit("auth", { code: authData.code })
     }
 
     return (
