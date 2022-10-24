@@ -18,9 +18,11 @@ const Routing: React.FC  = () => {
                 <Route index element={<Leaderboard />} />
                 <Route path='leaderboard' element={<Leaderboard />} />
                 <Route path='game' element={<Game />} />
-                <Route path='chat' element={<Chat />}>
+                <Route path='chat' element={<Chat />} />
+                <Route path='chat/chat_window' element={<ChatWindow />} />
+                {/* <Route path='chat' element={<Chat />}>
                     <Route path='chat_window' element={<ChatWindow />} />
-                </Route>
+                </Route> */}
             </Route>
 
         </Routes>

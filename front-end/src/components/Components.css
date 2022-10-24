@@ -50,16 +50,37 @@
     transform: scale(1.1);
 }
 
-.chatrooms {
+.chatroom {
+    position: relative;
     width: 80%;
     height: 50%;
-    margin: 20px;
+    margin-top: 40px;
     border: 2px solid black;
 }
 
-.chatwindow {
-    width: 60%;
-    height: 60%;
-    border: 2px solid black;
-    margin: 20px;
+.chatroom__form {
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+}
+
+.chatroom__form--input {
+    width: calc(100% - 4px);
+    background: #757575;
+    border: none;
+    height: 35px;
+}
+
+.chatroom__form--input:focus {
+    outline: none;
+}
+
+.chatroom__form--input::placeholder {
+    color: black;
+}
+
+.chatroom__text {
+    margin-top: 30px;
+    height: calc(100% - 65px);
+    overflow: auto;
 }

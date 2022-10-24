@@ -10,19 +10,22 @@ import './Components.css';
 
 const   Login: React.FC = () => {
     const [user, setUser] = useState<string>("");
+    const [token, setToken] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault()
-        // sessionStorage.setItem("user", user);
+        sessionStorage.setItem("user", user);
+        console.log(sessionStorage.getItem("user"));
+        setToken(true);
         navigate('/discopong');
     };
 
-    // if (sessionStorage.getItem("user")) {
+    // if (token == true) {
     //     navigate('/discopong');
     // }
 
-    return (
+    return  (
         <div className="grid-container">
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__login">
@@ -34,7 +37,6 @@ const   Login: React.FC = () => {
             </div>
         </div>
       )
-
 };
 
 export default Login;

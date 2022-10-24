@@ -1,8 +1,7 @@
 import React, {  useContext, useState } from "react";
 import { SocketContext } from './Socket';
 import './Components.css';
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate} from 'react-router-dom';
 
 const   Chat: React.FC = () => {
 	
@@ -12,7 +11,6 @@ const   Chat: React.FC = () => {
 		
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
-		console.log("click 1");
 		socket.emit("channel_create", {
 			creatoer_id: 1,
 			channel_name: "test",
@@ -24,7 +22,7 @@ const   Chat: React.FC = () => {
 
     return (
         <>
-        <div className="chatrooms">
+        <div className="chatroom">
             Open Chatrooms
 			{/* <button className="loginform__button" onClick={(e) => handleClick(e)}>NEW CHATROOM</button> */}
         </div>
