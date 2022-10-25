@@ -174,23 +174,23 @@ export interface GameEndedData {
 	payload : GameResult;
 }
 
-/**
- * Event for when a game has 
- */
-export class GameEndedEvent {
-	constructor(gameEndedData : GameEndedData){
-		this._gameID = gameEndedData.gameID;
-		this._payload = gameEndedData.payload;
-	};
-	private _gameID: number;
-	private _payload: GameResult;
+///**
+// * Event for when a game has 
+// */
+//export class GameEndedEvent {
+//	constructor(gameEndedData : GameEndedData){
+//		this._gameID = gameEndedData.gameID;
+//		this._payload = gameEndedData.payload;
+//	};
+//	private _gameID: number;
+//	private _payload: GameResult;
 
-	// ------------------------------------------------------------------------------------------------
-	// Getters
-	get	gameID() { return (this._gameID); }
-	get	payload() { return (this._payload); }
+//	// ------------------------------------------------------------------------------------------------
+//	// Getters
+//	get	gameID() { return (this._gameID); }
+//	get	payload() { return (this._payload); }
 
-}
+//}
 
 // TODO: might change the constructor(s) for the events..
 

@@ -22,6 +22,7 @@ export class AppController {
 	*/
 	// TODO: Find a way to pass eventsemitter??
 	this.appService.createGame(DTO, gameID);
+
 }
 
 	@OnEvent('game.frameupdate')

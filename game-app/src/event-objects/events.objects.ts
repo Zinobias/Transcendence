@@ -1,3 +1,4 @@
+import { GameConfig } from "src/enums";
 import { Entity, GameResult, MoveStatePaddle } from "src/game-objects/game-object-interfaces";
 
 interface MoveStateData {
@@ -51,12 +52,16 @@ export class GameFrameUpdateEvent {
 	constructor(frameData : GameFrameData){
 		this._gameID = frameData.gameID;
 		this._payload = frameData.payload;
+		this._boardDimensions = [GameConfig.BOARD_HEIGHT, GameConfig.BOARD_WIDTH];
 	};
 	private _gameID: number;
 	private _payload: Entity[];
+	private _boardDimensions: number[];
 
 	// ------------------------------------------------------------------------------------------------
 	// Getters
+	
+	get boardDimensions() : number[] {return this._boardDimensions}
 	get	gameID() { return (this._gameID); }
 	get	payload() { return (this._payload); }
 
@@ -70,20 +75,29 @@ export class GameFrameUpdateEvent {
 	payload : GameResult;
 }
 
+///**
+// * Event for when a game has 
+// */
+//export class GameEndedEvent {
+//	constructor(gameEndedData : GameEndedData){
+//		this._gameID = gameEndedData.gameID;
+//		this._payload = gameEndedData.payload;
+//	};
+//	private _gameID: number;
+//	private _payload: GameResult;
+
+//	// ------------------------------------------------------------------------------------------------
+//	// Getters
+//	get	gameID() { return (this._gameID); }
+//	get	payload() { return (this._payload); }
+
+//}
+
 /**
- * Event for when a game has 
+ * userID to join the queue for x gamemode
+ * Possibly replace gamemode with options object.
  */
-export class GameEndedEvent {
-	constructor(gameEndedData : GameEndedData){
-		this._gameID = gameEndedData.gameID;
-		this._payload = gameEndedData.payload;
-	};
-	private _gameID: number;
-	private _payload: GameResult;
-
-	// ------------------------------------------------------------------------------------------------
-	// Getters
-	get	gameID() { return (this._gameID); }
-	get	payload() { return (this._payload); }
-
+export interface gameMatchmakingEntity{
+	userID 		: string;
+	gameMode 	: string;
 }
