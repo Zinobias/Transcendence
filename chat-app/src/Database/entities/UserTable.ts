@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity({ name: 'users' })
+@Entity()
 export class UserTable {
   constructor(loginId: string, userName: string) {
     this.loginId = loginId;
@@ -19,6 +19,6 @@ export class UserTable {
   @Column({ default: new Date() })
   createAt: Date;
 
-  @Column({ type: 'mediumblob' })
-  avatar: Buffer;
+  // @Column({ type: 'mediumblob' })
+  // avatar: Buffer;
 }

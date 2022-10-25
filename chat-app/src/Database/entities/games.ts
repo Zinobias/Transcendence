@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { UserTable } from './UserTable';
 
-@Entity({ name: 'games' })
+@Entity()
 export class games {
   @PrimaryColumn()
   gameId: number;

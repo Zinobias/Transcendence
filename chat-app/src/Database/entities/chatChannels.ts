@@ -4,7 +4,9 @@ import { UserTable } from './UserTable';
 
 @Entity()
 export class ChatChannels {
-  constructor(channel: Channel) {
+  constructor(channel?: Channel) {
+    if (channel == undefined) return;
+    console.log(channel);
     this.channelId = channel.channelId;
     this.ownerId = channel.owner;
     this.owner2Id = channel.otherOwner;

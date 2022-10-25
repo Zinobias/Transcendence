@@ -7,6 +7,7 @@ import { UserTable } from './UserTable';
 @Entity()
 export class ChatChannelSettings {
   constructor(setting: Setting) {
+    if (setting == undefined) return;
     this.channelId = setting.channelId;
     this.affectedUser = setting.userId;
     this.from = setting.from;
@@ -27,10 +28,10 @@ export class ChatChannelSettings {
   @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
   @JoinColumn({ name: 'affectedUser' })
 
-  @Column('longtext')
+  @Column()
   from: number;
 
-  @Column('longtext')
+  @Column()
   until: number;
 
   @PrimaryColumn()

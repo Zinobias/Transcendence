@@ -13,6 +13,7 @@ import { UserTable } from './UserTable';
 @Entity()
 export class chatMessage {
   constructor(channelId: number, message: Message) {
+    if (message === undefined) return;
     this.channelId = channelId;
     this.message = message.message;
     this.userId = message.sender;
