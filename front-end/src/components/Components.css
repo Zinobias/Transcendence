@@ -7,20 +7,17 @@
 .loginform {
     display:flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
 .loginform__label {
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 1px;
 }
 
 .loginform__input {
     width:100%;
     padding:10px;
-    margin:5px;
     background: transparent;
     border: 2px solid black;
     box-sizing: border-box;
@@ -51,4 +48,39 @@
 
 .loginform__button:hover {
     transform: scale(1.1);
+}
+
+.chatroom {
+    position: relative;
+    width: 80%;
+    height: 50%;
+    margin-top: 40px;
+    border: 2px solid black;
+}
+
+.chatroom__form {
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+}
+
+.chatroom__form--input {
+    width: calc(100% - 4px);
+    background: #757575;
+    border: none;
+    height: 35px;
+}
+
+.chatroom__form--input:focus {
+    outline: none;
+}
+
+.chatroom__form--input::placeholder {
+    color: black;
+}
+
+.chatroom__text {
+    margin-top: 30px;
+    height: calc(100% - 65px);
+    overflow: auto;
 }
