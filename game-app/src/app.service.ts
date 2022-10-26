@@ -61,7 +61,7 @@ export class AppService {
 	 */
 	@EventPattern("game.create")
 	async createGame(DTO : createGameDTO, gameID : number) {
-		let newGame : Game = new Game(this.eventEmitter ,[DTO.player1UID, DTO.player2UID], DTO.gameMode, gameID);
+		let newGame : Game = new Game(this.eventEmitter , this.client ,[DTO.player1UID, DTO.player2UID], DTO.gameMode, gameID);
 		logger.log("New game instance has been created");
 		this.addNewGameToDatabase(DTO).then(() => {
 			logger.log("new game instance added to DB");
