@@ -20,11 +20,13 @@ import {
   ChannelKick,
   ChannelBan,
   ChannelDisband,
+  ChannelMessage,
 } from './Events/ChannelEvents';
 import { Setting } from './Objects/Setting';
 import { User } from './Objects/User';
 import { AuthData } from './Events/OtherEvents';
-import { response } from 'express';
+import { randomUUID } from 'crypto';
+import { Message } from './Objects/Message';
 
 export interface AuthToken {
   access_token: string;
@@ -46,14 +48,12 @@ export class AppGateway
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('AppGateway');
 
-  @SubscribeMessage('msgToServer')
-  handleMessage(client: Socket, payload: string): void {
-    this.server.emit('msgToClient', payload);
-  }
-
   afterInit(server: Server) {
     this.logger.log('Init');
   }
+
+  private static clientMap = new Map();
+  private static socketMap = new Map();
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
@@ -61,6 +61,11 @@ export class AppGateway
 
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
+    const newVar: number = AppGateway.clientMap.get(client.id);
+    if (newVar != undefined) {
+      AppGateway.socketMap.delete(newVar);
+    }
+    AppGateway.clientMap.delete(client.id);
   }
 
   @SubscribeMessage('auth')
@@ -71,8 +76,7 @@ export class AppGateway
         grant_type: 'authorization_code',
         client_id:
           'u-s4t2ud-97cf4334b48e0666383ad5f7509c011b62e838ecb24c7b90a2b38cf2594759d7',
-        client_secret:
-          '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',
+        client_secret: process.env.SECRET,
         code: data.code,
         redirect_uri: 'http://localhost:3000',
       }),
@@ -89,6 +93,23 @@ export class AppGateway
         }).then((secondResponse) => {
           secondResponse.json().then((secondResult) => {
             console.log(secondResult.id);
+            AppGateway.clientMap.set(client.id, secondResult.id);
+            AppGateway.socketMap.set(secondResult.id, client);
+            const uuid = randomUUID();
+            Queries.getInstance()
+              .storeAuth(secondResult.id, uuid)
+              .then((result) => {
+                if (result == true) {
+                  client.emit('user_id', {
+                    user_id: secondResult.id,
+                    auth_cookie: uuid,
+                  });
+                } else {
+                  client.emit('auth_failed', {
+                    msg: 'Unable to store auth token',
+                  });
+                }
+              });
           });
         });
       });
@@ -96,7 +117,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('channel_create')
-  async channelCreate(data: ChannelCreate) {
+  async channelCreate(client: Socket, data: ChannelCreate) {
     console.log('testing debug etc');
     const user: User = AppGateway.getUser(data.creator_id, 'channel_create');
     if (user == null) return;
@@ -126,12 +147,18 @@ export class AppGateway
       );
       return;
     }
-
     channel.channelId = channelId;
+
+    const userIds = channel.users.map((a) => a.userId);
+    AppGateway.notify(userIds, 'channel_create_success', {
+      channel_name: channel.channelName,
+      channel_id: channel.channelId,
+      channel_users: channel.users,
+    });
   }
 
   @SubscribeMessage('channel_join')
-  handleJoin(data: ChannelJoin) {
+  handleJoin(client: Socket, data: ChannelJoin) {
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_join',
@@ -148,10 +175,16 @@ export class AppGateway
 
     channel.addUser(user);
     Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
+
+    const userIds = channel.users.map((a) => a.userId);
+    AppGateway.notify(userIds, 'channel_join_success', {
+      channel_id: channel.channelId,
+      user_id: data.user_id,
+    });
   }
 
   @SubscribeMessage('channel_leave')
-  handleLeave(data: ChannelLeave) {
+  handleLeave(client: Socket, data: ChannelLeave) {
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_leave',
@@ -162,10 +195,17 @@ export class AppGateway
 
     channel.removeUser(data.user_id);
     Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
+
+    const userIds = channel.users.map((a) => a.userId);
+    userIds.push(data.user_id);
+    AppGateway.notify(userIds, 'channel_leave_success', {
+      channel_id: channel.channelId,
+      user_id: data.user_id,
+    });
   }
 
   @SubscribeMessage('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
-  handlePromote(data: ChannelPromote) {
+  handlePromote(client: Socket, data: ChannelPromote) {
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_promote',
@@ -184,10 +224,15 @@ export class AppGateway
     );
     channel.addSetting(setting);
     Queries.getInstance().addSetting(setting);
+
+    AppGateway.notify([data.user_id], 'channel_promote_success', {
+      channel_id: channel.channelId,
+      user_id: data.user_id,
+    });
   }
 
   @SubscribeMessage('channel_demote')
-  handleDemote(data: ChannelDemote) {
+  handleDemote(client: Socket, data: ChannelDemote) {
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
       'channel_demote',
@@ -206,7 +251,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('channel_kick')
-  handleKick(data: ChannelKick) {
+  handleKick(client: Socket, data: ChannelKick) {
     //TODO send a message to the frontend to notify kicked user somewhere (if we want to do that?)
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
@@ -222,7 +267,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('channel_ban')
-  handleBan(data: ChannelBan) {
+  handleBan(client: Socket, data: ChannelBan) {
     //TODO send a message to the frontend to notify banned user somewhere (if we want to do that?)
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
@@ -250,7 +295,7 @@ export class AppGateway
   }
 
   @SubscribeMessage('channel_disband')
-  handleDisband(data: ChannelDisband) {
+  handleDisband(client: Socket, data: ChannelDisband) {
     //TODO send a message to the frontend to notify all other users (if we want to do that?)
     const channel: Channel = AppGateway.getChannel(
       data.channel_id,
@@ -260,6 +305,56 @@ export class AppGateway
 
     Channel.removeChannel(data.channel_id);
     Queries.getInstance().removeChannel(data.channel_id);
+
+    const userIds = channel.users.map((a) => a.userId);
+    AppGateway.notify(userIds, 'remove_channel', {
+      channel_id: channel.channelId,
+    });
+  }
+
+  @SubscribeMessage('channel_message')
+  handleMessage(client: Socket, data: ChannelMessage) {
+    const channel: Channel = AppGateway.getChannel(
+      data.channel_id,
+      'channel_message',
+    );
+    if (channel == null) return;
+
+    if (!channel.hasUser(data.user_id)) {
+      client.emit('channel_message_failed', {
+        reason: 'You are not a member of this channel',
+      });
+      return;
+    }
+    const message = new Message(
+      data.message,
+      data.user_id,
+      new Date().getUTCMilliseconds(),
+    );
+    Queries.getInstance()
+      .addChannelMessage(data.channel_id, message)
+      .then((res) => {
+        if (res == false) {
+          client.emit('channel_message_failed', {
+            reason: 'Internal server error',
+          });
+          return;
+        }
+        const userIds = channel.users.map((a) => a.userId);
+        AppGateway.notify(userIds, 'channel_message', message);
+      });
+  }
+
+  //EZ MESSAGE:
+
+  private static notify(userIds: number[], channel: string, args: object) {
+    for (const userId of userIds) {
+      const socketId: number = AppGateway.clientMap.get(userId);
+      if (socketId == undefined) continue;
+      const socket: Socket = AppGateway.socketMap.get(socketId);
+      if (socket == undefined) continue;
+      socket.emit(channel, args);
+    }
   }
 
   //EZ ERRORS:

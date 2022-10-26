@@ -14,6 +14,7 @@ export class AuthData {
     }
     code: string;
 }
+
 const Routing: React.FC  = () => {
     const socket = useContext(SocketContext);
     let b = window.location.href.includes("?code");
@@ -23,6 +24,9 @@ const Routing: React.FC  = () => {
         let authData = new AuthData(str);
         console.log(authData.code)
         console.log("EMITTING")
+        socket.on("user_id", res => {
+            console.log(res.auth_cookie);
+        })
         socket.emit("auth", { code: authData.code })
     }
 

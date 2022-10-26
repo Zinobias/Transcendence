@@ -12,6 +12,7 @@ import { ChatChannelSettings } from './entities/chatChannelSettings';
 import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
 import { chatMessage } from './entities/chatMessages';
+import {InsertResult} from "typeorm";
 
 export class Queries {
   private static _instance: Queries;
@@ -323,7 +324,10 @@ export class Queries {
    */
   async addChannelMessage(channelId: number, message: Message) {
     const chat = myDataSource.getRepository(chatMessage);
-    await chat.insert(new chatMessage(channelId, message));
+    const insertResult: InsertResult = await chat.insert(
+      new chatMessage(channelId, message),
+    );
+    return insertResult.identifiers.length == 1;
   }
 
   /**
@@ -339,5 +343,10 @@ export class Queries {
         new Message(result.message, result.userId, result.timestamp),
       );
     return messageList;
+  }
+
+  async storeAuth(id: number, auth: string): Promise<boolean> {
+    //TODO store id and auth token in db
+    return true;
   }
 }
