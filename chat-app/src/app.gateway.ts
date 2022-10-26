@@ -53,11 +53,6 @@ export class AppGateway
 
   afterInit(server: Server) {
     this.logger.log('Init');
-    Queries.getInstance()
-      .addUser('abc', 'abi is learning')
-      .then((r) => {
-        this.logger.log('Abba was added to the database ig?');
-      });
   }
 
   handleDisconnect(client: Socket) {
