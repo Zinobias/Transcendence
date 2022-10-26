@@ -63,24 +63,24 @@ export class AppService {
 	async createGame(DTO : createGameDTO, gameID : number) {
 		let newGame : Game = new Game(this.eventEmitter ,[DTO.player1UID, DTO.player2UID], DTO.gameMode, gameID);
 		logger.log("New game instance has been created");
-		return ;
+		this.addNewGameToDatabase(DTO).then(() => {
+			logger.log("new game instance added to DB");
+		});
 	}
 	
 	@EventPattern("game.ended")
 	async gameFinishedHandler(@Payload() gameResult : GameEndedData) {
 		this.client.emit("frontend.game.ended", gameResult);
 		logger.log("Game-ended event caught & emitted to frontend");
-		this.addGameToDatabase(gameResult.payload).then(() => {
+		this.addGameResultToDatabase(gameResult.payload).then(() => {
 			logger.log("GameID: [" + gameResult.gameID + "] Game result has been added to the database");
 		})
-		/**
-		 * TODO:
-		 * Add result to DB
-		 */
 	}
 
-	@EventPattern("game.ended")
-	async addGameToDatabase(@Payload() gameresult : GameResult) {
+	async addNewGameToDatabase(newGame : createGameDTO) {
+		// TODO : add new game to db
+	}
+	async addGameResultToDatabase(gameresult : GameResult) {
 		// logger.log("GameID: [" + gameresult.gameID + "] Game result has been added to the database");
 		// TODO: Go wild abby 
 		/**
