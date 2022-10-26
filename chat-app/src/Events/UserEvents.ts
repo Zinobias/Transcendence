@@ -1,40 +1,40 @@
-export class UserCreate {
+export interface UserCreate {
   user_id: number;
   login_id: string;
   name: string;
 }
 
-export class UserEditName {
+export interface UserEditName {
   user_id: number;
   new_name: string;
 }
 
-export class UserEditAvatar {
+export interface UserEditAvatar {
   user_id: number;
   new_avatar: string;
 }
 
-export class UserBlockUser {
+export interface UserBlockUser {
   user_id: number;
   blocked_id: number;
 }
 
-export class UserUnblockUser {
+export interface UserUnblockUser {
   user_id: number;
   blocked_id: number;
 }
 
-export class UserFriendUser {
+export interface UserFriendUser {
   user_id: number;
   friend_id: number;
 }
 
-export class UserAcceptFriendUser {
+export interface UserAcceptFriendUser {
   user_id: number;
   friend_id: number;
 }
 
-export class UserRemoveFriend {
+export interface UserRemoveFriend {
   user_id: number;
   friend_id: number;
 }
