@@ -1,5 +1,14 @@
 import { Friend } from './Friend';
 
+export interface IUser {
+  userId: number;
+  loginId: string;
+  name: string;
+  avatar: object;
+  blocked: User[];
+  friends: Friend[];
+}
+
 export class User {
   private static _users: User[] = [];
 
@@ -109,5 +118,16 @@ export class User {
 
   unfriend(friend: User) {
     this._friends = this._friends.filter((a) => a._userId != friend._userId);
+  }
+
+  getIUser(): IUser {
+    return {
+      userId: this.userId,
+      loginId: this.loginId,
+      name: this.name,
+      avatar: this.avatar,
+      blocked: this.blocked,
+      friends: this.friends,
+    };
   }
 }

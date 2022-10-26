@@ -12,7 +12,7 @@ const   Chat: React.FC = () => {
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
 		socket.emit("channel_create", {
-			creatoer_id: 1,
+			creator_id: 1,
 			channel_name: "test",
 			creator2_id: 2,
 		});
