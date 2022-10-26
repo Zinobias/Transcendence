@@ -258,3 +258,7 @@ export class GamePlayerMoveEvent {
 	get	newState() { return (this._newState); }
 
 }
+
+export const gameModes : string[] = [
+	"DEFAULT",
+];

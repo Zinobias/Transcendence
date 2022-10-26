@@ -2,6 +2,7 @@ import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle} f
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
 import { GamePlayerMoveEvent, GameFrameUpdateEvent } from "./event-objects/events.objects";
+import { ClientProxy } from "@nestjs/microservices";
 
 
 export class Game {
@@ -15,7 +16,8 @@ export class Game {
 	private	_toServe			: Boolean;
 
 	constructor(
-			private eventEmitter		: EventEmitter2, 
+			private eventEmitter		: EventEmitter2,
+			private client				: ClientProxy,
 			PlayersUIDs					: string[], 
 			private readonly gameMode	: string, 
 			private readonly gameID		: number
@@ -208,7 +210,7 @@ export class Game {
 			
 			*/
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
-			this.eventEmitter.emit('game.frameUpdate', 
+			this.client.emit('game.frameUpdate',
 			new GameFrameUpdateEvent({
 				gameID:	 this.gameID,
 				payload: this.entities,

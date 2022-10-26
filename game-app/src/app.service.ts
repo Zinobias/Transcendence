@@ -1,53 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventPattern, Payload } from '@nestjs/microservices';
-import { Socket } from 'dgram';
+import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { createGameDTO } from './dto/dto';
 import { gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
-import { GameEndedData } from './game-object-interfaces';
-
+import { GameEndedData, gameModes } from './game-object-interfaces';
+import { GameResult } from './game-objects/game-object-interfaces';
+const logger = new Logger("AppService");
 @Injectable()
 export class AppService {
+	private client 				: ClientProxy;
+	// private matchmakingQueue	: gameMatchmakingEntity[];
+	private matchMakingQueue : Map<string , string[]>;
 	/**
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
 	 */
-	constructor(private eventEmitter : EventEmitter2) {};
+	constructor(private eventEmitter : EventEmitter2) {
+		this.client = ClientProxyFactory.create( {
+			transport: Transport.TCP,
+			options : {
+				host: '127.0.0.1',
+				port: 3000,
+			},
+		});
+	};
 
-	private matchmakingQueue : gameMatchmakingEntity[];
+	async emitEvent(pattern : string, payload : {}) {
+		this.eventEmitter.emit(pattern, payload);
+	}
 
-	@EventPattern("game.ended")
-	gameFinishedHandler(@Payload() gameResult : GameEndedData) {
-		this.eventEmitter.emit("frontend.game.ended", gameResult);
-		/**
-		 * TODO:
-		 * Add result to DB
-		 */
+	
+	addToQueue(@Payload() payload : gameMatchmakingEntity) {
+		this.matchMakingQueue.get(payload.gameMode)?.push(payload.userID);
 	}
 	
-	@EventPattern("game.player.move")
-	async userMoveEvent(@Payload() payload : any) {
-		// figure out how to receive this.
-		// game.player.move." + payload.gameID
-		// send keyinput as payload.
-		//this.eventEmitter.emit();
-	}
-
-	@EventPattern("game.user.join.queue")
-	matchmakingHandler(@Payload() payload : gameMatchmakingEntity) {
-		if (this.matchmakingQueue.length % 2 === 0) {
-			let gameDTO : createGameDTO = {
-				player1UID 	: this.matchmakingQueue.pop()?.userID as string,
-				player2UID	: this.matchmakingQueue.pop()?.userID as string,
-				gameMode 	: "placeholder",
+	findMatch() {
+		for (let gameMode of gameModes) {
+			if (this.matchMakingQueue.get(gameMode)?.length as number % 2) {
+				let gameDTO : createGameDTO = {
+					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as string,
+					player2UID	: this.matchMakingQueue.get(gameMode)?.pop() as string,
+					gameMode 	: gameMode,
+				}
+				this.client.emit("game.found", gameDTO);
+				logger.log("Game found event emitted to client");
 			}
-			this.eventEmitter.emit("game.found", gameDTO);
 		}
-		else 
-			this.matchmakingQueue.push(payload);
+		// TODO: Do we have to add this to the database?
 	}
-
+	
 	/**
 	 * Will create a game instance.
 	 * @param DTO Data transfer object {	
@@ -58,26 +60,42 @@ export class AppService {
 	 * @returns void
 	 */
 	@EventPattern("game.create")
-  	async createGame(DTO : createGameDTO, gameID : number) {
-	let newGame : Game = new Game(this.eventEmitter ,[DTO.player1UID, DTO.player2UID], DTO.gameMode, gameID);
-	return ;
-  }
+	async createGame(DTO : createGameDTO, gameID : number) {
+		let newGame : Game = new Game(this.eventEmitter , this.client ,[DTO.player1UID, DTO.player2UID], DTO.gameMode, gameID);
+		logger.log("New game instance has been created");
+		this.addNewGameToDatabase(DTO).then(() => {
+			logger.log("new game instance added to DB");
+		});
+	}
+	
+	@EventPattern("game.ended")
+	async gameFinishedHandler(@Payload() gameResult : GameEndedData) {
+		this.client.emit("frontend.game.ended", gameResult);
+		logger.log("Game-ended event caught & emitted to frontend");
+		this.addGameResultToDatabase(gameResult.payload).then(() => {
+			logger.log("GameID: [" + gameResult.gameID + "] Game result has been added to the database");
+		})
+	}
 
-  	async addGameToDatabase(DTO : createGameDTO) {
-	// TODO: Go wild abby 
-	/**
-	 * Update database gameID
-	 * Add game to database.
-	 * maybe set a state or so?
-	 * it will have a winner field, so maybe set it to a default value when not defined.
-	 */
-	// {
-	//	gameId : number;
-	//	player1 : string;
-	//	player2 : string;
-	//	player1Score : number;
-	//	player2Score : number;
-	//	winner : string;
-	//	}
-  }
+	async addNewGameToDatabase(newGame : createGameDTO) {
+		// TODO : add new game to db
+	}
+	async addGameResultToDatabase(gameresult : GameResult) {
+		// logger.log("GameID: [" + gameresult.gameID + "] Game result has been added to the database");
+		// TODO: Go wild abby 
+		/**
+		 * Update database gameID
+		 * Add game to database.
+		 * maybe set a state or so?
+		 * it will have a winner field, so maybe set it to a default value when not defined.
+		 */
+		// {
+			//	gameId : number;
+			//	player1 : string;
+			//	player2 : string;
+			//	player1Score : number;
+			//	player2Score : number;
+			//	winner : string;
+			//	}
+		}
 }
