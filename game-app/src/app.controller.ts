@@ -1,27 +1,33 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Get, Logger, Post, Req } from '@nestjs/common';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { AppService } from './app.service';
-import { createGameDTO } from './dto/dto';
-import { GameEndedData, GameFrameUpdateEvent } from './event-objects/events.objects';
+import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 
+
+const logger = new Logger("controller");
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
+  constructor(private appService: AppService) {}
 
 	@OnEvent('game.frameupdate')
 	async updateFrame(@Payload() payload : GameFrameUpdateEvent) {
 		// TODO: Forward payload to frontend.
+		
+	}
+	@EventPattern("game.player.move")
+	async userMoveEvent(@Payload() payload : any) {
+		this.appService.emitEvent("game.player.move." + payload.gameID, payload);
+		// figure out how to receive this.
+		// game.player.move." + payload.gameID
+		// send keyinput as payload.
+		//this.eventEmitter.emit();
 	}
 
-	// @EventPattern("game.ended")
-	// gameFinishedHandler(@Payload() gameResult : GameEndedData) {
-	// 	this.appService.eventEmitter.emit("frontend.game.ended", gameResult);
-	// 	/**
-	// 	 * TODO:
-	// 	 * Add result to DB
-	// 	 */
-	// }
+	@EventPattern("game.user.join.queue")
+	matchmakingHandler(@Payload() payload : gameMatchmakingEntity) {
+		this.appService.addToQueue(payload);
+		this.appService.findMatch();
+	}
 }
 

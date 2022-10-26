@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
-//import { FrontendGateway } from './frontend-gateway.gateway';
+// import { FrontendGateway } from './frontend.gateway';
 
 @Module({
   imports: [
@@ -24,6 +24,6 @@ import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
 	  })
   ],
   controllers: [AppController],
-  providers: [AppService/*, FrontendGateway*/],
+  providers: [AppService],
 })
 export class AppModule {}
