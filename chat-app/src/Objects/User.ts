@@ -2,7 +2,6 @@ import { Friend } from './Friend';
 
 export interface IUser {
   userId: number;
-  loginId: string;
   name: string;
   avatar: object;
   blocked: User[];
@@ -27,7 +26,6 @@ export class User {
   }
 
   private readonly _userId: number;
-  private readonly _loginId: string;
   private _name: string;
   private _avatar: object;
   private _blocked: User[];
@@ -35,14 +33,12 @@ export class User {
 
   constructor(
     userId: number,
-    loginId: string,
     name: string,
     avatar: object,
     blocked: User[],
     friends: Friend[],
   ) {
     this._userId = userId;
-    this._loginId = loginId;
     this._name = name;
     this._avatar = avatar;
     this._blocked = blocked;
@@ -52,10 +48,6 @@ export class User {
 
   get userId(): number {
     return this._userId;
-  }
-
-  get loginId(): string {
-    return this._loginId;
   }
 
   get name(): string {
@@ -123,7 +115,6 @@ export class User {
   getIUser(): IUser {
     return {
       userId: this.userId,
-      loginId: this.loginId,
       name: this.name,
       avatar: this.avatar,
       blocked: this.blocked,

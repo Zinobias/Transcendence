@@ -26,12 +26,12 @@ export class Queries {
   //Users table
   /**
    * Creates a new user entry
-   * @param loginId login id for the user
+   * @param userId user id for the user
    * @param userName name for the user
    */
-  async addUser(loginId: string, userName: string) {
+  async addUser(userId: number, userName: string) {
     const userRepository = myDataSource.getRepository(UserTable);
-    await userRepository.save(new UserTable(loginId, userName));
+    await userRepository.save(new UserTable(userId, userName));
     console.log('user added');
   }
 
@@ -57,11 +57,11 @@ export class Queries {
 
   /**
    * Get a user from their login id
-   * @param loginId login id of the user
+   * @param userId user id of the user
    */
-  async getUser(loginId: string): Promise<User> {
+  async getUser(userId: number): Promise<User> {
     const userRepository = myDataSource.getRepository(UserTable);
-    const findUser = await userRepository.findOneBy({ loginId: loginId });
+    const findUser = await userRepository.findOneBy({ userId: userId });
     return User.getUser(findUser.userId);
   }
 
