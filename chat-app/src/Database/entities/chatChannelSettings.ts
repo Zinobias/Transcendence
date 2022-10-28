@@ -1,10 +1,13 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {Entity, Column, PrimaryColumn, ManyToOne, JoinColumn} from 'typeorm';
 import { Setting } from '../../Objects/Setting';
 import { SettingType } from '../../Enums/SettingType';
+import { ChatChannels } from './chatChannels';
+import { UserTable } from './UserTable';
 
 @Entity()
 export class ChatChannelSettings {
   constructor(setting: Setting) {
+    if (setting == undefined) return;
     this.channelId = setting.channelId;
     this.affectedUser = setting.userId;
     this.from = setting.from;
@@ -12,16 +15,23 @@ export class ChatChannelSettings {
     this.setting = setting.setting;
   }
 
-  @PrimaryColumn() //TODO: needs to be a foreign key as well
+  @PrimaryColumn()
   channelId: number;
 
-  @PrimaryColumn() //TODO: needs to be a foreign key as well
+  @ManyToOne(() => ChatChannels, (chat) => chat.channelId) //TODO: needs to be a foreign key as well
+  @JoinColumn({ name: 'channelId' })
+  channel: ChatChannels;
+
+  @PrimaryColumn()
   affectedUser: number;
 
-  @Column('longtext')
+  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @JoinColumn({ name: 'affectedUser' })
+
+  @Column()
   from: number;
 
-  @Column('longtext')
+  @Column()
   until: number;
 
   @PrimaryColumn()

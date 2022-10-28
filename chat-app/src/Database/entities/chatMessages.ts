@@ -1,9 +1,19 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn,
+} from 'typeorm';
 import { Message } from '../../Objects/Message';
+import { ChatChannels } from './chatChannels';
+import { UserTable } from './UserTable';
 
 @Entity()
 export class chatMessage {
   constructor(channelId: number, message: Message) {
+    if (message === undefined) return;
     this.channelId = channelId;
     this.message = message.message;
     this.userId = message.sender;
@@ -12,12 +22,16 @@ export class chatMessage {
   @PrimaryGeneratedColumn()
   messageId: number;
 
-  @Column() //TODO: needs to be a foreign key
+  @PrimaryColumn()
   channelId: number;
 
-  @Column() //TODO: needs to be a foreign key
+  @ManyToOne(() => ChatChannels, (chat) => chat.channelId) //TODO: needs to be a foreign key
+  @JoinColumn({ name: 'channelId' })
+  @PrimaryColumn()
   userId: number;
 
+  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @JoinColumn({ name: 'userId' })
   @Column()
   message: string;
 

@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { UserTable } from './UserTable';
 
 @Entity()
 export class Blocked {
@@ -6,9 +7,18 @@ export class Blocked {
     this.userId = userId;
     this.blockId = blockId;
   }
-  @PrimaryColumn() //TODO: needs to be a foreign key as well
+
+  @PrimaryColumn()
   userId: number;
 
-  @PrimaryColumn() //TODO: needs to be a foreign key as well
+  @PrimaryColumn()
   blockId: number;
+
+  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @JoinColumn({ name: 'userId' })
+  users: UserTable;
+
+  @ManyToOne(() => Blocked, (block) => block.blockId) //TODO: needs to be a foreign key as well
+  @JoinColumn({ name: 'blockId' })
+  block: Blocked;
 }

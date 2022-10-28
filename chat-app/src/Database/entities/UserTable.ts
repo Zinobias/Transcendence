@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'users' })
+@Entity()
 export class UserTable {
   constructor(userId: number, userName: string) {
     this.userId = userId;
@@ -16,6 +16,6 @@ export class UserTable {
   @Column({ default: new Date() })
   createAt: Date;
 
-  @Column({ type: 'mediumblob' })
-  avatar: Buffer;
+  // @Column({ type: 'longblob' })
+  // avatar: Buffer;
 }

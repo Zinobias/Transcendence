@@ -5,7 +5,7 @@ import { UserTable } from './entities/UserTable';
 import { Blocked } from './entities/blocked';
 import { Message } from '../Objects/Message';
 import { SettingType } from '../Enums/SettingType';
-import { myDataSource } from './DataSource';
+import { getDataSource, myDataSource } from './DataSource';
 import { Friends } from './entities/friends';
 import { ChatChannels } from './entities/chatChannels';
 import { ChatChannelSettings } from './entities/chatChannelSettings';
@@ -41,9 +41,10 @@ export class Queries {
    * @param userId user to get the avatar for
    * @param image image to store as the avatar
    */
-  async setUserAvatar(userId: number, image: object) {
+  async setUserAvatar(userId: number, image: Buffer) {
+    const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
-    await userRepository.update({ userId: userId }, { avatar: image });
+    // await userRepository.update({ userId: userId });
   }
 
   /**
@@ -52,6 +53,7 @@ export class Queries {
    * @param newName string to set the new name to
    */
   async setUserName(userId: number, newName: string) {
+    const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
     await userRepository.update({ userId: userId }, { userName: newName });
   }
@@ -61,6 +63,7 @@ export class Queries {
    * @param userId user id of the user
    */
   async getUser(userId: number): Promise<User> {
+    const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
     const findUser = await userRepository.findOneBy({ userId: userId });
     return User.getUser(findUser.userId);
@@ -72,6 +75,7 @@ export class Queries {
    * @param userId user to get blocked users for
    */
   async getBlockedUsers(userId: number): Promise<User[]> {
+    const myDataSource = await getDataSource();
     const blockUserRepository = myDataSource.getRepository(Blocked);
     const findUser = await blockUserRepository.findBy({ userId: userId });
     const blockedUsers: User[] = [];
@@ -87,6 +91,7 @@ export class Queries {
    * @param blockedUser blocked user
    */
   async addBlockedUser(userId: number, blockedUser: number): Promise<void> {
+    const myDataSource = await getDataSource();
     const blocked_user_repository = myDataSource.getRepository(Blocked);
     await blocked_user_repository.save(new Blocked(userId, blockedUser));
   }
@@ -97,6 +102,7 @@ export class Queries {
    * @param blockedUser user to remove
    */
   async removeBlockedUser(userId: number, blockedUser: number): Promise<void> {
+    const myDataSource = await getDataSource();
     const blocked_user_repository = myDataSource.getRepository(Blocked);
     const find_user = await blocked_user_repository.findOneBy({
       userId: userId,
@@ -114,6 +120,7 @@ export class Queries {
    *  (if accepted is true, it returns active friends, if false it returns friend requests)
    */
   async getFriends(userId: number, accepted: boolean): Promise<Friend[]> {
+    const myDataSource = await getDataSource();
     const friends = myDataSource.getRepository(Friends);
     const find_friend = await friends.findBy({
       userId: userId,
@@ -137,6 +144,7 @@ export class Queries {
     toUserId: number,
     confirmed: boolean,
   ): Promise<void> {
+    const myDataSource = await getDataSource();
     const friends_repository = myDataSource.getRepository(Friends);
     await friends_repository.save(new Friends(fromUserId, toUserId, confirmed));
   }
@@ -147,6 +155,7 @@ export class Queries {
    * @param friendId UserTable to remove from userId's friend list
    */
   async removeFriend(userId: number, friendId: number): Promise<void> {
+    const myDataSource = await getDataSource();
     const friends_repository = myDataSource.getRepository(Friends);
     await friends_repository.delete({ userId: userId, friendId: friendId });
   }
@@ -158,6 +167,7 @@ export class Queries {
    * returns the id of the newly created channel
    */
   async createChannel(channel: Channel): Promise<number> {
+    const myDataSource = await getDataSource();
     const addChannel = myDataSource.getRepository(ChatChannels);
     await addChannel.save(new ChatChannels(channel));
     return channel.channelId;
@@ -168,6 +178,7 @@ export class Queries {
    * @param channel_id channel to remove
    */
   async removeChannel(channel_id: number) {
+    const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(ChatChannels);
     await channel.delete({ channelId: channel_id });
   }
@@ -177,6 +188,7 @@ export class Queries {
    * @param owner user to get channels for
    */
   async getActiveChannels(owner: number): Promise<Channel[]> {
+    const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(ChatChannels);
     const find_channel = await channel.findBy({
       ownerId: owner,
@@ -194,6 +206,7 @@ export class Queries {
    * @param channelId channel to disable
    */
   async disableChannel(channelId: number): Promise<void> {
+    const myDataSource = await getDataSource();
     const disable = myDataSource.getRepository(ChatChannels);
     await disable.update({ channelId: channelId }, { closed: true });
   }
@@ -204,6 +217,7 @@ export class Queries {
    * @param channelName new channel name
    */
   async setChannelName(channelId: number, channelName: string) {
+    const myDataSource = await getDataSource();
     const setChannel = myDataSource.getRepository(ChatChannels);
     await setChannel.update(
       { channelId: channelId },
@@ -217,6 +231,7 @@ export class Queries {
    * @param setting setting to store
    */
   async addSetting(setting: Setting) {
+    const myDataSource = await getDataSource();
     const set_setting = myDataSource.getRepository(ChatChannelSettings);
     await set_setting.save(new ChatChannelSettings(setting));
   }
@@ -232,6 +247,7 @@ export class Queries {
     userId: number,
     settingType: SettingType,
   ) {
+    const myDataSource = await getDataSource();
     const setting = myDataSource.getRepository(ChatChannelSettings);
     const find = setting.findBy({
       channelId: channelId,
@@ -247,6 +263,7 @@ export class Queries {
    * @param userId optional user to get the settings for
    */
   async getSettings(channelId: number, userId?: number): Promise<Channel[]> {
+    const myDataSource = await getDataSource();
     const setting = myDataSource.getRepository(ChatChannelSettings);
     let find_setting;
     if (userId == undefined) {
@@ -272,6 +289,7 @@ export class Queries {
    * @param userId user to add to the channel
    */
   async addChannelMember(channelId: number, userId: number) {
+    const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(ChatMembers);
     await channel.save(new ChatMembers(channelId, userId));
   }
@@ -282,6 +300,7 @@ export class Queries {
    * @param userId user to remove from the channel
    */
   async removeChannelMember(channelId: number, userId: number) {
+    const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(ChatMembers);
     const find_channel = channel.findOneBy({
       channelId: channelId,
@@ -295,6 +314,7 @@ export class Queries {
    * @param channelId channel to get users for
    */
   async getChannelMembers(channelId: number): Promise<User[]> {
+    const myDataSource = await getDataSource();
     const user = myDataSource.getRepository(ChatMembers);
     const find = await user.findBy({ channelId: channelId });
     const channelList: User[] = [];
@@ -308,6 +328,7 @@ export class Queries {
    * @param userId user to get channels for
    */
   async getChannels(userId: number): Promise<Channel[]> {
+    const myDataSource = await getDataSource();
     const user = myDataSource.getRepository(ChatMembers);
     const find = await user.findBy({ userId: userId });
     const channelList: Channel[] = [];
@@ -323,6 +344,7 @@ export class Queries {
    * @param message object containing all information about the message
    */
   async addChannelMessage(channelId: number, message: Message) {
+    const myDataSource = await getDataSource();
     const chat = myDataSource.getRepository(chatMessage);
     const insertResult: InsertResult = await chat.insert(
       new chatMessage(channelId, message),
@@ -335,6 +357,7 @@ export class Queries {
    * @param channelId channel to get messages from
    */
   async getChannelMessages(channelId: number): Promise<Message[]> {
+    const myDataSource = await getDataSource();
     const message = myDataSource.getRepository(chatMessage);
     const find = await message.findBy({ channelId: channelId });
     const messageList: Message[] = [];
