@@ -10,39 +10,12 @@ import NavBar from './NavBar';
 import { SocketContext } from "./Socket";
 import { useCookies } from 'react-cookie';
 
-
-export class AuthData {
-    constructor(code: string) {
-        this.code = code;
-    }
-    code: string;
-}
-
 const Routing: React.FC  = () => {
-    const [cookies, setCookie, removeCookie] = useCookies(['user']);
+    const [cookies, setCookie] = useCookies(['user']);
     const socket = useContext(SocketContext);
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [authData, setAuthData] = useState<string>("");
-
-    // if (searchParams.get("code") && !cookies.user) {
-    //     setCookie('user', searchParams.get("code"), {path: '/'});
-    // }
-
-    // let b = window.location.href.includes("?code");
-    // if (b) {
-    //     let number = window.location.href.lastIndexOf("code=");
-    //     let str = window.location.href.substring(number + 5);
-    //     let authData = new AuthData(str);
-    //     console.log(authData.code)
-    //     console.log("EMITTING")
-    //     socket.on("user_id", res => {
-    //         console.log(res.auth_cookie);
-    //     })
-    //     socket.emit("auth", { code: authData.code })
-    // }
 
     return (
-        //still need to write proper guard
+        // STILL NEED TO WRITE PROPER GUARD
         <Routes>
             <Route path='/Login' element={cookies.user ? <NavBar /> : <Login />}/>
             <Route path='/' element={!cookies.user ? <Login /> : <NavBar />}>
