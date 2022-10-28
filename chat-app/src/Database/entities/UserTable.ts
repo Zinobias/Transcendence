@@ -19,6 +19,6 @@ export class UserTable {
   @Column({ default: new Date() })
   createAt: Date;
 
-  // @Column({ type: 'mediumblob' })
+  // @Column({ type: 'longblob' })
   // avatar: Buffer;
 }

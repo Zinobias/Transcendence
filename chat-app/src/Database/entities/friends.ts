@@ -1,4 +1,11 @@
-import {Entity, Column, PrimaryColumn, ManyToOne, ManyToMany, JoinColumn} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  ManyToMany,
+  JoinColumn,
+} from 'typeorm';
 import { UserTable } from './UserTable';
 import { Friend } from '../../Objects/Friend';
 

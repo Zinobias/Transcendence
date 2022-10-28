@@ -5,7 +5,7 @@ import { UserTable } from './entities/UserTable';
 import { Blocked } from './entities/blocked';
 import { Message } from '../Objects/Message';
 import { SettingType } from '../Enums/SettingType';
-import {getDataSource, myDataSource} from './DataSource';
+import { getDataSource, myDataSource } from './DataSource';
 import { Friends } from './entities/friends';
 import { ChatChannels } from './entities/chatChannels';
 import { ChatChannelSettings } from './entities/chatChannelSettings';
@@ -30,7 +30,7 @@ export class Queries {
    * @param userName name for the user
    */
   async addUser(loginId: string, userName: string) {
-    console.log("im creating database");
+    console.log('im creating database');
     const AppDataSource = await getDataSource();
     console.log(AppDataSource.options);
     const userRepository = AppDataSource.getRepository(UserTable);
@@ -43,10 +43,10 @@ export class Queries {
    * @param userId user to get the avatar for
    * @param image image to store as the avatar
    */
-  async setUserAvatar(userId: number, image: object) {
+  async setUserAvatar(userId: number, image: Buffer) {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
-    //await userRepository.update({ userId: userId }, { avatar: image });
+    // await userRepository.update({ userId: userId });
   }
 
   /**
@@ -57,7 +57,7 @@ export class Queries {
   async setUserName(userId: number, newName: string) {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
-    // await userRepository.update({ userId: userId }, { userName: newName });
+    await userRepository.update({ userId: userId }, { userName: newName });
   }
 
   /**

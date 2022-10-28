@@ -7,10 +7,10 @@ import { Friends } from './entities/friends';
 require('dotenv').config({ path: __dirname + '/.env' });
 export const myDataSource = new DataSource({
   type: 'postgres',
-  host: '172.18.0.3',
+  host: process.env.POSTGRES_HOST,
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
-  database: process.env.POSTGRES_NAME,
+  database: process.env.POSTGRES_DB,
   entities: [__dirname + '/entities/*.{js,ts}'],
   synchronize: true,
 });
