@@ -14,7 +14,7 @@ const App: React.FC = () => {
 	  socket.on("msgToClient", data => {
 		  console.log(data + "client");
 	  });
-  }, [])
+  }, []) //only re-run the effect if new message comes in
 
   return (
     <SocketContext.Provider value={socket}>

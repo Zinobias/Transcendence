@@ -1,13 +1,10 @@
-import React, { useState, useRef, useEffect, useContext }  from "react";
-import { AppContext } from './AppContext';
-
+import React, { useState, useRef, useEffect }  from "react";
 
 const   ChatWindow: React.FC = () => {
 	
     const [message, setMessage] = useState<string>("");
     const [chat, setChat] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
-    const appContext = useContext(AppContext);
     console.log("new chat window");
 
 
@@ -26,30 +23,28 @@ const   ChatWindow: React.FC = () => {
     return (
         <div className="chatroom">
             New Chat Room
-        <form className="chatroom__form"  onSubmit={(e) => {
-                handleMessage(e)
-                // inputRef.current?.blur();
-                }}>
-            <input 
-                className="chatroom__form--input" 
-                ref={inputRef}
-                type="input"
-                value={message} 
-                onChange={(e) => setMessage(e.target.value)}  
-                // placeholder="Enter your message"
-            />
-        </form>
-        <div className="chatroom__text">
-
-            {chat.map((element, index) => {
-            return (
-            <div key={index}>
-                <h2>{element}</h2>
+            <form className="chatroom__form"  onSubmit={(e) => {
+                    handleMessage(e)
+                    // inputRef.current?.blur();
+                    }}>
+                <input 
+                    className="chatroom__form--input" 
+                    ref={inputRef}
+                    type="input"
+                    value={message} 
+                    onChange={(e) => setMessage(e.target.value)}  
+                    // placeholder="Enter your message"
+                />
+            </form>
+            <div className="chatroom__text">
+                {chat.map((element, index) => {
+                return (
+                <div key={index} className="chatroom__text--bubble__left">
+                    <p>USER<br/>{element}</p>
+                </div>
+                );
+            })}
             </div>
-            );
-        })}
-
-        </div>
         </div>
     )
 };
