@@ -13,9 +13,9 @@ COPY ["./package.json", "./package-lock.json*", "./"]
 
 # npm install will download all dependencies defined in package.json
 # into node_modules
-RUN npm install --production
+RUN npm install
 
 # Installed all dependencies, now we copy over the sourcecode
 COPY . .
 EXPOSE 8080
-CMD ["node", "app.js"]
+CMD ["npm", "run", "start:dev"]

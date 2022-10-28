@@ -12,6 +12,7 @@ import { ChatChannelSettings } from './entities/chatChannelSettings';
 import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
 import { chatMessage } from './entities/chatMessages';
+import {InsertResult} from "typeorm";
 
 export class Queries {
   private static _instance: Queries;
@@ -26,15 +27,12 @@ export class Queries {
   //Users table
   /**
    * Creates a new user entry
-   * @param loginId login id for the user
+   * @param userId user id for the user
    * @param userName name for the user
    */
-  async addUser(loginId: string, userName: string) {
-    console.log('im creating database');
-    const AppDataSource = await getDataSource();
-    console.log(AppDataSource.options);
-    const userRepository = AppDataSource.getRepository(UserTable);
-    await userRepository.save(new UserTable(loginId, userName));
+  async addUser(userId: number, userName: string) {
+    const userRepository = myDataSource.getRepository(UserTable);
+    await userRepository.save(new UserTable(userId, userName));
     console.log('user added');
   }
 
@@ -62,12 +60,12 @@ export class Queries {
 
   /**
    * Get a user from their login id
-   * @param loginId login id of the user
+   * @param userId user id of the user
    */
-  async getUser(loginId: string): Promise<User> {
+  async getUser(userId: number): Promise<User> {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
-    const findUser = await userRepository.findOneBy({ loginId: loginId });
+    const findUser = await userRepository.findOneBy({ userId: userId });
     return User.getUser(findUser.userId);
   }
 
@@ -348,7 +346,10 @@ export class Queries {
   async addChannelMessage(channelId: number, message: Message) {
     const myDataSource = await getDataSource();
     const chat = myDataSource.getRepository(chatMessage);
-    await chat.insert(new chatMessage(channelId, message));
+    const insertResult: InsertResult = await chat.insert(
+      new chatMessage(channelId, message),
+    );
+    return insertResult.identifiers.length == 1;
   }
 
   /**
@@ -365,5 +366,10 @@ export class Queries {
         new Message(result.message, result.userId, result.timestamp),
       );
     return messageList;
+  }
+
+  async storeAuth(id: number, auth: string): Promise<boolean> {
+    //TODO store id and auth token in db
+    return true;
   }
 }

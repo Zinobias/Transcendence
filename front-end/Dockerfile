@@ -19,4 +19,4 @@ WORKDIR /usr/src/app
 
 # Installed all dependencies, now we copy over the sourcecode
 #COPY . .
-CMD ["npm", "start"]
+CMD ["npm", "start", "--watch"]

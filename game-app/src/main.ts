@@ -12,7 +12,7 @@ async function bootstrap() {
 		AppModule,
 		{
 			transport: Transport.TCP,
-			options: {// might change the host
+			options: {// might change the hostname
 				host: "front-end",
 				port: 3000,
 			}

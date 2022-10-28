@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import {redirect, useNavigate} from 'react-router-dom';
 import '../App.css'
 import './Components.css';
 
@@ -10,19 +10,23 @@ import './Components.css';
 
 const   Login: React.FC = () => {
     const [user, setUser] = useState<string>("");
+    const [token, setToken] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault()
-        // sessionStorage.setItem("user", user);
+        // window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-97cf4334b48e0666383ad5f7509c011b62e838ecb24c7b90a2b38cf2594759d7&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code'
+        sessionStorage.setItem("user", user);
+        console.log(sessionStorage.getItem("user"));
+        setToken(true);
         navigate('/discopong');
     };
 
-    // if (sessionStorage.getItem("user")) {
+    // if (token == true) {
     //     navigate('/discopong');
     // }
 
-    return (
+    return  (
         <div className="grid-container">
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__login">
@@ -34,7 +38,6 @@ const   Login: React.FC = () => {
             </div>
         </div>
       )
-
 };
 
 export default Login;

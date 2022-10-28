@@ -1,7 +1,8 @@
 import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle} from "./game-objects/game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
-import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedEvent } from "./event-objects/events.objects";
+import { GamePlayerMoveEvent, GameFrameUpdateEvent } from "./event-objects/events.objects";
+import { ClientProxy } from "@nestjs/microservices";
 
 
 export class Game {
@@ -15,7 +16,8 @@ export class Game {
 	private	_toServe			: Boolean;
 
 	constructor(
-			private eventEmitter		: EventEmitter2, 
+			private eventEmitter		: EventEmitter2,
+			private client				: ClientProxy,
 			PlayersUIDs					: string[], 
 			private readonly gameMode	: string, 
 			private readonly gameID		: number
@@ -26,7 +28,7 @@ export class Game {
 		this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(2)];
 		this.entities.push(this.playerPaddles[0][1], this.playerPaddles[1][1]);
 		this.ballFactory();
-		this.eventEmitter.addListener("game.player.move" + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
+		this.eventEmitter.addListener("game.player.move." + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
 		this.start(); // prob put this in the calling function.
 	};
 
@@ -35,13 +37,21 @@ export class Game {
 		// TODO: Send gameFinishedEvent to the frontEnd service.
 		// TODO: This has to happen in the app GameFinishedEventHandler.
 		// TODO: Maybe construct results here.
-		this.eventEmitter.emit('game.ended', 
-			new GameEndedEvent({
-			gameID: this.gameID,
-			payload: this.results,
-		}),
-		);
-		this.eventEmitter.removeListener("game.player.move" + this.gameID, this.setPlayerMovementState); 
+
+		//this.eventEmitter.emit('game.ended', 
+		//	new GameEndedEvent({
+		//	gameID: this.gameID,
+		//	payload: this.results,
+		//}),
+		//);
+
+		this.eventEmitter.emit('game.ended', {gameID : this.gameID, payload: this.results });
+		//new GameEndedEvent({
+		//gameID: this.gameID,
+		//payload: this.results,
+		//}),
+		//);
+		this.eventEmitter.removeListener("game.player.move." + this.gameID, this.setPlayerMovementState); 
 		return ;
 	}
 	// DTO for this should be
@@ -200,7 +210,7 @@ export class Game {
 			
 			*/
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
-			this.eventEmitter.emit('game.frameUpdate', 
+			this.client.emit('game.frameUpdate',
 			new GameFrameUpdateEvent({
 				gameID:	 this.gameID,
 				payload: this.entities,

@@ -1,30 +1,54 @@
 import React, { ReactNode, useState, useEffect, useContext } from 'react';
-import socketIOClient from "socket.io-client";
 import './App.css';
-import Login from './components/Login';
-import NavBar from './components/NavBar';
 import { SocketContext } from './components/Socket';
 import Routing from './components/Routing';
 
-const ENDPOINT = "http://localhost:8080";
+// import { useCookies } from 'react-cookie';
 
 const App: React.FC = () => {
 
-  const [myBool, setmyBool] = useState<boolean>(true);
   const socket = useContext(SocketContext);
-  
+
   //strict mode makes useEffect fire twice in developer mode
   useEffect(() => {
 	  socket.on("msgToClient", data => {
 		  console.log(data + "client");
 	  });
-  }, [])
+  }, []) //only re-run the effect if new message comes in
 
   return (
     <SocketContext.Provider value={socket}>
-          <Routing />    
+        <Routing />    
     </SocketContext.Provider>
   );
+
+
+  // const [name, setName] = useState<string>("");
+  // const [cookies, setCookie] = useCookies(['name']);
+
+  // const handleClick = () => {
+  //   setCookie('name', name, { path: '/' });
+  // }
+
+  // return (
+  //   <div className="app">
+  //     <h1>Name of the user:</h1>
+  //     <input
+  //       placeholder="name"
+  //       value={name}
+  //       onChange={(e) => setName(e.target.value)}
+  //     />
+  //     <div>
+  //       <button onClick={handleClick}>Set Cookie</button>
+  //     </div>
+  //     <br />
+  //     {cookies.name && (
+  //     <div>
+  //        Name: <p>{cookies.name}</p>
+  //     </div>
+  //     )}
+  //   </div>
+  // );
 
 }
 
