@@ -21,6 +21,7 @@ services:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_HOST: "${POSTGRES_HOST}"
       SECRET: "${SECRET}"
+      CLIENT: "${CLIENT}"
     volumes:
       - type: bind
         source: ./chat-app/

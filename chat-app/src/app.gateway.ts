@@ -74,8 +74,7 @@ export class AppGateway
       method: 'Post',
       body: JSON.stringify({
         grant_type: 'authorization_code',
-        client_id:
-          'u-s4t2ud-97cf4334b48e0666383ad5f7509c011b62e838ecb24c7b90a2b38cf2594759d7',
+        client_id: process.env.CLIENT,
         client_secret: process.env.SECRET,
         code: data.code,
         redirect_uri: 'http://localhost:3000',

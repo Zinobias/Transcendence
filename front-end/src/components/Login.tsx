@@ -19,6 +19,7 @@ const   Login: React.FC = () => {
     useEffect(() => {
         socket.on("user_id", res => {
             console.log(res.auth_cookie);
+			console.log(res.user_id);
             setCookie('user', res.auth_cookie, {path: '/'});
             navigate('/');
         })
@@ -31,7 +32,7 @@ const   Login: React.FC = () => {
 
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault()
-        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-97cf4334b48e0666383ad5f7509c011b62e838ecb24c7b90a2b38cf2594759d7&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code'
+        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dc4d066a92ebb003a5fa223b28af0bd6f27c6943eb7a2d20ea6ae42a75cd508c&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code'
     };
 
     return  (
