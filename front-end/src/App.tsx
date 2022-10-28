@@ -22,34 +22,6 @@ const App: React.FC = () => {
     </SocketContext.Provider>
   );
 
-
-  // const [name, setName] = useState<string>("");
-  // const [cookies, setCookie] = useCookies(['name']);
-
-  // const handleClick = () => {
-  //   setCookie('name', name, { path: '/' });
-  // }
-
-  // return (
-  //   <div className="app">
-  //     <h1>Name of the user:</h1>
-  //     <input
-  //       placeholder="name"
-  //       value={name}
-  //       onChange={(e) => setName(e.target.value)}
-  //     />
-  //     <div>
-  //       <button onClick={handleClick}>Set Cookie</button>
-  //     </div>
-  //     <br />
-  //     {cookies.name && (
-  //     <div>
-  //        Name: <p>{cookies.name}</p>
-  //     </div>
-  //     )}
-  //   </div>
-  // );
-
 }
 
 export default App;
