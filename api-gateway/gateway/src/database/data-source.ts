@@ -1,5 +1,4 @@
 import { DataSource } from 'typeorm';
-import { UserTable } from './entities/user-table';
 
 require('dotenv').config({ path: __dirname + '/.env' });
 export const myDataSource = new DataSource({
