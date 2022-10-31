@@ -1,18 +1,40 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Queries } from './database/queries';
 import { randomUUID } from 'crypto';
 import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway()
-export class ApiGateway {
-  constructor(@Inject(Auth) private readonly auth: Auth) {}
-  @SubscribeMessage()
-  handleMessage(client: any, payload: any): string {
-    //client = chat-appendFile
-    //client.send(pattern, payload);
-    return 'Hello world!';
-  }
+@WebSocketGateway(8081 {
+	path: '/',
+	port: 3000
+})
+export class ApiGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect	{
+	private clientList : {userID : number,
+	};
+
+	constructor(@Inject(Auth) private readonly auth: Auth) {}
+
+	afterInit(server: Server) {
+		this.logger.log("Initialized");
+	}
+
+	handleConnection(client: Socket, ...args: any[]) {
+		this.logger.log('Client connected: ${client.id}');
+	}
+
+	handleDisconnect(client: Socket) {
+		this.logger.log('Client disconnected: ${client.id}');
+	}
+
+	@WebSocketServer() wss : Server;
+	private logger : Logger = new Logger("AppGateway");
+
+	@SubscribeMessage('message')
+	handleMessage(client: any, payload: any): string {
+	//client = chat-appendFile
+	//client.send(pattern, payload);
+	return 'Hello world!';
+	}
 }
 
 @Injectable()
