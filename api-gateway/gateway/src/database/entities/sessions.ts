@@ -1,15 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { UserTable } from './UserTable';
+import { UserTable } from './user-table';
 @Entity()
 export class Sessions {
   @PrimaryColumn()
   userId: number;
 
-  @PrimaryColumn()
+  @Column()
   sessionCode: string;
 
-  @Column({ default: new Date() })
-  time: Date;
+  @Column({ default: new Date().getMilliseconds() })
+  time: number;
 
   @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
