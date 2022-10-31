@@ -4,9 +4,9 @@ import { Queries } from './database/queries';
 import { randomUUID } from 'crypto';
 import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway(8081 {
-	path: '/',
-	port: 3000
+@WebSocketGateway(8081 ,{
+	path: '/', // can look into path
+	serveClient: true,
 })
 export class ApiGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect	{
 	private clientList : {userID : number,
