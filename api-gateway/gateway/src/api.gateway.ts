@@ -60,6 +60,15 @@ export class Sockets {
     }
     return null;
   }
+
+  public sendData(users: number[], pattern: string, payload: {}) {
+    for (const user of users) {
+      const socket = this.getSocket(user);
+      if (socket != null) {
+        socket.emit(pattern, payload);
+      }
+    }
+  }
 }
 
 @Injectable()
