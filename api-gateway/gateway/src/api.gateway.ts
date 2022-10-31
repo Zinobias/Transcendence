@@ -7,6 +7,7 @@ import { Socket, Server } from 'socket.io';
 @WebSocketGateway(8081 ,{
 	path: '/', // can look into path
 	serveClient: true,
+	namespace: '/',
 })
 export class ApiGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect	{
 	private clientList : {userID : number,
