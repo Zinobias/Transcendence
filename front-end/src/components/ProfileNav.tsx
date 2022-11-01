@@ -12,6 +12,7 @@ const ProfileNav: React.FC = () => {
     const handleClick = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
         e.preventDefault();
         console.log("click");
+        //document.getElementById("myDropdown")?.classList.toggle("show");
     };
 
     return (
@@ -22,6 +23,11 @@ const ProfileNav: React.FC = () => {
             className="avatar"
             onClick={(e) => handleClick(e)}
         />
+        {/* <div id="myDropdown" className="avatar__dropdown--content">
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </div> */}
         </>
       );
 }

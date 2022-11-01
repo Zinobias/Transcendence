@@ -29,6 +29,7 @@ const   Login: React.FC = () => {
     // if (searchParams.get("code")) {
     //     console.log("EMITTING")
     //     socket.emit("auth", { code: searchParams.get("code") })
+    //     //socket.emit("chat", {userID: 12, accessToken: "test", eventPattern: "auth", payload: {code: searchParams.get("code")}})
     // }
 
     //WITHOUT BACKEND

@@ -22,3 +22,10 @@ export interface AppData {
     name?: string;
     token?: string;
 }
+
+export interface DTO {
+    userID : number,
+    accessToken : string,
+    eventPattern : string,
+    payload : {},
+}
