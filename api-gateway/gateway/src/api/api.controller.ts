@@ -1,7 +1,7 @@
 import { Controller, Inject } from '@nestjs/common';
 import { EventPattern, Payload, ClientProxy } from '@nestjs/microservices';
 import { WebSocketServer } from '@nestjs/websockets';
-import { Sockets } from 'src/api.gateway';
+import { Sockets } from 'src/sockets.class';
 //import { Server } from 'http';
 
 export interface microServiceDTO {
