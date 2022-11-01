@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, Link } from 'react-router-dom';
 import LogoutButton from './Buttons';
+import ProfileNav from "./ProfileNav";
 import '../App.css'
 
 /*
@@ -23,6 +24,7 @@ const NavBar: React.FC = () => {
             </div>   
             <div className="grid__left">left</div>
             <div className="grid__right">
+              {/* <ProfileNav /> */}
               <LogoutButton />
             </div>
             <div className="grid__body">
