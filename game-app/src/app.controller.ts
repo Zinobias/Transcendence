@@ -5,10 +5,10 @@ import { AppService } from './app.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 
 
-const logger = new Logger("controller");
 @Controller()
 export class AppController {
-  constructor(private appService: AppService) {}
+	constructor(private appService: AppService) {}
+	private readonly logger = new Logger("controller");
 
 	@OnEvent('game.frameupdate')
 	async updateFrame(@Payload() payload : GameFrameUpdateEvent) {
@@ -28,6 +28,11 @@ export class AppController {
 	matchmakingHandler(@Payload() payload : gameMatchmakingEntity) {
 		this.appService.addToQueue(payload);
 		this.appService.findMatch();
+	}
+
+	@EventPattern("testMsg")
+	testFunc(@Payload() payload : any) {
+		this.logger.log(payload.message);
 	}
 }
 

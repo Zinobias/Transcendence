@@ -1,4 +1,5 @@
 import { Inject, Logger } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -27,7 +28,8 @@ export class ApiGateway
   
   //private clientList: { userID: number };
 
-  constructor(@Inject(Sockets) private readonly sockets : Sockets, /*@Inject(Auth) private readonly auth: Auth*/) {}
+  constructor(@Inject(Sockets) private readonly sockets : Sockets, /*@Inject(Auth) private readonly auth: Auth*/
+  @Inject('GAME_SERVICE') private gameClient : ClientProxy ) {}
 
   afterInit(server: Server) {
     this.logger.log('Initialized');
@@ -35,9 +37,10 @@ export class ApiGateway
 
   // TODO: make sure it is storing the userID
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log('Client connected: ${client.id}');
-    //this.sockets.storeSocket(args[0] as number, client); 
+    this.logger.log('Client connected: ${client.id}' + ' ' + args[0]);
+    this.sockets.storeSocket(args[0] as number, client); 
     client.emit('wssTest', {message : "Connected to the websocketServer"});
+    this.gameClient.emit("testMsg", {message : "random message from gateway"});
   }
 
   handleDisconnect(client: Socket) {

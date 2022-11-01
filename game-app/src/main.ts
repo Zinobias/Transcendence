@@ -13,8 +13,8 @@ async function bootstrap() {
 		{
 			transport: Transport.TCP,
 			options: {// might change the hostname
-				host: "front-end",
-				port: 3000,
+				host: "gateway",
+				port: 3001,
 			}
 		},
 	);

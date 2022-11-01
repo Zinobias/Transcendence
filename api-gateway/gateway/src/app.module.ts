@@ -15,7 +15,7 @@ import { Sockets } from './sockets.class';
       transport: Transport.TCP,
       options : {
           host: 'game-app',
-          port: 3000,
+          port: 3001,
     },
   },{ 
     name: 'CHAT_SERVICE', 
