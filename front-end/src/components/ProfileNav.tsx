@@ -1,4 +1,5 @@
 import React from "react";
+import LogoutButton from './Buttons';
 import '../App.css'
 
 /*
@@ -12,23 +13,21 @@ const ProfileNav: React.FC = () => {
     const handleClick = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
         e.preventDefault();
         console.log("click");
-        //document.getElementById("myDropdown")?.classList.toggle("show");
+        document.getElementById("myDropdown")?.classList.toggle("show");
     };
 
     return (
-        <>
-        <img
-            src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
-            alt="defaultAvatar"
-            className="avatar"
-            onClick={(e) => handleClick(e)}
-        />
-        {/* <div id="myDropdown" className="avatar__dropdown--content">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
-        </div> */}
-        </>
+        <div id="myProfile" className="profile">
+            <img
+                src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
+                alt="defaultAvatar"
+                className="profile__avatar"
+                onClick={(e) => handleClick(e)}
+            />
+            <div id="myDropdown" className="profile__dropdown">
+                <LogoutButton />
+            </div>
+        </div>
       );
 }
 
