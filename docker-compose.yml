@@ -31,6 +31,13 @@ services:
 #    container_name: game_app
 #    build: gameApp
 
+  gateway:
+    container_name: gateway
+    build: api-gateway/gateway
+    ports:
+      - "8081:8081"
+      - "8082:8082"
+
   db:
     container_name: db
     image: postgres
