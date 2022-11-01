@@ -10,7 +10,7 @@ import {
 import { Socket } from 'socket.io';
 import { Server } from 'typeorm';
 
-@WebSocketGateway(8081, {
+@WebSocketGateway(8082, {
   path: '/', // can look into path
   serveClient: true,
   namespace: '/chat',

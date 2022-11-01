@@ -9,12 +9,12 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { Sockets } from './sockets.class';
-import { Auth } from './auth.service';
+//import { Auth } from './auth.service';
 
-@WebSocketGateway(8081, {
-  path: '/', // can look into path
-  serveClient: true,
-  namespace: '/',
+@WebSocketGateway(8084, {
+  //path: '/', // can look into path
+  //serveClient: true,
+  //namespace: '/',
 })
 export class ApiGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -24,7 +24,7 @@ export class ApiGateway
   
   //private clientList: { userID: number };
 
-  constructor(@Inject(Sockets) private readonly sockets : Sockets, @Inject(Auth) private readonly auth: Auth) {}
+  constructor(@Inject(Sockets) private readonly sockets : Sockets, /*@Inject(Auth) private readonly auth: Auth*/) {}
 
   afterInit(server: Server) {
     this.logger.log('Initialized');
@@ -33,8 +33,8 @@ export class ApiGateway
   // TODO: make sure it is storing the userID
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected: ${client.id}');
-    this.sockets.storeSocket(args[0] as number, client); 
-    client.emit('wssTest', {message : "Connected to the websocketServer"});
+    //this.sockets.storeSocket(args[0] as number, client); 
+    //client.emit('wssTest', {message : "Connected to the websocketServer"});
   }
 
   handleDisconnect(client: Socket) {

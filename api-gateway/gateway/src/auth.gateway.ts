@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { Server } from 'typeorm';
-@WebSocketGateway(8081, {
+@WebSocketGateway(8083, {
   path: '/', // can look into path
   serveClient: true,
   namespace: '/auth',
