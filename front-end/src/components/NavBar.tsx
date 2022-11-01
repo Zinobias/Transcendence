@@ -24,8 +24,8 @@ const NavBar: React.FC = () => {
             </div>   
             <div className="grid__left">left</div>
             <div className="grid__right">
-              {/* <ProfileNav /> */}
-              <LogoutButton />
+              <ProfileNav />
+              {/* <LogoutButton /> */}
             </div>
             <div className="grid__body">
               <Outlet />

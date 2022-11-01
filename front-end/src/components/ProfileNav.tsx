@@ -9,8 +9,9 @@ import '../App.css'
 
 const ProfileNav: React.FC = () => {
 
-    const handleClick = () => {
-
+    const handleClick = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+        e.preventDefault();
+        console.log("click");
     };
 
     return (
@@ -19,6 +20,7 @@ const ProfileNav: React.FC = () => {
             src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
             alt="defaultAvatar"
             className="avatar"
+            onClick={(e) => handleClick(e)}
         />
         </>
       );
