@@ -12,6 +12,9 @@ import { Sockets } from './sockets.class';
 //import { Auth } from './auth.service';
 
 @WebSocketGateway(8084, {
+	cors : {
+		origin : "*",
+	}
   //path: '/', // can look into path
   //serveClient: true,
   //namespace: '/',
@@ -20,7 +23,7 @@ export class ApiGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
   {
   @WebSocketServer() wss: Server;
-  private logger: Logger = new Logger('AppGateway');
+  private logger: Logger = new Logger('ApiGateway');
   
   //private clientList: { userID: number };
 
@@ -34,7 +37,7 @@ export class ApiGateway
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected: ${client.id}');
     //this.sockets.storeSocket(args[0] as number, client); 
-    //client.emit('wssTest', {message : "Connected to the websocketServer"});
+    client.emit('wssTest', {message : "Connected to the websocketServer"});
   }
 
   handleDisconnect(client: Socket) {
