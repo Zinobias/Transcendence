@@ -10,25 +10,31 @@ import { Sockets } from './sockets.class';
 @Module({
   imports: [
     ClientsModule.register([
-    { 
-      name: 'GAME_SERVICE', 
-      transport: Transport.TCP,
-      options : {
+      {
+        name: 'GAME_SERVICE',
+        transport: Transport.TCP,
+        options: {
           host: 'game-app',
           port: 3001,
-    },
-  },{ 
-    name: 'CHAT_SERVICE', 
-    transport: Transport.TCP,
-    options : {
-        host: 'chat-app',
-        port: 3000,
-  },
-},
-]),
-    
+        },
+      },
+      {
+        name: 'CHAT_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: 'chat-app',
+          port: 3000,
+        },
+      },
+    ]),
   ],
   controllers: [ApiController],
-  providers: [Sockets, /* Auth,*/ ApiGateway, ChatGateway, GameGateway, AuthGateway],
+  providers: [
+    Sockets,
+    /* Auth,*/ ApiGateway,
+    ChatGateway,
+    GameGateway,
+    AuthGateway,
+  ],
 })
 export class AppModule {}
