@@ -1,11 +1,11 @@
 import React, {  useContext, useState } from "react";
-import { SocketContext } from './Socket';
 import './Components.css';
 import { useNavigate} from 'react-router-dom';
+import {ChatSocketContext} from "./Socket";
 
 const   Chat: React.FC = () => {
 	
-	const socket = useContext(SocketContext);
+	const socket = useContext(ChatSocketContext);
 	const navigate = useNavigate()
     const [chatroomName, setChatroomName] = useState<string>("");
 		

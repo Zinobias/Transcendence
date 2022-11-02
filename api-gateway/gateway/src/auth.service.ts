@@ -1,19 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { SubscribeMessage } from '@nestjs/websockets';
 import { Queries } from './database/queries';
 import { randomUUID } from 'crypto';
-import { Socket, Server } from 'socket.io';
+import { Socket } from 'socket.io';
 import { Sockets } from './sockets.class';
 import { AuthData, AuthToken } from './auth.objects';
 
-@Injectable()
-export class Auth {
+// @Injectable()
+export class AuthServices {
   constructor(@Inject(Sockets) private readonly sockets: Sockets) {}
   private static map = new Map();
 
   public checkAuth(userId: number, accessToken: string): boolean {
-    if (Auth.map.has(userId)) {
-      return Auth.map.get(userId) == accessToken;
+    if (AuthServices.map.has(userId)) {
+      return AuthServices.map.get(userId) == accessToken;
     }
     return false;
   }
@@ -23,30 +22,30 @@ export class Auth {
       userId,
     );
     if (accessToken != null) {
-      Auth.map.set(userId, accessToken);
+      AuthServices.map.set(userId, accessToken);
     }
   }
 
-  @SubscribeMessage('auth')
   async auth(client: Socket, data: AuthData) {
-    const oauthResponse = await fetch(
-      'https://api.intra.42.fr/v2/oauth/token',
-      {
-        method: 'Post',
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          client_id: process.env.CLIENT,
-          client_secret: process.env.SECRET,
-          code: data.code,
-          redirect_uri: 'http://localhost:3000',
-        }),
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
+    const oauthResponse = await this.fetchOauthResponse(data);
     const json: AuthToken = await oauthResponse.json();
     const userId = await this.retrieveUserId(client, json);
     const uuid = randomUUID();
     this.storeSession(client, userId, uuid);
+  }
+
+  private async fetchOauthResponse(data: AuthData): Promise<Response> {
+    return await fetch('https://api.intra.42.fr/v2/oauth/token', {
+      method: 'Post',
+      body: JSON.stringify({
+        grant_type: 'authorization_code',
+        client_id: process.env.CLIENT,
+        client_secret: process.env.SECRET,
+        code: data.code,
+        redirect_uri: 'http://localhost:3000',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   private async retrieveUserId(

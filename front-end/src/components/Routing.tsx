@@ -7,12 +7,12 @@ import Leaderboard from './Leaderboard';
 import Game from './Game'
 import ChatWindow from './ChatWindow';
 import NavBar from './NavBar';
-import { SocketContext } from "./Socket";
+import { GameSocketContext } from "./Socket";
 import { useCookies } from 'react-cookie';
 
 const Routing: React.FC  = () => {
     const [cookies, setCookie] = useCookies(['user']);
-    const socket = useContext(SocketContext);
+    const socket = useContext(GameSocketContext);
 
     return (
         // STILL NEED TO WRITE PROPER GUARD
