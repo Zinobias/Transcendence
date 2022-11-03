@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryColumn, ManyToOne, JoinColumn} from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Setting } from '../../Objects/Setting';
 import { SettingType } from '../../Enums/SettingType';
 import { ChatChannels } from './chatChannels';
@@ -18,16 +18,15 @@ export class ChatChannelSettings {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => ChatChannels, (chat) => chat.channelId) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => ChatChannels, (chat) => chat.channelId)
   @JoinColumn({ name: 'channelId' })
   channel: ChatChannels;
 
   @PrimaryColumn()
   affectedUser: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'affectedUser' })
-
   @Column()
   from: number;
 

@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
-import { UserTable } from './entities/UserTable';
+import { user_table } from './entities/UserTable';
 // import { Blocked } from './entities/blocked';
-import { Friends } from './entities/friends';
+import { friends } from './entities/friends';
 // import { getEnvironmentData } from 'worker_threads';
 
 require('dotenv').config({ path: __dirname + '/.env' });

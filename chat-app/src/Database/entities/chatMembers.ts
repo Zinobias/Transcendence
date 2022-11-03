@@ -16,9 +16,9 @@ export class ChatMembers {
 
   @ManyToOne(() => ChatChannels, (channel) => channel.channelId)
   @JoinColumn({ name: 'channelId' })
-  channel: ChatChannels; //TODO: needs to be a foreign key as well
+  channel: ChatChannels;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
   user: UserTable;
 }

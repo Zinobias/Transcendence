@@ -14,11 +14,11 @@ export class Blocked {
   @PrimaryColumn()
   blockId: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
   users: UserTable;
 
-  @ManyToOne(() => Blocked, (block) => block.blockId) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => Blocked, (block) => block.blockId)
   @JoinColumn({ name: 'blockId' })
   block: Blocked;
 }

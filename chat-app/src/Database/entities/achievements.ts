@@ -1,4 +1,4 @@
-import {Entity, JoinColumn, ManyToOne, PrimaryColumn} from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { UserTable } from './UserTable';
 
 @Entity()
@@ -9,7 +9,7 @@ export class achievements {
   @PrimaryColumn()
   achievement: string;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
   user: UserTable;
 

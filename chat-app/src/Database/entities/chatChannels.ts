@@ -1,4 +1,12 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, PrimaryColumn, OneToMany, JoinColumn} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  PrimaryColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Channel } from '../../Objects/Channel';
 import { UserTable } from './UserTable';
 
@@ -21,11 +29,11 @@ export class ChatChannels {
   @PrimaryColumn()
   owner2Id: number;
 
-  @OneToMany(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @OneToMany(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'ownerId' })
   user: UserTable;
 
-  @ManyToOne(() => UserTable, (user) => user.userId, { nullable: true }) //TODO: needs to be a foreign key and nullable
+  @ManyToOne(() => UserTable, (user) => user.userId, { nullable: true })
   @JoinColumn({ name: 'owner2Id' })
   user2: UserTable;
 

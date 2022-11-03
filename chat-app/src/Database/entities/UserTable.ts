@@ -16,6 +16,10 @@ export class UserTable {
   @Column({ default: new Date() })
   createAt: Date;
 
-  // @Column({ type: 'longblob' })
-  // avatar: Buffer;
+  // @JoinColumn({ name: 'avatarId' })
+  // @OneToOne(() => blob, { nullable: true })
+  // avatar: blob;
+  //
+  // @Column({ nullable: true })
+  // avatarId: number;
 }

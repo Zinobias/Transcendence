@@ -23,11 +23,11 @@ export class Friends {
   @PrimaryColumn()
   friendId: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
   user: UserTable;
 
-  @ManyToMany(() => Friends, (friend) => friend.friendId) //TODO: needs to be a foreign key as well
+  @ManyToMany(() => Friends, (friend) => friend.friendId)
   @JoinColumn({ name: 'friendId' })
   friend: Friends;
 

@@ -12,6 +12,11 @@ import { ChatChannelSettings } from './entities/chatChannelSettings';
 import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
 import { chatMessage } from './entities/chatMessages';
+<<<<<<< HEAD
+=======
+import { blob } from 'stream/consumers';
+import { NotFoundException } from '@nestjs/common';
+>>>>>>> Add table foreign keys
 import {InsertResult} from "typeorm";
 
 export class Queries {
@@ -36,15 +41,35 @@ export class Queries {
     console.log('user added');
   }
 
+  async uploadDatabaseFile(dataBuffer: Buffer, filename: string) {
+    const avatar = myDataSource.getRepository(blob);
+    const newFile = await avatar.create({
+      filename,
+      data: dataBuffer,
+    });
+    await avatar.save(newFile);
+    return newFile;
+  }
+
+  async getFileById(fileId: number) {
+    const avatar = myDataSource.getRepository(blob);
+    const file = await avatar.findOneBy({ avatarId: fileId});
+    if (!file) {
+      throw new NotFoundException();
+    }
+    return file;
+  }
+
   /**
    * Sets a new avatar for a user
    * @param userId user to get the avatar for
    * @param image image to store as the avatar
    */
-  async setUserAvatar(userId: number, image: Buffer) {
+  async setUserAvatar(userId: number, image: Buffer, filename: string) {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
-    // await userRepository.update({ userId: userId });
+    const avatar = await this.uploadDatabaseFile(image, filename);
+    await userRepository.update(userId, { avatarId: avatar.avatarId });
   }
 
   /**

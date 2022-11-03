@@ -25,12 +25,12 @@ export class chatMessage {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => ChatChannels, (chat) => chat.channelId) //TODO: needs to be a foreign key
+  @ManyToOne(() => ChatChannels, (chat) => chat.channelId)
   @JoinColumn({ name: 'channelId' })
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
   @Column()
   message: string;

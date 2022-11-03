@@ -12,15 +12,15 @@ export class games {
   @PrimaryColumn()
   user2: number;
 
-  @ManyToOne(() => games) //TODO: needs to be a foreign key as well
+  @ManyToOne(() => games)
   @JoinColumn({ name: 'gameId' })
   game: games;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'user1' })
   userT: UserTable;
 
-  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key
+  @ManyToOne(() => UserTable, (user) => user.userId)
   @JoinColumn({ name: 'user2' })
   user2T: UserTable;
 
