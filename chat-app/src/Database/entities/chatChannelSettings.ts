@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {Entity, Column, PrimaryColumn, ManyToOne, JoinColumn} from 'typeorm';
 import { Setting } from '../../Objects/Setting';
 import { SettingType } from '../../Enums/SettingType';
 import { ChatChannels } from './chatChannels';
@@ -12,7 +12,7 @@ export class ChatChannelSettings {
     this.affectedUser = setting.userId;
     this.from = setting.from;
     this.until = setting.until;
-    this.setting = setting.setting.toLocaleString();
+    this.setting = setting.setting;
   }
 
   @PrimaryColumn()
@@ -25,8 +25,8 @@ export class ChatChannelSettings {
   @PrimaryColumn()
   affectedUser: number;
 
-  // @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
-  // @JoinColumn({ name: 'affectedUser' })
+  @ManyToOne(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key as well
+  @JoinColumn({ name: 'affectedUser' })
 
   @Column()
   from: number;
@@ -35,5 +35,5 @@ export class ChatChannelSettings {
   until: number;
 
   @PrimaryColumn()
-  setting: string;
+  setting: SettingType;
 }

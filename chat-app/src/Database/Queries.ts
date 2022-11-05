@@ -252,7 +252,7 @@ export class Queries {
     const find = setting.findBy({
       channelId: channelId,
       affectedUser: userId,
-      setting: settingType.toLocaleString(),
+      setting: settingType,
     });
     await setting.remove(await find);
   }

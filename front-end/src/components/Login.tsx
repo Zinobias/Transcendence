@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from "react";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import {AuthSocketContext} from "./Socket";
+import { SocketContext } from "./Socket";
 import '../App.css'
 import './Components.css';
 
@@ -14,31 +14,31 @@ const   Login: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [cookies, setCookie] = useCookies(['user']);
-    const socket = useContext(AuthSocketContext);
+    const socket = useContext(SocketContext);
 
     // WITH BACKEND
-    useEffect(() => {
-        socket.on("user_id", res => {
-            console.log(res.auth_cookie);
-			console.log(res.user_id);
-            setCookie('user', res.auth_cookie, {path: '/'});
-            navigate('/');
-        })
-    }, [])
+    // useEffect(() => {
+    //     socket.on("user_id", res => {
+    //         console.log(res.auth_cookie);
+	// 		console.log(res.user_id);
+    //         setCookie('user', res.auth_cookie, {path: '/'});
+    //         navigate('/');
+    //     })
+    // }, [])
     
-    if (searchParams.get("code")) {
-        console.log("EMITTING")
-        socket.emit("auth", { code: searchParams.get("code") })
-        //socket.emit("chat", {userID: 12, accessToken: "test", eventPattern: "auth", payload: {code: searchParams.get("code")}})
-    }
+    // if (searchParams.get("code")) {
+    //     console.log("EMITTING")
+    //     socket.emit("auth", { code: searchParams.get("code") })
+    //     //socket.emit("chat", {userID: 12, accessToken: "test", eventPattern: "auth", payload: {code: searchParams.get("code")}})
+    // }
 
     //WITHOUT BACKEND
-    // useEffect(() => {
-    //     if (searchParams.get("code")) {
-    //         setCookie('user', searchParams.get("code"), {path: '/'});
-    //         navigate('/');
-    //     }
-    // }, [])
+    useEffect(() => {
+        if (searchParams.get("code")) {
+            setCookie('user', searchParams.get("code"), {path: '/'});
+            navigate('/');
+        }
+    }, [])
 
     const handleLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
@@ -47,7 +47,7 @@ const   Login: React.FC = () => {
 
     return  (
         <div className="grid-container">
-            <span className="grid__header">Disco Pong</span>
+            <span className="grid__header">Disco Pong</span>      
             <div className="grid__body">
                 <button className="loginform__button" onClick={(e) => handleLogin(e)}>LOGIN</button>
             </div>

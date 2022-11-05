@@ -39,7 +39,7 @@ export class ApiGateway
 
   // TODO: make sure it is storing the userID
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log('Client connected: ' + client.id + ' ' + args[0]);
+    this.logger.log('Client connected: ${client.id}' + ' ' + args[0]);
     this.sockets.storeSocket(args[0] as number, client);
     client.emit('wssTest', { message: 'Connected to the websocketServer' });
     this.gameClient.emit('testMsg', { message: 'random message from gateway' });
