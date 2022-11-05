@@ -8,6 +8,7 @@ const   LogoutButton: React.FC = () => {
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         removeCookie('user');
+        console.log("click logout");
     };
 
     return (

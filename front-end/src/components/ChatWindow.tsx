@@ -12,6 +12,19 @@ const   ChatWindow: React.FC = () => {
         inputRef.current?.focus();
     }, [])
 
+    useEffect(() => {
+
+        if(inputRef&& inputRef.current) {
+          const element = inputRef.current;
+          element.scroll({
+            top: element.scrollHeight,
+            left: 0,
+            behavior: "smooth"
+          })
+        }
+  
+      }, [inputRef, chat])
+
     const handleMessage = (e: React.FormEvent) => {
         e.preventDefault();
         // console.log(message);
@@ -36,11 +49,11 @@ const   ChatWindow: React.FC = () => {
                     // placeholder="Enter your message"
                 />
             </form>
-            <div className="chatroom__text">
+            <div className="chatroom__text" ref={inputRef}>
                 {chat.map((element, index) => {
                 return (
                 <div key={index} className="chatroom__text--bubble__left">
-                    <p>USER<br/>{element}</p>
+                    <p><b>USER</b><br/>{element}</p>
                 </div>
                 );
             })}
