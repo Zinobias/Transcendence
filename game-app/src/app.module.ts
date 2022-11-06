@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 // import { FrontendGateway } from './frontend.gateway';
 
 @Module({
@@ -21,7 +22,17 @@ import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
 		verboseMemoryLeak: false,
 		// disable throwing uncaughtException if an error event is emitted and it has no listeners
 		ignoreErrors: false,
-	  })
+	  }),
+	  ClientsModule.register([
+		{
+		  name: 'gateway',
+		  transport: Transport.TCP,
+		  options: {
+			host: 'gateway',
+			port: 8089,
+		  },
+		},
+	  ]),
   ],
   controllers: [AppController],
   providers: [AppService],

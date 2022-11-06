@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller, Inject, Logger } from '@nestjs/common';
 import { EventPattern, Payload, ClientProxy } from '@nestjs/microservices';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Sockets } from 'src/sockets.class';
@@ -10,10 +10,11 @@ export interface microServiceDTO {
 	payload : {},
 }
 
-@Controller('api')
+@Controller()
 export class ApiController {
 	//@WebSocketServer()
 	//server : Server;
+	private logger = new Logger("gateway api controller");
 
 	constructor(@Inject(Sockets) private readonly sockets : Sockets,
 				@Inject('GAME_SERVICE') private game_client: ClientProxy,
@@ -21,10 +22,17 @@ export class ApiController {
 
 	@EventPattern('game')
 	gameForwarding(@Payload() payload : microServiceDTO ) {
+		this.logger.log("Msg from game to gateway received");
 		for (let userid of payload.userIDs) {
 			this.sockets.getSocket(userid)?.emit(payload.eventPattern, payload.payload);
 		}
 	}
+
+	@EventPattern('testMsg')
+	testingFnc(@Payload() payload : any){
+		this.logger.log("Msg from game to gateway received : " + payload);
+	}
+
 
 	@EventPattern('chat')
 	chatForwarding(@Payload() payload : microServiceDTO ) { // change any to interface

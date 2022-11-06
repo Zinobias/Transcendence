@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Logger, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Logger, Post, Req } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { AppService } from './app.service';
@@ -9,7 +9,17 @@ import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './ev
 
 @Controller()
 export class AppController {
-	constructor(private appService: AppService) {}
+
+	async onApplicationBootstrap() {
+		console.log("Boostrapped game controller");
+		console.log("trying to connect");
+		this.gatewayClient.connect();
+		console.log("Success");
+
+
+	}
+	constructor(private appService: AppService,
+		@Inject('gateway') private readonly  gatewayClient : ClientProxy) {}
 	private readonly logger = new Logger("game controller");
 
 	@OnEvent('game.frameupdate')
@@ -36,12 +46,8 @@ export class AppController {
 	async testFunc(@Payload() payload : any) {
 		this.logger.log(payload);
 		this.logger.log("connected to the game");
-
-	}
-
-	@SubscribeMessage("testMsg")
-	async testFuncc(client : Socket, data : any) {
-		this.logger.log("connected to the game");
+		
+		this.gatewayClient.emit<string, string>('testMsg', "testmsg from game");
 	}
 }
 
