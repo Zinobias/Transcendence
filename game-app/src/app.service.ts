@@ -25,7 +25,6 @@ export class AppService {
 			},
 		});
 	};
-
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
 	}

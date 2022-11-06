@@ -27,9 +27,17 @@ services:
         source: ./chat-app/
         target: /usr/src/app/
 
-#  game_app:
-#    container_name: game_app
-#    build: gameApp
+  game_app:
+    container_name: game-app
+    build: game-app
+    ports:
+      - '9000:9000'
+      - '3001:3001'
+
+    volumes:
+      - type: bind
+        source: ./game-app/
+        target: /usr/src/app/
 
   gateway:
     container_name: gateway
@@ -38,6 +46,10 @@ services:
       - "8081:8081"
       - "8082:8082"
       - "8084:8084"
+    volumes:
+      - type: bind
+        source: ./api-gateway/gateway
+        target: /usr/src/app/
 
   db:
     container_name: db

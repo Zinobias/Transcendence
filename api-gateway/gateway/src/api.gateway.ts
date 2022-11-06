@@ -1,5 +1,5 @@
 import { Inject, Logger } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservices';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -10,6 +10,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { Sockets } from './sockets.class';
 //import { Auth } from './auth.service';
+
 
 @WebSocketGateway(8084, {
   cors: {
@@ -25,6 +26,11 @@ export class ApiGateway
   @WebSocketServer() wss: Server;
   private logger: Logger = new Logger('ApiGateway');
 
+  async onApplicationBootstrap() {
+	console.log("bootstrap gateway");
+	// this.gameClient.connect();
+	this.gameClient.emit("testMsg", "msg from frontend");
+  }
   //private clientList: { userID: number };
 
   constructor(
@@ -41,8 +47,10 @@ export class ApiGateway
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log('Client connected: ${client.id}' + ' ' + args[0]);
     this.sockets.storeSocket(args[0] as number, client);
-    client.emit('wssTest', { message: 'Connected to the websocketServer' });
-    this.gameClient.emit('testMsg', { message: 'random message from gateway' });
+    client.emit('wssTest', { message: 'Connected to the websocketServer' }); // relays back to frontend
+	this.gameClient.send('testMsg', { message: 'random message from gateway' }); // to game
+	this.gameClient.emit("testMsg", "user connected to frontend");
+
   }
 
   handleDisconnect(client: Socket) {

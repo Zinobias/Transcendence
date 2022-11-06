@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Logger, Post, Req } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { EventPattern, Payload, Transport } from '@nestjs/microservices';
+import { EventPattern, Payload } from '@nestjs/microservices';
+import { SubscribeMessage } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 import { AppService } from './app.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 
@@ -8,7 +10,7 @@ import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './ev
 @Controller()
 export class AppController {
 	constructor(private appService: AppService) {}
-	private readonly logger = new Logger("controller");
+	private readonly logger = new Logger("game controller");
 
 	@OnEvent('game.frameupdate')
 	async updateFrame(@Payload() payload : GameFrameUpdateEvent) {
@@ -31,8 +33,15 @@ export class AppController {
 	}
 
 	@EventPattern("testMsg")
-	testFunc(@Payload() payload : any) {
-		this.logger.log(payload.message);
+	async testFunc(@Payload() payload : any) {
+		this.logger.log(payload);
+		this.logger.log("connected to the game");
+
+	}
+
+	@SubscribeMessage("testMsg")
+	async testFuncc(client : Socket, data : any) {
+		this.logger.log("connected to the game");
 	}
 }
 

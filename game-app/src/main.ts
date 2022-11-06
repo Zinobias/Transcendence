@@ -3,8 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 
-const logger = new Logger("Main");
 
+const logger = new Logger("Main");
 async function bootstrap() {
 	// const app = await NestFactory.create(AppModule);
 	// await app.listen(3000);
@@ -13,11 +13,12 @@ async function bootstrap() {
 		{
 			transport: Transport.TCP,
 			options: {// might change the hostname
-				host: "gateway",
+				host: "game-app",
 				port: 3001,
-			}
+			},
 		},
-	);
-	app.listen().then(() => {logger.log("Microservice is listening");});
+		);
+	await app.listen().then(() => {logger.log("Microservice is listening");});
 }
+
 bootstrap();
