@@ -13,7 +13,6 @@ export class AppController {
 	async onApplicationBootstrap() {
 		console.log("Boostrapped game controller");
 		console.log("trying to connect");
-		this.gatewayClient.connect();
 		console.log("Success");
 
 
