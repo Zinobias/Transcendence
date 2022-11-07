@@ -78,6 +78,7 @@ export class ApiGateway
   @SubscribeMessage('game')
   handleGame(client: Socket, payload: FrontEndDTO) {
     //TODO verify auth
+	console.log("auth works");
     this.gameClient.emit(payload.eventPattern, payload.payload);
   }
 }

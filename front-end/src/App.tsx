@@ -14,6 +14,7 @@ const App: React.FC = () => {
 	  socket.on("wssTest", message => {
 		  console.log(message.message + "client");
 	  });
+	  socket.emit('game', { msg : "dsssss"});
   }, []) //only re-run the effect if new message comes in
 
   return (
