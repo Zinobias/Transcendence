@@ -22,10 +22,13 @@ const NavBar: React.FC = () => {
                 <li><Link to='/chat'>Chat</Link></li>
               </ul>
             </div>   
-            <div className="grid__left">left</div>
-            <div className="grid__right">
+            <div className="grid__left">
               {/* <ProfileNav /> */}
               <LogoutButton />
+            </div>
+            <div className="grid__right">
+              <ProfileNav />
+              {/* <LogoutButton /> */}
             </div>
             <div className="grid__body">
               <Outlet />
