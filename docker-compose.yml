@@ -11,7 +11,7 @@ services:
         target: /usr/src/app/
 
   chat_app:
-    container_name: chat
+    container_name: chat-app
     build: chat-app
 
     environment:
@@ -50,7 +50,7 @@ services:
     container_name: db
     image: postgres
     ports:
-      - '5433:5432'
+      - '5432:5432'
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"

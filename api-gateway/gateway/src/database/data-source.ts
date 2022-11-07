@@ -16,7 +16,7 @@ myDataSource
   .then(async () => {
     console.log('Connection initialized with database...');
   })
-  .catch((error) => console.log('dsssss', error));
+  .catch((error) => console.log('Failed to connec to database', error));
 
 export const getDataSource = (delay = 3000): Promise<DataSource> => {
   if (myDataSource.isInitialized) return Promise.resolve(myDataSource);
