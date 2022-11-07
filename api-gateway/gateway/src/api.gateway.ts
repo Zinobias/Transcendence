@@ -11,7 +11,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { Sockets } from './sockets.class';
 import { Auth } from './auth.service';
-import {AuthGuard} from "../auth.guard";
+import {AuthGuard} from "./auth.guard";
 
 export interface FrontEndDTO {
   userId: number;

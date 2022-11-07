@@ -3,7 +3,6 @@ import { InsertResult } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { Database } from './data-source';
 
-
 @Injectable()
 export class Queries {
 

@@ -5,8 +5,9 @@ import {
   Inject,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { FrontEndDTO } from './src/api.gateway';
-import { Auth } from './src/auth.service';
+import { FrontEndDTO } from './api.gateway';
+import { Auth } from './auth.service';
+
 
 @Injectable()
 export class AuthGuard implements CanActivate {

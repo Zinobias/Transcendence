@@ -39,7 +39,9 @@ services:
     container_name: gateway
     build: api-gateway/gateway
     ports:
-      - "8089:8089"
+      - "8089:8089" # Port for microservice communication
+      - "8084:8084" # Port for clientside communication
+
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
@@ -55,7 +57,7 @@ services:
     container_name: db
     image: postgres
     ports:
-      - '5432:5432'
+      - '5432:5432' # Default postgres port
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"

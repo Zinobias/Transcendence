@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { Queries } from './database/queries';
 import { randomUUID } from 'crypto';
-import { Socket, Server } from 'socket.io';
+import { Socket} from 'socket.io';
 import { Sockets } from './sockets.class';
 import { AuthData, AuthToken } from './auth.objects';
 

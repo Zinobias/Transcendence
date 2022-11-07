@@ -3,8 +3,10 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class Database {
-	constructor(
-		private dataSource : DataSource = new DataSource(
+	private readonly dataSource;
+	
+	constructor() {
+		this.dataSource = new DataSource(
 		{
 			type: 'postgres',
 			host: process.env.POSTGRES_HOST,
@@ -14,7 +16,7 @@ export class Database {
 			entities: [__dirname + '/entities/*.{js,ts}'],
 			synchronize: true,
 		})
-	  ) {}
+	  }
 
 
 	async onApplicationBootstrap() {
