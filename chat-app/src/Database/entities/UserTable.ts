@@ -1,7 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  Column,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
-export class UserTable {
+export class user_table {
   constructor(loginId: string, userName: string) {
     this.loginId = loginId;
     this.userName = userName;

@@ -1,8 +1,12 @@
 import { DataSource } from 'typeorm';
-// import { user_table } from './entities/UserTable';
-// import { Blocked } from './entities/blocked';
-// import { friends } from './entities/Friends';
-// import { getEnvironmentData } from 'worker_threads';
+import { user_table } from './entities/UserTable';
+import { blocked } from './entities/Blocked';
+import { achievements } from './entities/Achievements';
+import { chat_channels } from './entities/ChatChannels';
+import { chat_channel_settings } from './entities/ChatChannelSettings';
+import { chat_members } from './entities/ChatMembers';
+import { games } from './entities/Games';
+import { sessions } from './entities/Sessions';
 
 require('dotenv').config({ path: __dirname + '/.env' });
 export const myDataSource = new DataSource({
@@ -11,7 +15,17 @@ export const myDataSource = new DataSource({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  entities: [__dirname + '/entities/*.{js,ts}'],
+  entities: [
+    user_table,
+    blocked,
+    achievements,
+    chat_channels,
+    chat_channel_settings,
+    chat_members,
+    chat_members,
+    games,
+    sessions,
+  ],
   synchronize: true,
 });
 
