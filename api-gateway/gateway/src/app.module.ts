@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ApiGateway } from './api.gateway';
-import { ChatGateway } from './chat.gateway';
-import { GameGateway } from './game.gateway';
-import { AuthGateway } from './auth.gateway';
 import { ApiController } from './api/api.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { Sockets } from './sockets.class';
-//import { Auth } from './auth.service';
+import { Auth } from './auth.service';
 @Module({
   imports: [
     ClientsModule.register([
@@ -29,12 +26,6 @@ import { Sockets } from './sockets.class';
     ]),
   ],
   controllers: [ApiController],
-  providers: [
-    Sockets,
-    /* Auth,*/ ApiGateway,
-    ChatGateway,
-    GameGateway,
-    AuthGateway,
-  ],
+  providers: [Sockets, Auth, ApiGateway],
 })
 export class AppModule {}
