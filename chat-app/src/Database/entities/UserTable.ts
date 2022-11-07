@@ -1,14 +1,17 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class UserTable {
-  constructor(userId: number, userName: string) {
-    this.userId = userId;
+  constructor(loginId: string, userName: string) {
+    this.loginId = loginId;
     this.userName = userName;
   }
 
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   userId: number;
+
+  @Column()
+  loginId: string;
 
   @Column()
   userName: string;

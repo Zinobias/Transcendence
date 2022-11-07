@@ -7,12 +7,13 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { Message } from '../../Objects/Message';
-import { ChatChannels } from './chatChannels';
-import { UserTable } from './UserTable';
+import { chat_channels } from './ChatChannels';
+import { user_table } from './UserTable';
 
 @Entity()
-export class chatMessage {
+export class chat_message {
   constructor(channelId: number, message: Message) {
+    console.log("testinggggggg");
     if (message === undefined) return;
     this.channelId = channelId;
     this.message = message.message;
@@ -25,13 +26,17 @@ export class chatMessage {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => ChatChannels, (chat) => chat.channelId)
+  @ManyToOne(() => chat_channels, (chat) => chat.channelId)
   @JoinColumn({ name: 'channelId' })
+  chat: chat_channels;
+
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
+  user: user_table;
+
   @Column()
   message: string;
 

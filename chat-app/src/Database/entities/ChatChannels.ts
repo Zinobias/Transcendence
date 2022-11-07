@@ -8,10 +8,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Channel } from '../../Objects/Channel';
-import { UserTable } from './UserTable';
+import { user_table } from './UserTable';
 
 @Entity()
-export class ChatChannels {
+export class chat_channels {
   constructor(channel?: Channel) {
     if (channel == undefined) return;
     console.log(channel);
@@ -29,13 +29,13 @@ export class ChatChannels {
   @PrimaryColumn()
   owner2Id: number;
 
-  @OneToMany(() => UserTable, (user) => user.userId)
+  @OneToMany(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'ownerId' })
-  user: UserTable;
+  user: user_table;
 
-  @ManyToOne(() => UserTable, (user) => user.userId, { nullable: true })
+  @ManyToOne(() => user_table, (user) => user.userId, { nullable: true })
   @JoinColumn({ name: 'owner2Id' })
-  user2: UserTable;
+  user2: user_table;
 
   @Column()
   channelName: string;

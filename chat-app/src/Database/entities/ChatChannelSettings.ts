@@ -1,12 +1,13 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Setting } from '../../Objects/Setting';
 import { SettingType } from '../../Enums/SettingType';
-import { ChatChannels } from './chatChannels';
-import { UserTable } from './UserTable';
+import { chat_channels } from './ChatChannels';
+import { user_table } from './UserTable';
 
 @Entity()
-export class ChatChannelSettings {
+export class chat_channel_settings {
   constructor(setting: Setting) {
+    console.log("testinggggggg");
     if (setting == undefined) return;
     this.channelId = setting.channelId;
     this.affectedUser = setting.userId;
@@ -18,14 +19,14 @@ export class ChatChannelSettings {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => ChatChannels, (chat) => chat.channelId)
+  @ManyToOne(() => chat_channels, (chat) => chat.channelId)
   @JoinColumn({ name: 'channelId' })
-  channel: ChatChannels;
+  channel: chat_channels;
 
   @PrimaryColumn()
   affectedUser: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'affectedUser' })
   @Column()
   from: number;

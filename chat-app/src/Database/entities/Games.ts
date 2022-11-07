@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
-import { UserTable } from './UserTable';
+import { user_table } from './UserTable';
 
 @Entity()
 export class games {
@@ -16,13 +16,13 @@ export class games {
   @JoinColumn({ name: 'gameId' })
   game: games;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'user1' })
-  userT: UserTable;
+  userT: user_table;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'user2' })
-  user2T: UserTable;
+  user2T: user_table;
 
   @Column()
   user1score: number;

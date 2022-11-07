@@ -1,5 +1,5 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { UserTable } from './UserTable';
+import { user_table } from './UserTable';
 
 @Entity()
 export class achievements {
@@ -9,9 +9,9 @@ export class achievements {
   @PrimaryColumn()
   achievement: string;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
-  user: UserTable;
+  user: user_table;
 
   @ManyToOne(() => achievements, (achievement) => achievement.achievement)
   @JoinColumn({ name: 'achievement' })

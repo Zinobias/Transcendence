@@ -6,11 +6,11 @@ import {
   ManyToMany,
   JoinColumn,
 } from 'typeorm';
-import { UserTable } from './UserTable';
+import { user_table } from './UserTable';
 import { Friend } from '../../Objects/Friend';
 
 @Entity()
-export class Friends {
+export class friends {
   constructor(userId: number, friendId: number, active: boolean) {
     this.userId = userId;
     this.friendId = friendId;
@@ -23,13 +23,13 @@ export class Friends {
   @PrimaryColumn()
   friendId: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
-  user: UserTable;
+  user: user_table;
 
-  @ManyToMany(() => Friends, (friend) => friend.friendId)
+  @ManyToMany(() => friends, (friend) => friend.friendId)
   @JoinColumn({ name: 'friendId' })
-  friend: Friends;
+  friend: friends;
 
   @Column()
   active: boolean;

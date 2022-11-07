@@ -1,8 +1,8 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { UserTable } from './UserTable';
+import { user_table } from './UserTable';
 
 @Entity()
-export class Blocked {
+export class blocked {
   constructor(userId: number, blockId) {
     this.userId = userId;
     this.blockId = blockId;
@@ -14,11 +14,11 @@ export class Blocked {
   @PrimaryColumn()
   blockId: number;
 
-  @ManyToOne(() => UserTable, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
-  users: UserTable;
+  users: user_table;
 
-  @ManyToOne(() => Blocked, (block) => block.blockId)
+  @ManyToOne(() => blocked, (block) => block.blockId)
   @JoinColumn({ name: 'blockId' })
-  block: Blocked;
+  block: blocked;
 }
