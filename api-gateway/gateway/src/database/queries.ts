@@ -1,19 +1,16 @@
-import { getDataSource } from './data-source';
 import { Sessions } from './entities/sessions';
 import { InsertResult } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
+import { Database } from './data-source';
 
+
+@Injectable()
 export class Queries {
-  private static _instance: Queries;
 
-  public static getInstance(): Queries {
-    if (this._instance == undefined) {
-      this._instance = new Queries();
-    }
-    return this._instance;
-  }
+constructor(@Inject(Database) private database : Database) {}
 
   async storeAuth(id: number, auth: string): Promise<boolean> {
-    const myDataSource = await getDataSource();
+    const myDataSource = await this.database.getDataSource();
     const repo = myDataSource.getRepository(Sessions);
     const insertResult: InsertResult = await repo.insert({
       userId: id,
@@ -24,7 +21,7 @@ export class Queries {
 
   private static readonly expireTime = 604800000; // 7 days
   async loadSession(id: number): Promise<string | null> {
-    const myDataSource = await getDataSource();
+    const myDataSource = await this.database.getDataSource();
     const repo = myDataSource.getRepository(Sessions);
     const session = await repo.findOneBy({
       userId: id,

@@ -8,7 +8,8 @@ import { AuthData, AuthToken } from './auth.objects';
 
 @Injectable()
 export class Auth {
-  constructor(@Inject(Sockets) private readonly sockets: Sockets) {}
+  constructor(@Inject(Sockets) private readonly sockets: Sockets,
+  @Inject(Queries) private readonly queries : Queries) {}
   private static map = new Map();
 
   public checkAuth(userId: number, accessToken: string): boolean {
@@ -19,7 +20,7 @@ export class Auth {
   }
 
   public async updateAuth(userId: number) {
-    const accessToken: string | null = await Queries.getInstance().loadSession(
+    const accessToken: string | null = await this.queries.loadSession(
       userId,
     );
     if (accessToken != null) {
@@ -68,7 +69,7 @@ export class Auth {
   }
 
   private storeSession(client: Socket, userId: number, uuid: string) {
-    Queries.getInstance()
+    this.queries
       .storeAuth(userId, uuid)
       .then(async (success) => {
         if (success) {
