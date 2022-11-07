@@ -20,7 +20,7 @@ import { Auth } from './auth.service';
         transport: Transport.TCP,
         options: {
           host: 'chat-app',
-          port: 3000,
+          port: 8080,
         },
       },
     ]),
