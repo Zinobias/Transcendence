@@ -23,9 +23,7 @@ export class ApiController {
 	@EventPattern('game')
 	gameForwarding(@Payload() payload : microServiceDTO ) {
 		this.logger.log("Msg from game to gateway received");
-		for (let userid of payload.userIDs) {
-			this.sockets.getSocket(userid)?.emit(payload.eventPattern, payload.payload);
-		}
+		this.sockets.sendData(payload.userIDs, payload.eventPattern, payload.payload);
 	}
 
 	@EventPattern('testMsg')

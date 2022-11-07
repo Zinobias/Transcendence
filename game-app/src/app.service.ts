@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { createGameDTO } from './dto/dto';
@@ -9,22 +9,13 @@ import { GameResult } from './game-objects/game-object-interfaces';
 const logger = new Logger("AppService");
 @Injectable()
 export class AppService {
-	private client 				: ClientProxy;
 	// private matchmakingQueue	: gameMatchmakingEntity[];
 	private matchMakingQueue : Map<string , string[]>;
 	/**
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
 	 */
-	constructor(private eventEmitter : EventEmitter2) {
-		this.client = ClientProxyFactory.create( {
-			transport: Transport.TCP,
-			options : {
-				host: '127.0.0.1',
-				port: 3000,
-			},
-		});
-	};
+	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {};
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
 	}
