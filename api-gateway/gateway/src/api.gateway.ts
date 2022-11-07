@@ -1,4 +1,4 @@
-import { Inject, Logger } from '@nestjs/common';
+import {Inject, Logger, UseGuards} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   OnGatewayConnection,
@@ -11,13 +11,11 @@ import {
 import { Socket, Server } from 'socket.io';
 import { Sockets } from './sockets.class';
 import { Auth } from './auth.service';
-
-export enum Destination {
-  GAME_SERVICE,
-  CHAT_SERVICE,
-}
+import {AuthGuard} from "../auth.guard";
 
 export interface FrontEndDTO {
+  userId: number;
+  token: string;
   eventPattern: string;
   payload: {};
 }
@@ -69,12 +67,14 @@ export class ApiGateway
     this.logger.log('Client disconnected: ${client.id}');
   }
 
+  @UseGuards(AuthGuard)
   @SubscribeMessage('chat')
   handleChat(client: Socket, payload: FrontEndDTO) {
     //TODO verify auth
     this.chatClient.emit(payload.eventPattern, payload.payload);
   }
 
+  @UseGuards(AuthGuard)
   @SubscribeMessage('game')
   handleGame(client: Socket, payload: FrontEndDTO) {
     //TODO verify auth
