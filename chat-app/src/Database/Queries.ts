@@ -11,10 +11,9 @@ import { chat_channels } from './entities/ChatChannels';
 import { chat_channel_settings } from './entities/ChatChannelSettings';
 import { chat_members } from './entities/ChatMembers';
 import { Friend } from '../Objects/Friend';
-import { chatMessage } from './entities/chatMessages';
-import { blob } from 'stream/consumers';
-import { NotFoundException } from '@nestjs/common';
-import {InsertResult} from "typeorm";
+import { InsertResult } from 'typeorm';
+import { UserTable } from './entities/UserTable';
+import { chat_message } from './entities/ChatMessages';
 
 export class Queries {
   private static _instance: Queries;
