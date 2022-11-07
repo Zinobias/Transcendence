@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useRef, useEffect }  from "react";
 import LogoutButton from './Buttons';
 import '../App.css'
+import { AiFillSlackSquare } from "react-icons/ai";
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 
@@ -10,10 +11,35 @@ import '../App.css'
 
 const ProfileNav: React.FC = () => {
 
+    const [open, setOpen] = useState<boolean>(false);
+    const wrapperRef = useRef<HTMLElement>(null);
+    
+    useEffect(() => {
+        /**
+         * Alert if clicked on outside of element
+         */
+        function handleClickOutside(event: any) {
+            // if (event.type  === "mousedown")
+            //     console.log("outside click");
+            if (wrapperRef.current) 
+                console.log("outside click");
+            // if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+            //     console.log("outside click");
+            // }
+        }
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+          // Unbind the event listener on clean up
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, [wrapperRef]);
+
     const handleClick = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
         e.preventDefault();
-        console.log("click");
-        document.getElementById("myDropdown")?.classList.toggle("show");
+        console.log("inside click");
+        setOpen(true);
+        // document.getElementById("myDropdown")?.classList.toggle("show");
     };
 
     return (
@@ -25,7 +51,9 @@ const ProfileNav: React.FC = () => {
                 onClick={(e) => handleClick(e)}
             />
             <div id="myDropdown" className="profile__dropdown">
-                <LogoutButton />
+                <p>Theme</p>
+                <p>Change Avatar</p>
+                <p>Friends: </p>
             </div>
         </div>
       );

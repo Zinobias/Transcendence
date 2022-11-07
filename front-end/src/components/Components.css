@@ -148,9 +148,11 @@ p {
 
 .profile__dropdown {
     display: none;
+    margin-top: 15px;
     /* position: absolute; */
     /* min-width: 160px; */
     /* scale: 0.8; */
+        border: 2px solid black;
     z-index: 1;
 }
 
