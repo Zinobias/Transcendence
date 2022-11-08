@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { createGameDTO } from './dto/dto';
 import { gameMatchmakingEntity } from './event-objects/events.objects';
@@ -27,7 +27,7 @@ export class AppService {
 	
 	findMatch() {
 		for (let gameMode of gameModes) {
-			if (this.matchMakingQueue.get(gameMode)?.length as number % 2) {
+			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
 				let gameDTO : createGameDTO = {
 					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as string,
 					player2UID	: this.matchMakingQueue.get(gameMode)?.pop() as string,
@@ -58,7 +58,7 @@ export class AppService {
 		});
 	}
 	
-	@EventPattern("game.ended")
+	@OnEvent("game.ended")
 	async gameFinishedHandler(@Payload() gameResult : GameEndedData) {
 		this.client.emit("frontend.game.ended", gameResult);
 		logger.log("Game-ended event caught & emitted to frontend");
