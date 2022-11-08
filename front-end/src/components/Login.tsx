@@ -13,32 +13,33 @@ import './Components.css';
 const   Login: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [cookies, setCookie] = useCookies(['user']);
+    const [cookies, setCookie] = useCookies(['user', 'userID']);
     const socket = useContext(SocketContext);
 
     // WITH BACKEND
-    // useEffect(() => {
-    //     socket.on("user_id", res => {
-    //         console.log(res.auth_cookie);
-	// 		console.log(res.user_id);
-    //         setCookie('user', res.auth_cookie, {path: '/'});
-    //         navigate('/');
-    //     })
-    // }, [])
+    useEffect(() => {
+        socket.on("user_id", res => {
+            console.log(res.auth_cookie);
+			console.log(res.user_id);
+            setCookie('user', res.auth_cookie, {path: '/'});
+            setCookie('userID', res.user_id, {path: '/'});
+            navigate('/');
+        })
+    }, [])
     
-    // if (searchParams.get("code")) {
-    //     console.log("EMITTING")
-    //     socket.emit("auth", { code: searchParams.get("code") })
-    //     //socket.emit("chat", {userID: 12, accessToken: "test", eventPattern: "auth", payload: {code: searchParams.get("code")}})
-    // }
+    if (searchParams.get("code")) {
+        console.log("EMITTING");
+        socket.emit("auth", { code: searchParams.get("code") });
+        //socket.emit("chat", {userID: 12, accessToken: "test", eventPattern: "auth", payload: {code: searchParams.get("code")}})
+    }
 
     //WITHOUT BACKEND
-    useEffect(() => {
-        if (searchParams.get("code")) {
-            setCookie('user', searchParams.get("code"), {path: '/'});
-            navigate('/');
-        }
-    }, [])
+    // useEffect(() => {
+    //     if (searchParams.get("code")) {
+    //         setCookie('user', searchParams.get("code"), {path: '/'});
+    //         navigate('/');
+    //     }
+    // }, [])
 
     const handleLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()

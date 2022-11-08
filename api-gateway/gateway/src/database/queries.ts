@@ -2,6 +2,7 @@ import { Sessions } from './entities/sessions';
 import { InsertResult } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { Database } from './data-source';
+import { UserTable } from './entities/user-table';
 
 @Injectable()
 export class Queries {
@@ -10,6 +11,7 @@ constructor(@Inject(Database) private database : Database) {}
 
   async storeAuth(id: number, auth: string): Promise<boolean> {
     const myDataSource = await this.database.getDataSource();
+    //const userRepo = myDataSource.getRepository(UserTable);
     const repo = myDataSource.getRepository(Sessions);
     const insertResult: InsertResult = await repo.insert({
       userId: id,

@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
-
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import { Sessions } from './sessions';
 @Entity()
 export class UserTable {
   constructor(userId: number, userName: string) {
@@ -15,6 +15,9 @@ export class UserTable {
 
   @Column({ default: new Date() })
   createAt: Date;
+
+  @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
+  public sessions: Sessions[];
 
   // @Column({ type: 'longblob' })
   // avatar: Buffer;

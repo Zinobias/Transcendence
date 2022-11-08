@@ -1,4 +1,5 @@
 import React, {  useContext, useState } from "react";
+import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import './Components.css';
 import { useNavigate} from 'react-router-dom';
@@ -7,13 +8,15 @@ const   Chat: React.FC = () => {
 	
 	const socket = useContext(SocketContext);
 	const navigate = useNavigate()
+    const [cookies, setCookie] = useCookies(['userID']);
     const [chatroomName, setChatroomName] = useState<string>("");
 		
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
 		socket.emit("channel_create", {
-			creator_id: 1,
-			channel_name: "test",
+            // use cookie data
+			creator_id: cookies.userID,
+			channel_name: chatroomName,
 			creator2_id: 2,
 		});
         // socket.emit("msgToServer", "test");

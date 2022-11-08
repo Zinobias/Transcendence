@@ -11,9 +11,9 @@ const App: React.FC = () => {
 
   //strict mode makes useEffect fire twice in developer mode
   useEffect(() => {
-	  socket.on("wssTest", message => {
-		  console.log(message.message + "client");
-	  });
+	  // socket.on("wssTest", message => {
+		//   console.log(message.message + "client");
+	  // });
 	  socket.emit('game', { msg : "dsssss"});
   }, []) //only re-run the effect if new message comes in
 

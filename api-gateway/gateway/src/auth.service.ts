@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { Queries } from './database/queries';
 import { randomUUID } from 'crypto';
@@ -28,8 +28,11 @@ export class Auth {
     }
   }
 
-  @SubscribeMessage('auth')
+  private logger = new Logger("auth");
+
+  //@SubscribeMessage('auth')
   async auth(client: Socket, data: AuthData) {
+    this.logger.log("auth event " + data.code);
     const oauthResponse = await fetch(
       'https://api.intra.42.fr/v2/oauth/token',
       {
@@ -45,6 +48,7 @@ export class Auth {
       },
     );
     const json: AuthToken = await oauthResponse.json();
+    //this.logger.log("oauth response " + json);
     const userId = await this.retrieveUserId(client, json);
     const uuid = randomUUID();
     this.storeSession(client, userId, uuid);
@@ -54,7 +58,7 @@ export class Auth {
     client: Socket,
     authToken: AuthToken,
   ): Promise<number> {
-    console.log(authToken.access_token);
+    this.logger.log(authToken.access_token);
     const response = await fetch('https://api.intra.42.fr/v2/me', {
       method: 'Get',
       headers: {
@@ -63,7 +67,7 @@ export class Auth {
       },
     });
     const json = await response.json();
-    console.log(json.id);
+    this.logger.log(json.id);
     this.sockets.storeSocket(json.id, client);
     return json.id;
   }

@@ -74,11 +74,18 @@ export class ApiGateway
     this.chatClient.emit(payload.eventPattern, payload.payload);
   }
 
-  @UseGuards(AuthGuard)
+  //@UseGuards(AuthGuard)
   @SubscribeMessage('game')
-  handleGame(client: Socket, payload: FrontEndDTO) {
+    handleGame(client: Socket, payload: FrontEndDTO) {
     //TODO verify auth
-	console.log("auth works");
+    console.log("auth works " + payload);
     this.gameClient.emit(payload.eventPattern, payload.payload);
   }
+
+  @SubscribeMessage('auth')
+    async handleAuth(client: Socket, payload: any) {
+    console.log("auth event " + payload.code);
+    await this.auth.auth(client, payload);
+  }
+
 }
