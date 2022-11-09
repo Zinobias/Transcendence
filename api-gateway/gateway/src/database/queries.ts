@@ -15,10 +15,10 @@ constructor(@Inject(Database) private database : Database) {}
     const repo = myDataSource.getRepository(Sessions);
     // const repo2 = myDataSource.getRepository(UserTable);
 	// console.log("id : ");
-    const insertResult: InsertResult = await repo.upsert({
+    const insertResult: InsertResult = await repo.upsert([{
       userId: id,
       sessionCode: auth,
-    }, ['sessionCode']);
+    }], ['userId', 'sessionCode']);
     return insertResult.identifiers.length === 1;
   }
 

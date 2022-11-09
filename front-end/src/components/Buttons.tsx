@@ -3,11 +3,12 @@ import React from "react";
 import { useCookies } from 'react-cookie';
 
 const   LogoutButton: React.FC = () => {
-    const [cookies, setCookie, removeCookie] = useCookies(['user']);
+    const [cookies, setCookie, removeCookie] = useCookies(['user', 'userID']);
 
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         removeCookie('user');
+        removeCookie('userID')
         console.log("click logout");
     };
 
@@ -18,4 +19,4 @@ const   LogoutButton: React.FC = () => {
     )
 };
 
-export default LogoutButton;
+export default LogoutButton; 

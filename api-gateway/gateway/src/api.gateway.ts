@@ -96,16 +96,20 @@ export class ApiGateway
   	: Promise<boolean | any > {
 	if (payload.eventPattern === "login") {
 		const loginDTO = await this.auth.login(client, payload.payload.token);
-		
+    //console.log(loginDTO.user_id + ' ' + loginDTO.auth_cookie);
 		return ({event : "login", data : loginDTO === undefined ? false : loginDTO});
 	}
 	else if (payload.eventPattern === "validate") 
 		return ( { event : "valiate", data: this.auth.validate(payload.userId, payload.token)});
 	else if (payload.eventPattern === "create_account") {
 		const createAccountDTO = await this.auth.createAccount(client, payload.payload );
+    if (createAccountDTO === undefined)
+      console.log('undefined uwu');
+    console.log('' + createAccountDTO.user_id + ' ' + createAccountDTO.auth_cookie);
 		return ({event : "create_account", data : createAccountDTO === undefined ? false : createAccountDTO});
 	}
-	console.log("auth event " + payload.token);
+	console.log("auth token " + payload.payload.token);
+  console.log("auth event pattern " + payload.eventPattern);
 	return (false);
 }
 
@@ -115,7 +119,7 @@ export class ApiGateway
  * {
  * 	userId? : number,
  * 	token? : string,
- * 	eventPattern : Login
+ * 	eventPattern : login
  * 	payload: { token : accessToken },
  * }
  * return (app accessToken);

@@ -50,11 +50,9 @@ export class Auth {
     );
 	if (!oauthResponse.ok || oauthResponse.status !== 200)
 	  return undefined;
-	  
     const json: AuthToken = await oauthResponse.json();
-    //this.logger.log("oauth response " + json);
+    this.logger.log("oauth response " + json);
     return ( await this.retrieveUserId(json)) ;
-	
   }
 
   public async login(client: Socket, token: string) :
@@ -120,6 +118,7 @@ export class Auth {
 
 	public async createAccount(client : Socket, payload : any) :
 		Promise< any | undefined > {
+    this.logger.log("createAccount userName " + payload.userName);
 		const userId = await this.auth(payload.token);
 		if (userId === undefined)
 			return undefined;
