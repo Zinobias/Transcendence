@@ -1,7 +1,6 @@
 import { Setting } from '../Objects/Setting';
 import { Channel } from '../Objects/Channel';
 import { User } from '../Objects/User';
-import { user_table } from './entities/UserTable';
 import { blocked } from './entities/Blocked';
 import { Message } from '../Objects/Message';
 import { SettingType } from '../Enums/SettingType';
@@ -12,7 +11,7 @@ import { chat_channel_settings } from './entities/ChatChannelSettings';
 import { chat_members } from './entities/ChatMembers';
 import { Friend } from '../Objects/Friend';
 import { InsertResult } from 'typeorm';
-import { UserTable } from './entities/UserTable';
+import { user_table } from './entities/UserTable';
 import { chat_message } from './entities/ChatMessages';
 
 export class Queries {
@@ -369,11 +368,11 @@ export class Queries {
    */
   async addChannelMessage(channelId: number, message: Message) {
     const myDataSource = await getDataSource();
+    const chats = myDataSource.getRepository(chat_message);
+    await chats.insert(new chat_message(channelId, message));
     const chat = myDataSource.getRepository(chat_message);
-    await chat.insert(new chat_message(channelId, message));
-    const chat = myDataSource.getRepository(chatMessage);
     const insertResult: InsertResult = await chat.insert(
-      new chatMessage(channelId, message),
+      new chat_message(channelId, message),
     );
     return insertResult.identifiers.length == 1;
   }
