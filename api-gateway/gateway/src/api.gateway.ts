@@ -1,6 +1,7 @@
 import {Inject, Logger, UseGuards} from '@nestjs/common';
 import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import {
+	MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -70,14 +71,14 @@ export class ApiGateway
 
   @UseGuards(AuthGuard)
   @SubscribeMessage('chat')
-  handleChat(client: Socket, payload: FrontEndDTO) {
+  handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
     this.chatClient.emit(payload.eventPattern, payload.payload);
   }
 
   //@UseGuards(AuthGuard)
   @SubscribeMessage('game')
-    handleGame(client: Socket, payload: FrontEndDTO) {
+    handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
     console.log("auth works " + payload);
     this.gameClient.emit(payload.eventPattern, payload.payload);
@@ -90,19 +91,19 @@ export class ApiGateway
 //     await this.auth.auth(client, payload);
 //   }
 
-  @MessagePattern('auth')
+  @SubscribeMessage('auth')
   async handleAuthResp(client: Socket, payload: FrontEndDTO) 
   	: Promise<boolean | any > {
 	if (payload.eventPattern === "login") {
 		const loginDTO = await this.auth.login(client, payload.payload.token);
 		
-		return (loginDTO === undefined ? false : loginDTO);
+		return ({event : "login", data : loginDTO === undefined ? false : loginDTO});
 	}
 	else if (payload.eventPattern === "validate") 
-		return ( this.auth.validate(payload.userId, payload.token));
+		return ( { event : "valiate", data: this.auth.validate(payload.userId, payload.token)});
 	else if (payload.eventPattern === "create_account") {
 		const createAccountDTO = await this.auth.createAccount(client, payload.payload );
-		return (createAccountDTO === undefined ? false : createAccountDTO);
+		return ({event : "create_account", data : createAccountDTO === undefined ? false : createAccountDTO});
 	}
 	console.log("auth event " + payload.token);
 	return (false);
