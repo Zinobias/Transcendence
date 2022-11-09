@@ -1,10 +1,4 @@
-import {
-  Entity,
-  Column,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class user_table {
@@ -16,7 +10,7 @@ export class user_table {
   @PrimaryGeneratedColumn()
   userId: number;
 
-  @Column()
+  @Column({ nullable: true })
   loginId: string;
 
   @Column()

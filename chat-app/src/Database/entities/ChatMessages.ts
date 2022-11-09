@@ -13,7 +13,6 @@ import { user_table } from './UserTable';
 @Entity()
 export class chat_message {
   constructor(channelId: number, message: Message) {
-    console.log("testinggggggg");
     if (message === undefined) return;
     this.channelId = channelId;
     this.message = message.message;
@@ -27,14 +26,14 @@ export class chat_message {
   channelId: number;
 
   @ManyToOne(() => chat_channels, (chat) => chat.channelId)
-  @JoinColumn({ name: 'channelId' })
+  // @JoinColumn({ name: 'channelId' })
   chat: chat_channels;
 
   @PrimaryColumn()
   userId: number;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  // @JoinColumn({ name: 'userId' })
   user: user_table;
 
   @Column()

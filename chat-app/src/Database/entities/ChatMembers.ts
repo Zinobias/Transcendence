@@ -15,10 +15,10 @@ export class chat_members {
   userId: number;
 
   @ManyToOne(() => chat_channels, (channel) => channel.channelId)
-  @JoinColumn({ name: 'channelId' })
+  // @JoinColumn({ name: 'channelId' })
   channel: chat_channels;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  // @JoinColumn({ name: 'userId' })
   user: user_table;
 }

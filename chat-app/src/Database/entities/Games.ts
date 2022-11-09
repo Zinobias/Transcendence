@@ -12,16 +12,16 @@ export class games {
   @PrimaryColumn()
   user2: number;
 
-  @ManyToOne(() => games)
-  @JoinColumn({ name: 'gameId' })
-  game: games;
+  // @ManyToOne(() => games)
+  // @JoinColumn({ name: 'gameId' })
+  // game: games;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'user1' })
+  // @JoinColumn({ name: 'user1' })
   userT: user_table;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'user2' })
+  // @JoinColumn({ name: 'user2' })
   user2T: user_table;
 
   @Column()

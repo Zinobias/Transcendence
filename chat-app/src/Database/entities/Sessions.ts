@@ -13,6 +13,6 @@ export class sessions {
   time: Date;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  // @JoinColumn({ name: 'userId' })
   user: user_table;
 }
