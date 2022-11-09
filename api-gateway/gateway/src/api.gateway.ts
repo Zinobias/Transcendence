@@ -1,5 +1,5 @@
 import {Inject, Logger, UseGuards} from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -14,11 +14,12 @@ import { Auth } from './auth.service';
 import {AuthGuard} from "./auth.guard";
 
 export interface FrontEndDTO {
-  userId: number;
-  token: string;
+  userId?: number;
+  token?: string;
   eventPattern: string;
-  payload: {};
+  payload: any;
 }
+
 
 @WebSocketGateway(8084, {
   cors: {
@@ -82,10 +83,68 @@ export class ApiGateway
     this.gameClient.emit(payload.eventPattern, payload.payload);
   }
 
-  @SubscribeMessage('auth')
-    async handleAuth(client: Socket, payload: any) {
-    console.log("auth event " + payload.code);
-    await this.auth.auth(client, payload);
-  }
+
+//   @SubscribeMessage('auth')
+//     async handleAuth(client: Socket, payload: any) {
+//     console.log("auth event " + payload.code);
+//     await this.auth.auth(client, payload);
+//   }
+
+  @MessagePattern('auth')
+  async handleAuthResp(client: Socket, payload: FrontEndDTO) 
+  	: Promise<boolean | any > {
+	if (payload.eventPattern === "login") {
+		const loginDTO = await this.auth.login(client, payload.payload.token);
+		
+		return (loginDTO === undefined ? false : loginDTO);
+	}
+	else if (payload.eventPattern === "validate") 
+		return ( this.auth.validate(payload.userId, payload.token));
+	else if (payload.eventPattern === "create_account") {
+		const createAccountDTO = await this.auth.createAccount(client, payload.payload );
+		return (createAccountDTO === undefined ? false : createAccountDTO);
+	}
+	console.log("auth event " + payload.token);
+	return (false);
+}
+
+/**
+ * auth routes
+ * route 1 : Login. 
+ * {
+ * 	userId? : number,
+ * 	token? : string,
+ * 	eventPattern : Login
+ * 	payload: { token : accessToken },
+ * }
+ * return (app accessToken);
+ * route 2 : validating token w/ userId.
+ *  {
+ * 	userId? : number,
+ * 	token? : string,
+ * 	eventPattern : Validate
+ * 	payload: {},
+ * }
+ * return (boolean);
+ * 
+ * route 3 : Create account.
+ *  {
+ * 	userId? : number,
+ * 	token? : string,
+ * 	eventPattern : Validate
+ * 	payload: { 
+ * 		token : accessToken,
+ * 		userName : string,
+ * },
+ * }
+ * return (accessToken);
+ */
+
+// export interface FrontEndDTO {
+// 	userId?: number;
+// 	token?: string;
+// 	eventPattern: string;
+// 	payload: {};
+//   }
 
 }

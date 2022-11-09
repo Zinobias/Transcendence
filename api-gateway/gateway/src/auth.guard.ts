@@ -24,6 +24,8 @@ export class AuthGuard implements CanActivate {
   }
 
   validateRequest(request: FrontEndDTO): boolean {
-    return this.auth.checkAuth(request.userId, request.token);
+	if (request.userId === undefined || request.token === undefined)
+		return (false);
+    return this.auth.validate(request.userId, request.token);
   }
 }
