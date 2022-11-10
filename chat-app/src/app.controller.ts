@@ -13,6 +13,7 @@ import {
   ChannelLeave,
   ChannelMessage,
   ChannelPromote,
+  GetChannelsUser,
 } from './Events/ChannelEvents';
 import { User } from './Objects/User';
 import { Channel } from './Objects/Channel';
@@ -43,12 +44,15 @@ export class AppController {
   @EventPattern('channel_create')
   async channelCreate(data: ChannelCreate) {
     console.log('testing debug etc');
-    const user: User = AppController.getUser(data.creator_id, 'channel_create');
+    const user: User = await AppController.getUser(
+      data.creator_id,
+      'channel_create',
+    );
     if (user == null) return;
-    const usersArr: User[] = [User.getUser(data.creator_id)];
+    const usersArr: User[] = [await User.getUser(data.creator_id)];
 
     if (data.creator2_id != -1) {
-      const user2: User = AppController.getUser(
+      const user2: User = await AppController.getUser(
         data.creator2_id,
         'channel_create',
       );
@@ -82,13 +86,16 @@ export class AppController {
   }
 
   @EventPattern('channel_join')
-  handleJoin(data: ChannelJoin) {
+  async handleJoin(data: ChannelJoin) {
     const channel: Channel = AppController.getChannel(
       data.channel_id,
       'channel_join',
     );
     if (channel == null) return;
-    const user: User = AppController.getUser(data.user_id, 'channel_join');
+    const user: User = await AppController.getUser(
+      data.user_id,
+      'channel_join',
+    );
     if (user == null) return;
     if (AppController.userInChannel(channel, user.userId, 'channel_join'))
       return;
@@ -276,6 +283,12 @@ export class AppController {
       });
   }
 
+  @EventPattern('get_channels_user')
+  getChannelsUser(data: GetChannelsUser) {
+    const channels = Channel.getUserChannels(data.user_id);
+    this.notify([data.user_id], 'channels_for_user', { channels: channels });
+  }
+
   //EZ MESSAGE:
 
   private notify(userIds: number[], channel: string, args: object) {
@@ -300,8 +313,11 @@ export class AppController {
     return channel;
   }
 
-  private static getUser(userId: number, source: string): User {
-    const user: User = User.getUser(userId);
+  private static async getUser(
+    userId: number,
+    source: string,
+  ): Promise<User | undefined> {
+    const user: User = await User.getUser(userId);
     if (user == null) {
       Logger.warn('Received invalid user id [' + userId + '] from ' + source);
       return undefined;

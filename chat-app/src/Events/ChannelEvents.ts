@@ -48,3 +48,7 @@ export interface ChannelMessage {
   user_id: number;
   message: string;
 }
+
+export interface GetChannelsUser {
+  user_id: number;
+}

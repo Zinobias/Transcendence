@@ -16,6 +16,12 @@ export class Channel {
     return undefined;
   }
 
+  public static getUserChannels(userId: number): Channel[] {
+    return this._channels.filter(
+      (a) => a._users.filter((b) => b.userId == userId).length == 1,
+    );
+  }
+
   public static removeChannel(channelId: number) {
     this._channels = this._channels.filter((a) => a._channelId != channelId);
   }

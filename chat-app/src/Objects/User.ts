@@ -1,4 +1,6 @@
 import { Friend } from './Friend';
+import { Queries } from '../Database/Queries';
+import { Logger } from '@nestjs/common';
 
 export interface IUser {
   userId: number;
@@ -15,9 +17,13 @@ export class User {
     this._users.push(user);
   }
 
-  public static getUser(userId: number): User {
+  public static async getUser(userId: number): Promise<User> {
     const users = this._users.filter((a) => a._userId == userId);
     if (users.length == 1) return users[0];
+    const user: User = await Queries.getInstance().getUser(userId);
+    if (user === undefined)
+      Logger.warn('Received request for user that does not exist in database.');
+    else return user;
     return undefined;
   }
 
