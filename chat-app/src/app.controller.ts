@@ -68,6 +68,7 @@ export class AppController {
       usersArr,
       [],
       [],
+      false,
     );
     const channelId = await Queries.getInstance().createChannel(channel);
     if (channelId == -1) {
@@ -79,7 +80,7 @@ export class AppController {
     channel.channelId = channelId;
 
     const userIds = channel.users.map((a) => a.userId);
-    console.log("test " + userIds);
+    console.log('test ' + userIds);
     this.notify(userIds, 'channel_create_success', {
       channel_name: channel.channelName,
       channel_id: channel.channelId,
