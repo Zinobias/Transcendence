@@ -17,7 +17,7 @@ export class User {
     this._users.push(user);
   }
 
-  public static async getUser(userId: number): Promise<User> {
+  public static async getUser(userId: number): Promise<User | undefined> {
     const users = this._users.filter((a) => a._userId == userId);
     if (users.length == 1) return users[0];
     const user: User = await Queries.getInstance().getUser(userId);
