@@ -69,7 +69,7 @@ export class ApiGateway
     this.logger.log('Client disconnected: ${client.id}');
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @SubscribeMessage('chat')
   handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth

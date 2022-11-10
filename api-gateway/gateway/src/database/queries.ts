@@ -41,6 +41,8 @@ constructor(@Inject(Database) private database : Database) {}
     const myDataSource = await this.database.getDataSource();
     const userTableRepo = myDataSource.getRepository(UserTable);
 
+  // TODO: make sure to see if user exists or not
+  // it adds a user  multiple times now
 	const insertResult: InsertResult = await userTableRepo.insert(
 	{
 		userId : userId,

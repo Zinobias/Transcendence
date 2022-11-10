@@ -43,7 +43,7 @@ export class Auth {
           client_id: process.env.CLIENT,
           client_secret: process.env.SECRET,
           code: token,
-          redirect_uri: 'http://localhost:3000',
+          redirect_uri: 'http://localhost:3000/login',
         }),
         headers: { 'Content-Type': 'application/json' },
       },

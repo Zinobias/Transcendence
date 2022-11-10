@@ -8,18 +8,16 @@ const   Chat: React.FC = () => {
 	
 	const socket = useContext(SocketContext);
 	const navigate = useNavigate()
-    const [cookies, setCookie] = useCookies(['userID']);
+    const [cookies] = useCookies(['userID']);
     const [chatroomName, setChatroomName] = useState<string>("");
 		
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
-		socket.emit("channel_create", {
-            // use cookie data
-			creator_id: cookies.userID,
-			channel_name: chatroomName,
-			creator2_id: 2,
-		});
-        // socket.emit("msgToServer", "test");
+        socket.emit("chat", {
+            eventPattern: "channel_create", 
+            payload: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: 2}
+        });
+        console.log("emiting new chatroom " + chatroomName);
 		navigate('chat_window');
     };
 

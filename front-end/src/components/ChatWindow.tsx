@@ -1,12 +1,18 @@
-import React, { useState, useRef, useEffect }  from "react";
+import React, { useState, useRef, useEffect, useContext }  from "react";
+import { SocketContext } from "./Socket";
 
 const   ChatWindow: React.FC = () => {
 	
     const [message, setMessage] = useState<string>("");
     const [chat, setChat] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
-    console.log("new chat window");
+    const socket = useContext(SocketContext);
 
+    useEffect(() => {
+        socket.on("channel_create_success", data => {
+            console.log("success "+ data.channelId);
+        })
+    }, [])
 
     useEffect(() => {
         inputRef.current?.focus();
