@@ -6,19 +6,23 @@ import { UserTable } from './entities/user-table';
 
 @Injectable()
 export class Queries {
-
-constructor(@Inject(Database) private database : Database) {}
+  constructor(@Inject(Database) private database: Database) {}
 
   public async storeAuth(id: number, auth: string): Promise<boolean> {
     const myDataSource = await this.database.getDataSource();
     //const userRepo = myDataSource.getRepository(UserTable);
     const repo = myDataSource.getRepository(Sessions);
     // const repo2 = myDataSource.getRepository(UserTable);
-	// console.log("id : ");
-    const insertResult: InsertResult = await repo.upsert([{
-      userId: id,
-      sessionCode: auth,
-    }], ['userId', 'sessionCode']);
+    // console.log("id : ");
+    const insertResult: InsertResult = await repo.upsert(
+      [
+        {
+          userId: id,
+          sessionCode: auth,
+        },
+      ],
+      ['userId', 'sessionCode'],
+    );
     return insertResult.identifiers.length === 1;
   }
 
@@ -37,17 +41,16 @@ constructor(@Inject(Database) private database : Database) {}
     else return session.sessionCode;
   }
 
-  public async createUser(userId : number, userName : string) {
+  public async createUser(userId: number, userName: string) {
     const myDataSource = await this.database.getDataSource();
     const userTableRepo = myDataSource.getRepository(UserTable);
 
-  // TODO: make sure to see if user exists or not
-  // it adds a user  multiple times now
-	const insertResult: InsertResult = await userTableRepo.insert(
-	{
-		userId : userId,
-		userName : userName}
-	);
-	return insertResult.identifiers.length === 1;
+    // TODO: make sure to see if user exists or not
+    // it adds a user  multiple times now
+    const insertResult: InsertResult = await userTableRepo.insert({
+      userId: userId,
+      userName: userName,
+    });
+    return insertResult.identifiers.length === 1;
   }
 }

@@ -16,7 +16,7 @@ export class Sockets {
     return null;
   }
 
-  public sendData(users: number[], pattern: string, payload: {}) {
+  public sendData(users: number[], pattern: string, payload: object) {
     for (const user of users) {
       const socket = this.getSocket(user);
       if (socket != null) {
