@@ -1,4 +1,12 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, PrimaryColumn, OneToMany, JoinColumn} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  PrimaryColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Channel } from '../../Objects/Channel';
 import { UserTable } from './UserTable';
 

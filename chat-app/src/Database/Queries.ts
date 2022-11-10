@@ -12,7 +12,7 @@ import { ChatChannelSettings } from './entities/chatChannelSettings';
 import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
 import { chatMessage } from './entities/chatMessages';
-import {InsertResult} from "typeorm";
+import { InsertResult } from 'typeorm';
 
 export class Queries {
   private static _instance: Queries;
