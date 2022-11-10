@@ -39,17 +39,17 @@ export const    AccountButton: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        // if (searchParams.get("code")) {
-        //     console.log("EMITTING " + userName);
-        //     socket.emit("auth", {eventPattern: "create_account", payload: {token: searchParams.get("code"), userName: "panini"}});
-        // }
+        if (searchParams.get("code")) {
+            console.log("EMITTING " + userName);
+            socket.emit("auth", {eventPattern: "create_account", payload: {token: searchParams.get("code"), userName: "panini"}});
+        }
         console.log("userName " + userName);
     }, [])
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         console.log("REDIRECTING " + userName);
-        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dc4d066a92ebb003a5fa223b28af0bd6f27c6943eb7a2d20ea6ae42a75cd508c&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code'
+        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dc4d066a92ebb003a5fa223b28af0bd6f27c6943eb7a2d20ea6ae42a75cd508c&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin&response_type=code'
     };
 
     return (   

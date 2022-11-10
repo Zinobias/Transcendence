@@ -51,6 +51,6 @@ export class Queries {
       userId: userId,
       userName: userName,
     });
-    return insertResult.identifiers.length === 1;
+    return insertResult.identifiers.length === 2;
   }
 }

@@ -26,7 +26,7 @@ export class ChatChannels {
   @PrimaryColumn()
   ownerId: number;
 
-  @Column()
+  @Column({nullable: true})
   owner2Id: number;
 
   @OneToMany(() => UserTable, (user) => user.userId) //TODO: needs to be a foreign key

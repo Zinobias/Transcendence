@@ -43,15 +43,16 @@ export class AppController {
 
   @EventPattern('channel_create')
   async channelCreate(data: ChannelCreate) {
-    console.log('testing debug etc');
+    console.log('testing debug etc' + data.creator_id);
     const user: User = await AppController.getUser(
       data.creator_id,
       'channel_create',
     );
+    console.log('testing debug etc');
     if (user == null) return;
     const usersArr: User[] = [await User.getUser(data.creator_id)];
-
-    if (data.creator2_id != -1) {
+    console.log('testing debug etc');
+    if (data.creator2_id != undefined) {
       const user2: User = await AppController.getUser(
         data.creator2_id,
         'channel_create',
@@ -78,6 +79,7 @@ export class AppController {
     channel.channelId = channelId;
 
     const userIds = channel.users.map((a) => a.userId);
+    console.log("test " + userIds);
     this.notify(userIds, 'channel_create_success', {
       channel_name: channel.channelName,
       channel_id: channel.channelId,
@@ -317,6 +319,7 @@ export class AppController {
     userId: number,
     source: string,
   ): Promise<User | undefined> {
+    console.log('testing debug etc');
     const user: User = await User.getUser(userId);
     if (user == null) {
       Logger.warn('Received invalid user id [' + userId + '] from ' + source);

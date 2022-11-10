@@ -10,7 +10,7 @@ const   ChatWindow: React.FC = () => {
 
     useEffect(() => {
         socket.on("channel_create_success", data => {
-            console.log("success "+ data.channelId);
+            console.log("success "+ data.channel_id);
         })
     }, [])
 

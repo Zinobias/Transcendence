@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate} from 'react-router-dom';
-import { LoginButton } from "./Buttons";
+import { LoginButton, AccountButton } from "./Buttons";
 import '../App.css'
 import './Components.css';
 
@@ -22,6 +22,7 @@ const   Login: React.FC = () => {
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__body">
                 <LoginButton/>
+                {/* <AccountButton/> */}
                 {/* <br/>
                 <p>or</p>
                 <button className="defaultButton" onClick={(e) => handleClick(e)}>Sign Up</button> */}
