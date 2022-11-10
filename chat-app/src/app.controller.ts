@@ -41,7 +41,7 @@ export class AppController {
   }
 
   @EventPattern('channel_create')
-  async channelCreate(client: Socket, data: ChannelCreate) {
+  async channelCreate(data: ChannelCreate) {
     console.log('testing debug etc');
     const user: User = AppController.getUser(data.creator_id, 'channel_create');
     if (user == null) return;
@@ -82,7 +82,7 @@ export class AppController {
   }
 
   @EventPattern('channel_join')
-  handleJoin(client: Socket, data: ChannelJoin) {
+  handleJoin(data: ChannelJoin) {
     const channel: Channel = AppController.getChannel(
       data.channel_id,
       'channel_join',
@@ -109,7 +109,7 @@ export class AppController {
   }
 
   @EventPattern('channel_leave')
-  handleLeave(client: Socket, data: ChannelLeave) {
+  handleLeave(data: ChannelLeave) {
     const channel: Channel = AppController.getChannel(
       data.channel_id,
       'channel_leave',
@@ -132,7 +132,7 @@ export class AppController {
   }
 
   @EventPattern('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
-  handlePromote(client: Socket, data: ChannelPromote) {
+  handlePromote(data: ChannelPromote) {
     const channel: Channel = AppController.getChannel(
       data.channel_id,
       'channel_promote',
@@ -159,7 +159,7 @@ export class AppController {
   }
 
   @EventPattern('channel_demote')
-  handleDemote(client: Socket, data: ChannelDemote) {
+  handleDemote(data: ChannelDemote) {
     const channel: Channel = AppController.getChannel(
       data.channel_id,
       'channel_demote',
@@ -180,7 +180,7 @@ export class AppController {
   }
 
   @EventPattern('channel_kick')
-  handleKick(client: Socket, data: ChannelKick) {
+  handleKick(data: ChannelKick) {
     //TODO send a message to the frontend to notify kicked user somewhere (if we want to do that?)
     const channel: Channel = AppController.getChannel(
       data.channel_id,
@@ -198,7 +198,7 @@ export class AppController {
   }
 
   @EventPattern('channel_ban')
-  handleBan(client: Socket, data: ChannelBan) {
+  handleBan(data: ChannelBan) {
     //TODO send a message to the frontend to notify banned user somewhere (if we want to do that?)
     const channel: Channel = AppController.getChannel(
       data.channel_id,
@@ -226,7 +226,7 @@ export class AppController {
   }
 
   @EventPattern('channel_disband')
-  handleDisband(client: Socket, data: ChannelDisband) {
+  handleDisband(data: ChannelDisband) {
     //TODO send a message to the frontend to notify all other users (if we want to do that?)
     const channel: Channel = AppController.getChannel(
       data.channel_id,
@@ -244,7 +244,7 @@ export class AppController {
   }
 
   @EventPattern('channel_message')
-  handleMessage(client: Socket, data: ChannelMessage) {
+  handleMessage(data: ChannelMessage) {
     const channel: Channel = AppController.getChannel(
       data.channel_id,
       'channel_message',
@@ -252,9 +252,9 @@ export class AppController {
     if (channel == null) return;
 
     if (!channel.hasUser(data.user_id)) {
-      client.emit('channel_message_failed', {
-        reason: 'You are not a member of this channel',
-      });
+      // client.emit('channel_message_failed', { TODO fix this
+      //   reason: 'You are not a member of this channel',
+      // });
       return;
     }
     const message = new Message(
@@ -266,9 +266,9 @@ export class AppController {
       .addChannelMessage(data.channel_id, message)
       .then((res) => {
         if (res == false) {
-          client.emit('channel_message_failed', {
-            reason: 'Internal server error',
-          });
+          // client.emit('channel_message_failed', { TODO fix this
+          //   reason: 'Internal server error',
+          // });
           return;
         }
         const userIds = channel.users.map((a) => a.userId);
