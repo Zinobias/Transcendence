@@ -13,6 +13,7 @@ import { ChatMembers } from './entities/chatMembers';
 import { Friend } from '../Objects/Friend';
 import { chatMessage } from './entities/chatMessages';
 import { InsertResult } from 'typeorm';
+import { find } from 'rxjs';
 
 export class Queries {
   private static _instance: Queries;
@@ -66,7 +67,8 @@ export class Queries {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(UserTable);
     const findUser = await userRepository.findOneBy({ userId: userId });
-    return User.getUser(findUser.userId);
+    if (findUser == undefined) return undefined;
+    return new User(findUser.userId, findUser.userName, undefined);
   }
 
   //Blocked users table

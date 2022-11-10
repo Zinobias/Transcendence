@@ -37,19 +37,13 @@ export class User {
   private _blocked: User[];
   private _friends: Friend[];
 
-  constructor(
-    userId: number,
-    name: string,
-    avatar: object,
-    blocked: User[],
-    friends: Friend[],
-  ) {
+  constructor(userId: number, name: string, avatar: object) {
     this._userId = userId;
     this._name = name;
     this._avatar = avatar;
-    this._blocked = blocked;
-    this._friends = friends;
     User.addUser(this);
+    this.updateBlocked();
+    this.updateFriends();
   }
 
   get userId(): number {
@@ -126,5 +120,13 @@ export class User {
       blocked: this.blocked,
       friends: this.friends,
     };
+  }
+
+  private async updateBlocked() {
+    this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
+  }
+
+  private async updateFriends() {
+    this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
   }
 }
