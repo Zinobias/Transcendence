@@ -3,7 +3,7 @@ import { User } from './User';
 export class Friend extends User {
   private _confirmed: boolean;
   constructor(user: User, confirmed: boolean) {
-    super(user.userId, user.name, user.avatar, user.blocked, user.friends);
+    super(user.userId, user.name, user.avatar);
     this._confirmed = confirmed;
   }
 
