@@ -128,7 +128,8 @@ export class Queries {
     });
     const friendList: Friend[] = [];
     for (const [, result] of find_friend.entries()) {
-      friendList.push(<Friend>await Friend.getUser(result.userId));
+      const user = await Friend.getUser(result.userId);
+      friendList.push(<Friend>user);
     }
     return friendList;
   }
