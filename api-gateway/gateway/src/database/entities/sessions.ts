@@ -5,13 +5,13 @@ export class Sessions {
   @PrimaryColumn()
   userId: number;
 
-  @Column()
+  @PrimaryColumn()
   sessionCode: string;
 
   @Column({ default: new Date().getMilliseconds() })
   time: number;
 
   @ManyToOne(() => UserTable, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  //@JoinColumn({ name: 'userId' })
   user: UserTable;
 }

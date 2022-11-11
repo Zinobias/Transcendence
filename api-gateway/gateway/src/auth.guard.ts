@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 import { FrontEndDTO } from './api.gateway';
 import { Auth } from './auth.service';
 
-
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(@Inject(Auth) private auth: Auth) {}
@@ -17,13 +16,15 @@ export class AuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToWs().getData();
-	console.log(request);
-	console.log("Went through auth");
-	console.log("Request data : {" + request.msg + "}");
+    console.log(request);
+    console.log('Went through auth');
+    console.log('Request data : {' + request.msg + '}');
     return this.validateRequest(request);
   }
 
   validateRequest(request: FrontEndDTO): boolean {
-    return this.auth.checkAuth(request.userId, request.token);
+    if (request.userId === undefined || request.token === undefined)
+      return false;
+    return this.auth.validate(request.userId, request.token);
   }
 }

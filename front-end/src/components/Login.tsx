@@ -1,7 +1,6 @@
-import React, { useEffect, useContext } from "react";
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
-import { SocketContext } from "./Socket";
+import React from "react";
+import { useNavigate} from 'react-router-dom';
+import { LoginButton, AccountButton } from "./Buttons";
 import '../App.css'
 import './Components.css';
 
@@ -11,45 +10,22 @@ import './Components.css';
 */
 
 const   Login: React.FC = () => {
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [cookies, setCookie] = useCookies(['user']);
-    const socket = useContext(SocketContext);
+    //const navigate = useNavigate();
 
-    // WITH BACKEND
-    // useEffect(() => {
-    //     socket.on("user_id", res => {
-    //         console.log(res.auth_cookie);
-	// 		console.log(res.user_id);
-    //         setCookie('user', res.auth_cookie, {path: '/'});
-    //         navigate('/');
-    //     })
-    // }, [])
-    
-    // if (searchParams.get("code")) {
-    //     console.log("EMITTING")
-    //     socket.emit("auth", { code: searchParams.get("code") })
-    //     //socket.emit("chat", {userID: 12, accessToken: "test", eventPattern: "auth", payload: {code: searchParams.get("code")}})
-    // }
-
-    //WITHOUT BACKEND
-    useEffect(() => {
-        if (searchParams.get("code")) {
-            setCookie('user', searchParams.get("code"), {path: '/'});
-            navigate('/');
-        }
-    }, [])
-
-    const handleLogin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
-        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dc4d066a92ebb003a5fa223b28af0bd6f27c6943eb7a2d20ea6ae42a75cd508c&redirect_uri=http%3A%2F%2Flocalhost%3A3000&response_type=code'
-    };
+    // const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    //     e.preventDefault();
+    //     navigate('/SignUp');
+    // };
 
     return  (
         <div className="grid-container">
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__body">
-                <button className="loginform__button" onClick={(e) => handleLogin(e)}>LOGIN</button>
+                <LoginButton/>
+                {/* <AccountButton/> */}
+                {/* <br/>
+                <p>or</p>
+                <button className="defaultButton" onClick={(e) => handleClick(e)}>Sign Up</button> */}
             </div>
         </div>
       )

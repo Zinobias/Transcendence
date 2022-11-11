@@ -2,34 +2,55 @@ import { Sessions } from './entities/sessions';
 import { InsertResult } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { Database } from './data-source';
+import { UserTable } from './entities/user-table';
 
 @Injectable()
 export class Queries {
+  constructor(@Inject(Database) private database: Database) {}
 
-constructor(@Inject(Database) private database : Database) {}
-
-  async storeAuth(id: number, auth: string): Promise<boolean> {
+  public async storeAuth(id: number, auth: string): Promise<boolean> {
     const myDataSource = await this.database.getDataSource();
+    //const userRepo = myDataSource.getRepository(UserTable);
     const repo = myDataSource.getRepository(Sessions);
-    const insertResult: InsertResult = await repo.insert({
-      userId: id,
-      sessionCode: auth,
-    });
-    return insertResult.identifiers.length == 1;
+    // const repo2 = myDataSource.getRepository(UserTable);
+    // console.log("id : ");
+    const insertResult: InsertResult = await repo.upsert(
+      [
+        {
+          userId: id,
+          sessionCode: auth,
+        },
+      ],
+      ['userId', 'sessionCode'],
+    );
+    return insertResult.identifiers.length === 1;
   }
 
   private static readonly expireTime = 604800000; // 7 days
-  async loadSession(id: number): Promise<string | null> {
+  async loadSession(id: number): Promise<string | undefined> {
     const myDataSource = await this.database.getDataSource();
     const repo = myDataSource.getRepository(Sessions);
     const session = await repo.findOneBy({
       userId: id,
     });
     if (
-      session == undefined ||
+      session === null ||
       session.time + Queries.expireTime < new Date().getMilliseconds()
     )
-      return '';
+      return undefined;
     else return session.sessionCode;
+  }
+
+  public async createUser(userId: number, userName: string) {
+    const myDataSource = await this.database.getDataSource();
+    const userTableRepo = myDataSource.getRepository(UserTable);
+
+    // TODO: make sure to see if user exists or not
+    // it adds a user  multiple times now
+    const insertResult: InsertResult = await userTableRepo.insert({
+      userId: userId,
+      userName: userName,
+    });
+    return insertResult.identifiers.length === 2;
   }
 }

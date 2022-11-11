@@ -19,6 +19,7 @@ export class chat_channels {
     this.ownerId = channel.owner;
     this.owner2Id = channel.otherOwner;
     this.channelName = channel.channelName;
+    this.closed = channel.closed;
   }
   @PrimaryGeneratedColumn()
   channelId: number;
@@ -26,7 +27,7 @@ export class chat_channels {
   @PrimaryColumn()
   ownerId: number;
 
-  @PrimaryColumn()
+  @Column({ nullable: true })
   owner2Id: number;
 
   @OneToMany(() => user_table, (user) => user.userId)
@@ -37,7 +38,7 @@ export class chat_channels {
   @JoinColumn({ name: 'owner2Id' })
   user2: user_table;
 
-  @Column()
+  @Column({ nullable: true })
   channelName: string;
 
   @Column()

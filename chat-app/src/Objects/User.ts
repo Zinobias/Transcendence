@@ -1,4 +1,6 @@
 import { Friend } from './Friend';
+import { Queries } from '../Database/Queries';
+import { Logger } from '@nestjs/common';
 
 export interface IUser {
   userId: number;
@@ -15,9 +17,13 @@ export class User {
     this._users.push(user);
   }
 
-  public static getUser(userId: number): User {
+  public static async getUser(userId: number): Promise<User | undefined> {
     const users = this._users.filter((a) => a._userId == userId);
     if (users.length == 1) return users[0];
+    const user: User = await Queries.getInstance().getUser(userId);
+    if (user === undefined)
+      Logger.warn('Received request for user that does not exist in database.');
+    else return user;
     return undefined;
   }
 
@@ -31,19 +37,13 @@ export class User {
   private _blocked: User[];
   private _friends: Friend[];
 
-  constructor(
-    userId: number,
-    name: string,
-    avatar: object,
-    blocked: User[],
-    friends: Friend[],
-  ) {
+  constructor(userId: number, name: string, avatar: object) {
     this._userId = userId;
     this._name = name;
     this._avatar = avatar;
-    this._blocked = blocked;
-    this._friends = friends;
     User.addUser(this);
+    this.updateBlocked();
+    this.updateFriends();
   }
 
   get userId(): number {
@@ -120,5 +120,13 @@ export class User {
       blocked: this.blocked,
       friends: this.friends,
     };
+  }
+
+  private async updateBlocked() {
+    this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
+  }
+
+  private async updateFriends() {
+    this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
   }
 }

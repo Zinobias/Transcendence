@@ -16,6 +16,12 @@ export class Channel {
     return undefined;
   }
 
+  public static getUserChannels(userId: number): Channel[] {
+    return this._channels.filter(
+      (a) => a._users.filter((b) => b.userId == userId).length == 1,
+    );
+  }
+
   public static removeChannel(channelId: number) {
     this._channels = this._channels.filter((a) => a._channelId != channelId);
   }
@@ -27,6 +33,7 @@ export class Channel {
   private _users: User[];
   private readonly _messages: Message[];
   private _settings: Setting[];
+  private _closed: boolean;
 
   constructor(
     channelId: number,
@@ -35,6 +42,7 @@ export class Channel {
     users: User[],
     messages: Message[],
     settings: Setting[],
+    closed: boolean,
     otherOwner?: number,
   ) {
     this._channelId = channelId;
@@ -43,6 +51,7 @@ export class Channel {
     this._users = users;
     this._messages = messages;
     this._settings = settings;
+    this._closed = closed;
     if (otherOwner != null) this._otherOwner = otherOwner;
   }
 
@@ -88,6 +97,10 @@ export class Channel {
 
   public get messages(): Message[] {
     return this._messages;
+  }
+
+  get closed(): boolean {
+    return this._closed;
   }
 
   public get settings(): Setting[] {

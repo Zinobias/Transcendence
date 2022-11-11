@@ -1,6 +1,7 @@
-import {Inject, Logger, UseGuards} from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Inject, Logger, UseGuards } from '@nestjs/common';
+import { ClientProxy, MessagePattern } from '@nestjs/microservices';
 import {
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -11,13 +12,13 @@ import {
 import { Socket, Server } from 'socket.io';
 import { Sockets } from './sockets.class';
 import { Auth } from './auth.service';
-import {AuthGuard} from "./auth.guard";
+import { AuthGuard } from './auth.guard';
 
 export interface FrontEndDTO {
-  userId: number;
-  token: string;
+  userId?: number;
+  token?: string;
   eventPattern: string;
-  payload: {};
+  payload: any;
 }
 
 @WebSocketGateway(8084, {
@@ -67,18 +68,99 @@ export class ApiGateway
     this.logger.log('Client disconnected: ${client.id}');
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @SubscribeMessage('chat')
-  handleChat(client: Socket, payload: FrontEndDTO) {
+  handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
     this.chatClient.emit(payload.eventPattern, payload.payload);
   }
 
-  @UseGuards(AuthGuard)
+  //@UseGuards(AuthGuard)
   @SubscribeMessage('game')
-  handleGame(client: Socket, payload: FrontEndDTO) {
+  handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
-	console.log("auth works");
+    console.log('auth works ' + payload);
     this.gameClient.emit(payload.eventPattern, payload.payload);
   }
+
+  //   @SubscribeMessage('auth')
+  //     async handleAuth(client: Socket, payload: any) {
+  //     console.log("auth event " + payload.code);
+  //     await this.auth.auth(client, payload);
+  //   }
+
+  @SubscribeMessage('auth')
+  async handleAuthResp(
+    client: Socket,
+    payload: FrontEndDTO,
+  ): Promise<boolean | any> {
+    if (payload.eventPattern === 'login') {
+      const loginDTO = await this.auth.login(client, payload.payload.token);
+      //console.log(loginDTO.user_id + ' ' + loginDTO.auth_cookie);
+      return {
+        event: 'login',
+        data: loginDTO === undefined ? false : loginDTO,
+      };
+    } else if (payload.eventPattern === 'validate')
+      return {
+        event: 'valiate',
+        data: this.auth.validate(payload.userId, payload.token),
+      };
+    else if (payload.eventPattern === 'create_account') {
+      const createAccountDTO = await this.auth.createAccount(
+        client,
+        payload.payload,
+      );
+      if (createAccountDTO === undefined) console.log('undefined uwu');
+      console.log(
+        '' + createAccountDTO.user_id + ' ' + createAccountDTO.auth_cookie,
+      );
+      return {
+        event: 'create_account',
+        data: createAccountDTO === undefined ? false : createAccountDTO,
+      };
+    }
+    console.log('auth token ' + payload.payload.token);
+    console.log('auth event pattern ' + payload.eventPattern);
+    return false;
+  }
+
+  /**
+   * auth routes
+   * route 1 : Login.
+   * {
+   * 	userId? : number,
+   * 	token? : string,
+   * 	eventPattern : login
+   * 	payload: { token : accessToken },
+   * }
+   * return (app accessToken);
+   * route 2 : validating token w/ userId.
+   *  {
+   * 	userId? : number,
+   * 	token? : string,
+   * 	eventPattern : Validate
+   * 	payload: {},
+   * }
+   * return (boolean);
+   *
+   * route 3 : Create account.
+   *  {
+   * 	userId? : number,
+   * 	token? : string,
+   * 	eventPattern : Validate
+   * 	payload: {
+   * 		token : accessToken,
+   * 		userName : string,
+   * },
+   * }
+   * return (accessToken);
+   */
+
+  // export interface FrontEndDTO {
+  // 	userId?: number;
+  // 	token?: string;
+  // 	eventPattern: string;
+  // 	payload: {};
+  //   }
 }

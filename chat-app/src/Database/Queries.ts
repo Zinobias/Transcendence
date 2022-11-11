@@ -103,7 +103,7 @@ export class Queries {
     const findUser = await blockUserRepository.findBy({ userId: userId });
     const blockedUsers: User[] = [];
     for (const [, result] of findUser.entries()) {
-      blockedUsers.push(User.getUser(result.blockId));
+      blockedUsers.push(await User.getUser(result.blockId));
     }
     return blockedUsers;
   }
@@ -151,7 +151,9 @@ export class Queries {
     });
     const friendList: Friend[] = [];
     for (const [, result] of find_friend.entries()) {
-      friendList.push(<Friend>Friend.getUser(result.userId));
+      const user = await User.getUser(result.userId);
+      if (user === undefined) continue;
+      friendList.push(<Friend>user);
     }
     return friendList;
   }
@@ -343,7 +345,7 @@ export class Queries {
     const find = await user.findBy({ channelId: channelId });
     const channelList: User[] = [];
     for (const [, result] of find.entries())
-      channelList.push(User.getUser(result.userId));
+      channelList.push(await User.getUser(result.userId));
     return channelList;
   }
 
