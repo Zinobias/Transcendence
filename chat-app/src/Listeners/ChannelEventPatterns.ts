@@ -133,6 +133,7 @@ export class ChannelEventPatterns {
     if (channel == null) return;
     if (this.util.userInChannel(channel, data.user_id, 'channel_promote'))
       return;
+    if (this.util.notAdmin(channel, data.user_id, 'channel_promote')) return;
 
     const setting: Setting = new Setting(
       SettingType.ADMIN,
