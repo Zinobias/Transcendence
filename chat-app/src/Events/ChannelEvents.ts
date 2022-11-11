@@ -41,6 +41,7 @@ export interface ChannelBan {
 
 export interface ChannelDisband {
   channel_id: number;
+  user_id: number;
 }
 
 export interface ChannelMessage {

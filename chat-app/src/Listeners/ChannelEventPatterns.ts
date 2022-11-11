@@ -77,6 +77,7 @@ export class ChannelEventPatterns {
     });
   }
 
+  //TODO check if user is invited?
   @EventPattern('channel_join')
   async handleJoin(data: ChannelJoin) {
     const channel: Channel = this.util.getChannel(
@@ -223,6 +224,7 @@ export class ChannelEventPatterns {
       'channel_disband',
     );
     if (channel == null) return;
+    if (this.util.notOwner(channel, data.user_id, 'channel_disband')) return;
 
     Channel.removeChannel(data.channel_id);
     Queries.getInstance().removeChannel(data.channel_id);
