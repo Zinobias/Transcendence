@@ -44,13 +44,18 @@ export class Queries {
   public async createUser(userId: number, userName: string) {
     const myDataSource = await this.database.getDataSource();
     const userTableRepo = myDataSource.getRepository(UserTable);
-
     // TODO: make sure to see if user exists or not
-    // it adds a user  multiple times now
-    const insertResult: InsertResult = await userTableRepo.insert({
-      userId: userId,
-      userName: userName,
-    });
-    return insertResult.identifiers.length === 2;
+    const find = userTableRepo.findBy({ userId: userId, userName: userName });
+    if (!find) {
+      const insertResult: InsertResult = await userTableRepo.insert({
+        userId: userId,
+        userName: userName,
+      });
+      console.log('pass\n');
+      return true;
+    } else {
+      console.log('fail\n');
+      return false;
+    }
   }
 }

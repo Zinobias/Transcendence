@@ -85,11 +85,16 @@ export class Queries {
    * Get a user from their login id
    * @param loginId login id of the user
    */
-  async getUser(loginId: string): Promise<User> {
+  /**
+   * Get a user from their login id
+   * @param userId user id of the user
+   */
+  async getUser(userId: number): Promise<User> {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(user_table);
-    const findUser = await userRepository.findOneBy({ loginId: loginId });
-    return User.getUser(findUser.userId);
+    const findUser = await userRepository.findOneBy({ userId: userId });
+    if (findUser == undefined) return undefined;
+    return new User(findUser.userId, findUser.userName, undefined);
   }
 
   //Blocked users table
