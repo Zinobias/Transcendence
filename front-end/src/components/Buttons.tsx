@@ -41,7 +41,13 @@ export const    AccountButton: React.FC = () => {
     useEffect(() => {
         if (searchParams.get("code")) {
             console.log("EMITTING " + userName);
-            socket.emit("auth", {eventPattern: "create_account", payload: {token: searchParams.get("code"), userName: "panini"}});
+            socket.emit("auth", {
+                eventPattern: "create_account", 
+                data: {
+                    token: searchParams.get("code"), 
+                    userName: "panini"
+                }
+            });
         }
         console.log("userName " + userName);
     }, [])
@@ -82,10 +88,10 @@ export const    LoginButton: React.FC = () => {
 
     useEffect(() => {
         if (searchParams.get("code")) {
-            console.log("EMITTING LOGIN");
+            console.log("EMITTING LOGIN " + searchParams.get("code"));
             socket.emit("auth", {
                 eventPattern: "login", 
-                payload: {token: searchParams.get("code")}
+                data: {token: searchParams.get("code")}
             });
         }
     }, [])

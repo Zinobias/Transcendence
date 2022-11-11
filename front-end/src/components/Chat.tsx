@@ -15,7 +15,7 @@ const   Chat: React.FC = () => {
 		e.preventDefault()
         socket.emit("chat", {
             eventPattern: "channel_create", 
-            payload: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
+            data: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
         });
         console.log("emiting new chatroom " + chatroomName);
 		navigate('chat_window');
