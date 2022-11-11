@@ -13,12 +13,13 @@ import { Socket, Server } from 'socket.io';
 import { Sockets } from './sockets.class';
 import { Auth } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { CreateAccountDTO, LoginDTO } from './api.gateway.DTOs';
 
 export interface FrontEndDTO {
   userId?: number;
-  token?: string;
+  authToken?: string;
   eventPattern: string;
-  payload: any;
+  data: any;
 }
 
 @WebSocketGateway(8084, {
@@ -72,7 +73,7 @@ export class ApiGateway
   @SubscribeMessage('chat')
   handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
-    this.chatClient.emit(payload.eventPattern, payload.payload);
+    this.chatClient.emit(payload.eventPattern, payload.data);
   }
 
   //@UseGuards(AuthGuard)
@@ -80,7 +81,7 @@ export class ApiGateway
   handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
     console.log('auth works ' + payload);
-    this.gameClient.emit(payload.eventPattern, payload.payload);
+    this.gameClient.emit(payload.eventPattern, payload.data);
   }
 
   //   @SubscribeMessage('auth')
@@ -95,32 +96,36 @@ export class ApiGateway
     payload: FrontEndDTO,
   ): Promise<boolean | any> {
     if (payload.eventPattern === 'login') {
-      const loginDTO = await this.auth.login(client, payload.payload.token);
-      //console.log(loginDTO.user_id + ' ' + loginDTO.auth_cookie);
+      const loginDTO : LoginDTO | undefined = await this.auth.login(client, payload.data.token);
+     
       return {
         event: 'login',
         data: loginDTO === undefined ? false : loginDTO,
       };
+
     } else if (payload.eventPattern === 'validate')
       return {
         event: 'valiate',
-        data: this.auth.validate(payload.userId, payload.token),
+        data: this.auth.validate(payload.userId, payload.authToken),
       };
+
     else if (payload.eventPattern === 'create_account') {
-      const createAccountDTO = await this.auth.createAccount(
+      const createAccountDTO : CreateAccountDTO | undefined = await this.auth.createAccount(
         client,
-        payload.payload,
+        payload.data,
       );
-      if (createAccountDTO === undefined) console.log('undefined uwu');
-      console.log(
-        '' + createAccountDTO.user_id + ' ' + createAccountDTO.auth_cookie,
-      );
+
+      if (createAccountDTO === undefined) {
+	  	console.log('undefined uwu');
+		return ({event : 'create_account', data : false});
+	}
+      console.log('' + createAccountDTO.user_id + ' ' + createAccountDTO.auth_cookie);
       return {
         event: 'create_account',
-        data: createAccountDTO === undefined ? false : createAccountDTO,
+        data: createAccountDTO,
       };
     }
-    console.log('auth token ' + payload.payload.token);
+    console.log('auth token ' + payload.data.token);
     console.log('auth event pattern ' + payload.eventPattern);
     return false;
   }

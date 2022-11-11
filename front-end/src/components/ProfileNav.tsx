@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect }  from "react";
+// import LogoutButton from './Buttons';
 import '../App.css'
+import { AiFillSlackSquare } from "react-icons/ai";
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 

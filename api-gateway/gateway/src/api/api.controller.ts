@@ -40,6 +40,7 @@ export class ApiController {
   @EventPattern('chat')
   chatForwarding(@Payload() payload: microServiceDTO) {
     // change any to interface
+	// this.logger("kek");
     for (const userid of payload.userIDs) {
       this.sockets
         .getSocket(userid)
