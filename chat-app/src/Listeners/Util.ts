@@ -76,6 +76,13 @@ export class Util {
     return false;
   }
 
+  /**
+   * Checks if a user is not an admin in a channel
+   * @param channel
+   * @param actorId
+   * @param source
+   * returns true if user is *not* an admin
+   */
   public notAdmin(channel: Channel, actorId: number, source: string): boolean {
     if (!channel.isAdmin(actorId)) {
       Logger.warn(
@@ -89,8 +96,15 @@ export class Util {
     return false;
   }
 
+  /**
+   * Checks if a user does not own the specified channel
+   * @param channel
+   * @param actorId
+   * @param source
+   * returns true if user is *not* an owner
+   */
   public notOwner(channel: Channel, actorId: number, source: string): boolean {
-    if (!channel.isAdmin(actorId)) {
+    if (!channel.isOwner(actorId)) {
       Logger.warn(
         'Actor [' +
           actorId +

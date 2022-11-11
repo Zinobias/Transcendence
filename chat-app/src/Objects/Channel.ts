@@ -52,7 +52,7 @@ export class Channel {
     this._messages = messages;
     this._settings = settings;
     this._closed = closed;
-    if (otherOwner != null) this._otherOwner = otherOwner;
+    if (otherOwner != undefined) this._otherOwner = otherOwner;
   }
 
   public set channelId(value: number) {
@@ -122,6 +122,7 @@ export class Channel {
   }
 
   public isAdmin(userId: number): boolean {
+    if (this.otherOwner !== undefined) return false;
     if (this.isOwner(userId)) return true;
     return (
       this.settings
