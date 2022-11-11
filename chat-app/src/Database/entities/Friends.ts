@@ -23,11 +23,11 @@ export class friends {
   friendId: number;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  // @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'userId' })
   user: user_table;
 
   @ManyToMany(() => friends, (friend) => friend.friendId)
-  // @JoinColumn({ name: 'friendId' })
+  @JoinColumn({ name: 'friendId' })
   friend: friends;
 
   @Column()

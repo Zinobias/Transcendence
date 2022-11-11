@@ -15,10 +15,10 @@ export class blocked {
   blockId: number;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  // @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'userId' })
   users: user_table;
 
   @ManyToOne(() => blocked, (block) => block.blockId)
-  // @JoinColumn({ name: 'blockId' })
+  @JoinColumn({ name: 'blockId' })
   block: blocked;
 }

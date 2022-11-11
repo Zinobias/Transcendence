@@ -10,10 +10,10 @@ export class achievements {
   achievement: string;
 
   @ManyToOne(() => user_table, (user) => user.userId)
-  // @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'userId' })
   user: user_table;
 
   @ManyToOne(() => achievements, (achievement) => achievement.achievement)
-  // @JoinColumn({ name: 'achievement' })
+  @JoinColumn({ name: 'achievement' })
   achievementUser: achievements;
 }

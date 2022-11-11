@@ -15,7 +15,7 @@ export class chat_channels {
   constructor(channel?: Channel) {
     if (channel == undefined) return;
     console.log(channel);
-    this.channelId = channel.channelId;
+    // this.channelId = channel.channelId;
     this.ownerId = channel.owner;
     this.owner2Id = channel.otherOwner;
     this.channelName = channel.channelName;
@@ -30,11 +30,11 @@ export class chat_channels {
   owner2Id: number;
 
   @OneToMany(() => user_table, (user) => user.userId)
-  // @JoinColumn({ name: 'ownerId' })
+  @JoinColumn({ name: 'ownerId' })
   user: user_table;
 
   @ManyToOne(() => user_table, (user) => user.userId, { nullable: true })
-  // @JoinColumn({ name: 'owner2Id' })
+  @JoinColumn({ name: 'owner2Id' })
   user2: user_table;
 
   @Column()
