@@ -3,7 +3,7 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { AppService } from './app.service';
+import { MatchMakingService } from './app.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 
 
@@ -17,7 +17,7 @@ export class AppController {
 
 
 	}
-	constructor(private appService: AppService,
+	constructor(private matchMakingService: MatchMakingService,
 		@Inject('gateway') private readonly  gatewayClient : ClientProxy) {}
 	private readonly logger = new Logger("game controller");
 
@@ -28,7 +28,7 @@ export class AppController {
 	}
 	@EventPattern("game.player.move")
 	async userMoveEvent(@Payload() payload : any) {
-		this.appService.emitEvent("game.player.move." + payload.gameID, payload);
+		this.matchMakingService.emitEvent("game.player.move." + payload.gameID, payload);
 		// figure out how to receive this.
 		// game.player.move." + payload.gameID
 		// send keyinput as payload.
@@ -37,8 +37,8 @@ export class AppController {
 
 	@EventPattern("game.user.join.queue")
 	matchmakingHandler(@Payload() payload : gameMatchmakingEntity) {
-		this.appService.addToQueue(payload);
-		this.appService.findMatch();
+		this.matchMakingService.addToQueue(payload);
+		this.matchMakingService.findMatch();
 	}
 
 	@EventPattern("testMsg")

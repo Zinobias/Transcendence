@@ -1,16 +1,21 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
-import { createGameDTO } from './dto/dto';
+import { CreateGameDTO, GameInfo } from './dto/dto';
 import { gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
 import { GameEndedData, gameModes } from './game-object-interfaces';
 import { GameResult } from './game-objects/game-object-interfaces';
 const logger = new Logger("AppService");
+
+
 @Injectable()
-export class AppService {
-	// private matchmakingQueue	: gameMatchmakingEntity[];
+export class MatchMakingService {
 	private matchMakingQueue : Map<string , string[]>;
+	private gameId : number;
+	private gameList : GameInfo[];
+
+
 	/**
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
@@ -18,6 +23,7 @@ export class AppService {
 	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {};
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
+		this.gameId = 0;
 	}
 
 	
@@ -28,7 +34,7 @@ export class AppService {
 	findMatch() {
 		for (let gameMode of gameModes) {
 			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
-				let gameDTO : createGameDTO = {
+				let gameDTO : CreateGameDTO = {
 					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as string,
 					player2UID	: this.matchMakingQueue.get(gameMode)?.pop() as string,
 					gameMode 	: gameMode,
@@ -50,14 +56,51 @@ export class AppService {
 	 * @returns void
 	 */
 	@EventPattern("game.create")
-	async createGame(DTO : createGameDTO, gameID : number) {
-		let newGame : Game = new Game(this.eventEmitter , this.client ,[DTO.player1UID, DTO.player2UID], DTO.gameMode, gameID);
+	public async createGame(createGameDTO : CreateGameDTO, gameID : number) {
+		let newGame : Game = new Game(this.eventEmitter , this.client ,[createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameID);
 		logger.log("New game instance has been created");
-		this.addNewGameToDatabase(DTO).then(() => {
+		this.addNewGameToDatabase(createGameDTO).then(() => {
 			logger.log("new game instance added to DB");
 		});
+		this.addGameToList(createGameDTO);
 	}
 	
+	private async addGameToList(gameDto : CreateGameDTO) {
+		this.gameList.push({
+			player1		: gameDto.player1UID, 
+			player2 	: gameDto.player2UID,
+			gameId 		: this.gameId,
+			gameMode	: gameDto.gameMode,
+		});
+		this.gameId++;
+	}
+
+	private async removeGameFromList(gameId : number) {
+			let index = this.gameList.findIndex((ref) => {
+				return (ref.gameId === gameId);
+			})
+			if (index !== -1)
+				this.gameList.splice(index, 1);
+	}
+
+	public async addSpectator(userId : string, targetGameId : number) {
+		for (let game of this.gameList) {
+			if (game.gameId === targetGameId) {
+				if (game.spectatorList?.includes(userId) === false)
+					game.spectatorList?.push(userId);
+			}
+		}
+	}
+
+	public async removeSpecator(userId : string, targetGameId : number) {
+		for (let game of this.gameList) {
+			if (game.gameId === targetGameId) {
+				if (game.spectatorList?.includes(userId) === true)
+					game.spectatorList.splice(game.spectatorList.indexOf(userId), 1);
+			}
+		}
+	}
+
 	@OnEvent("game.ended")
 	async gameFinishedHandler(@Payload() gameResult : GameEndedData) {
 		this.client.emit("frontend.game.ended", gameResult);
@@ -67,7 +110,7 @@ export class AppService {
 		})
 	}
 
-	async addNewGameToDatabase(newGame : createGameDTO) {
+	async addNewGameToDatabase(newGame : CreateGameDTO) {
 		// TODO : add new game to db
 	}
 	async addGameResultToDatabase(gameresult : GameResult) {
