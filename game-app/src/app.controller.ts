@@ -3,7 +3,7 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { MatchMakingService } from './app.service';
+import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 
 
@@ -14,8 +14,6 @@ export class AppController {
 		console.log("Boostrapped game controller");
 		console.log("trying to connect");
 		console.log("Success");
-
-
 	}
 	constructor(private matchMakingService: MatchMakingService,
 		@Inject('gateway') private readonly  gatewayClient : ClientProxy) {}

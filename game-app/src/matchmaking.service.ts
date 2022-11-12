@@ -57,20 +57,21 @@ export class MatchMakingService {
 	 */
 	@EventPattern("game.create")
 	public async createGame(createGameDTO : CreateGameDTO, gameID : number) {
-		let newGame : Game = new Game(this.eventEmitter , this.client ,[createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameID);
+		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameID);
 		logger.log("New game instance has been created");
 		this.addNewGameToDatabase(createGameDTO).then(() => {
 			logger.log("new game instance added to DB");
 		});
-		this.addGameToList(createGameDTO);
+		this.addGameToList(createGameDTO, newGameInstance);
 	}
 	
-	private async addGameToList(gameDto : CreateGameDTO) {
+	private async addGameToList(gameDto : CreateGameDTO, gameInstance : Game) {
 		this.gameList.push({
-			player1		: gameDto.player1UID, 
-			player2 	: gameDto.player2UID,
-			gameId 		: this.gameId,
-			gameMode	: gameDto.gameMode,
+			player1			: gameDto.player1UID, 
+			player2 		: gameDto.player2UID,
+			gameId 			: this.gameId,
+			gameInstance 	: gameInstance,
+			gameMode		: gameDto.gameMode,
 		});
 		this.gameId++;
 	}

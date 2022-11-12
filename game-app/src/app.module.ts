@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { MatchMakingService } from './app.service';
+import { MatchMakingService } from './matchmaking.service';
 import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 // import { FrontendGateway } from './frontend.gateway';
