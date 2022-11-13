@@ -7,10 +7,15 @@ export interface CreateGameDTO {
   }
 
   export interface GameInfo {
-	readonly player1 		:  	any ,
-	readonly player2		: 	any ,
+	readonly player1 		:  	string ,
+	readonly player2		: 	string ,
 	spectatorList? 			:	string[];
 	readonly gameId			: 	number,
-	readonly gameInstance 	: Game;
+	readonly gameInstance 	:	Game;
 	gameMode 				: 	string,
 };
+
+export interface GameFrameUpdateDTO {
+	uids : string[],
+	data : any,
+}

@@ -11,9 +11,9 @@ const logger = new Logger("AppService");
 
 @Injectable()
 export class MatchMakingService {
-	private matchMakingQueue : Map<string , string[]>;
-	private gameId : number;
-	private gameList : GameInfo[];
+	private matchMakingQueue	: Map<string , string[]>;
+	private gameId 				: number;
+	private gameList			: GameInfo[];
 
 
 	/**
@@ -26,12 +26,30 @@ export class MatchMakingService {
 		this.gameId = 0;
 	}
 
-	
-	addToQueue(@Payload() payload : gameMatchmakingEntity) {
-		this.matchMakingQueue.get(payload.gameMode)?.push(payload.userID);
+	public isInGame(uid : string) : boolean{
+		if (this.getGameList().find((e) => {
+			return ((e.player1 === uid || e.player2 === uid));
+		})!== undefined)
+			return true;
+		return false;
+	}
+
+	public isInQueue(uid : string) : boolean {
+		for (let gameMode of this.matchMakingQueue.entries()) {
+			for (let user of gameMode) {
+				if (uid === user)
+					return (true);
+			}
+		}
+		return false;
+	}
+
+	public addToQueue(payload : gameMatchmakingEntity) {
+		if (this.isInQueue(payload.userID) === false)
+			this.matchMakingQueue.get(payload.gameMode)?.push(payload.userID);
 	}
 	
-	findMatch() {
+	public findMatch() {
 		for (let gameMode of gameModes) {
 			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
 				let gameDTO : CreateGameDTO = {
@@ -55,7 +73,7 @@ export class MatchMakingService {
 	 * @param gameID ID of the game : number
 	 * @returns void
 	 */
-	@EventPattern("game.create")
+	@OnEvent("game.create")
 	public async createGame(createGameDTO : CreateGameDTO, gameID : number) {
 		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameID);
 		logger.log("New game instance has been created");
@@ -65,7 +83,7 @@ export class MatchMakingService {
 		this.addGameToList(createGameDTO, newGameInstance);
 	}
 	
-	private async addGameToList(gameDto : CreateGameDTO, gameInstance : Game) {
+	private addGameToList(gameDto : CreateGameDTO, gameInstance : Game) {
 		this.gameList.push({
 			player1			: gameDto.player1UID, 
 			player2 		: gameDto.player2UID,
@@ -76,12 +94,23 @@ export class MatchMakingService {
 		this.gameId++;
 	}
 
-	private async removeGameFromList(gameId : number) {
+	public removeGameFromList(gameId : number) {
 			let index = this.gameList.findIndex((ref) => {
 				return (ref.gameId === gameId);
 			})
 			if (index !== -1)
 				this.gameList.splice(index, 1);
+	}
+
+	// TODO : make the gamelist smaller.
+	public getGameList() : GameInfo[] {
+		return (this.gameList);
+	}
+
+	public getGameInfo(gameId : number) : GameInfo | undefined {
+		return (this.gameList.find((e) => {
+			return (e.gameId === gameId);
+		}));
 	}
 
 	public async addSpectator(userId : string, targetGameId : number) {
@@ -93,7 +122,7 @@ export class MatchMakingService {
 		}
 	}
 
-	public async removeSpecator(userId : string, targetGameId : number) {
+	public async removeSpectator(userId : string, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
 				if (game.spectatorList?.includes(userId) === true)
