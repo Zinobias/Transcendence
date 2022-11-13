@@ -21,8 +21,8 @@ const   Login: React.FC = () => {
         <div className="grid-container">
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__body">
-                {/* <LoginButton/> */}
-                <AccountButton/>
+                <LoginButton/>
+                {/* <AccountButton/> */}
                 {/* <br/>
                 <p>or</p>
                 <button className="defaultButton" onClick={(e) => handleClick(e)}>Sign Up</button> */}

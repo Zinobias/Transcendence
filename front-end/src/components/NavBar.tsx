@@ -3,6 +3,7 @@ import { Outlet, Link } from 'react-router-dom';
 import { LogoutButton } from './Buttons';
 import ProfileNav from "./ProfileNav";
 import '../App.css'
+import Friendslist from "./Friendslist";
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 
@@ -28,6 +29,7 @@ const NavBar: React.FC = () => {
             </div>
             <div className="grid__right">
               <ProfileNav />
+              <Friendslist />
               {/* <LogoutButton /> */}
             </div>
             <div className="grid__body">

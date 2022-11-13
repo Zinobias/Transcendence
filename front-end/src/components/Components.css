@@ -58,9 +58,9 @@
 .chatroom {
     position: relative;
     width: 80%;
-    height: 50%;
+    /* height: 40%; */
     margin-top: 40px;
-    border: 2px solid black;
+    /* border: 2px solid black; */
 }
 
 .chatroom__form {
@@ -136,6 +136,33 @@ p {
     background-color: black;
 }
 
+
+/*
+    LIST CHATROOMS
+*/
+
+.listChat {
+    display: flex;
+    margin: 5px;
+    /* width: 40%;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 25px; */
+}
+
+.listChat__text {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    font-size: 20px;
+}
+
+.listChat__icon {
+    margin-right: 10px;
+    font-size: 25px;
+}
+
+
 /*
     PROFILE NAV
 */
@@ -152,7 +179,7 @@ p {
     /* position: absolute; */
     /* min-width: 160px; */
     /* scale: 0.8; */
-        border: 2px solid black;
+    border: 2px solid black;
     z-index: 1;
 }
 
@@ -195,6 +222,34 @@ p {
                 4px 4px 0px 0px #5dce64;
 }
 
-.defaultButton:hover {
+.boringButton {
+    font-size: 30px;
+    width:30%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.boringButton__small {
+    width:10%;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.boringButton__small:hover {
+    transform: scale(1.05);
+}
+
+.defaultButton:hover, .boringButton:hover {
     transform: scale(1.1);
 }
+
+/*
+    GAME
+*/

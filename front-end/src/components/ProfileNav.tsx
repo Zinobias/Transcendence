@@ -8,7 +8,6 @@ import { AiFillSlackSquare } from "react-icons/ai";
     This allows nested UI to show up when child routes are rendered. If the parent route matched exactly
 */
 
-
 const ProfileNav: React.FC = () => {
 
     const [open, setOpen] = useState<boolean>(false);

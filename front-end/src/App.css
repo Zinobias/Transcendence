@@ -37,6 +37,20 @@
                 2px 2px 0px #5dce64;
 }
 
+.heading__small {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  font-size: 30px;
+  z-index: 1;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: bold;
+  text-shadow:  1px 1px 0px #CE5937,
+                2px 2px 0px #5dce64;
+}
+
 .discoheading {
   text-transform: uppercase;
   font-size: 50px;

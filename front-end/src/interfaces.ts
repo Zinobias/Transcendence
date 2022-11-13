@@ -29,3 +29,8 @@ export interface DTO {
     eventPattern : string,
     payload : {},
 }
+export interface Chatroom {
+    name: string;
+    id: number;
+    password?: boolean;
+}
