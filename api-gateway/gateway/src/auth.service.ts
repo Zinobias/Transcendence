@@ -62,7 +62,11 @@ export class Auth {
 
     if (userId === undefined)
 		return undefined;
-    this.sockets.storeSocket(userId, client);
+	return (await this.login2(client, userId));
+  }
+
+  private async login2(client: Socket, userId: number): Promise<any | undefined> {
+	this.sockets.storeSocket(userId, client);
     /**
      * TODO: Check if user in dataBase
      */
@@ -90,7 +94,7 @@ export class Auth {
 
   private async storeSession( userId: number, uuid: string)
   	: Promise<boolean> {
-    const isSuccessful = await this.queries.storeAuth(userId, uuid);
+    const isSuccessful: boolean = await this.queries.storeAuth(userId, uuid);
 
 	if (isSuccessful)
 		await this.updateAuth(userId);
@@ -106,6 +110,6 @@ export class Auth {
     if (userId === undefined) return undefined;
     if ((await this.queries.createUser(userId, payload.userName)) === false)
       return undefined;
-    return this.login(client, payload.token);
+    return this.login2(client, userId);
   }
 }

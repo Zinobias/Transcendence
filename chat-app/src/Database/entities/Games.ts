@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, PrimaryColumn, JoinColumn } from 'typeorm';
+import { Entity, Column, OneToOne, PrimaryColumn, JoinColumn } from 'typeorm';
 import { user_table } from './UserTable';
 
 @Entity()
@@ -6,21 +6,21 @@ export class games {
   @PrimaryColumn()
   gameId: number;
 
-  @PrimaryColumn()
+  @Column()
   user1: number;
 
-  @PrimaryColumn()
+  @Column()
   user2: number;
 
-  @ManyToOne(() => games)
-  // @JoinColumn({ name: 'gameId' })
-  game: games;
+//   @ManyToOne(() => games)
+//   // @JoinColumn({ name: 'gameId' })
+//   game: games;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @OneToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'user1' })
   userT: user_table;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @OneToOne(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'user2' })
   user2T: user_table;
 
