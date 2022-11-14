@@ -14,12 +14,12 @@ export class Auth {
   ) {}
   private static map = new Map();
 
-  public validate(
-    userId: number | undefined,
-    accessToken: string | undefined,
-  ): boolean {
-    if (userId === undefined || accessToken === undefined) return false;
-    if (Auth.map.has(userId)) return Auth.map.get(userId) == accessToken;
+  public validate( userId: number | undefined, accessToken: string | undefined)
+  	: boolean {
+    if (userId === undefined || accessToken === undefined) 
+		return false;
+    if (Auth.map.has(userId))
+		return Auth.map.get(userId) === accessToken;
     return false;
   }
 
@@ -56,36 +56,25 @@ export class Auth {
     return await this.retrieveUserId(json);
   }
 
-  public async login(client: Socket, token: string): Promise<any | undefined> {
-    // this.logger.log("auth event " + token);
-    // const oauthResponse = await fetch(
-    //   'https://api.intra.42.fr/v2/oauth/token',
-    //   {
-    //     method: 'Post',
-    //     body: JSON.stringify({
-    //       grant_type: 'authorization_code',
-    //       client_id: process.env.CLIENT,
-    //       client_secret: process.env.SECRET,
-    //       code: token,
-    //       redirect_uri: 'http://localhost:3000',
-    //     }),
-    //     headers: { 'Content-Type': 'application/json' },
-    //   },
-    // );
-    // const json: AuthToken = await oauthResponse.json();
-    // //this.logger.log("oauth response " + json);
-    // const userId = await this.retrieveUserId(client, json);
+  public async login(client: Socket, token: string)
+  	: Promise<any | undefined> {
     const userId = await this.auth(token);
-    if (userId === undefined) return undefined;
+
+    if (userId === undefined)
+		return undefined;
     this.sockets.storeSocket(userId, client);
     /**
      * TODO: Check if user in dataBase
      */
     const uuid = randomUUID();
-    return this.storeSession(userId, uuid);
+	if (await this.storeSession(userId, uuid) === true)
+		return ({user_id : userId, auth_cookie : uuid});
+	else
+		return (undefined);
   }
 
-  private async retrieveUserId(authToken: AuthToken): Promise<number> {
+  private async retrieveUserId(authToken: AuthToken)
+  	: Promise<number> {
     this.logger.log(authToken.access_token);
     const response = await fetch('https://api.intra.42.fr/v2/me', {
       method: 'Get',
@@ -99,19 +88,13 @@ export class Auth {
     return json.id;
   }
 
-  private async storeSession(
-    userId: number,
-    uuid: string,
-  ): Promise<any | undefined> {
-    const success = await this.queries.storeAuth(userId, uuid);
-    if (success) {
-      await this.updateAuth(userId);
-      return {
-        user_id: userId,
-        auth_cookie: uuid,
-      };
-    }
-    return undefined;
+  private async storeSession( userId: number, uuid: string)
+  	: Promise<boolean> {
+    const isSuccessful = await this.queries.storeAuth(userId, uuid);
+
+	if (isSuccessful)
+		await this.updateAuth(userId);
+	return (isSuccessful);
   }
 
   public async createAccount(

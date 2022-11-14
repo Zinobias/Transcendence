@@ -1,10 +1,13 @@
 import React from "react";
+import { DefaultMatchmaking, DiscoMatchmaking } from "./Buttons";
 
 const   Game: React.FC = () => {
     return (
-        <div className="app__text">
-            Game
-        </div>
+        <>
+            <p>game</p>
+            <DefaultMatchmaking />
+            <DiscoMatchmaking />
+        </>
     )
 };
 

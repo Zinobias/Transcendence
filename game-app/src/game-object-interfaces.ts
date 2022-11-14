@@ -175,7 +175,7 @@ export interface GameEndedData {
 }
 
 ///**
-// * Event for when a game has 
+// * Event for when a game has ended
 // */
 //export class GameEndedEvent {
 //	constructor(gameEndedData : GameEndedData){

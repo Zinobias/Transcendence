@@ -38,3 +38,7 @@ export interface UserRemoveFriend {
   user_id: number;
   friend_id: number;
 }
+
+export interface GetUserData {
+  user_id: number;
+}

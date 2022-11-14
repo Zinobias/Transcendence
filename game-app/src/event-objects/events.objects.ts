@@ -52,7 +52,7 @@ export class GameFrameUpdateEvent {
 	constructor(frameData : GameFrameData){
 		this._gameID = frameData.gameID;
 		this._payload = frameData.payload;
-		this._boardDimensions = [GameConfig.BOARD_HEIGHT, GameConfig.BOARD_WIDTH];
+		this._boardDimensions = [GameConfig.BOARD_WIDTH, GameConfig.BOARD_HEIGHT];
 	};
 	private _gameID: number;
 	private _payload: Entity[];

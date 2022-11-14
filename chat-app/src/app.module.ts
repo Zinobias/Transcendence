@@ -3,6 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppGateway } from './app.gateway';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ChannelEventPatterns } from './Listeners/ChannelEventPatterns';
+import { Util } from './Listeners/Util';
+import { RetrieveUserDataEventPatterns } from './Listeners/RetrieveUserDataEventPatterns';
 
 @Module({
   imports: [
@@ -17,7 +20,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       },
     ]),
   ],
-  controllers: [AppController],
-  providers: [AppService, AppGateway],
+  controllers: [
+    AppController,
+    ChannelEventPatterns,
+    RetrieveUserDataEventPatterns,
+  ],
+  providers: [AppService, AppGateway, Util],
 })
 export class AppModule {}

@@ -41,14 +41,11 @@ export interface ChannelBan {
 
 export interface ChannelDisband {
   channel_id: number;
+  user_id: number;
 }
 
 export interface ChannelMessage {
   channel_id: number;
   user_id: number;
   message: string;
-}
-
-export interface GetChannelsUser {
-  user_id: number;
 }
