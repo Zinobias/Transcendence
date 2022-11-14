@@ -41,7 +41,13 @@ export const    AccountButton: React.FC = () => {
     useEffect(() => {
         if (searchParams.get("code")) {
             console.log("EMITTING " + userName);
-            socket.emit("auth", {eventPattern: "create_account", payload: {token: searchParams.get("code"), userName: "panini"}});
+            socket.emit("auth", {
+                eventPattern: "create_account", 
+                data: {
+                    token: searchParams.get("code"), 
+                    userName: "panini"
+                }
+            });
         }
         console.log("userName " + userName);
     }, [])
@@ -82,10 +88,10 @@ export const    LoginButton: React.FC = () => {
 
     useEffect(() => {
         if (searchParams.get("code")) {
-            console.log("EMITTING LOGIN");
+            console.log("EMITTING LOGIN " + searchParams.get("code"));
             socket.emit("auth", {
                 eventPattern: "login", 
-                payload: {token: searchParams.get("code")}
+                data: {token: searchParams.get("code")}
             });
         }
     }, [])
@@ -99,6 +105,53 @@ export const    LoginButton: React.FC = () => {
     return (
         <>
             <button className="defaultButton" onClick={(e) => handleClick(e)}>LOGIN</button>
+        </>
+    )
+};
+
+export const DefaultMatchmaking: React.FC = () => {
+
+    const [state, setState] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (state)
+            console.log("emitting default");
+        //socke.emit
+    }, [state])
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault()
+        setState(true);
+        console.log("click default");
+    };
+
+    return (
+        <>
+            <button className="boringButton" onClick={(e) => handleClick(e)}>DEFAULT</button>
+        </>
+    )
+
+};
+
+export const DiscoMatchmaking: React.FC = () => {
+
+    const [state, setState] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (state)
+            console.log("emitting disco");
+        //socket.emit
+    }, [state])
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault()
+        setState(true);
+        console.log("click disco");
+    };
+
+    return (
+        <>
+            <button className="defaultButton" onClick={(e) => handleClick(e)}>DISCO</button>
         </>
     )
 };
