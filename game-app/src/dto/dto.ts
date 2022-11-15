@@ -26,7 +26,7 @@ export interface addSpectatorDTO {
 }
 
 export interface outDTO {
-	userIDs : string[],
+	userIds : string[],
 	eventPattern : string,
 	data : any
 }
