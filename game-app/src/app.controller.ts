@@ -152,10 +152,10 @@ export class AppController {
 	 * @param Payload { userId : string}
 	 */
 	@EventPattern('game.isInGame')
-	isInGame(@Payload() Payload : any) {
-		let success : boolean = this.matchMakingService.isInGame(Payload.userId);
+	isInGame(@Payload() payload : any) {
+		let success : boolean = this.matchMakingService.isInGame(payload.userId);
 		this.gatewayClient.emit<string, outDTO>('game', {
-			userIDs : [Payload.userId],
+			userIDs : [payload.userId],
 			eventPattern : 'game.isInGame',
 			data : {
 				status : success,
@@ -170,19 +170,19 @@ export class AppController {
 	 * @param Payload { userId : string}
 	 */
 	@EventPattern('game.get.activeGameId')
-	getActiveGameId(@Payload() Payload : any) {
-		let ret = this.matchMakingService.getUserActiveGameId(Payload.userId);
+	getActiveGameId(@Payload() payload : any) {
+		let ret = this.matchMakingService.getUserActiveGameId(payload.userId);
 
 		if (ret === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
-				userIDs : [Payload.userId],
+				userIDs : [payload.userId],
 				eventPattern : 'game.get.activeGameId',
 				data : undefined
 			});
 			return ;
 		}
 		this.gatewayClient.emit<string, outDTO>('game', {
-			userIDs : [Payload.userId],
+			userIDs : [payload.userId],
 			eventPattern : 'game.get.activeGameId',
 			data : {
 				gameId : ret,
@@ -195,16 +195,45 @@ export class AppController {
 	 * @param Payload { userId : string}
 	 */
 	@EventPattern('game.isInQueue')
-	isInQueue(@Payload() Payload : any) {
-		let success : boolean = this.matchMakingService.isInQueue(Payload.userId);
+	isInQueue(@Payload() payload : any) {
+		let success : boolean = this.matchMakingService.isInQueue(payload.userId);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
-			userIDs : [Payload.userId],
+			userIDs : [payload.userId],
 			eventPattern : 'game.isInQueue',
 			data : {
 				status : success,
 				status_msg : success === true ? "userId in queue" : "userId not in queue",
 			}
 		});
+	}
+
+	/**
+	 * Returns a list of all the active game instances.
+	 * If empty, returns undefined
+	 * @param payload 
+	 */
+	@EventPattern('game.get.gameList')
+	getGameList(@Payload() payload : any) {
+		let gameListRet = this.matchMakingService.getGameList();
+		
+		if (gameListRet.length === 0) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				userIDs : [payload.userId],
+				eventPattern : 'game.get.gameList',
+				data : {
+					gameList : undefined
+				}
+			});
+			return ;
+		}
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIDs : [payload.userId],
+			eventPattern : 'game.get.gameList',
+			data : {
+				gameList : gameListRet,
+			}
+		});
+
 	}
 }
