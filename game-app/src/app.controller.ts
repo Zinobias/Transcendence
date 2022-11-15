@@ -5,7 +5,7 @@ import { SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
-import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO } from './dto/dto';
+import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
 
 
 @Controller()
@@ -42,11 +42,21 @@ export class AppController {
 			data 	: payload.payload}); // Forwarding entities of the game. to render in frontend.
 	}
 
+	/**
+	 * Forwards player key input to game instance, through an internal dynamic event handler in the game instance.
+	 */
 	@EventPattern("game.player.move")
-	async userMoveEvent(@Payload() payload : any) {
-		// TODO: Should get userId passed from gateway.
-		this.matchMakingService.emitEvent("game.player.move." + payload.gameId, payload);
+	async userMoveEvent(@Payload() payload : userKeyInputDTO) {
+		let res = this.matchMakingService.getUserActiveGameId(payload.userId);
+		if (res === undefined)
+			return ;
+		this.matchMakingService.emitEvent("game.player.move." + res, payload.keyEvent);
 	}
+
+	/**
+	 * Catches internal game.ended event, handles it & forwards it to all uids that are part of the game.
+	 * removes game from the active game list.
+	 */
 	@OnEvent('game.ended')
 	async gameEndedEvent(@Payload() payload : GameEndedData) {
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
@@ -130,6 +140,7 @@ export class AppController {
 	});
 	return ;
 	}
+
 	/**
 	 * User join the spectators for a game.
 	 * returns a boolean that tells about the status of the operation.
@@ -257,6 +268,12 @@ export class AppController {
 		});
 	}
 
+	/**
+	 * Retrieves object with game metadata.
+	 * returns undefined if non existant.
+	 * @param payload 
+	 * @returns 
+	 */
 	@EventPattern('game.get.gameInfo')
 	getGameInfo(@Payload() payload : any) {
 		let gameInfoRet = this.matchMakingService.getGameInfo(payload.gameId);

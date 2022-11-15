@@ -1,4 +1,5 @@
 import { Game } from "src/game-class";
+import { MoveStatePaddle } from "src/game-object-interfaces";
 
 export interface CreateGameDTO {
 	player1UID	: string;
@@ -29,4 +30,9 @@ export interface outDTO {
 	userIds : string[],
 	eventPattern : string,
 	data : any
+}
+
+export interface userKeyInputDTO {
+	userId	 : string,
+	keyEvent : MoveStatePaddle,
 }

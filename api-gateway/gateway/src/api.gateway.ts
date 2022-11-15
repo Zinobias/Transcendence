@@ -81,6 +81,10 @@ export class ApiGateway
   handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
     //TODO verify auth
     console.log('auth works ' + payload);
+	if (payload.eventPattern === 'game.player.move') {
+		if (payload.userId === undefined || payload.userId !== payload.data.userId)
+			return ;
+	}
     this.gameClient.emit(payload.eventPattern, payload.data);
   }
 
