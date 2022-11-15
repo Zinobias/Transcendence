@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
-import { CreateGameDTO, GameInfo } from './dto/dto';
+import { CreateGameDTO, GameInfo, outDTO } from './dto/dto';
 import { gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
 import { GameEndedData, gameModes } from './game-object-interfaces';
@@ -34,6 +34,16 @@ export class MatchMakingService {
 		return false;
 	}
 
+	public getUserActiveGameId(uid : string) : number | undefined{
+		let e = this.getGameList().find((e) => {
+			return ((e.player1 === uid || e.player2 === uid));
+		});
+		if (e !== undefined)
+			return (e?.gameId)
+		else
+			return undefined;
+	}
+
 	public isInQueue(uid : string) : boolean {
 		for (let gameMode of this.matchMakingQueue.entries()) {
 			for (let user of gameMode) {
@@ -48,6 +58,20 @@ export class MatchMakingService {
 		if (this.isInQueue(payload.userID) === false)
 			this.matchMakingQueue.get(payload.gameMode)?.push(payload.userID);
 	}
+
+	// TODO : Confirm this is working.
+	public removeFromQueue(uuid : string) {
+		for (let gameMode of this.matchMakingQueue.entries()) {
+			let index = gameMode.findIndex((g) => {
+				return (g === uuid);
+			})
+			if (index !== -1)
+				this.gameList.splice(index, 1);
+				return true;
+		}
+		return false;
+	}
+
 	
 	public findMatch() {
 		for (let gameMode of gameModes) {
@@ -57,7 +81,12 @@ export class MatchMakingService {
 					player2UID	: this.matchMakingQueue.get(gameMode)?.pop() as string,
 					gameMode 	: gameMode,
 				}
-				this.client.emit("game.found", gameDTO);
+				this.emitEvent('game.create', gameDTO);
+				this.client.emit<string, outDTO>("game", {
+					userIDs 		: [gameDTO.player1UID, gameDTO.player2UID],
+					eventPattern 	: 'game.found',
+					data 			: undefined
+				});
 				logger.log("Game found event emitted to client");
 			}
 		}
@@ -116,19 +145,25 @@ export class MatchMakingService {
 	public async addSpectator(userId : string, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
-				if (game.spectatorList?.includes(userId) === false)
+				if (game.spectatorList?.includes(userId) === false) {
 					game.spectatorList?.push(userId);
+					return true;
+				}
 			}
 		}
+		return false;
 	}
 
 	public async removeSpectator(userId : string, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
-				if (game.spectatorList?.includes(userId) === true)
+				if (game.spectatorList?.includes(userId) === true) {
 					game.spectatorList.splice(game.spectatorList.indexOf(userId), 1);
+					return true;
+				}
 			}
 		}
+		return false;
 	}
 
 	@OnEvent("game.ended")

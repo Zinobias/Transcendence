@@ -7,7 +7,7 @@ import { Sockets } from 'src/sockets.class';
 export interface microServiceDTO {
   eventPattern: string;
   userIDs: number[];
-  payload: object;
+  data: any;
 }
 
 @Controller()
@@ -28,7 +28,7 @@ export class ApiController {
     this.sockets.sendData(
       payload.userIDs,
       payload.eventPattern,
-      payload.payload,
+      payload.data,
     );
   }
 
@@ -44,7 +44,7 @@ export class ApiController {
     for (const userid of payload.userIDs) {
       this.sockets
         .getSocket(userid)
-        ?.emit(payload.eventPattern, payload.payload);
+        ?.emit(payload.eventPattern, payload.data);
     }
   }
 }

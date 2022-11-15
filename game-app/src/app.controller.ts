@@ -5,17 +5,17 @@ import { SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
-import { GameFrameUpdateDTO } from './dto/dto';
+import { addSpectatorDTO, GameFrameUpdateDTO, outDTO } from './dto/dto';
 
 
 @Controller()
 export class AppController {
 
 	async onApplicationBootstrap() {
-		console.log("Boostrapped game controller");
-		console.log("trying to connect");
+		console.log("Bootstrapped game controller");
 		console.log("Success");
 	}
+
 	constructor(private matchMakingService: MatchMakingService,
 		@Inject('gateway') private readonly  gatewayClient : ClientProxy,
 		private evenEmitter : EventEmitter2) {}
@@ -24,6 +24,7 @@ export class AppController {
 	@OnEvent('game.frame.update')
 	async updateFrame(@Payload() payload : GameFrameUpdateEvent) {
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameID);
+
 		if (gameInfo === undefined) {
 			this.logger.debug('game.frame.update cant find the gameInfo');
 			return ;
@@ -51,25 +52,7 @@ export class AppController {
 		//this.eventEmitter.emit();
 	}
 
-	/**
-	 * Tries to add the user to the matchmaking queue for chosen Gamemode.
-	 * If the player is already in a game or in the queue, it will return an error.
-	 * @param payload 
-	 * @returns 
-	 */
-	@EventPattern("game.user.join.queue")
-	matchmakingHandler(@Payload() payload : gameMatchmakingEntity) {
-		if (this.matchMakingService.isInGame(payload.userID) === true) {
-			this.gatewayClient.emit('game', {
-				eventPattern 	: 'game.user.join.queue',
-				data			: undefined,
-			});
-			return ;
-		}
-		this.matchMakingService.addToQueue(payload);
-		this.matchMakingService.findMatch();
-	}
-
+	
 	@EventPattern("testMsg")
 	async testFunc(@Payload() payload : any) {
 		this.logger.log(payload);
@@ -77,5 +60,151 @@ export class AppController {
 		
 		this.gatewayClient.emit<string, string>('testMsg', "testmsg from game");
 	}
-}
 
+	/**
+	 * Tries to add the user to the matchmaking queue for chosen Gamemode.
+	 * If the player is already in a game or in the queue, it will return an error.
+	 * data is undefined in case of an error.
+	 * @param payload 
+	 * @returns 
+	 */
+	@EventPattern("game.join.queue")
+	joinMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
+		if (this.matchMakingService.isInGame(payload.userID) === true) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				userIDs 		: [payload.userID],
+				eventPattern 	: 'game.user.join.queue',
+				data			: undefined,
+			});
+			return ;
+		}
+		this.gatewayClient.emit<string, outDTO>('game', {
+			eventPattern : 'game.user.join.queue',
+			userIDs		: [payload.userID],
+			data		: undefined,
+		});
+		this.matchMakingService.addToQueue(payload);
+		this.matchMakingService.findMatch();
+	}
+
+
+		/**
+	 * Tries to add the user to the matchmaking queue for chosen Gamemode.
+	 * If the player is already in a game or in the queue, it will return an error.
+	 * data is undefined in case of an error.
+	 * @param payload 
+	 * @returns 
+	 */
+		 @EventPattern("game.leave.queue")
+		 leaveMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
+			let success = this.matchMakingService.removeFromQueue(payload.userID);
+
+			this.gatewayClient.emit<string, outDTO>('game', {
+				userIDs : [payload.userID],
+				eventPattern : 'game.leave.queue',
+				data : { 
+					status : success,
+					status_msg : success === true ? "Left queue, or was never in the queue." : "Left queue, or was never in the queue.",
+				}
+			});
+			return ;
+		 }
+	/**
+	 * User join the spectators for a game.
+	 * returns a boolean that tells about the status of the operation.
+	 * @param payload 
+	 */
+	@EventPattern('game.spectate.start')
+	async startSpectateGame(@Payload() payload : addSpectatorDTO) {
+		let success = await this.matchMakingService.addSpectator(payload.userId, payload.targetGameId);
+	
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIDs : [payload.userId],
+			eventPattern : 'game.spectate.start',
+			data : { 
+				status : success,
+				status_msg : success === true ? "Success" : "gameId invalid",
+			}
+		});
+	}
+
+		/**
+	 * User join the spectators for a game.
+	 * returns a boolean that tells about the status of the operation.
+	 * @param payload 
+	 */
+	@EventPattern('game.spectate.stop')
+	async stopSpectateGame(@Payload() payload : addSpectatorDTO) {
+		let success = await this.matchMakingService.removeSpectator(payload.userId, payload.targetGameId);
+
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIDs : [payload.userId],
+			eventPattern : 'game.spectate.stop',
+			data : { 
+				status : success,
+				status_msg : success === true ? "Success" : "gameId invalid",
+			}
+		});
+	}
+
+	/**
+	 * Returns a boolean & msg, true if  user is currently in a game.
+	 * @param Payload { userId : string}
+	 */
+	@EventPattern('game.isInGame')
+	isInGame(@Payload() Payload : any) {
+		let success : boolean = this.matchMakingService.isInGame(Payload.userId);
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIDs : [Payload.userId],
+			eventPattern : 'game.isInGame',
+			data : {
+				status : success,
+				status_msg : success === true ? "userId in game" : "userId not in game",
+			}
+		});
+	}
+
+	/**
+	 * Returns undefined if not actually in an active game,
+	 * returns the gameId if in a game.
+	 * @param Payload { userId : string}
+	 */
+	@EventPattern('game.get.activeGameId')
+	getActiveGameId(@Payload() Payload : any) {
+		let ret = this.matchMakingService.getUserActiveGameId(Payload.userId);
+
+		if (ret === undefined) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				userIDs : [Payload.userId],
+				eventPattern : 'game.get.activeGameId',
+				data : undefined
+			});
+			return ;
+		}
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIDs : [Payload.userId],
+			eventPattern : 'game.get.activeGameId',
+			data : {
+				gameId : ret,
+			}
+		});
+	}
+
+	/**
+	 * Returns a boolean & msg, true if  user is currently in the queue.
+	 * @param Payload { userId : string}
+	 */
+	@EventPattern('game.isInQueue')
+	isInQueue(@Payload() Payload : any) {
+		let success : boolean = this.matchMakingService.isInQueue(Payload.userId);
+
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIDs : [Payload.userId],
+			eventPattern : 'game.isInQueue',
+			data : {
+				status : success,
+				status_msg : success === true ? "userId in queue" : "userId not in queue",
+			}
+		});
+	}
+}

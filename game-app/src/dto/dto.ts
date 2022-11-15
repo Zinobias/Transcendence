@@ -19,3 +19,14 @@ export interface GameFrameUpdateDTO {
 	uids : string[],
 	data : any,
 }
+
+export interface addSpectatorDTO {
+	userId : string,
+	targetGameId : number,
+}
+
+export interface outDTO {
+	userIDs : string[],
+	eventPattern : string,
+	data : any
+}
