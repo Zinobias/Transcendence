@@ -8,7 +8,6 @@ import { chat_members } from './entities/ChatMembers';
 import { games } from './entities/Games';
 import { sessions } from './entities/Sessions';
 
-require('dotenv').config({ path: __dirname + '/.env' });
 export const myDataSource = new DataSource({
   type: 'postgres',
   host: process.env.POSTGRES_HOST,

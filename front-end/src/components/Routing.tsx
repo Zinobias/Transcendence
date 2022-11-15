@@ -18,8 +18,8 @@ const Routing: React.FC  = () => {
         // STILL NEED TO WRITE PROPER GUARD
         <Routes>
             {/* <Route path='/Login' element={cookies.user ? <NavBar /> : <Login />}/> */}
-            <Route path='/Login' element={<Login />}/>
-            {/* <Route path='/SignUp' element={<SignUp />}/> */}
+            <Route path='/login' element={<Login />}/>
+            <Route path='/signup' element={<SignUp />}/>
             <Route path='/' element={<Guard outlet={<NavBar />} />}>
             {/* <Route path='/' element={!cookies.user ? <Login /> : <NavBar />}> */}
                 <Route index element={<Leaderboard />} />

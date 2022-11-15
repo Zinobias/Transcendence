@@ -4,6 +4,7 @@ import { LogoutButton } from './Buttons';
 import ProfileNav from "./ProfileNav";
 import '../App.css'
 import Friendslist from "./Friendslist";
+import FooterChat from "./FooterChat";
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 
@@ -12,10 +13,12 @@ import Friendslist from "./Friendslist";
 
 const NavBar: React.FC = () => {
     return (
+
+        <>
         <div className="grid-container">
 
           {/* <div className="grid-item">    */}
-          <span className="grid__header">Disco Pong</span>      
+          {/* <span className="grid__header">Disco Pong</span>       */}
           <div id="nav">
               <ul>
                 <li><Link to='/game'>Game</Link></li>
@@ -36,7 +39,10 @@ const NavBar: React.FC = () => {
               <Outlet />
             </div>
           {/* </div> */}
+            <FooterChat />
         </div>
+        
+        </>
       );
 }
 

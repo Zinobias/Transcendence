@@ -41,6 +41,7 @@
     font-weight: bold;
     font-family: 'Silkscreen', cursive;
     background-color: transparent;
+    cursor: pointer;
     box-shadow: 1px 1px 0px 0px #CE5937, 
                 2px 2px 0px 0px #CE5937, 
                 3px 3px 0px 0px #5dce64,  
@@ -55,12 +56,18 @@
     CHAT
 */
 
+/* position: relative;
+width: 100%;
+height: 100%;
+background-color: #646464;
+text-align: left; */
+
 .chatroom {
     position: relative;
-    width: 80%;
-    /* height: 40%; */
+    width: 70%;
+    height: 70%;
     margin-top: 40px;
-    /* border: 2px solid black; */
+    border: 2px solid black;
 }
 
 .chatroom__form {
@@ -111,14 +118,18 @@
     font-family: 'Didact Gothic';
 }
 
+
 .chatroom__text--bubble__right {
     width: 40%;
     margin: 2%;
-    float: right;
-    border: 1px solid black;
+    border-radius: 5px;
+    padding: 1px;
+    /* border: 1px solid black; */
+    background: #757575;
+    font-family: 'Didact Gothic';
 }
 
-p {
+p.chatp {
     margin-left: 10px;
     margin-right: 10px;
 }
@@ -168,19 +179,14 @@ p {
 */
 
 .profile {
-    /* position: relative; */
-    /* display: inline-block; */
-    /* border: 2px solid black; */
+    width: 100%;
 }
 
 .profile__dropdown {
     display: none;
     margin-top: 15px;
-    /* position: absolute; */
-    /* min-width: 160px; */
-    /* scale: 0.8; */
+    position: relative;
     border: 2px solid black;
-    z-index: 1;
 }
 
 .profile__avatar {
@@ -191,7 +197,17 @@ p {
     margin-right: auto;
 }
 
+.profile__close {
+    margin-right: 10px;
+    font-size: 25px;
+}
+
+.profile__close:hover {
+    cursor: pointer;
+}
+
 .profile__avatar:hover, .profile__avatar:focus {
+    cursor: pointer;
     transform: scale(1.05);
 }
 
@@ -199,9 +215,6 @@ p {
     display: block;
 }
 
-.profile__border{
-    border: 2px solid black;
-}
 
 /*
     BUTTONS
@@ -216,6 +229,7 @@ p {
     font-weight: bold;
     font-family: 'Silkscreen', cursive;
     background-color: transparent;
+    cursor: pointer;
     box-shadow: 1px 1px 0px 0px #CE5937, 
                 2px 2px 0px 0px #CE5937, 
                 3px 3px 0px 0px #5dce64,  
@@ -229,6 +243,7 @@ p {
     border: 3px solid;
     color: black;
     font-weight: bold;
+    cursor: pointer;
     font-family: 'Silkscreen', cursive;
     background-color: transparent;
 }
@@ -238,6 +253,7 @@ p {
     border: 2px solid;
     color: black;
     font-weight: bold;
+    cursor: pointer;
     font-family: 'Silkscreen', cursive;
     background-color: transparent;
 }
@@ -249,6 +265,50 @@ p {
 .defaultButton:hover, .boringButton:hover {
     transform: scale(1.1);
 }
+
+/*
+    FOOTER CHAT
+*/
+
+.footerChat {
+    position: fixed;
+    bottom: 0px;
+    right: 30px;
+    text-align: right;
+    margin: 0;
+}
+
+.footerChat__icon {
+    font-size:1.1em; 
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px 20px 5px 20px;
+    background-color: black;
+    color:  #757575;
+    display: inline-block;
+    text-align: right;
+    text-decoration: none;
+    -webkit-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.3);
+    box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.3);
+}
+
+.footerChat__body {
+    display: none;
+    border: 1px solid #000000;
+    height: 500px;
+    width: 500px;
+    background-color: #646464;
+    -webkit-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.3);
+    -moz-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.3);
+    box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.3);
+}
+
+.footerChat__show {
+    display: block;
+}
+
 
 /*
     GAME
