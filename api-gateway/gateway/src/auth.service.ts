@@ -1,5 +1,4 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { SubscribeMessage } from '@nestjs/websockets';
 import { Queries } from './database/queries';
 import { randomUUID } from 'crypto';
 import { Socket } from 'socket.io';
@@ -14,8 +13,7 @@ export class Auth {
   ) {}
   private static map = new Map();
 
-  public validate( userId: number | undefined, accessToken: string | undefined)
-  	: boolean {
+  public validate(userId: number | undefined, accessToken: string | undefined): boolean {
     if (userId === undefined || accessToken === undefined) 
 		return false;
     if (Auth.map.has(userId))
@@ -34,7 +32,7 @@ export class Auth {
 
   private logger = new Logger('auth');
 
-  private async auth(token: string): Promise<number | undefined> {
+  private async auth(token: string, signup: boolean): Promise<number | undefined> {
     this.logger.log('auth event ' + token);
     const oauthResponse = await fetch(
       'https://api.intra.42.fr/v2/oauth/token',
@@ -45,7 +43,9 @@ export class Auth {
           client_id: process.env.CLIENT,
           client_secret: process.env.SECRET,
           code: token,
-          redirect_uri: 'http://localhost:3000/login',
+          redirect_uri: signup
+            ? 'http://localhost:3000/signup'
+            : 'http://localhost:3000/login',
         }),
         headers: { 'Content-Type': 'application/json' },
       },
@@ -56,12 +56,11 @@ export class Auth {
     return await this.retrieveUserId(json);
   }
 
-  public async login(client: Socket, token: string)
-  	: Promise<any | undefined> {
-    const userId = await this.auth(token);
+  public async login(client: Socket, token: string): Promise<any | undefined> {
+    const userId = await this.auth(token, false);
 
     if (userId === undefined)
-		return undefined;
+      return undefined;
 	return (await this.login2(client, userId));
   }
 
@@ -71,14 +70,12 @@ export class Auth {
      * TODO: Check if user in dataBase
      */
     const uuid = randomUUID();
-	if (await this.storeSession(userId, uuid) === true)
-		return ({user_id : userId, auth_cookie : uuid});
-	else
-		return (undefined);
+    if ((await this.storeSession(userId, uuid)) === true)
+      return { user_id: userId, auth_cookie: uuid };
+    else return undefined;
   }
 
-  private async retrieveUserId(authToken: AuthToken)
-  	: Promise<number> {
+  private async retrieveUserId(authToken: AuthToken): Promise<number> {
     this.logger.log(authToken.access_token);
     const response = await fetch('https://api.intra.42.fr/v2/me', {
       method: 'Get',
@@ -92,22 +89,19 @@ export class Auth {
     return json.id;
   }
 
-  private async storeSession( userId: number, uuid: string)
-  	: Promise<boolean> {
+  private async storeSession(userId: number, uuid: string): Promise<boolean> {
     const isSuccessful: boolean = await this.queries.storeAuth(userId, uuid);
 
-	if (isSuccessful)
-		await this.updateAuth(userId);
-	return (isSuccessful);
+    if (isSuccessful) await this.updateAuth(userId);
+    return isSuccessful;
   }
 
-  public async createAccount(
-    client: Socket,
-    payload: any,
-  ): Promise<any | undefined> {
+  public async createAccount(client: Socket, payload: any): Promise<any | undefined> {
     this.logger.log('createAccount userName ' + payload.userName);
-    const userId = await this.auth(payload.token);
-    if (userId === undefined) return undefined;
+    const userId = await this.auth(payload.token, true);
+
+    if (userId === undefined)
+      return undefined;
     if ((await this.queries.createUser(userId, payload.userName)) === false)
       return undefined;
     return this.login2(client, userId);
