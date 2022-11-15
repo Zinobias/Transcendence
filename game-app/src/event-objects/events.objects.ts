@@ -67,11 +67,20 @@ export class GameFrameUpdateEvent {
 
 }
 
+
+
+// export interface GameResult {
+// 	readonly player1	: 	PlayerData;
+// 	readonly player2	: 	PlayerData;
+// 	gameId				:	number;
+// 	winnerUID			:	string;
+// }
+
 /**
  * object for the gameEndedEvent
  */
  export interface GameEndedData {
-	gameId : number;
+	gameId 	: number;
 	payload : GameResult;
 }
 

@@ -165,15 +165,6 @@ export interface GameResult {
 	winnerUID			:	string;
 }
 
-
-/**
- * object for the gameEndedEvent
- */
-export interface GameEndedData {
-	gameId : number;
-	payload : GameResult;
-}
-
 ///**
 // * Event for when a game has ended
 // */

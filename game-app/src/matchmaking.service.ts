@@ -2,9 +2,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { CreateGameDTO, GameInfo, outDTO } from './dto/dto';
-import { gameMatchmakingEntity } from './event-objects/events.objects';
+import { GameEndedData, gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
-import { GameEndedData, gameModes } from './game-object-interfaces';
+import { gameModes } from './game-object-interfaces';
 import { GameResult } from './game-objects/game-object-interfaces';
 const logger = new Logger("AppService");
 
@@ -23,7 +23,7 @@ export class MatchMakingService {
 	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {};
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
-		this.gameId = 0;
+		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	}
 
 	public isInGame(uid : string) : boolean{
@@ -103,8 +103,9 @@ export class MatchMakingService {
 	 * @returns void
 	 */
 	@OnEvent("game.create")
-	public async createGame(createGameDTO : CreateGameDTO, gameId : number) {
-		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameId);
+	public async createGame(createGameDTO : CreateGameDTO) {
+		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, this.gameId);
+
 		logger.log("New game instance has been created");
 		this.addNewGameToDatabase(createGameDTO).then(() => {
 			logger.log("new game instance added to DB");
@@ -120,6 +121,7 @@ export class MatchMakingService {
 			gameInstance 	: gameInstance,
 			gameMode		: gameDto.gameMode,
 		});
+		// TODO : Increment gameIds in DB.
 		this.gameId++;
 	}
 

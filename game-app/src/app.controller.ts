@@ -5,7 +5,7 @@ import { SubscribeMessage } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
-import { addSpectatorDTO, GameFrameUpdateDTO, outDTO } from './dto/dto';
+import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO } from './dto/dto';
 
 
 @Controller()
@@ -39,20 +39,41 @@ export class AppController {
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.frame.update.' + gameInfo.gameId,
 			targets : uids,
-			data 	: payload.payload});
+			data 	: payload.payload}); // Forwarding entities of the game. to render in frontend.
 	}
 
 	@EventPattern("game.player.move")
 	async userMoveEvent(@Payload() payload : any) {
 		// TODO: Should get userId passed from gateway.
 		this.matchMakingService.emitEvent("game.player.move." + payload.gameId, payload);
-		// figure out how to receive this.
-		// game.player.move." + payload.gameId
-		// send keyinput as payload.
-		//this.eventEmitter.emit();
+	}
+	@OnEvent('game.ended')
+	async gameEndedEvent(@Payload() payload : GameEndedData) {
+		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
+
+		if (gameInfo === undefined) {
+			this.logger.debug('game.frame.update cant find the gameInfo');
+			return ;
+		}
+		let uids : string[];
+		if (gameInfo?.spectatorList !== undefined) {
+			uids = gameInfo?.spectatorList;
+			uids.push(gameInfo.player1, gameInfo.player2);
+		}
+		else
+			uids = [gameInfo.player1, gameInfo.player2];
+		this.gatewayClient.emit('game', {
+			eventPattern : 'game.ended.' + gameInfo.gameId,
+			targets : uids,
+			data 	: {
+				winner : payload.payload.winnerUID,
+				player1ScoreFinal : 2,
+				player2ScoreFinal : 5,
+			}
+		}); // Forwarding entities of the game. to render in frontend.
+		this.matchMakingService.removeGameFromList(payload.gameId);
 	}
 
-	
 	@EventPattern("testMsg")
 	async testFunc(@Payload() payload : any) {
 		this.logger.log(payload);
@@ -88,27 +109,27 @@ export class AppController {
 	}
 
 
-		/**
+	/**
 	 * Tries to add the user to the matchmaking queue for chosen Gamemode.
 	 * If the player is already in a game or in the queue, it will return an error.
 	 * data is undefined in case of an error.
 	 * @param payload 
 	 * @returns 
 	 */
-		 @EventPattern("game.leave.queue")
-		 leaveMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
-			let success = this.matchMakingService.removeFromQueue(payload.userId);
+	@EventPattern("game.leave.queue")
+	leaveMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
+	let success = this.matchMakingService.removeFromQueue(payload.userId);
 
-			this.gatewayClient.emit<string, outDTO>('game', {
-				userIds : [payload.userId],
-				eventPattern : 'game.leave.queue',
-				data : { 
-					status : success,
-					status_msg : success === true ? "Left queue, or was never in the queue." : "Left queue, or was never in the queue.",
-				}
-			});
-			return ;
-		 }
+	this.gatewayClient.emit<string, outDTO>('game', {
+		userIds : [payload.userId],
+		eventPattern : 'game.leave.queue',
+		data : { 
+			status : success,
+			status_msg : success === true ? "Left queue, or was never in the queue." : "Left queue, or was never in the queue.",
+		}
+	});
+	return ;
+	}
 	/**
 	 * User join the spectators for a game.
 	 * returns a boolean that tells about the status of the operation.
@@ -257,5 +278,18 @@ export class AppController {
 				gameList : gameInfoRet,
 			}
 		});
+	}
+
+	/**
+	 * How do we confirm that the request is valid and not forged?
+	 * @param payload create Game DTO
+	 * @returns 
+	 */
+	@EventPattern('game.create')
+	async createGame(@Payload() payload : CreateGameDTO) {
+		await this.matchMakingService.createGame(payload);
+		return ({event : 'game.create', data : {
+			success : true
+		}});
 	}
 }
