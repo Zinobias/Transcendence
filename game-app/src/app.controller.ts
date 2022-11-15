@@ -60,6 +60,8 @@ export class AppController {
 	@OnEvent('game.ended')
 	async gameEndedEvent(@Payload() payload : GameEndedData) {
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
+		this.logger.debug("Game-ended event caught & emitted to frontend");
+		this.logger.debug("GameID: [" + payload.gameId + "] Game result has been added to the database");
 
 		if (gameInfo === undefined) {
 			this.logger.debug('game.frame.update cant find the gameInfo');

@@ -26,6 +26,12 @@ export class MatchMakingService {
 		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	}
 
+
+	/**
+	 * Returns true if the user is in a game, false otherwise.
+	 * @param uid user to check if ingame.
+	 * @returns true or false
+	 */
 	public isInGame(uid : string) : boolean{
 		if (this.getGameList().find((e) => {
 			return ((e.player1 === uid || e.player2 === uid));
@@ -34,6 +40,11 @@ export class MatchMakingService {
 		return false;
 	}
 
+	/**
+	 * checks if the user is in an active game & returns gameId
+	 * @param uid user to check
+	 * @returns gameId 
+	 */
 	public getUserActiveGameId(uid : string) : number | undefined{
 		let e = this.getGameList().find((e) => {
 			return ((e.player1 === uid || e.player2 === uid));
@@ -44,6 +55,13 @@ export class MatchMakingService {
 			return undefined;
 	}
 
+
+	/**
+	 * Returns true if the user is in the queue currently.
+	 * false otherwise.
+	 * @param uid User to check.
+	 * @returns 
+	 */
 	public isInQueue(uid : string) : boolean {
 		for (let gameMode of this.matchMakingQueue.entries()) {
 			for (let user of gameMode) {
@@ -54,12 +72,20 @@ export class MatchMakingService {
 		return false;
 	}
 
+	/**
+	 * Adds a user to the matchmaking queue.
+	 * @param payload
+	 */
 	public addToQueue(payload : gameMatchmakingEntity) {
 		if (this.isInQueue(payload.userId) === false)
 			this.matchMakingQueue.get(payload.gameMode)?.push(payload.userId);
 	}
 
-	// TODO : Confirm this is working.
+	/**
+	 * Removes a user from the matchmaking queue, regardless of mode.
+	 * @param uuid user to remove from queue
+	 * @returns 
+	 */
 	public removeFromQueue(uuid : string) {
 		for (let gameMode of this.matchMakingQueue.entries()) {
 			let index = gameMode.findIndex((g) => {
@@ -73,6 +99,11 @@ export class MatchMakingService {
 	}
 
 	
+	/**
+	 * Check to see if after the user has been added to the queue, as match can be constructed.
+	 * if the case is yes, it attemps to create a game instance. By emitting game.create & therefore 
+	 * calling createGame().
+	 */
 	public findMatch() {
 		for (let gameMode of gameModes) {
 			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
@@ -113,6 +144,12 @@ export class MatchMakingService {
 		this.addGameToList(createGameDTO, newGameInstance);
 	}
 	
+	/**
+	 * adds game instance to the active games list.
+	 * increments gameId internally & in db.
+	 * @param gameDto 
+	 * @param gameInstance 
+	 */
 	private addGameToList(gameDto : CreateGameDTO, gameInstance : Game) {
 		this.gameList.push({
 			player1			: gameDto.player1UID, 
@@ -125,6 +162,11 @@ export class MatchMakingService {
 		this.gameId++;
 	}
 
+
+	/**
+	 * removes game instance from the game list.
+	 * @param gameId
+	 */
 	public removeGameFromList(gameId : number) {
 			let index = this.gameList.findIndex((ref) => {
 				return (ref.gameId === gameId);
@@ -133,17 +175,32 @@ export class MatchMakingService {
 				this.gameList.splice(index, 1);
 	}
 
-	// TODO : make the gamelist smaller.
+	/**
+	 * 
+	 * @returns game list object.
+	 */
 	public getGameList() : GameInfo[] {
 		return (this.gameList);
 	}
 
+
+	/**
+	 *  returns game instance metadata
+	 * @param gameId 
+	 * @returns game metadata object
+	 */
 	public getGameInfo(gameId : number) : GameInfo | undefined {
 		return (this.gameList.find((e) => {
 			return (e.gameId === gameId);
 		}));
 	}
 
+	/**
+	 * Starts spectating a game, adds the spectator to the list of users that should receive frame updates & game ended events.
+	 * @param userId userId that wants to spectate
+	 * @param targetGameId game to spectate
+	 * @returns 
+	 */
 	public async addSpectator(userId : string, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
@@ -156,6 +213,12 @@ export class MatchMakingService {
 		return false;
 	}
 
+	/**
+	 * Removes the spectator
+	 * @param userId spectator name.
+	 * @param targetGameId game to stop spectating.
+	 * @returns 
+	 */
 	public async removeSpectator(userId : string, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
@@ -166,15 +229,6 @@ export class MatchMakingService {
 			}
 		}
 		return false;
-	}
-
-	@OnEvent("game.ended")
-	async gameFinishedHandler(@Payload() gameResult : GameEndedData) {
-		this.client.emit("frontend.game.ended", gameResult);
-		logger.log("Game-ended event caught & emitted to frontend");
-		this.addGameResultToDatabase(gameResult.payload).then(() => {
-			logger.log("GameID: [" + gameResult.gameId + "] Game result has been added to the database");
-		});
 	}
 
 	async addNewGameToDatabase(newGame : CreateGameDTO) {
