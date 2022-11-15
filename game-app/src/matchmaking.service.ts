@@ -55,8 +55,8 @@ export class MatchMakingService {
 	}
 
 	public addToQueue(payload : gameMatchmakingEntity) {
-		if (this.isInQueue(payload.userID) === false)
-			this.matchMakingQueue.get(payload.gameMode)?.push(payload.userID);
+		if (this.isInQueue(payload.userId) === false)
+			this.matchMakingQueue.get(payload.gameMode)?.push(payload.userId);
 	}
 
 	// TODO : Confirm this is working.
@@ -83,7 +83,7 @@ export class MatchMakingService {
 				}
 				this.emitEvent('game.create', gameDTO);
 				this.client.emit<string, outDTO>("game", {
-					userIDs 		: [gameDTO.player1UID, gameDTO.player2UID],
+					userIds 		: [gameDTO.player1UID, gameDTO.player2UID],
 					eventPattern 	: 'game.found',
 					data 			: undefined
 				});
@@ -99,12 +99,12 @@ export class MatchMakingService {
 	 * player1UID	: string;
 	 * player2UID	: string;
 	 * gameMode		: string;}
-	 * @param gameID ID of the game : number
+	 * @param gameId ID of the game : number
 	 * @returns void
 	 */
 	@OnEvent("game.create")
-	public async createGame(createGameDTO : CreateGameDTO, gameID : number) {
-		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameID);
+	public async createGame(createGameDTO : CreateGameDTO, gameId : number) {
+		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, gameId);
 		logger.log("New game instance has been created");
 		this.addNewGameToDatabase(createGameDTO).then(() => {
 			logger.log("new game instance added to DB");
@@ -171,18 +171,18 @@ export class MatchMakingService {
 		this.client.emit("frontend.game.ended", gameResult);
 		logger.log("Game-ended event caught & emitted to frontend");
 		this.addGameResultToDatabase(gameResult.payload).then(() => {
-			logger.log("GameID: [" + gameResult.gameID + "] Game result has been added to the database");
-		})
+			logger.log("GameID: [" + gameResult.gameId + "] Game result has been added to the database");
+		});
 	}
 
 	async addNewGameToDatabase(newGame : CreateGameDTO) {
 		// TODO : add new game to db
 	}
 	async addGameResultToDatabase(gameresult : GameResult) {
-		// logger.log("GameID: [" + gameresult.gameID + "] Game result has been added to the database");
+		// logger.log("GameID: [" + gameresult.gameId + "] Game result has been added to the database");
 		// TODO: Go wild abby 
 		/**
-		 * Update database gameID
+		 * Update database gameId
 		 * Add game to database.
 		 * maybe set a state or so?
 		 * it will have a winner field, so maybe set it to a default value when not defined.
