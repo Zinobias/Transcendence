@@ -22,7 +22,7 @@ export class friends {
   @PrimaryColumn()
   friendId: number;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.friend)
   @JoinColumn({ name: 'userId' })
   user: user_table;
 

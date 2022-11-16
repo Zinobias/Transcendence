@@ -18,15 +18,17 @@ export class chat_channel_settings {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => chat_channels, (chat) => chat.channelId)
+  @ManyToOne(() => chat_channels, (chat) => chat.chat)
   @JoinColumn({ name: 'channelId' })
   channel: chat_channels;
 
   @PrimaryColumn()
   affectedUser: number;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.setting)
   @JoinColumn({ name: 'affectedUser' })
+  user: user_table;
+
   @Column()
   from: number;
 

@@ -9,10 +9,10 @@ export class sessions {
   @PrimaryColumn()
   sessionCode: string;
 
-  @Column({ default: new Date() })
-  time: Date;
+  @Column({ default: new Date().getMilliseconds() })
+  time: number;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.session)
   @JoinColumn({ name: 'userId' })
   user: user_table;
 }

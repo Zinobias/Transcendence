@@ -25,14 +25,14 @@ export class chat_message {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => chat_channels, (chat) => chat.channelId)
+  @ManyToOne(() => chat_channels, (chat) => chat.message)
   @JoinColumn({ name: 'channelId' })
   chat: chat_channels;
 
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @ManyToOne(() => user_table, (user) => user.message)
   @JoinColumn({ name: 'userId' })
   user: user_table;
 
