@@ -1,28 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
-@Entity()
+@Entity('users')
 export class user_table {
-  constructor(loginId: string, userName: string) {
-    this.loginId = loginId;
-    this.userName = userName;
-  }
+	constructor(userId: number, userName: string) {
+		this.userId = userId;
+		this.userName = userName;
+	}
 
-  @PrimaryGeneratedColumn()
-  userId: number;
+	@PrimaryColumn()
+	userId: number;
 
-  @Column({ nullable: true })
-  loginId: string;
+	@Column()
+	userName: string;
 
-  @Column()
-  userName: string;
+	@Column({ default: new Date() })
+	createAt: Date;
 
-  @Column({ default: new Date() })
-  createAt: Date;
-
-  // @JoinColumn({ name: 'avatarId' })
-  // @OneToOne(() => blob, { nullable: true })
-  // avatar: blob;
-  //
-  // @Column({ nullable: true })
-  // avatarId: number;
+	// @JoinColumn({ name: 'avatarId' })
+	// @OneToOne(() => blob, { nullable: true })
+	// avatar: blob;
+	//
+	// @Column({ nullable: true })
+	// avatarId: number;
 }
