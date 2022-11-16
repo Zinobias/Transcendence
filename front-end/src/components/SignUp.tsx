@@ -1,5 +1,5 @@
 import React from "react";
-import { AccountButton } from "./Buttons";
+import { SignupButton } from "./Buttons";
 
 const SignUp: React.FC = () => {
 
@@ -8,7 +8,7 @@ const SignUp: React.FC = () => {
         <div className="grid-container">
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__body">
-                <AccountButton/>
+                <SignupButton />
             </div>
         </div>
     )

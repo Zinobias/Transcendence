@@ -154,7 +154,11 @@ export interface PlayerData {
 export interface GameResult {
 	readonly player1	: 	PlayerData;
 	readonly player2	: 	PlayerData;
-	gameID				:	number;
+	playerScores		:	{
+		player1FinalScore : number,
+		player2FinalScore : number,
+	}
+	gameId				:	number;
 	winnerUID			:	string;
 }
 

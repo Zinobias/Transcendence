@@ -1,7 +1,7 @@
 import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle} from "./game-objects/game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
-import { GamePlayerMoveEvent, GameFrameUpdateEvent } from "./event-objects/events.objects";
+import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedData } from "./event-objects/events.objects";
 import { ClientProxy } from "@nestjs/microservices";
 
 
@@ -20,7 +20,7 @@ export class Game {
 			private client				: ClientProxy,
 			PlayersUIDs					: string[], 
 			private readonly gameMode	: string, 
-			private readonly gameID		: number
+			private readonly gameId		: number
 		) {
 		[this.player1.uid, this.player2.uid] = [ PlayersUIDs[0], PlayersUIDs[1]];
 		[this.player1.score, this.player2.score] = [0, 0];
@@ -28,7 +28,7 @@ export class Game {
 		this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(2)];
 		this.entities.push(this.playerPaddles[0][1], this.playerPaddles[1][1]);
 		this.ballFactory();
-		this.eventEmitter.addListener("game.player.move." + this.gameID, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
+		this.eventEmitter.addListener("game.player.move." + this.gameId, this.setPlayerMovementState); // documentation for this is absolutely disastrous.
 		this.start(); // prob put this in the calling function.
 	};
 
@@ -40,49 +40,42 @@ export class Game {
 
 		//this.eventEmitter.emit('game.ended', 
 		//	new GameEndedEvent({
-		//	gameID: this.gameID,
+		//	gameId: this.gameId,
 		//	payload: this.results,
 		//}),
 		//);
 
-		this.eventEmitter.emit('game.ended', {gameID : this.gameID, payload: this.results });
-		//new GameEndedEvent({
-		//gameID: this.gameID,
-		//payload: this.results,
-		//}),
-		//);
-		this.eventEmitter.removeListener("game.player.move." + this.gameID, this.setPlayerMovementState); 
+		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
+		this.eventEmitter.removeListener("game.player.move." + this.gameId, this.setPlayerMovementState); 
 		return ;
 	}
 	// DTO for this should be
 	// TODO: Hook to frontend for user input.
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	
-	// somehow want to listen to this event.
-	//@OnEvent("game.player.move", {async: true})
 	private setPlayerMovementState(payload: GamePlayerMoveEvent) {
 		let		playerPaddle : PlayerPaddle = payload.playerNumber === 1 ? this.playerPaddles[0][1] : this.playerPaddles[1][1];
 
-			switch (payload.newState) {
-				case MoveStatePaddle.keyPressDown: {
-					playerPaddle.keyPressDown = true;
-					break ;
-				}
-				case MoveStatePaddle.keyReleaseDown: {
-					playerPaddle.keyPressDown = false;
-					break ;
-				}
-				case MoveStatePaddle.keyPressUp: {
-					playerPaddle.keyPressUp = true;
-					break ;
-				}
-				case MoveStatePaddle.keyReleaseUp: {
-					playerPaddle.keyPressUp = false;
-					break ;
-				}
+		switch (payload.newState) {
+			case MoveStatePaddle.keyPressDown: {
+				playerPaddle.keyPressDown = true;
+				break ;
 			}
-			return;
+			case MoveStatePaddle.keyReleaseDown: {
+				playerPaddle.keyPressDown = false;
+				break ;
+			}
+			case MoveStatePaddle.keyPressUp: {
+				playerPaddle.keyPressUp = true;
+				break ;
+			}
+			case MoveStatePaddle.keyReleaseUp: {
+				playerPaddle.keyPressUp = false;
+				break ;
+			}
 		}
+		return;
+	}
 	/**
 	 * Moves the player based on keyPressStates and checks whether it is a possible move.
 	 */	
@@ -101,19 +94,6 @@ export class Game {
 	 * Moves the ball and checks for intersections with entities.
 	 */
 	private moveBall() : void {
-		// NOTE TO ME:
-		// Dont need to overcomplicate, it's 2d
-		// Just compare x & y
-		//if (this.ball.velocityVector) {
-		//	let	newPos : Vec2 = new Vec2(this.ball.pos.x + this.ball.velocityVector?.x, this.ball.pos.y + this.ball.velocityVector?.y);
-		//	let dotProduct = Vec2.getDotProduct(newPos, this.playerPaddles[0][1].pos);
-		//	if (dotProduct) {
-
-		//	}
-		//	dotProduct = Vec2.getDotProduct(newPos, this.playerPaddles[1][1].pos);
-			
-			
-		//}
 		if (this.ball.velocityVector) {
 			this.ball.pos.x += this.ball.velocityVector?.x;
 			this.ball.pos.y += this.ball.velocityVector?.y;
@@ -210,9 +190,9 @@ export class Game {
 			
 			*/
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
-			this.client.emit('game.frameUpdate',
+			this.eventEmitter.emit('game.frameUpdate',
 			new GameFrameUpdateEvent({
-				gameID:	 this.gameID,
+				gameId:	 this.gameId,
 				payload: this.entities,
 			}),
 			);
@@ -224,7 +204,11 @@ export class Game {
 		this.results = {
 			player1		: this.player1,
 			player2		: this.player2,
-			gameID		: this.gameID,
+			playerScores : {
+				player1FinalScore : this.player1.score,
+				player2FinalScore : this.player2.score,
+			},
+			gameId		: this.gameId,
 			winnerUID 	: this.player1.score > this.player2.score ? this.player1.uid : this.player2.uid,
 		};
 	}

@@ -161,17 +161,8 @@ export interface PlayerData {
 export interface GameResult {
 	readonly player1	: 	PlayerData;
 	readonly player2	: 	PlayerData;
-	gameID				:	number;
+	gameId				:	number;
 	winnerUID			:	string;
-}
-
-
-/**
- * object for the gameEndedEvent
- */
-export interface GameEndedData {
-	gameID : number;
-	payload : GameResult;
 }
 
 ///**
@@ -179,15 +170,15 @@ export interface GameEndedData {
 // */
 //export class GameEndedEvent {
 //	constructor(gameEndedData : GameEndedData){
-//		this._gameID = gameEndedData.gameID;
+//		this._gameId = gameEndedData.gameId;
 //		this._payload = gameEndedData.payload;
 //	};
-//	private _gameID: number;
+//	private _gameId: number;
 //	private _payload: GameResult;
 
 //	// ------------------------------------------------------------------------------------------------
 //	// Getters
-//	get	gameID() { return (this._gameID); }
+//	get	gameId() { return (this._gameId); }
 //	get	payload() { return (this._payload); }
 
 //}
@@ -198,7 +189,7 @@ export interface GameEndedData {
  * object for the gameFrameUpdate event
  */
 export interface GameFrameData {
-	gameID : number;
+	gameId : number;
 	payload : Entity[];
 }
 
@@ -208,19 +199,19 @@ export class GameFrameUpdateEvent {
 	 * 
 	 * @param frameData Objects interface 
 	 * @gameFrameData gameFrameData {
-	 * 	gameID : number;
+	 * 	gameId : number;
 	 * 	payload : Entity[]; }
 	 */
 	constructor(frameData : GameFrameData){
-		this._gameID = frameData.gameID;
+		this._gameId = frameData.gameId;
 		this._payload = frameData.payload;
 	};
-	private _gameID: number;
+	private _gameId: number;
 	private _payload: Entity[];
 
 	// ------------------------------------------------------------------------------------------------
 	// Getters
-	get	gameID() { return (this._gameID); }
+	get	gameId() { return (this._gameId); }
 	get	payload() { return (this._payload); }
 
 }

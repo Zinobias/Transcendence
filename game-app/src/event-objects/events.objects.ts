@@ -33,7 +33,7 @@ export class GamePlayerMoveEvent {
 }
 
 export interface GameFrameData {
-	gameID : number;
+	gameId : number;
 	payload : Entity[];
 }
 
@@ -46,15 +46,15 @@ export class GameFrameUpdateEvent {
 	 * 
 	 * @param frameData Objects interface 
 	 * @gameFrameData gameFrameData {
-	 * 	gameID : number;
+	 * 	gameId : number;
 	 * 	payload : Entity[]; }
 	 */
 	constructor(frameData : GameFrameData){
-		this._gameID = frameData.gameID;
+		this._gameId = frameData.gameId;
 		this._payload = frameData.payload;
 		this._boardDimensions = [GameConfig.BOARD_WIDTH, GameConfig.BOARD_HEIGHT];
 	};
-	private _gameID: number;
+	private _gameId: number;
 	private _payload: Entity[];
 	private _boardDimensions: number[];
 
@@ -62,16 +62,25 @@ export class GameFrameUpdateEvent {
 	// Getters
 	
 	get boardDimensions() : number[] {return this._boardDimensions}
-	get	gameID() { return (this._gameID); }
+	get	gameId() { return (this._gameId); }
 	get	payload() { return (this._payload); }
 
 }
+
+
+
+// export interface GameResult {
+// 	readonly player1	: 	PlayerData;
+// 	readonly player2	: 	PlayerData;
+// 	gameId				:	number;
+// 	winnerUID			:	string;
+// }
 
 /**
  * object for the gameEndedEvent
  */
  export interface GameEndedData {
-	gameID : number;
+	gameId 	: number;
 	payload : GameResult;
 }
 
@@ -80,24 +89,24 @@ export class GameFrameUpdateEvent {
 // */
 //export class GameEndedEvent {
 //	constructor(gameEndedData : GameEndedData){
-//		this._gameID = gameEndedData.gameID;
+//		this._gameId = gameEndedData.gameId;
 //		this._payload = gameEndedData.payload;
 //	};
-//	private _gameID: number;
+//	private _gameId: number;
 //	private _payload: GameResult;
 
 //	// ------------------------------------------------------------------------------------------------
 //	// Getters
-//	get	gameID() { return (this._gameID); }
+//	get	gameId() { return (this._gameId); }
 //	get	payload() { return (this._payload); }
 
 //}
 
 /**
- * userID to join the queue for x gamemode
+ * userId to join the queue for x gamemode
  * Possibly replace gamemode with options object.
  */
 export interface gameMatchmakingEntity{
-	userID 		: string;
+	userId 		: string;
 	gameMode 	: string;
 }

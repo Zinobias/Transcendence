@@ -1,11 +1,14 @@
 import { Sessions } from './entities/sessions';
 import { InsertResult } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Database } from './data-source';
 import { UserTable } from './entities/user-table';
 
 @Injectable()
 export class Queries {
+
+	private readonly logger = new Logger('queries');
+
   constructor(@Inject(Database) private database: Database) {}
 
   public async storeAuth(id: number, auth: string): Promise<boolean> {
@@ -23,7 +26,7 @@ export class Queries {
       ],
       ['userId', 'sessionCode'],
     );
-    return insertResult.identifiers.length === 1;
+    return insertResult.identifiers[0].userId !== undefined;
   }
 
   private static readonly expireTime = 604800000; // 7 days

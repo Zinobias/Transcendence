@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate} from 'react-router-dom';
-import { LoginButton, AccountButton } from "./Buttons";
+import { LoginButton, SignupButton } from "./Buttons";
 import '../App.css'
 import './Components.css';
 
@@ -10,22 +10,22 @@ import './Components.css';
 */
 
 const   Login: React.FC = () => {
-    //const navigate = useNavigate();
+    const navigate = useNavigate();
 
-    // const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    //     e.preventDefault();
-    //     navigate('/SignUp');
-    // };
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        navigate('/signup');
+    };
 
     return  (
         <div className="grid-container">
             <span className="grid__header">Disco Pong</span>      
             <div className="grid__body">
                 <LoginButton/>
-                {/* <AccountButton/> */}
-                {/* <br/>
+                {/* <SignupButton/> */}
+                <br/>
                 <p>or</p>
-                <button className="defaultButton" onClick={(e) => handleClick(e)}>Sign Up</button> */}
+                <button className="defaultButton" onClick={(e) => handleClick(e)}>Sign Up</button>
             </div>
         </div>
       )

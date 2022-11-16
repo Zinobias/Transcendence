@@ -14,10 +14,10 @@ const   Chat: React.FC = () => {
     const [chatroomName, setChatroomName] = useState<string>("");
 
     var chats: Chatroom[] = [
-        {name: "best chat", id: 1},
-        {name: "uwu chat with me", id: 2, password: true},
-        {name: "need help with gear", id: 3, password: true},
-        {name: "hydro homies", id: 4},
+        {name: "chat 1", id: 1},
+        {name: "chat 2", id: 2, password: true},
+        {name: "chat 3", id: 3, password: true},
+        {name: "chat 4", id: 4},
     ];
 		
     const handleClick = (e: React.FormEvent) => {
@@ -37,7 +37,7 @@ const   Chat: React.FC = () => {
 
     return (
         <>
-        <div className="chatroom">
+        <div>
             <span className="heading__small">OPEN CHATROOMS PLACEHOLDER</span>
             <ListChatrooms chatroom={chats} />
         </div>
