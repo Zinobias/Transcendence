@@ -90,11 +90,15 @@ export class Queries {
    * @param userId user id of the user
    */
   async getUser(userId: number): Promise<User> {
+    console.log('testing debug in getUser in queries ' + userId);
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(user_table);
-    const findUser = await userRepository.findOneBy({ userId: userId });
-    if (findUser == undefined) return undefined;
-    return new User(findUser.userId, findUser.userName, undefined);
+    try {
+      const findUser = await userRepository.findOneBy({ userId: userId });
+      return new User(findUser.userId, findUser.userName, undefined);
+    } catch (e) {
+      return undefined;
+    }
   }
 
   //Blocked users table
@@ -197,6 +201,7 @@ export class Queries {
    * returns the id of the newly created channel
    */
   async createChannel(channel: Channel): Promise<number> {
+    console.trace('debugging createChannel ');
     const myDataSource = await getDataSource();
     const addChannel = myDataSource.getRepository(chat_channels);
     await addChannel.save(new chat_channels(channel));
