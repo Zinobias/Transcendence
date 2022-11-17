@@ -1,109 +1,127 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Queries } from './database/queries';
-import { randomUUID } from 'crypto';
-import { Socket } from 'socket.io';
-import { Sockets } from './sockets.class';
-import { AuthToken } from './auth.objects';
+import {Inject, Injectable, Logger} from '@nestjs/common';
+import {Queries} from './database/queries';
+import {randomUUID} from 'crypto';
+import {Socket} from 'socket.io';
+import {Sockets} from './sockets.class';
+import {AuthToken} from './auth.objects';
 
 @Injectable()
 export class Auth {
-  constructor(
-    @Inject(Sockets) private readonly sockets: Sockets,
-    @Inject(Queries) private readonly queries: Queries,
-  ) {}
-  private static map = new Map();
-
-  public validate(userId: number | undefined, accessToken: string | undefined): boolean {
-    if (userId === undefined || accessToken === undefined) 
-		return false;
-    if (Auth.map.has(userId))
-		return Auth.map.get(userId) === accessToken;
-    return false;
-  }
-
-  public async updateAuth(userId: number) {
-    const accessToken: string | undefined = await this.queries.loadSession(
-      userId,
-    );
-    if (accessToken != undefined) {
-      Auth.map.set(userId, accessToken);
+    constructor(
+        @Inject(Sockets) private readonly sockets: Sockets,
+        @Inject(Queries) private readonly queries: Queries,
+    ) {
     }
-  }
 
-  private logger = new Logger('auth');
+    private logger: Logger = new Logger('Auth');
 
-  private async auth(token: string, signup: boolean): Promise<number | undefined> {
-    this.logger.log('auth event ' + token);
-    const oauthResponse = await fetch(
-      'https://api.intra.42.fr/v2/oauth/token',
-      {
-        method: 'Post',
-        body: JSON.stringify({
-          grant_type: 'authorization_code',
-          client_id: process.env.CLIENT,
-          client_secret: process.env.SECRET,
-          code: token,
-          redirect_uri: signup
-            ? 'http://localhost:3000/signup'
-            : 'http://localhost:3000/login',
-        }),
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
-    if (!oauthResponse.ok || oauthResponse.status !== 200) return undefined;
-    const json: AuthToken = await oauthResponse.json();
-    this.logger.log('oauth response ' + json);
-    return await this.retrieveUserId(json);
-  }
+    private static map = new Map();
 
-  public async login(client: Socket, token: string): Promise<any | undefined> {
-    const userId = await this.auth(token, false);
+    public validate(userId: number | undefined, accessToken: string | undefined): boolean {
+        if (userId === undefined || accessToken === undefined) {
+            this.logger.warn('Received undefined userId [' + userId
+                + '] or accessToken [' + accessToken + '] when validating auth');
+            return false;
+        }
+        if (Auth.map.has(userId))
+            return Auth.map.get(userId) === accessToken;
+        return false;
+    }
 
-    if (userId === undefined)
-      return undefined;
-	return (await this.login2(client, userId));
-  }
+    public async updateAuth(userId: number) {
+        const accessToken: string | undefined = await this.queries.loadSession(
+            userId,
+        );
+        if (accessToken != undefined)
+            Auth.map.set(userId, accessToken);
+        else
+            Logger.warn('Received undefined accessToken when loading session for user id [' + userId + ']')
+    }
 
-  private async login2(client: Socket, userId: number): Promise<any | undefined> {
-	this.sockets.storeSocket(userId, client);
-    /**
-     * TODO: Check if user in dataBase
-     */
-    const uuid = randomUUID();
-    if ((await this.storeSession(userId, uuid)) === true)
-      return { user_id: userId, auth_cookie: uuid };
-    else return undefined;
-  }
+    private async auth(token: string, signup: boolean): Promise<number | undefined> {
+        this.logger.log('Received auth event with token [' + token + ']');
+        const oauthResponse = await fetch(
+            'https://api.intra.42.fr/v2/oauth/token',
+            {
+                method: 'Post',
+                body: JSON.stringify({
+                    grant_type: 'authorization_code',
+                    client_id: process.env.CLIENT,
+                    client_secret: process.env.SECRET,
+                    code: token,
+                    redirect_uri: signup
+                        ? 'http://localhost:3000/signup'
+                        : 'http://localhost:3000/login',
+                }),
+                headers: {'Content-Type': 'application/json'},
+            },
+        );
+        if (!oauthResponse.ok || oauthResponse.status !== 200) {
+            this.logger.warn('Failed to get an oauth response')
+            return undefined;
+        }
+        const json: AuthToken = await oauthResponse.json();
+        this.logger.debug('Oauth response is: ' + json);
+        return await this.retrieveUserId(json);
+    }
 
-  private async retrieveUserId(authToken: AuthToken): Promise<number> {
-    this.logger.log(authToken.access_token);
-    const response = await fetch('https://api.intra.42.fr/v2/me', {
-      method: 'Get',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + authToken.access_token,
-      },
-    });
-    const json = await response.json();
-    this.logger.log(json.id);
-    return json.id;
-  }
+    public async login(client: Socket, token: string): Promise<any | undefined> {
+        const userId = await this.auth(token, false);
 
-  private async storeSession(userId: number, uuid: string): Promise<boolean> {
-    const isSuccessful: boolean = await this.queries.storeAuth(userId, uuid);
+        if (userId === undefined) {
+            this.logger.warn("Received undefined userId from auth")
+            return undefined;
+        }
+        return (await this.login2(client, userId));
+    }
 
-    if (isSuccessful) await this.updateAuth(userId);
-    return isSuccessful;
-  }
+    private async login2(client: Socket, userId: number): Promise<any | undefined> {
+        this.logger.debug("Storing socket, user id: [" + userId + "] socket id [" + client.id + "]")
+        this.sockets.storeSocket(userId, client);
+        /**
+         * TODO: Check if user in dataBase
+         */
+        const uuid = randomUUID();
+        if ((await this.storeSession(userId, uuid)))
+            return {user_id: userId, auth_cookie: uuid};
+        else {
+            this.logger.error('Unable to store session for user id [' + userId + ']');
+            return undefined;
+        }
+    }
 
-  public async createAccount(client: Socket, payload: any): Promise<any | undefined> {
-    this.logger.log('createAccount userName ' + payload.userName);
-    const userId = await this.auth(payload.token, true);
+    private async retrieveUserId(authToken: AuthToken): Promise<number> {
+        this.logger.log(authToken.access_token);
+        const response = await fetch('https://api.intra.42.fr/v2/me', {
+            method: 'Get',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + authToken.access_token,
+            },
+        });
+        const json = await response.json();
+        this.logger.log(json.id);
+        return json.id;
+    }
 
-    if (userId === undefined)
-      return undefined;
-    if ((await this.queries.createUser(userId, payload.userName)) === false)
-      return undefined;
-    return this.login2(client, userId);
-  }
+    private async storeSession(userId: number, uuid: string): Promise<boolean> {
+        const isSuccessful: boolean = await this.queries.storeAuth(userId, uuid);
+
+        if (isSuccessful)
+            await this.updateAuth(userId);
+        else
+            this.logger.warn('Unable to store auth for user id [' + userId + ']')
+        return isSuccessful;
+    }
+
+    public async createAccount(client: Socket, payload: any): Promise<any | undefined> {
+        this.logger.log('Creating an account for [' + payload.userName + ']');
+        const userId = await this.auth(payload.token, true);
+
+        if (userId === undefined)
+            return undefined;
+        if (!(await this.queries.createUser(userId, payload.userName)))
+            return undefined;
+        return this.login2(client, userId);
+    }
 }
