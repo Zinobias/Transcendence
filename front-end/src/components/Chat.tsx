@@ -15,7 +15,7 @@ const   Chat: React.FC = () => {
 
     useEffect(() => {
         socket.on("channel_create_success", data => {
-            console.log("socket.on channel_create_success "+ data.channelName);
+            console.log("socket.on channel_create_success "+ data.channel_name);
         })
 
         // return () => {
