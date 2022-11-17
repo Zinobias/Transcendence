@@ -36,7 +36,7 @@ export class ApiGateway
     private logger: Logger = new Logger('ApiGateway');
 
     async onApplicationBootstrap() {
-        this.logger.debug('bootstrap gateway');
+        this.logger.log(`Starting bootstrap gateway...`);
         // this.gameClient.connect();
         this.gameClient.emit('testMsg', 'msg from frontend');
         this.chatClient.emit('testMsg', 'msg from frontend');
@@ -54,12 +54,12 @@ export class ApiGateway
     }
 
     afterInit(server: Server) {
-        this.logger.log('Initialized');
+        this.logger.log(`Initialized gateway`);
     }
 
     // TODO: make sure it is storing the userID
     handleConnection(client: Socket, ...args: any[]) {
-        this.logger.log('Client connected: ${client.id}' + ' ' + args[0]);
+        this.logger.log(`Client connected: ${client.id} ${args[0]}`);
         // this.sockets.storeSocket(args[0] as number, client); /*This shouldn't be needed as auth handles that*/
         client.emit('wssTest', {message: 'Connected to the websocketServer'}); // relays back to frontend
         this.gameClient.send('testMsg', {message: 'random message from gateway'}); // to game
@@ -67,7 +67,7 @@ export class ApiGateway
     }
 
     handleDisconnect(client: Socket) {
-        this.logger.log('Client disconnected: ${client.id}');
+        this.logger.log(`Client disconnected: ${client.id}`);
     }
 
     // @UseGuards(AuthGuard)
@@ -81,7 +81,7 @@ export class ApiGateway
     @SubscribeMessage('game')
     handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
         //TODO verify auth
-        this.logger.debug('auth works ' + payload);
+        this.logger.debug(`auth works ${payload}`);
         if (payload.eventPattern === 'game.player.move') {
             if (payload.userId === undefined || payload.userId !== payload.data.userId)
                 return;

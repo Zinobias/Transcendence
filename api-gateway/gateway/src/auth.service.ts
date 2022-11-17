@@ -19,8 +19,7 @@ export class Auth {
 
     public validate(userId: number | undefined, accessToken: string | undefined): boolean {
         if (userId === undefined || accessToken === undefined) {
-            this.logger.warn('Received undefined userId [' + userId
-                + '] or accessToken [' + accessToken + '] when validating auth');
+            this.logger.warn(`Received undefined userId [${userId}] or accessToken [${accessToken}] when validating auth`);
             return false;
         }
         if (Auth.map.has(userId))
@@ -35,11 +34,11 @@ export class Auth {
         if (accessToken != undefined)
             Auth.map.set(userId, accessToken);
         else
-            Logger.warn('Received undefined accessToken when loading session for user id [' + userId + ']')
+            Logger.warn(`Received undefined accessToken when loading session for user id [${userId}]`)
     }
 
     private async auth(token: string, signup: boolean): Promise<number | undefined> {
-        this.logger.log('Received auth event with token [' + token + ']');
+        this.logger.log(`Received ${signup ? 'signup' : 'login'} event with token [${token}]`);
         const oauthResponse = await fetch(
             'https://api.intra.42.fr/v2/oauth/token',
             {
@@ -61,7 +60,7 @@ export class Auth {
             return undefined;
         }
         const json: AuthToken = await oauthResponse.json();
-        this.logger.debug('Oauth response is: ' + json);
+        this.logger.debug(`Oauth response is:\n${json}`);
         return await this.retrieveUserId(json);
     }
 
@@ -69,14 +68,14 @@ export class Auth {
         const userId = await this.auth(token, false);
 
         if (userId === undefined) {
-            this.logger.warn("Received undefined userId from auth")
+            this.logger.warn(`Received undefined userId from auth`)
             return undefined;
         }
         return (await this.login2(client, userId));
     }
 
     private async login2(client: Socket, userId: number): Promise<any | undefined> {
-        this.logger.debug("Storing socket, user id: [" + userId + "] socket id [" + client.id + "]")
+        this.logger.debug(`Storing socket, user id: [${userId}] socket id [${client.id}]`)
         this.sockets.storeSocket(userId, client);
         /**
          * TODO: Check if user in dataBase
@@ -85,7 +84,7 @@ export class Auth {
         if ((await this.storeSession(userId, uuid)))
             return {user_id: userId, auth_cookie: uuid};
         else {
-            this.logger.error('Unable to store session for user id [' + userId + ']');
+            this.logger.error(`Unable to store session for user id [${userId}]`);
             return undefined;
         }
     }
@@ -115,7 +114,7 @@ export class Auth {
     }
 
     public async createAccount(client: Socket, payload: any): Promise<any | undefined> {
-        this.logger.log('Creating an account for [' + payload.userName + ']');
+        this.logger.log(`Creating an account for [${payload.userName}]`);
         const userId = await this.auth(payload.token, true);
 
         if (userId === undefined)
