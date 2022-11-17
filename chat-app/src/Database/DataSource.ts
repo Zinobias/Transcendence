@@ -23,8 +23,7 @@ export const myDataSource = new DataSource({
     chat_channels,
     chat_channel_settings,
     chat_members,
-    chat_message,
-    friends,
+    chat_members,
     games,
     sessions,
   ],
@@ -32,22 +31,21 @@ export const myDataSource = new DataSource({
 });
 
 myDataSource
-  .initialize()
-  .then(async () => {
-    console.log('Connection initialized with database...');
-  })
-  .catch((error) =>
-    console.log('Failed to init connection w/ database', error),
-  );
+    .initialize()
+    .then(async () => {
+        console.log('Connection initialized with database...');
+    })
+    .catch((error) =>
+        console.log('Failed to init connection w/ database', error),
+    );
 
 export const getDataSource = (delay = 3000): Promise<DataSource> => {
-  if (myDataSource.isInitialized) return Promise.resolve(myDataSource);
+    if (myDataSource.isInitialized) return Promise.resolve(myDataSource);
 
-  return new Promise((resolve, reject) => {
-    console.log('hello');
-    setTimeout(() => {
-      if (myDataSource.isInitialized) resolve(myDataSource);
-      else reject('Failed to create connection with database');
-    }, delay);
-  });
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (myDataSource.isInitialized) resolve(myDataSource);
+            else reject('Failed to create connection with database');
+        }, delay);
+    });
 };

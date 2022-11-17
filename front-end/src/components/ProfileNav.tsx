@@ -32,9 +32,9 @@ const ProfileNav: React.FC = () => {
                 <span className="profile__close" onClick={(e) => handleClose(e)}>
                     <AiFillCloseSquare />
                 </span>
-                <p>My Profile</p>
-                <p>Change Avatar</p>
-                <p>2 Factor Authentication</p>
+                <p style={{textAlign: "left"}}>My Profile</p>
+                <p style={{textAlign: "left"}}>Change Avatar</p>
+                <p style={{textAlign: "left"}}>2 Factor Authentication</p>
             </div>
         </div>
       );

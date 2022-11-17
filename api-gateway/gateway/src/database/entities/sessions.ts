@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { UserTable } from './user-table';
 
-@Entity('users')
+@Entity()
 export class Sessions {
 	@PrimaryColumn()
 	userId: number;
@@ -13,6 +13,6 @@ export class Sessions {
 	time: number;
 
 	@ManyToOne(() => UserTable, (user) => user.userId)
-		//@JoinColumn({ name: 'userId' })
+	@JoinColumn({ name: 'userId' })
 	user: UserTable;
 }

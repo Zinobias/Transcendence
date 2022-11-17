@@ -16,7 +16,7 @@ export const   LogoutButton: React.FC = () => {
 
     return (
         <div>
-            <button className="loginform__button" onClick={(e) => handleLogout(e)}>LOGOUT</button>
+            <button className="logoutButton" onClick={(e) => handleLogout(e)}>LOGOUT</button>
         </div>
     )
 };
@@ -30,8 +30,8 @@ export const    SignupButton: React.FC = () => {
 
     useEffect(() => {
         socket.on("create_account", res => {
-            console.log(res.auth_cookie);
-			console.log(res.user_id);
+            console.log("socket.on create_acconut " + res.auth_cookie);
+			console.log("socket.on create_acocunt " + res.user_id);
             setCookie('user', res.auth_cookie, {path: '/'});
             setCookie('userID', res.user_id, {path: '/'});
             navigate('/');
@@ -40,7 +40,7 @@ export const    SignupButton: React.FC = () => {
 
     useEffect(() => {
         if (searchParams.get("code")) {
-            console.log("EMITTING " + userName);
+            console.log("emitting create_account " + userName);
             socket.emit("auth", {
                 eventPattern: "create_account", 
                 data: {
@@ -78,8 +78,8 @@ export const    LoginButton: React.FC = () => {
 
     useEffect(() => {
         socket.on("login", res => {
-            console.log(res.auth_cookie);
-			console.log(res.user_id);
+            console.log("socket.on login " + res.auth_cookie);
+			console.log("socket.on login " + res.user_id);
             setCookie('user', res.auth_cookie, {path: '/'});
             setCookie('userID', res.user_id, {path: '/'});
             navigate('/');
@@ -88,7 +88,7 @@ export const    LoginButton: React.FC = () => {
 
     useEffect(() => {
         if (searchParams.get("code")) {
-            console.log("EMITTING LOGIN " + searchParams.get("code"));
+            console.log("emitting login " + searchParams.get("code"));
             socket.emit("auth", {
                 eventPattern: "login", 
                 data: {token: searchParams.get("code")}

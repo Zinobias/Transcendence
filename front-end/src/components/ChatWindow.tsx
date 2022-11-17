@@ -10,9 +10,9 @@ const   ChatWindow: React.FC = () => {
 
     useEffect(() => {
         socket.on("channel_create_success", data => {
-            console.log("success "+ data.channel_id);
+            console.log("socket.on channel_create_success "+ data.channelName);
         })
-    }, [])
+    },)
 
     useEffect(() => {
         inputRef.current?.focus();

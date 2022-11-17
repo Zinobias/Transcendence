@@ -1,4 +1,4 @@
-import React, {  useContext, useState } from "react";
+import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import { useNavigate} from 'react-router-dom';
@@ -13,13 +13,24 @@ const   Chat: React.FC = () => {
     const [cookies] = useCookies(['userID']);
     const [chatroomName, setChatroomName] = useState<string>("");
 
+    useEffect(() => {
+        socket.on("channel_create_success", data => {
+            console.log("socket.on channel_create_success "+ data.channelName);
+        })
+
+        // return () => {
+        //     socket.off("channel_create_success");
+        // }
+    },)
+
     var chats: Chatroom[] = [
         {name: "chat 1", id: 1},
         {name: "chat 2", id: 2, password: true},
         {name: "chat 3", id: 3, password: true},
         {name: "chat 4", id: 4},
     ];
-		
+
+
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
         if (chatroomName) {
@@ -27,8 +38,8 @@ const   Chat: React.FC = () => {
                 eventPattern: "channel_create", 
                 data: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
             });
-            console.log("emiting new chatroom " + chatroomName);
-            navigate('chat_window');
+            console.log("emiting channel_create " + chatroomName);
+            // navigate('chat_window');
         }
         else {
             alert("Name Field is required");
