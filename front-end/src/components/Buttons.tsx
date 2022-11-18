@@ -37,6 +37,13 @@ export const    SignupButton: React.FC = () => {
             setCookie('userID', res.user_id, {path: '/'});
             navigate('/');
         })
+        socket.on('retrieve_redirect', res => {
+            signupLink = res.signup;
+        })
+        return () => {
+            socket.off('retrieve_redirect');
+            socket.off("create_account");
+        }
     }, [])
 
     useEffect(() => {
@@ -54,21 +61,12 @@ export const    SignupButton: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        socket.on('retrieve_redirect', res => {
-            signupLink = res.signup;
-        })
-        return () => {
-            socket.off('retrieve_redirect');
-        }
-    }, [])
-
-    useEffect(() => {
         socket.emit('retrieve_redirect', {});
     }, [])
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        console.log("REDIRECTING " + userName);
+        console.log("rediricting signup " + userName);
         window.location.href = signupLink;
     };
 
@@ -89,7 +87,7 @@ export const    LoginButton: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const socket = useContext(SocketContext);
-    let loginLink = '';
+    let loginLink : string = '';
 
     useEffect(() => {
         socket.on("login", res => {
@@ -99,6 +97,13 @@ export const    LoginButton: React.FC = () => {
             setCookie('userID', res.user_id, {path: '/'});
             navigate('/');
         })
+        socket.on('retrieve_redirect', res => {
+            loginLink = res.login;
+        })
+        return () => {
+            socket.off('retrieve_redirect');
+            socket.off('login');
+        }
     }, [])
 
     useEffect(() => {
@@ -108,15 +113,6 @@ export const    LoginButton: React.FC = () => {
                 eventPattern: "login", 
                 data: {token: searchParams.get("code")}
             });
-        }
-    }, [])
-
-    useEffect(() => {
-        socket.on('retrieve_redirect', res => {
-            loginLink = res.login;
-        })
-        return () => {
-            socket.off('retrieve_redirect');
         }
     }, [])
 

@@ -73,7 +73,7 @@ export class ChannelEventPatterns {
         channel.channelId = channelId;
 
         const userIds = channel.users.map((a) => a.userId);
-        this.util.notify(userIds, 'channel_create_success', {
+        this.util.notify(userIds, 'channel_create', {
             success: true,
             channel_name: channel.channelName,
             channel_id: channel.channelId,
