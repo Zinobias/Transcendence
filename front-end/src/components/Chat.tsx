@@ -10,16 +10,16 @@ const   Chat: React.FC = () => {
 	
 	const socket = useContext(SocketContext);
 	const navigate = useNavigate()
-    const [cookies] = useCookies(['userID']);
+    const [cookies] = useCookies(['userID', 'user']);
     const [chatroomName, setChatroomName] = useState<string>("");
 
     useEffect(() => {
-        socket.on("channel_create_success", data => {
-            console.log(`socket.on channel_create_success ${data.channel_name}`);
+        socket.on("channel_create", data => {
+            console.log(`socket.on channel_create ${data.channel_name}`);
         })
 
         return () => {
-            socket.off("channel_create_success");
+            socket.off("channel_create");
         }
     },[])
 
@@ -34,7 +34,7 @@ const   Chat: React.FC = () => {
         if (chatroomName) {
             socket.emit("chat", {
                 userId: cookies.userID,
-                authToken: 'HAHA NO TOKEN LOL GIT GUD',
+                authToken: cookies.user,
                 eventPattern: "channel_create", 
                 data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
             });
