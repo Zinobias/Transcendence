@@ -29,13 +29,14 @@ const   Chat: React.FC = () => {
         {name: "chat 3", id: 3, password: true},
         {name: "chat 4", id: 4},
     ];
-
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
         if (chatroomName) {
             socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: 'HAHA NO TOKEN LOL GIT GUD',
                 eventPattern: "channel_create", 
-                data: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
+                data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
             });
             console.log("emiting channel_create " + chatroomName);
             // navigate('chat_window');

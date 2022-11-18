@@ -75,7 +75,7 @@ export class ApiGateway
         this.logger.log(`Client disconnected: ${client.id}`);
     }
 
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @SubscribeMessage('chat')
     handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
@@ -87,7 +87,7 @@ export class ApiGateway
         this.chatClient.emit(payload.eventPattern, payload.data);
     }
 
-    //@UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @SubscribeMessage('game')
     handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
         //TODO verify auth
