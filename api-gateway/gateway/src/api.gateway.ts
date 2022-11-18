@@ -80,8 +80,8 @@ export class ApiGateway
     handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
-        if (payload.userId !== undefined && payload.userId !== payload.data.userId) {
-            Logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
+        if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
+            this.logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
             return;
         }
         this.chatClient.emit(payload.eventPattern, payload.data);
