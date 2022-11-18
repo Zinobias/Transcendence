@@ -3,15 +3,19 @@ import { Socket } from 'socket.io';
 
 @Injectable()
 export class Sockets {
-  private static socketMap : Map<number, Socket>= new Map<number, Socket>();
+  private socketMap : Map<number, Socket>;
+
+  constructor() {
+	this.socketMap = new Map<number, Socket>();
+  }
 
   public storeSocket(userId: number, socket: Socket) {
-    Sockets.socketMap.set(userId, socket);
+    this.socketMap.set(userId, socket);
   }
 
   public getSocket(userId: number): Socket | undefined {
-    if (Sockets.socketMap.has(userId)) {
-      return Sockets.socketMap.get(userId);
+    if (this.socketMap.has(userId)) {
+      return this.socketMap.get(userId);
     }
     return undefined;
   }
