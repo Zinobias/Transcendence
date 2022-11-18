@@ -79,6 +79,7 @@ export class ApiGateway
     @SubscribeMessage('chat')
     handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
         //TODO verify auth
+        this.logger.debug(`chat event ${payload.eventPattern}`);
         this.chatClient.emit(payload.eventPattern, payload.data);
     }
 

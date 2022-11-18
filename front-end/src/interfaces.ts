@@ -1,26 +1,6 @@
-import { Socket } from "socket.io-client";
-
 export interface Todo {
     id: number;
     todo: string;
-}
-
-export interface Chatroom {
-    name: string;
-    pasword?: string;
-}
-
-export interface User {
-    init: boolean;
-    name?: string;
-    token?: string;
-}
-
-export interface AppData {
-    socket: Socket;
-    init: boolean;
-    name?: string;
-    token?: string;
 }
 
 export interface DTO {
@@ -29,8 +9,19 @@ export interface DTO {
     eventPattern : string,
     payload : {},
 }
-export interface Chatroom {
+export interface TestRoom {
     name: string;
     id: number;
     password?: boolean;
 }
+
+// export interface Channel {
+//     channelId: number,
+//     owner: number,
+//     channelName: string,
+//     users: User[],
+//     messages: Message[],
+//     settings: Setting[],
+//     closed: boolean,
+//     otherOwner?: number,
+// }

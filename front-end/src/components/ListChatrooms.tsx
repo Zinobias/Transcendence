@@ -1,9 +1,9 @@
 import React from "react";
-import { Chatroom } from "../interfaces"
+import { TestRoom } from "../interfaces"
 import { SlLock } from 'react-icons/sl'
 
 interface Props {
-    chatroom: Chatroom[];
+    chatroom: TestRoom[];
 }
 
 const ListChatrooms: React.FC<Props> = ({chatroom}) => {

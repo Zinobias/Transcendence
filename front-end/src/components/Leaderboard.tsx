@@ -18,7 +18,7 @@ const   Leaderboard: React.FC = () => {
     return (
         <div>
             Leaderboard
-            <button className="defaultButton" onClick={(e) => handleClick(e)}>X</button>
+            {/* <button className="defaultButton" onClick={(e) => handleClick(e)}>X</button> */}
         </div>
     )
 };

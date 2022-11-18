@@ -15,13 +15,13 @@ export class RetrieveUserDataEventPatterns {
                 @Inject('gateway') private readonly gateway: ClientProxy,
                 @Inject(Util) private readonly util: Util) {}
 
-    @EventPattern('get_channels_user')
-    getChannelsUser(data: GetUserData) {
-        const channels = Channel.getUserChannels(data.user_id);
-        this.util.notify([data.user_id], 'channels_for_user', {
-            channels: channels,
-        });
-    }
+    // @EventPattern('get_channels_user')
+    // getChannelsUser(data: GetUserData) {
+    //     const channels = Channel.getUserChannels(data.user_id);
+    //     this.util.notify([data.user_id], 'channels_for_user', {
+    //         channels: channels,
+    //     });
+    // }
 
     @EventPattern('get_user')
     async getUser(data: GetUserData) {

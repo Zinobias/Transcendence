@@ -71,7 +71,7 @@ export class ChannelEventPatterns {
         channel.channelId = channelId;
 
         const userIds = channel.users.map((a) => a.userId);
-        this.logger.log('test ' + userIds);
+        this.logger.log('channel_create_success ' + userIds);
         this.util.notify(userIds, 'channel_create_success', {
             channel_name: channel.channelName,
             channel_id: channel.channelId,
@@ -297,6 +297,7 @@ export class ChannelEventPatterns {
 
     @EventPattern('get_channels_user')
     getChannelsUser(data: GetUserData) {
+        this.logger.debug(`get_channels_user ${data.user_id}`);
         const channels = Channel.getUserChannels(data.user_id);
         this.util.notify([data.user_id], 'channels_for_user', {
             channels: channels,

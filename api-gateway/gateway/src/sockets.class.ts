@@ -10,14 +10,12 @@ export class Sockets {
   }
 
   public storeSocket(userId: number, socket: Socket) {
+    console.log(`storing socket : ${userId} and ${socket}`);
     this.socketMap.set(userId, socket);
   }
 
   public getSocket(userId: number): Socket | undefined {
-    if (this.socketMap.has(userId)) {
-      return this.socketMap.get(userId);
-    }
-    return undefined;
+    return this.socketMap.get(userId);
   }
 
   public sendData(users: number[], pattern: string, payload: object) {

@@ -2,7 +2,7 @@ import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import { useNavigate} from 'react-router-dom';
-import { Chatroom } from "../interfaces"
+import { TestRoom } from "../interfaces"
 import ListChatrooms from "./ListChatrooms";
 import './Components.css';
 
@@ -18,12 +18,17 @@ const   Chat: React.FC = () => {
             console.log(`socket.on channel_create_success ${data.channel_name}`);
         })
 
+        socket.on("channels_for_user", data => {
+            console.log(`socket.on channels_for_user`);
+        })
+
         return () => {
             socket.off("channel_create_success");
+            socket.off("channels_for_user");
         }
     },[])
 
-    var chats: Chatroom[] = [
+    var chats: TestRoom[] = [
         {name: "chat 1", id: 1},
         {name: "chat 2", id: 2, password: true},
         {name: "chat 3", id: 3, password: true},
@@ -38,6 +43,11 @@ const   Chat: React.FC = () => {
                 data: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
             });
             console.log("emiting channel_create " + chatroomName);
+            socket.emit("chat", {
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+            console.log("emiting get_channels_user");
             // navigate('chat_window');
         }
         else {
