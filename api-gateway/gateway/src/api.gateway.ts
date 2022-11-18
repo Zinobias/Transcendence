@@ -113,7 +113,6 @@ export class ApiGateway
             return;
         if (payload.eventPattern === 'login') {
             const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token);
-
             return {
                 event: 'login',
                 data: loginDTO === undefined ? false : loginDTO,
