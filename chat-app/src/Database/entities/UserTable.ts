@@ -11,19 +11,19 @@ import { sessions } from './Sessions';
 
 @Entity()
 export class user_table {
-	constructor(userId: number, userName: string) {
-		this.userId = userId;
-		this.userName = userName;
-	}
+  constructor(userId: number, userName: string) {
+    this.userId = userId;
+    this.userName = userName;
+  }
 
   @PrimaryGeneratedColumn()
   userId: number;
 
-	@Column()
-	userName: string;
+  @Column()
+  userName: string;
 
-	@Column({ default: new Date() })
-	createAt: Date;
+  @Column({ default: new Date() })
+  createAt: Date;
 
   @OneToMany(() => games, (game) => game.userT, { onDelete: 'CASCADE' })
   game: games[];
