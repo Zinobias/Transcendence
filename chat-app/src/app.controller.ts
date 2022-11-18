@@ -25,5 +25,5 @@ export class AppController {
 export interface microServiceDTO {
   eventPattern: string;
   userIDs: number[];
-  payload: object;
+  data: object;
 }

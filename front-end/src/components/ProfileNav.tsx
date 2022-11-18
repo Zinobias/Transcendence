@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect }  from "react";
-// import LogoutButton from './Buttons';
-import '../App.css'
+import { Link } from 'react-router-dom';
 import { AiFillCloseSquare } from "react-icons/ai";
+import Friendslist from "./Friendslist";
+import { useCookies } from 'react-cookie';
+import '../App.css'
+
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 
@@ -9,6 +12,8 @@ import { AiFillCloseSquare } from "react-icons/ai";
 */
 
 const ProfileNav: React.FC = () => {
+    const [cookies, setCookie] = useCookies(['user', 'userID']);
+    var path:string = "/profile?id=" + cookies.userID; 
 
     const handleClick = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
         e.preventDefault();
@@ -32,9 +37,8 @@ const ProfileNav: React.FC = () => {
                 <span className="profile__close" onClick={(e) => handleClose(e)}>
                     <AiFillCloseSquare />
                 </span>
-                <p>My Profile</p>
-                <p>Change Avatar</p>
-                <p>2 Factor Authentication</p>
+                <p style={{textAlign: "left"}}><Link to={path}>My Profile</Link></p>
+                <Friendslist />
             </div>
         </div>
       );

@@ -18,9 +18,9 @@ const Friendslist: React.FC = () => {
 
     return (
         <>
-            <p>Friendslist Placeholder</p>
+            <p style={{textAlign: "left"}}>Friendslist Placeholder</p>
             {friends.map((e) => (
-                <li key={e.userID}>{e.name}</li>
+                <li key={e.userID} className="friendslist">{e.name}</li>
             ))}
         </>
     );

@@ -1,24 +1,24 @@
-import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
-import { Sessions } from './sessions';
-@Entity()
+import { Entity, Column, PrimaryColumn } from 'typeorm';
+
+@Entity('users')
 export class UserTable {
-  constructor(userId: number, userName: string) {
-    this.userId = userId;
-    this.userName = userName;
-  }
+	constructor(userId: number, userName: string) {
+		this.userId = userId;
+		this.userName = userName;
+	}
 
-  @PrimaryColumn()
-  userId: number;
+	@PrimaryColumn()
+	userId: number;
 
-  @Column()
-  userName: string;
+	@Column()
+	userName: string;
 
-  @Column({ default: new Date() })
-  createAt: Date;
+	@Column({ default: new Date() })
+	createAt: Date;
 
-  @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
-  public sessions: Sessions[];
+	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
+	// public sessions: Sessions[];
 
-  // @Column({ type: 'longblob' })
-  // avatar: Buffer;
+	// @Column({ type: 'longblob' })
+	// avatar: Buffer;
 }
