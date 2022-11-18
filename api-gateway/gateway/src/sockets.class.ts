@@ -17,13 +17,9 @@ export class Sockets {
     }
 
     public getSocket(userId: number): Socket | undefined {
-        this.logger.debug(`Retrieving socket for userId: [${userId}]`);
-        if (this.socketMap.has(userId)) {
-            this.logger.debug(`Found socket for userId: [${userId}]`);
-            return this.socketMap.get(userId);
-        }
-        this.logger.debug(`No socket for userId: [${userId}] found`);
-        return undefined;
+        const socket: Socket | undefined = this.socketMap.get(userId);
+        this.logger.debug(`Retrieving socket for userId: [${userId}] found [${socket === undefined ? 'undefined' : socket.id}]`);
+        return socket;
     }
 
     public sendData(users: number[], pattern: string, payload: object) {
