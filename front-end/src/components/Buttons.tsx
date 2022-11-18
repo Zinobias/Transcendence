@@ -27,6 +27,7 @@ export const    SignupButton: React.FC = () => {
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [userName, setUserName] = useState<string>("");
     const socket = useContext(SocketContext);
+    let signupLink = '';
 
     useEffect(() => {
         socket.on("create_account", res => {
@@ -52,10 +53,23 @@ export const    SignupButton: React.FC = () => {
         console.log("userName " + userName);
     }, [])
 
+    useEffect(() => {
+        socket.on('retrieve_redirect', res => {
+            signupLink = res.signup;
+        })
+        return () => {
+            socket.off('retrieve_redirect');
+        }
+    }, [])
+
+    useEffect(() => {
+        socket.emit('retrieve_redirect', {});
+    }, [])
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         console.log("REDIRECTING " + userName);
-        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dc4d066a92ebb003a5fa223b28af0bd6f27c6943eb7a2d20ea6ae42a75cd508c&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fsignup&response_type=code'
+        window.location.href = signupLink;
     };
 
     return (   
@@ -75,6 +89,7 @@ export const    LoginButton: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const socket = useContext(SocketContext);
+    let loginLink = '';
 
     useEffect(() => {
         socket.on("login", res => {
@@ -96,10 +111,23 @@ export const    LoginButton: React.FC = () => {
         }
     }, [])
 
+    useEffect(() => {
+        socket.on('retrieve_redirect', res => {
+            loginLink = res.login;
+        })
+        return () => {
+            socket.off('retrieve_redirect');
+        }
+    }, [])
+
+    useEffect(() => {
+        socket.emit('retrieve_redirect', {});
+    }, [])
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         console.log("REDIRECTING LOGIN");
-        window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-dc4d066a92ebb003a5fa223b28af0bd6f27c6943eb7a2d20ea6ae42a75cd508c&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin&response_type=code'
+        window.location.href = loginLink
     };
 
     return (

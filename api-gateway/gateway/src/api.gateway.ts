@@ -108,10 +108,7 @@ export class ApiGateway
     //   }
 
     @SubscribeMessage('auth')
-    async handleAuthResp(
-        client: Socket,
-        payload: FrontEndDTO,
-    ): Promise<boolean | any> {
+    async handleAuthResp(client: Socket, payload: FrontEndDTO): Promise<boolean | any> {
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.eventPattern === 'login') {
@@ -146,6 +143,17 @@ export class ApiGateway
         }
         this.logger.debug(`Received invalid pattern on auth channel, Auth token: [${payload.data.token}], Event pattern: [${payload.eventPattern}]`);
         return false;
+    }
+
+    @SubscribeMessage('retrieve_redirect')
+    async handleRetrieveRedirect(client: Socket, payload: FrontEndDTO): Promise<any> {
+        return {
+            event: 'retrieve_redirect',
+            data: {
+                login: `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.CLIENT}&redirect_uri=http%3A%2F%2F${process.env.WEB_HOST}%3A${process.env.WEB_PORT}%2Flogin&response_type=code`,
+                signup: `https://api.intra.42.fr/oauth/authorize?client_id=${process.env.CLIENT}&redirect_uri=http%3A%2F%2F${process.env.WEB_HOST}%3A${process.env.WEB_PORT}%2Fsignup&response_type=code`
+            }
+        }
     }
 
     /**

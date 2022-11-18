@@ -48,6 +48,8 @@ services:
       POSTGRES_HOST: "${POSTGRES_HOST}"
       SECRET: "${SECRET}"
       CLIENT: "${CLIENT}"
+      WEB_HOST: "${WEB_HOST}"
+      WEB_PORT: "${WEB_PORT}"
 
     volumes:
       - type: bind
