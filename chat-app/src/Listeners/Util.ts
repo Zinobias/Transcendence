@@ -14,7 +14,7 @@ export class Util {
     const obj: microServiceDTO = {
       eventPattern: channel,
       userIDs: userIds,
-      payload: args,
+      data: args,
     };
     this.gateway.emit('chat', obj);
   }

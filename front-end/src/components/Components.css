@@ -179,27 +179,37 @@ p.chatp {
 */
 
 .profile {
-    width: 100%;
+    position: fixed;
+    top: 2%;
+    right: 3%;
+    text-align: right;
+    margin: 0;
 }
 
 .profile__dropdown {
     display: none;
-    margin-top: 15px;
-    position: relative;
+    height: 200px;
+    width: 150px;
+    /* margin: auto; */
+    line-height: 1;
+    padding: 2%;
+    background-color: #646464;
     border: 2px solid black;
 }
 
 .profile__avatar {
-    width: 100px;
-    height: 100px;
+    width: 60px;
+    height: 60px;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    /* object-fit: cover; */
+    display: inline-block;
 }
 
 .profile__close {
-    margin-right: 10px;
-    font-size: 25px;
+    font-size: 20px;
+    text-align: right;
 }
 
 .profile__close:hover {
@@ -219,6 +229,23 @@ p.chatp {
 /*
     BUTTONS
 */
+
+.logoutButton  {
+    position: fixed;
+    top: 2.5%;
+    left: 3%;
+    font-size: 30px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    cursor: pointer;
+    box-shadow: 1px 1px 0px 0px #CE5937, 
+                2px 2px 0px 0px #CE5937, 
+                3px 3px 0px 0px #5dce64,  
+                4px 4px 0px 0px #5dce64;
+}
 
 .defaultButton {
     font-size: 30px;
@@ -262,7 +289,7 @@ p.chatp {
     transform: scale(1.05);
 }
 
-.defaultButton:hover, .boringButton:hover {
+.defaultButton:hover, .boringButton:hover, .logoutButton:hover {
     transform: scale(1.1);
 }
 

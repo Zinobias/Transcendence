@@ -33,7 +33,7 @@ export class chat_channels {
   @Column({ nullable: true })
   owner2Id: number;
 
-  @OneToMany(() => user_table, (user) => user.chat)
+  @ManyToOne(() => user_table, (user) => user.chat)
   @JoinColumn({ name: 'ownerId' })
   user: user_table;
 
@@ -52,7 +52,7 @@ export class chat_channels {
   member: chat_members[];
 
   @OneToMany(() => chat_message, (chat) => chat.chat, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   message: chat_message[];
 
