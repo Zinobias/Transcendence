@@ -14,12 +14,17 @@ const   Chat: React.FC = () => {
     const [chatroomName, setChatroomName] = useState<string>("");
 
     useEffect(() => {
-        socket.on("channel_create", data => {
-            console.log(`socket.on channel_create ${data.channel_name}`);
+        // socket.on("channel_create", data => {
+        //     console.log(`socket.on channel_create ${data.channel_name}`);
+        // })
+
+        socket.on("channels_for_user", data => {
+            console.log(`socket.on channels_for_user`);
         })
 
         return () => {
-            socket.off("channel_create");
+            // socket.off("channel_create");
+            socket.off("channels_for_user");
         }
     },[])
 
@@ -32,13 +37,20 @@ const   Chat: React.FC = () => {
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
         if (chatroomName) {
+            // socket.emit("chat", {
+            //     userId: cookies.userID,
+            //     authToken: cookies.user,
+            //     eventPattern: "channel_create", 
+            //     data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
+            // });
+            // console.log("emiting channel_create " + chatroomName);
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
-                eventPattern: "channel_create", 
-                data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
-            });
-            console.log("emiting channel_create " + chatroomName);
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+            console.log("emiting get_channels_user");
             // navigate('chat_window');
         }
         else {

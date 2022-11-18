@@ -58,7 +58,7 @@ const   ChatWindow: React.FC = () => {
             <div className="chatroom__text" ref={inputRef}>
                 {chat.map((element, index) => {
                 return (
-                <div key={index} className="chatroom__text--bubble__left">
+                <div key={index} className="chatroom__text--bubble">
                     <p className="chatp"><b>USER</b><br/>{element}</p>
                 </div>
                 );
