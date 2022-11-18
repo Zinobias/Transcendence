@@ -2,9 +2,8 @@ import React from "react";
 import { Outlet, Link } from 'react-router-dom';
 import { LogoutButton } from './Buttons';
 import ProfileNav from "./ProfileNav";
-import '../App.css'
-import Friendslist from "./Friendslist";
 import FooterChat from "./FooterChat";
+import '../App.css'
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 

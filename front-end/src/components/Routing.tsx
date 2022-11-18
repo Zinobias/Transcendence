@@ -10,6 +10,7 @@ import ChatWindow from './ChatWindow';
 import NavBar from './NavBar';
 import SignUp from './SignUp';
 import Guard  from './Guard';
+import Profile from './Profile';
 
 const Routing: React.FC  = () => {
     const [cookies] = useCookies(['user']);
@@ -27,8 +28,8 @@ const Routing: React.FC  = () => {
                 <Route path='game' element={<Game />} />
                 <Route path='chat' element={<Chat />} />
                 <Route path='chat/chat_window' element={<ChatWindow />} />
+                <Route path='profile' element={<Profile/>}/>
             </Route>
-
         </Routes>
     )
 };

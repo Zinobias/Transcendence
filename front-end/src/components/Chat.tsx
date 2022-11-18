@@ -15,13 +15,13 @@ const   Chat: React.FC = () => {
 
     useEffect(() => {
         socket.on("channel_create_success", data => {
-            console.log("socket.on channel_create_success "+ data.channelName);
+            console.log(`socket.on channel_create_success ${data.channel_name}`);
         })
 
-        // return () => {
-        //     socket.off("channel_create_success");
-        // }
-    },)
+        return () => {
+            socket.off("channel_create_success");
+        }
+    },[])
 
     var chats: Chatroom[] = [
         {name: "chat 1", id: 1},
@@ -29,7 +29,6 @@ const   Chat: React.FC = () => {
         {name: "chat 3", id: 3, password: true},
         {name: "chat 4", id: 4},
     ];
-
 
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()

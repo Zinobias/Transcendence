@@ -5,13 +5,13 @@ import {
     ChannelBan,
     ChannelCreate,
     ChannelDemote,
-    ChannelDisband,
+    ChannelDisband, ChannelError,
     ChannelJoin,
     ChannelKick,
     ChannelLeave,
     ChannelMessage,
     ChannelPromote,
-} from '../Events/ChannelEvents';
+} from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
 import {Queries} from '../Database/Queries';
@@ -19,17 +19,18 @@ import {Setting} from '../Objects/Setting';
 import {SettingType} from '../Enums/SettingType';
 import {Message} from '../Objects/Message';
 import {Util} from './Util';
-import {GetUserData} from '../Events/UserEvents';
+import {GetUserData} from '../DTOs/UserDTOs';
 
 @Controller()
 export class ChannelEventPatterns {
-    private logger = new Logger('chat');
+    private logger = new Logger('ChannelEventPatterns');
 
-    constructor(
-        private readonly appService: AppService,
-        @Inject('gateway') private readonly gateway: ClientProxy,
-        @Inject(Util) private readonly util: Util,
-    ) {
+    constructor(private readonly appService: AppService,
+                @Inject('gateway') private readonly gateway: ClientProxy,
+                @Inject(Util) private readonly util: Util) {}
+
+    private emitFailedObject(userId: number, channel: string, reason: string) {
+        this.util.notify([userId], channel + '_err', {reason: reason})
     }
 
     @EventPattern('channel_create')
@@ -38,8 +39,10 @@ export class ChannelEventPatterns {
             data.creator_id,
             'channel_create',
         );
-        if (user == null)
+        if (user == null) {
+            // this.emitFailedObject()
             return;
+        }
         const usersArr: User[] = [await User.getUser(data.creator_id)];
         if (data.creator2_id != undefined) {
             const user2: User = await this.util.getUser(
@@ -62,15 +65,13 @@ export class ChannelEventPatterns {
         );
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {
-            Logger.warn(
-                'Received invalid channel [' + channelId + '] from channel_create',
-            );
+            this.logger.warn(`Received invalid channel [${channelId}] from channel_create`);
             return;
         }
         channel.channelId = channelId;
 
         const userIds = channel.users.map((a) => a.userId);
-        console.log('test ' + userIds);
+        this.logger.log('test ' + userIds);
         this.util.notify(userIds, 'channel_create_success', {
             channel_name: channel.channelName,
             channel_id: channel.channelId,
@@ -85,18 +86,24 @@ export class ChannelEventPatterns {
             data.channel_id,
             'channel_join',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
+
         const user: User = await this.util.getUser(data.user_id, 'channel_join');
-        if (user == null) return;
-        if (this.util.userInChannel(channel, user.userId, 'channel_join')) return;
+        if (user == null)
+            return;
+
+        if (this.util.userInChannel(channel, user.userId, 'channel_join'))
+            return;
 
         if (!channel.canJoin(data.user_id)) {
+            this.logger.debug(`User with id ${data.user_id} can't join ${channel.channelName} with id ${channel.channelId} since they're banned.`)
             //TODO some message to front end saying user can't join since they're banned
             return;
         }
 
         channel.addUser(user);
-        Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
+        await Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_join_success', {
@@ -106,17 +113,18 @@ export class ChannelEventPatterns {
     }
 
     @EventPattern('channel_leave')
-    handleLeave(data: ChannelLeave) {
+    async handleLeave(data: ChannelLeave) {
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_leave',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
         if (this.util.userInChannel(channel, data.user_id, 'channel_leave', true))
             return;
 
         channel.removeUser(data.user_id);
-        Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
+        await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
 
         const userIds = channel.users.map((a) => a.userId);
         userIds.push(data.user_id);
@@ -132,10 +140,12 @@ export class ChannelEventPatterns {
             data.channel_id,
             'channel_promote',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
         if (this.util.userInChannel(channel, data.user_id, 'channel_promote'))
             return;
-        if (this.util.notAdmin(channel, data.user_id, 'channel_promote')) return;
+        if (this.util.notAdmin(channel, data.user_id, 'channel_promote'))
+            return;
 
         const setting: Setting = new Setting(
             SettingType.ADMIN,
@@ -155,18 +165,20 @@ export class ChannelEventPatterns {
     }
 
     @EventPattern('channel_demote')
-    handleDemote(data: ChannelDemote) {
+    async handleDemote(data: ChannelDemote) {
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_demote',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
         if (this.util.userInChannel(channel, data.user_id, 'channel_demote', true))
             return;
-        if (this.util.notAdmin(channel, data.user_id, 'channel_kick')) return;
+        if (this.util.notAdmin(channel, data.user_id, 'channel_kick'))
+            return;
 
         channel.removeSetting(data.user_id, SettingType.ADMIN);
-        Queries.getInstance().removeSetting(
+        await Queries.getInstance().removeSetting(
             data.channel_id,
             data.user_id,
             SettingType.ADMIN,
@@ -174,35 +186,39 @@ export class ChannelEventPatterns {
     }
 
     @EventPattern('channel_kick')
-    handleKick(data: ChannelKick) {
+    async handleKick(data: ChannelKick) {
         //TODO send a message to the frontend to notify kicked user somewhere (if we want to do that?)
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_kick',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
         if (this.util.userInChannel(channel, data.user_id, 'channel_kick', true))
             return;
-        if (this.util.notOwner(channel, data.user_id, 'channel_kick')) return;
+        if (this.util.notOwner(channel, data.user_id, 'channel_kick'))
+            return;
 
         channel.removeUser(data.user_id);
-        Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
+        await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
     }
 
     @EventPattern('channel_ban')
-    handleBan(data: ChannelBan) {
+    async handleBan(data: ChannelBan) {
         //TODO send a message to the frontend to notify banned user somewhere (if we want to do that?)
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_ban',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
         if (this.util.userInChannel(channel, data.user_id, 'channel_ban', true))
             return;
-        if (this.util.notAdmin(channel, data.user_id, 'channel_ban')) return;
+        if (this.util.notAdmin(channel, data.user_id, 'channel_ban'))
+            return;
 
         channel.removeUser(data.user_id);
-        Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
+        await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
 
         const setting: Setting = new Setting(
             SettingType.BANNED,
@@ -213,22 +229,23 @@ export class ChannelEventPatterns {
             data.until,
         );
         channel.addSetting(setting);
-        Queries.getInstance().addSetting(setting);
-        Queries.getInstance().addSetting(setting);
+        await Queries.getInstance().addSetting(setting);
     }
 
     @EventPattern('channel_disband')
-    handleDisband(data: ChannelDisband) {
+    async handleDisband(data: ChannelDisband) {
         //TODO send a message to the frontend to notify all other users (if we want to do that?)
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_disband',
         );
-        if (channel == null) return;
-        if (this.util.notOwner(channel, data.user_id, 'channel_disband')) return;
+        if (channel == null)
+            return;
+        if (this.util.notOwner(channel, data.user_id, 'channel_disband'))
+            return;
 
         Channel.removeChannel(data.channel_id);
-        Queries.getInstance().removeChannel(data.channel_id);
+        await Queries.getInstance().removeChannel(data.channel_id);
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'remove_channel', {
@@ -242,12 +259,15 @@ export class ChannelEventPatterns {
             data.channel_id,
             'channel_message',
         );
-        if (channel == null) return;
+        if (channel == null)
+            return;
 
         if (!channel.hasUser(data.user_id)) {
-            // client.emit('channel_message_failed', { TODO fix this
-            //   reason: 'You are not a member of this channel',
-            // });
+            this.util.notify([data.user_id], 'channel_message', {
+                success: false,
+                reason: 'You are not a member of this channel',
+                message: undefined
+            });
             return;
         }
         const message = new Message(
@@ -259,13 +279,19 @@ export class ChannelEventPatterns {
             .addChannelMessage(data.channel_id, message)
             .then((res) => {
                 if (res == false) {
-                    // client.emit('channel_message_failed', { TODO fix this
-                    //   reason: 'Internal server error',
-                    // });
+                    this.util.notify([data.user_id], 'channel_message', {
+                        success: false,
+                        reason: 'Internal server error',
+                        message: undefined
+                    });
                     return;
                 }
                 const userIds = channel.users.map((a) => a.userId);
-                this.util.notify(userIds, 'channel_message', message);
+                this.util.notify(userIds, 'channel_message', {
+                    success: true,
+                    reason: undefined,
+                    message: message
+                });
             });
     }
 
