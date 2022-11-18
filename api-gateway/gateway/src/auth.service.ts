@@ -14,24 +14,22 @@ export class Auth {
 
     private logger: Logger = new Logger('Auth');
 
-    private static map : Map<number, string> = new Map();
+    private map: Map<number, string> = new Map();
 
     public validate(userId: number | undefined, accessToken: string | undefined): boolean {
         if (userId === undefined || accessToken === undefined) {
             this.logger.warn(`Received undefined userId [${userId}] or accessToken [${accessToken}] when validating auth`);
             return false;
         }
-        if (Auth.map.has(userId))
-            return Auth.map.get(userId) === accessToken;
+        if (this.map.has(userId))
+            return this.map.get(userId) === accessToken;
         return false;
     }
 
     public async updateAuth(userId: number) {
-        const accessToken: string | undefined = await this.queries.loadSession(
-            userId,
-        );
+        const accessToken: string | undefined = await this.queries.loadSession(userId);
         if (accessToken != undefined)
-            Auth.map.set(userId, accessToken);
+            this.map.set(userId, accessToken);
         else
             Logger.warn(`Received undefined accessToken when loading session for user id [${userId}]`)
     }
