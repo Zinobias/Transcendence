@@ -126,17 +126,16 @@ export class ApiGateway
             );
 
             if (createAccountDTO === undefined) {
-                this.logger.debug('undefined uwu');
+                this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
                 return ({event: 'create_account', data: false});
             }
-            this.logger.debug('' + createAccountDTO.user_id + ' ' + createAccountDTO.auth_cookie);
+            this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
                 event: 'create_account',
                 data: createAccountDTO,
             };
         }
-        this.logger.debug('auth token ' + payload.data.token);
-        this.logger.debug('auth event pattern ' + payload.eventPattern);
+        this.logger.debug(`Received invalid pattern on auth channel, Auth token: [${payload.data.token}], Event pattern: [${payload.eventPattern}]`);
         return false;
     }
 
