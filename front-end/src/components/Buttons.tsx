@@ -27,7 +27,7 @@ export const    SignupButton: React.FC = () => {
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [userName, setUserName] = useState<string>("");
     const socket = useContext(SocketContext);
-    let signupLink = '';
+    let signupLink : string;
 
     useEffect(() => {
         socket.on("create_account", res => {
