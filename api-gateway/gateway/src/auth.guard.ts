@@ -22,9 +22,11 @@ export class AuthGuard implements CanActivate {
         return this.validateRequest(request);
     }
 
-    validateRequest(request: FrontEndDTO): boolean {
+    private validateRequest(request: FrontEndDTO): boolean {
         if (request.userId === undefined || request.authToken === undefined)
             return false;
-        return this.auth.validate(request.userId, request.authToken);
+        let validateResult = this.auth.validate(request.userId, request.authToken);
+        this.logger.debug(`Validate result is: [${validateResult}]`);
+        return validateResult;
     }
 }

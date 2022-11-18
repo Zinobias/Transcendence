@@ -14,7 +14,7 @@ export class Auth {
 
     private logger: Logger = new Logger('Auth');
 
-    private static map = new Map();
+    private static map : Map<number, string> = new Map();
 
     public validate(userId: number | undefined, accessToken: string | undefined): boolean {
         if (userId === undefined || accessToken === undefined) {
