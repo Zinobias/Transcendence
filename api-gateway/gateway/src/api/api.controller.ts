@@ -48,4 +48,15 @@ export class ApiController {
                 ?.emit(payload.eventPattern, payload.data);
         }
     }
+
+    @EventPattern('chat_to_game')
+    chatToGame(@Payload() payload: microServiceDTO) {
+        this.game_client.emit(payload.eventPattern, payload.data);
+    }
+
+    @EventPattern('game_to_chat')
+    gameToChat(@Payload() payload: microServiceDTO) {
+        this.game_client.emit(payload.eventPattern, payload.data);
+    }
+
 }

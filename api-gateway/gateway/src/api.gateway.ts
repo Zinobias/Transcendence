@@ -78,7 +78,12 @@ export class ApiGateway
     // @UseGuards(AuthGuard)
     @SubscribeMessage('chat')
     handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
-        //TODO verify auth
+        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
+            return;
+        if (payload.userId !== undefined && payload.userId !== payload.data.userId) {
+            Logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
+            return;
+        }
         this.chatClient.emit(payload.eventPattern, payload.data);
     }
 
@@ -86,6 +91,8 @@ export class ApiGateway
     @SubscribeMessage('game')
     handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
         //TODO verify auth
+        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
+            return;
         this.logger.debug(`auth works ${payload}`);
         if (payload.eventPattern === 'game.player.move') {
             if (payload.userId === undefined || payload.userId !== payload.data.userId)
@@ -105,6 +112,8 @@ export class ApiGateway
         client: Socket,
         payload: FrontEndDTO,
     ): Promise<boolean | any> {
+        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
+            return;
         if (payload.eventPattern === 'login') {
             const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token);
 

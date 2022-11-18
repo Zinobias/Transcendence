@@ -10,8 +10,7 @@ export class Auth {
     constructor(
         @Inject(Sockets) private readonly sockets: Sockets,
         @Inject(Queries) private readonly queries: Queries,
-    ) {
-    }
+    ) {}
 
     private logger: Logger = new Logger('Auth');
 
@@ -56,7 +55,7 @@ export class Auth {
             },
         );
         if (!oauthResponse.ok || oauthResponse.status !== 200) {
-            this.logger.warn('Failed to get an oauth response')
+            this.logger.warn(`Failed to get an oauth response`)
             return undefined;
         }
         const json: AuthToken = await oauthResponse.json();
@@ -109,7 +108,7 @@ export class Auth {
         if (isSuccessful)
             await this.updateAuth(userId);
         else
-            this.logger.warn('Unable to store auth for user id [' + userId + ']')
+            this.logger.warn(`Unable to store auth for user id [${userId}]`)
         return isSuccessful;
     }
 

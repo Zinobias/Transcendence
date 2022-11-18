@@ -5,7 +5,7 @@ import {
     ChannelBan,
     ChannelCreate,
     ChannelDemote,
-    ChannelDisband, ChannelError,
+    ChannelDisband,
     ChannelJoin,
     ChannelKick,
     ChannelLeave,
@@ -19,7 +19,6 @@ import {Setting} from '../Objects/Setting';
 import {SettingType} from '../Enums/SettingType';
 import {Message} from '../Objects/Message';
 import {Util} from './Util';
-import {GetUserData} from '../DTOs/UserDTOs';
 
 @Controller()
 export class ChannelEventPatterns {
@@ -30,33 +29,35 @@ export class ChannelEventPatterns {
                 @Inject(Util) private readonly util: Util) {}
 
     private emitFailedObject(userId: number, channel: string, reason: string) {
-        this.util.notify([userId], channel + '_err', {reason: reason})
+        this.util.notify([userId], channel, {success: false, reason: reason})
     }
 
     @EventPattern('channel_create')
     async channelCreate(data: ChannelCreate) {
         const user: User = await this.util.getUser(
-            data.creator_id,
+            data.user_id,
             'channel_create',
         );
         if (user == null) {
-            // this.emitFailedObject()
+            this.emitFailedObject(data.user_id, 'channel_create', 'Unable to find dm user');
             return;
         }
-        const usersArr: User[] = [await User.getUser(data.creator_id)];
+        const usersArr: User[] = [await User.getUser(data.user_id)];
         if (data.creator2_id != undefined) {
             const user2: User = await this.util.getUser(
                 data.creator2_id,
                 'channel_create',
             );
-            if (user2 == null)
+            if (user2 == null) {
+                this.emitFailedObject(data.user_id, 'channel_create', 'Unable to find second dm user');
                 return;
+            }
             usersArr.push(user2);
         }
 
         const channel: Channel = new Channel(
             -1,
-            data.creator_id,
+            data.user_id,
             data.channel_name,
             usersArr,
             [],
@@ -65,14 +66,15 @@ export class ChannelEventPatterns {
         );
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {
+            this.emitFailedObject(data.user_id, 'channel_create', 'Unable to create a new channel');
             this.logger.warn(`Received invalid channel [${channelId}] from channel_create`);
             return;
         }
         channel.channelId = channelId;
 
         const userIds = channel.users.map((a) => a.userId);
-        this.logger.log('test ' + userIds);
         this.util.notify(userIds, 'channel_create_success', {
+            success: true,
             channel_name: channel.channelName,
             channel_id: channel.channelId,
             channel_users: channel.users,
@@ -86,19 +88,24 @@ export class ChannelEventPatterns {
             data.channel_id,
             'channel_join',
         );
-        if (channel == null)
+        if (channel == null) {
+            this.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
             return;
+        }
 
         const user: User = await this.util.getUser(data.user_id, 'channel_join');
-        if (user == null)
+        if (user == null) {
+            this.emitFailedObject(data.user_id, 'channel_join', `Unable to find your user`);
             return;
+        }
 
-        if (this.util.userInChannel(channel, user.userId, 'channel_join'))
+        if (this.util.userInChannel(channel, data.user_id, 'channel_join')) {
+            this.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
             return;
+        }
 
         if (!channel.canJoin(data.user_id)) {
-            this.logger.debug(`User with id ${data.user_id} can't join ${channel.channelName} with id ${channel.channelId} since they're banned.`)
-            //TODO some message to front end saying user can't join since they're banned
+            this.emitFailedObject(data.user_id, 'channel_join', `You've been banned from this channel`);
             return;
         }
 
@@ -118,10 +125,14 @@ export class ChannelEventPatterns {
             data.channel_id,
             'channel_leave',
         );
-        if (channel == null)
+        if (channel == null) {
+            this.emitFailedObject(data.user_id, 'channel_leave', `Unable to find the channel you're trying to join`);
             return;
-        if (this.util.userInChannel(channel, data.user_id, 'channel_leave', true))
+        }
+        if (this.util.userInChannel(channel, data.user_id, 'channel_leave')) {
+            this.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
             return;
+        }
 
         channel.removeUser(data.user_id);
         await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
@@ -142,25 +153,25 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.user_id, 'channel_promote'))
+        if (this.util.userInChannel(channel, data.affected_id, 'channel_promote'))
             return;
-        if (this.util.notAdmin(channel, data.user_id, 'channel_promote'))
+        if (this.util.notAdmin(channel, data.affected_id, 'channel_promote'))
             return;
 
         const setting: Setting = new Setting(
             SettingType.ADMIN,
             data.channel_id,
+            data.affected_id,
             data.user_id,
-            data.actor_id,
             new Date().getTime(),
             -1,
         );
         channel.addSetting(setting);
         Queries.getInstance().addSetting(setting);
 
-        this.util.notify([data.user_id], 'channel_promote_success', {
+        this.util.notify([data.affected_id], 'channel_promote_success', {
             channel_id: channel.channelId,
-            user_id: data.user_id,
+            user_id: data.affected_id,
         });
     }
 
@@ -172,15 +183,15 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.user_id, 'channel_demote', true))
+        if (this.util.userInChannel(channel, data.affected_id, 'channel_demote', true))
             return;
-        if (this.util.notAdmin(channel, data.user_id, 'channel_kick'))
+        if (this.util.notAdmin(channel, data.affected_id, 'channel_kick'))
             return;
 
-        channel.removeSetting(data.user_id, SettingType.ADMIN);
+        channel.removeSetting(data.affected_id, SettingType.ADMIN);
         await Queries.getInstance().removeSetting(
             data.channel_id,
-            data.user_id,
+            data.affected_id,
             SettingType.ADMIN,
         );
     }
@@ -194,13 +205,13 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.user_id, 'channel_kick', true))
+        if (this.util.userInChannel(channel, data.affected_id, 'channel_kick', true))
             return;
-        if (this.util.notOwner(channel, data.user_id, 'channel_kick'))
+        if (this.util.notOwner(channel, data.affected_id, 'channel_kick'))
             return;
 
-        channel.removeUser(data.user_id);
-        await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
+        channel.removeUser(data.affected_id);
+        await Queries.getInstance().removeChannelMember(data.channel_id, data.affected_id);
     }
 
     @EventPattern('channel_ban')
@@ -212,19 +223,19 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.user_id, 'channel_ban', true))
+        if (this.util.userInChannel(channel, data.affected_id, 'channel_ban', true))
             return;
-        if (this.util.notAdmin(channel, data.user_id, 'channel_ban'))
+        if (this.util.notAdmin(channel, data.affected_id, 'channel_ban'))
             return;
 
-        channel.removeUser(data.user_id);
-        await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
+        channel.removeUser(data.affected_id);
+        await Queries.getInstance().removeChannelMember(data.channel_id, data.affected_id);
 
         const setting: Setting = new Setting(
             SettingType.BANNED,
             data.channel_id,
+            data.affected_id,
             data.user_id,
-            data.actor_id,
             new Date().getTime(),
             data.until,
         );
