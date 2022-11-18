@@ -23,7 +23,7 @@ export class Vec2 {
 			this.y = src.y;
 		}
 		else  {
-			this.x = src ?? 0;
+			this.x = src ?? 0; //  ?? = nullish coalescing operator 
 			this.y = y ?? 0;
 		}
 	};

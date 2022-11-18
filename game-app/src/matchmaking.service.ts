@@ -20,7 +20,11 @@ export class MatchMakingService {
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
 	 */
-	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {};
+	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {
+		this.matchMakingQueue = new Map<string, string[]>;
+		this.gameList = [];
+	};
+
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
 		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
@@ -143,7 +147,7 @@ export class MatchMakingService {
 		});
 		this.addGameToList(createGameDTO, newGameInstance);
 	}
-	
+
 	/**
 	 * adds game instance to the active games list.
 	 * increments gameId internally & in db.

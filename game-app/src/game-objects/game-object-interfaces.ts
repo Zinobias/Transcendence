@@ -50,6 +50,7 @@ export abstract class Entity {
 		this._type = type;
 		if (width && height)
 			[this._width, this._height] = [width, height];
+		this._pos = new Vec2();
 	}
 
 	// ------------------------------------------------------------------------------------------------
@@ -86,12 +87,10 @@ export class Ball extends Entity {
 	private _speed : number;
 
 	constructor () {
-		super("ball");
+		super("ball", GameConfig.DEFAULT_BALL_RADIUS,GameConfig.DEFAULT_BALL_RADIUS);
 		this._color = new Color(211, 211, 211);
 		this.velocityVector = new Vec2(1, 0);
 		[this.pos.x, this.pos.y] = [0, 0];
-		this.height = GameConfig.DEFAULT_BALL_RADIUS;
-		this.width = GameConfig.DEFAULT_BALL_RADIUS;
 		//this.speed = GameConfig.DEFAULT_BALL_SPEED;
 	}
 
@@ -114,10 +113,10 @@ export class PlayerPaddle extends Entity {
 	private	_keyPressDown 	: boolean;
 
 	constructor(_playerNumber : number) {
-		super('player_paddle');
+		super('player_paddle', GameConfig.PADDLE_HEIGHT, GameConfig.PADDLE_WIDTH);
 		//[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
 		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2, -GameConfig.PADDLE_WIDTH / 2];
-		[this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
+		// [this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
@@ -148,6 +147,12 @@ export interface PlayerData {
 	score 	:	 number;
 }
 
+
+export interface PaddleGameData {
+	uid 			:	 string;
+	playerPaddle 	:	 PlayerPaddle;
+}
+
 /**
  * Results of the game.
  */
@@ -163,8 +168,8 @@ export interface GameResult {
 }
 
 export enum MoveStatePaddle {
-	keyPressUp = 0,
-	keyReleaseUp = 1,
-	keyPressDown = 2,
-	keyReleaseDown = 3,
+	keyPressUp	 	= 0,
+	keyReleaseUp 	= 1,
+	keyPressDown 	= 2,
+	keyReleaseDown 	= 3,
 }
