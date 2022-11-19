@@ -12,6 +12,7 @@ export class twoFactorAuthService {
 
 	private readonly logger = new Logger('twoFactorAuthService');
 	private readonly toBeValidatedMap = new Map<number, string>
+	
 	constructor() {}
 
 	/**
@@ -92,6 +93,7 @@ export class twoFactorAuthService {
 			secret: clientSecret, // secret of the user
 			encoding: 'ascii', // encoding type of secret
 			token : token, //  time-based one-time token (f.e from google auth).
+			window : 2, // see if window works, gives more leeway to validating, checks 10 tokens in past & future. against passcode.
 		})
 		return isVerified;
 	}
