@@ -20,29 +20,31 @@ export class twoFactorAuthService {
 	 * @param uid id of user.
 	 * @returns qrcode as a dataUrl string on success, undefined on failure.
 	 */
-	public async generateSecret(uid : number) : Promise<string | void | undefined> {
-	let secret : speakeasy.GeneratedSecret | undefined = speakeasy.generateSecret({ // Do not type this, the library functions are inconsistent on required types.
-		name: "discoPong" // named it will have in authenticator app.,
-	});
+	public async generateSecret(uid : number) : Promise<string | undefined> {
+		let secret : speakeasy.GeneratedSecret | undefined = speakeasy.generateSecret({ // Do not type this, the library functions are inconsistent on required types.
+			name: "discoPong" // named it will have in authenticator app.,
+		});
 
-	if (secret === undefined) {
-		this.logger.warn(`GenerateSecret went wrong`);
-		return undefined ;
-	}
-	else {
-		this.logger.log(`Generated secret : ${secret}`);
-		this.toBeValidatedMap.set(uid, secret.ascii);
-	}
-	let qrCodeResult : string | void;
+		if (secret === undefined) {
+			this.logger.warn(`GenerateSecret went wrong`);
+			return undefined ;
+		}
+		else {
+			this.logger.log(`Generated secret : ${secret}`);
+			this.toBeValidatedMap.set(uid, secret.ascii);
+		}
+		let qrCodeResult : string | void;
 
-	if (secret.otpauth_url)
-		qrCodeResult = await qrcode.toDataURL(secret.otpauth_url).catch((e) => {
-				this.logger.warn(`Generating qrcode went wrong`);
-				return (undefined);
-			});
-	else 
-		this.logger.warn(`Generating qrcode went wrong, secret otpauth undefined.`);
-	return qrCodeResult;
+		if (secret.otpauth_url)
+			qrCodeResult = await qrcode.toDataURL(secret.otpauth_url).catch((e) => {
+					this.logger.warn(`Generating qrcode went wrong`);
+					return (undefined);
+				});
+		else 
+			this.logger.warn(`Generating qrcode went wrong, secret otpauth undefined.`);
+		if (qrCodeResult)
+			return qrCodeResult;
+		return undefined;
 	}
 
 	// REMOVE THIS FUNCTION, i JUST COULDN'T HANDLE INTELLISENSE SCREAMING AT ME ;C

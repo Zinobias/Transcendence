@@ -1,5 +1,5 @@
 import {Inject, Logger, UseGuards} from '@nestjs/common';
-import {ClientProxy, MessagePattern} from '@nestjs/microservices';
+import {ClientProxy, MessagePattern, Payload} from '@nestjs/microservices';
 import {
     MessageBody,
     OnGatewayConnection,
@@ -14,7 +14,9 @@ import {Sockets} from './sockets.class';
 import {Auth} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {CreateAccountDTO, LoginDTO} from './api.gateway.DTOs';
+import { twoFactorAuthService } from './2fa.service';
 
+// TODO : replace frontendDTO from gateway, use the one in api.gateway.DTOS.ts
 export interface FrontEndDTO {
     userId?: number;
     authToken?: string;
@@ -55,6 +57,7 @@ export class ApiGateway
         @Inject('GAME_SERVICE') private gameClient: ClientProxy,
         @Inject('CHAT_SERVICE') private chatClient: ClientProxy,
         @Inject(Auth) private auth: Auth,
+		@Inject(twoFactorAuthService) private TFA : twoFactorAuthService,
     ) {
     }
 
@@ -154,6 +157,72 @@ export class ApiGateway
             }
         }
     }
+
+    @UseGuards(AuthGuard)
+    @SubscribeMessage('enable_2fa') 
+	async enableTwoFactorAuthentication(client : Socket, payload : FrontEndDTO) {
+		if (!payload.userId) // might not be neccessary due to authguard
+		return ({
+			event : 'enable_2fa',
+			data : {
+				success : false,
+				msg 	: 'enabling 2fa failed, invalid userId : undefined'
+			}
+		});
+		this.logger.log(`user [${payload.userId}] calling enable 2fa`);
+		let qrCode : string | undefined = await this.TFA.generateSecret(payload.userId);
+		let success : boolean = qrCode === undefined;
+		return ({event : 'enable_2fa', data : {
+			success : 	success,
+			msg		: 	success === true ? 'enabling 2fa succeeded' : 'enabling 2fa failed.',
+			qrCode 	:	qrCode,
+		}});
+	}
+
+    @UseGuards(AuthGuard)
+    @SubscribeMessage('verify_2fa') 
+	async verifyTFA(client : Socket, payload : FrontEndDTO) {
+		let success : boolean = false;
+
+		
+		if (!payload.userId)
+		return ({
+			event : 'verify_2fa',
+			data : {
+				success : success,
+				msg 	: 'enabling 2fa failed, invalid userId : undefined'
+			}
+		});
+		this.logger.log(`user [${payload.userId}] calling verify_2fa`);
+		if (!payload.data.TFAtoken)
+			success = false;
+		else
+			success = await this.TFA.verify(payload.userId, payload.data.TFAtoken);
+		return ({
+			event : 'verify_2fa', 
+			data : {
+				success : success,
+				msg		: success === true ? 'verifying 2fa succeeded' : 'verifying 2fa failed.',
+			}
+		});
+		};
+
+	@UseGuards(AuthGuard)
+	@SubscribeMessage('isEnabled_2fa') 
+	async hasTFA(client : Socket, payload : FrontEndDTO) {
+		let success : boolean = false;
+
+		if (payload.userId)
+		success = await this.TFA.hasTwoFA(payload.userId);
+		this.logger.log(`user [${payload.userId}] calling isEnabled2fa`);
+		return ({
+			event : 'isEnabled_2fa',
+			data : {
+				 success 	: success,
+				 msg		: success === true ? `2fa is enabled for user ${payload.userId}` : `2fa is disabled for user ${payload.userId}`,
+		}
+		});
+	}
 
     /**
      * auth routes
