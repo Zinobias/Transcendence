@@ -169,6 +169,7 @@ export class ApiGateway
 				msg 	: 'enabling 2fa failed, invalid userId : undefined'
 			}
 		});
+		// CHECK IF ALREADY IN DB, IF IN DB, RETURN FAILED.
 		this.logger.log(`user [${payload.userId}] calling enable 2fa`);
 		let qrCode : string | undefined = await this.TFA.generateSecret(payload.userId);
 		let success : boolean = qrCode === undefined;
