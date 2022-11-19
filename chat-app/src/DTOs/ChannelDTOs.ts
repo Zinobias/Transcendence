@@ -1,3 +1,5 @@
+import {Channel} from "../Objects/Channel";
+
 export interface ChannelError {
     reason: string
 }
@@ -52,4 +54,8 @@ export interface ChannelMessage {
     user_id: number;
     channel_id: number;
     message: string;
+}
+
+export interface ChannelsRetrieve {
+    user_id: number
 }
