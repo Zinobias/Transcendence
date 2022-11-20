@@ -120,8 +120,8 @@ export class ApiGateway
             return {
                 event: 'login',
                 data: { 
-					DTO : loginDTO === undefined ? false : loginDTO,
-					success : false,
+					DTO : loginDTO,
+					success : loginDTO === undefined ? false : true,
 					msg : loginDTO === undefined ? `Login went wrong` : `Login went well`,
 				},
             };
