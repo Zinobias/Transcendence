@@ -90,15 +90,11 @@ export class Queries {
    * @param userId user id of the user
    */
   async getUser(userId: number): Promise<User> {
-    console.log('testing debug in getUser in queries ' + userId);
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(user_table);
-    try {
-      const findUser = await userRepository.findOneBy({ userId: userId });
-      return new User(findUser.userId, findUser.userName, undefined);
-    } catch (e) {
-      return undefined;
-    }
+    const findUser = await userRepository.findOneBy({ userId: userId });
+    if (findUser == undefined) return undefined;
+    return new User(findUser.userId, findUser.userName, undefined);
   }
 
   //Blocked users table
@@ -201,7 +197,6 @@ export class Queries {
    * returns the id of the newly created channel
    */
   async createChannel(channel: Channel): Promise<number> {
-    console.trace('debugging createChannel ');
     const myDataSource = await getDataSource();
     const addChannel = myDataSource.getRepository(chat_channels);
     await addChannel.save(new chat_channels(channel));
@@ -237,6 +232,20 @@ export class Queries {
     return channelList;
   }
 
+  async getAllPublicChannels(): Promise<Channel[]> {
+    const myDataSource = await getDataSource();
+    const channel = myDataSource.getRepository(chat_channels);
+    const find_channel = await channel.findBy({
+      owner2Id: null,
+      closed: false,
+    });
+    const channelList: Channel[] = [];
+    for (const [, result] of find_channel.entries()) {
+      channelList.push(Channel.getChannel(result.channelId));
+    }
+    return channelList;
+  }
+
   /**
    * Disable a channel
    * @param channelId channel to disable
@@ -246,43 +255,6 @@ export class Queries {
     const disable = myDataSource.getRepository(chat_channels);
     await disable.update({ channelId: channelId }, { closed: true });
   }
-	async getAllPublicChannels(): Promise<Channel[]> {
-		const myDataSource = await getDataSource();
-		const channel = myDataSource.getRepository(chat_channels);
-		const find_channel = await channel.findBy({
-			owner2Id: null,
-			closed: false,
-		});
-		const channelList: Channel[] = [];
-		for (const [, result] of find_channel.entries()) {
-			channelList.push(Channel.getChannel(result.channelId));
-		}
-		return channelList;
-	}
-
-	async getAllPublicChannels(): Promise<Channel[]> {
-		const myDataSource = await getDataSource();
-		const channel = myDataSource.getRepository(chat_channels);
-		const find_channel = await channel.findBy({
-			owner2Id: null,
-			closed: false,
-		});
-		const channelList: Channel[] = [];
-		for (const [, result] of find_channel.entries()) {
-			channelList.push(Channel.getChannel(result.channelId));
-		}
-		return channelList;
-	}
-
-	/**
-	 * Disable a channel
-	 * @param channelId channel to disable
-	 */
-	async disableChannel(channelId: number): Promise<void> {
-		const myDataSource = await getDataSource();
-		const disable = myDataSource.getRepository(chat_channels);
-		await disable.update({ channelId: channelId }, { closed: true });
-	}
 
   /**
    * Set the name of a channel
