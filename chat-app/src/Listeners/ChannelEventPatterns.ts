@@ -27,7 +27,7 @@ export class ChannelEventPatterns {
     constructor(private readonly appService: AppService,
                 @Inject('gateway') private readonly gateway: ClientProxy,
                 @Inject(Util) private readonly util: Util,
-                @Inject(Queries) private readonly queries: Queries) {}
+                /*@Inject(Queries) private readonly queries: Queries*/) {}
 
     private emitFailedObject(userId: number, channel: string, reason: string) {
         this.util.notify([userId], channel, {success: false, reason: reason})
@@ -310,6 +310,6 @@ export class ChannelEventPatterns {
     @EventPattern('channels_retrieve')
     async handleRetrieve(data: ChannelsRetrieve) {
         //TODO needs error handling for if query fails
-        this.util.notify([data.user_id], 'channels_retrieve', await this.queries.getAllPublicChannels());
+        this.util.notify([data.user_id], 'channels_retrieve', await Queries.getInstance().getAllPublicChannels());
     }
 }

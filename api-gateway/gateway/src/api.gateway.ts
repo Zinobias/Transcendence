@@ -47,6 +47,7 @@ export class ApiGateway
 			player2UID 	: "234",
 			gameMode	: 'default'
 		});
+		
     }
 
     //private clientList: { userID: number };

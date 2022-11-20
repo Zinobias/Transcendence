@@ -1,5 +1,6 @@
 import {Injectable, Logger} from '@nestjs/common';
 import {Socket} from 'socket.io';
+import { mapGetter } from './map.tools';
 
 @Injectable()
 export class Sockets {
@@ -17,9 +18,11 @@ export class Sockets {
     }
 
     public getSocket(userId: number): Socket | undefined {
-        const socket: Socket | undefined = this.socketMap.get(userId);
+		let socket : Socket | undefined;
+
+		socket = mapGetter(userId, this.socketMap);
         this.logger.debug(`Retrieving socket for userId: [${userId}] found [${socket === undefined ? 'undefined' : socket.id}]`);
-        return socket;
+        return socket ;
     }
 
     public sendData(users: number[], pattern: string, payload: object) {
