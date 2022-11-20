@@ -14,7 +14,7 @@ import {Sockets} from './sockets.class';
 import {Auth} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {CreateAccountDTO, LoginDTO} from './api.gateway.DTOs';
-import { twoFactorAuthService } from './2fa.service';
+import { TwoFactorAuthService } from './2fa.service';
 
 // TODO : replace frontendDTO from gateway, use the one in api.gateway.DTOS.ts
 export interface FrontEndDTO {
@@ -58,7 +58,7 @@ export class ApiGateway
         @Inject('GAME_SERVICE') private gameClient: ClientProxy,
         @Inject('CHAT_SERVICE') private chatClient: ClientProxy,
         @Inject(Auth) private auth: Auth,
-		@Inject(twoFactorAuthService) private TFA : twoFactorAuthService,
+		@Inject(TwoFactorAuthService) private TFA : TwoFactorAuthService,
     ) {
     }
 
@@ -136,7 +136,7 @@ export class ApiGateway
 
             if (createAccountDTO === undefined) {
                 this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
-                return ({event: 'create_account', data: false});
+                return ({event: 'create_account', data: undefined });
             }
             this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
