@@ -136,7 +136,7 @@ export class ApiGateway
 
             if (createAccountDTO === undefined) {
                 this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
-                return ({event: 'create_account', data: undefined });
+                return ({event: 'create_account', data: false });
             }
             this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
