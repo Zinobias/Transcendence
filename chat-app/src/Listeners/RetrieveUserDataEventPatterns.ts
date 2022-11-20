@@ -26,6 +26,7 @@ export class RetrieveUserDataEventPatterns {
     @EventPattern('get_user')
     async getUser(data: GetUserData) {
         const user = await User.getUser(data.user_id);
+        console.log(`chat_app user ${user.name}`);
         this.util.notify([data.user_id], 'get_user', {
             user: user,
         });

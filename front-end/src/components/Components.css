@@ -275,6 +275,21 @@ p.chatp {
                 4px 4px 0px 0px #5dce64;
 }
 
+.defaultButtonA {
+    font-size: 30px;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    cursor: pointer;
+    box-shadow: 1px 1px 0px 0px #CE5937, 
+                2px 2px 0px 0px #CE5937, 
+                3px 3px 0px 0px #5dce64,  
+                4px 4px 0px 0px #5dce64;
+}
+
 .boringButton {
     font-size: 30px;
     width:30%;
@@ -301,7 +316,7 @@ p.chatp {
     transform: scale(1.05);
 }
 
-.defaultButton:hover, .boringButton:hover, .logoutButton:hover {
+.defaultButton:hover, .defaultButtonA:hover, .boringButton:hover, .logoutButton:hover {
     transform: scale(1.1);
 }
 

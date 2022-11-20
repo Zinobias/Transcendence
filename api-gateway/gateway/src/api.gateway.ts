@@ -188,7 +188,7 @@ export class ApiGateway
 		// CHECK IF ALREADY IN DB, IF IN DB, RETURN FAILED.
 		this.logger.log(`user [${payload.userId}] calling enable 2fa`);
 		let qrCode : string | undefined = await this.TFA.generateSecret(payload.userId);
-		let success : boolean = qrCode === undefined;
+		let success : boolean = qrCode !== undefined;
 		return ({event : 'enable_2fa', data : {
 			success : 	success,
 			msg		: 	success === true ? 'enabling 2fa succeeded' : 'enabling 2fa failed.',

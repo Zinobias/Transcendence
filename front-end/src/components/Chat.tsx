@@ -14,12 +14,12 @@ const   Chat: React.FC = () => {
     const [chatroomName, setChatroomName] = useState<string>("");
 
     useEffect(() => {
-        socket.on("channel_create", data => {
-            console.log(`socket.on channel_create ${data.channel_name}`);
+        socket.on("channel_create", response => {
+            console.log(`socket.on channel_create ${response.channel_name}`);
         })
 
-        socket.on("channels_retrieve", data => {
-            console.log(data);
+        socket.on("channels_retrieve", response => {
+            console.log(`channel retrieve return response ${response}`);
             console.log(`socket.on channels_retrieve`);
         })
 

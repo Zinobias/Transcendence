@@ -1,8 +1,11 @@
 import { Injectable, Logger } from "@nestjs/common";
-import speakeasy from 'speakeasy';
-import qrcode from 'qrcode';
+// import speakeasy from 'speakeasy';
+// import qrcode from 'qrcode';
 import { mapGetter } from "./map.tools";
 
+
+const speakeasy = require(`speakeasy`);
+const qrcode = require(`qrcode`);
 
 /**
  * NOTES :
@@ -22,7 +25,7 @@ export class TwoFactorAuthService {
 	 * @returns qrcode as a dataUrl string on success, undefined on failure.
 	 */
 	public async generateSecret(uid : number) : Promise<string | undefined> {
-		let secret : speakeasy.GeneratedSecret | undefined = speakeasy.generateSecret({ // Do not type this, the library functions are inconsistent on required types.
+		let secret : any = speakeasy.generateSecret({ // Do not type this, the library functions are inconsistent on required types.
 			name: "discoPong" // named it will have in authenticator app.,
 		});
 
@@ -37,7 +40,7 @@ export class TwoFactorAuthService {
 		let qrCodeResult : string | void;
 
 		if (secret.otpauth_url)
-			qrCodeResult = await qrcode.toDataURL(secret.otpauth_url).catch((e) => {
+			qrCodeResult = await qrcode.toDataURL(secret.otpauth_url).catch((e : any) => {
 					this.logger.warn(`Generating qrcode went wrong`);
 					return (undefined);
 				});
