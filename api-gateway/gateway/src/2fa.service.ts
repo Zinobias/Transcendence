@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
+import { mapGetter } from "./map.tools";
 
 
 /**
@@ -74,7 +75,7 @@ export class twoFactorAuthService {
 	 * @returns true if validated, false otherwise.
 	 */
 	public async verify(uid : number, token : string) : Promise<boolean> {
-		let clientSecret = this.toBeValidatedMap.get(uid);
+		let clientSecret = mapGetter(uid,this.toBeValidatedMap);
 
 		if (clientSecret !== undefined) {
 			this.logger.log(`adding ${uid} 2fasecret to db a.k.a validating.`);

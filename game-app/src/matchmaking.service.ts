@@ -6,23 +6,23 @@ import { GameEndedData, gameMatchmakingEntity } from './event-objects/events.obj
 import { Game } from './game-class';
 import { gameModes } from './game-object-interfaces';
 import { GameResult } from './game-objects/game-object-interfaces';
+import { mapGetter } from './map.tools';
 const logger = new Logger("AppService");
 
 
 @Injectable()
 export class MatchMakingService {
-	private matchMakingQueue	: Map<string , string[]>;
-	private gameId 				: number;
-	private gameList			: GameInfo[];
-
+	private readonly matchMakingQueue	: Map<string , string[]> = new Map<string, string[]>;
+	private gameId 			: number;
+	private readonly gameList			: GameInfo[] = [];
+	private readonly logger				: Logger =  new Logger('matchmakingService');;
 
 	/**
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
 	 */
 	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {
-		this.matchMakingQueue = new Map<string, string[]>;
-		this.gameList = [];
+		// this.matchMakingQueue = new Map<string, string[]>;
 		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	};
 
@@ -81,8 +81,18 @@ export class MatchMakingService {
 	 * @param payload
 	 */
 	public addToQueue(payload : gameMatchmakingEntity) {
-		if (this.isInQueue(payload.userId) === false)
-			this.matchMakingQueue.get(payload.gameMode)?.push(payload.userId);
+		
+		if (this.isInQueue(payload.userId) === false) {
+			let gameModeList = mapGetter(payload.gameMode, this.matchMakingQueue);
+			if (gameModeList !== undefined) {
+				gameModeList.push(payload.userId);
+				this.logger.log(`Added userId : [${payload.userId}] to queue for gamemode : [${payload.gameMode}]`);
+				return ;
+			}
+			this.logger.log(`Adding userId : [${payload.userId}] to queue for gamemode : [${payload.gameMode}] went wrong`);
+
+			// this.matchMakingQueue.get(payload.gameMode)?.push(payload.userId);
+		}
 	}
 
 	/**

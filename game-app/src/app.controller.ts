@@ -26,7 +26,7 @@ export class AppController {
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
 
 		if (gameInfo === undefined) {
-			this.logger.debug('game.frame.update cant find the gameInfo');
+			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
 			return ;
 		}
 		let uids : string[];
