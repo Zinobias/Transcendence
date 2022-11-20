@@ -18,9 +18,8 @@ export class Sockets {
     }
 
     public getSocket(userId: number): Socket | undefined {
-		let socket : Socket | undefined;
-
-		socket = mapGetter(userId, this.socketMap);
+		let socket : Socket | undefined = mapGetter(userId, this.socketMap);
+	
         this.logger.debug(`Retrieving socket for userId: [${userId}] found [${socket === undefined ? 'undefined' : socket.id}]`);
         return socket ;
     }
