@@ -119,13 +119,21 @@ export class ApiGateway
             const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token);
             return {
                 event: 'login',
-                data: loginDTO === undefined ? false : loginDTO,
+                data: { 
+					DTO : loginDTO === undefined ? false : loginDTO,
+					success : false,
+					msg : loginDTO === undefined ? `Login went wrong` : `Login went well`,
+				},
             };
 
         } else if (payload.eventPattern === 'validate')
             return {
-                event: 'valiate',
-                data: this.auth.validate(payload.userId, payload.authToken),
+                event: 'validate',
+                data: {
+					DTO		: this.auth.validate(payload.userId, payload.authToken),
+					success : true,
+					msg 	: 'validating',
+				},
             };
 
         else if (payload.eventPattern === 'create_account') {
@@ -136,12 +144,20 @@ export class ApiGateway
 
             if (createAccountDTO === undefined) {
                 this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
-                return ({event: 'create_account', data: false });
+                return ({event: 'create_account', data: {
+					success : false,
+					msg : `account creation failed`,
+				} 
+			});
             }
             this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
                 event: 'create_account',
-                data: createAccountDTO,
+                data: {
+					DTO : createAccountDTO,
+					success : true,
+					msg : 'Successfully created the account',
+				}
             };
         }
         this.logger.debug(`Received invalid pattern on auth channel, Auth token: [${payload.data.token}], Event pattern: [${payload.eventPattern}]`);
