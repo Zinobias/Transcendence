@@ -10,12 +10,6 @@ export interface Chatroom {
     pasword?: string;
 }
 
-export interface User {
-    init: boolean;
-    name?: string;
-    token?: string;
-}
-
 export interface AppData {
     socket: Socket;
     init: boolean;
