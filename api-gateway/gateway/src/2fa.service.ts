@@ -9,7 +9,7 @@ import { mapGetter } from "./map.tools";
  * 	1. potentially add caching if time left.
  */
 @Injectable()
-export class twoFactorAuthService {
+export class TwoFactorAuthService {
 
 	private readonly logger = new Logger('twoFactorAuthService');
 	private readonly toBeValidatedMap = new Map<number, string>
