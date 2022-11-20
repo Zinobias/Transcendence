@@ -116,16 +116,15 @@ export class ApiGateway
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.eventPattern === 'login') {
-            const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token);
+            const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token, payload.data.TFAToken ?? undefined);
             return {
                 event: 'login',
                 data: { 
 					DTO : loginDTO,
-					success : loginDTO === undefined ? false : true,
-					msg : loginDTO === undefined ? `Login went wrong` : `Login went well`,
+					success : loginDTO === undefined || loginDTO.auth_cookie === undefined  ? false : true,
+					msg : loginDTO === undefined || loginDTO.auth_cookie === undefined ? `Login went wrong` : `Login went well`,
 				},
             };
-
         } else if (payload.eventPattern === 'validate')
             return {
                 event: 'validate',

@@ -4,12 +4,14 @@ import {randomUUID} from 'crypto';
 import {Socket} from 'socket.io';
 import {Sockets} from './sockets.class';
 import {AuthToken} from './auth.objects';
+import { TwoFactorAuthService } from './2fa.service';
 
 @Injectable()
 export class Auth {
     constructor(
         @Inject(Sockets) private readonly sockets: Sockets,
         @Inject(Queries) private readonly queries: Queries,
+		@Inject(TwoFactorAuthService) private readonly TFA : TwoFactorAuthService,
     ) {
         this.logger.debug(`Creating Auth Class`)
         this.map = new Map<number, string[]>();
@@ -77,30 +79,39 @@ export class Auth {
         return await this.retrieveUserId(json);
     }
 
-    public async login(client: Socket, token: string): Promise<any | undefined> {
+    public async login(client: Socket, token: string, TFAToken? : string): Promise<any | undefined> {
         const userId = await this.auth(token, false);
 
         if (userId === undefined) {
             this.logger.warn(`Received undefined userId from auth`)
             return undefined;
         }
-        return (await this.login2(client, userId));
-    }
-
-    private async login2(client: Socket, userId: number): Promise<any | undefined> {
-        this.logger.debug(`Storing socket, user id: [${userId}] socket id [${client.id}]`)
-        this.sockets.storeSocket(userId, client);
+		this.sockets.storeSocket(userId, client);
         /**
          * TODO: Check if user in dataBase
          */
-        const uuid = randomUUID();
+		const uuid = randomUUID();
+		if (await this.TFA.hasTwoFA(userId) === true) {
+			if (TFAToken && await this.TFA.verify(userId, TFAToken) === true) {
+				return ({
+					user_id : userId,
+					auth_cookie : uuid,
+				});
+			}
+			else {
+				return ({
+					user_id : userId,
+					auth_cookie : undefined,
+				});
+			};
+		};
         if ((await this.storeSession(userId, uuid)))
             return {user_id: userId, auth_cookie: uuid};
         else {
             this.logger.error(`Unable to store session for user id [${userId}]`);
             return undefined;
-        }
-    }
+        };
+    };
 
     private async retrieveUserId(authToken: AuthToken): Promise<number> {
         this.logger.log(authToken.access_token);
@@ -129,11 +140,21 @@ export class Auth {
     public async createAccount(client: Socket, payload: any): Promise<any | undefined> {
         this.logger.log(`Creating an account for [${payload.userName}]`);
         const userId = await this.auth(payload.token, true);
-
+		
         if (userId === undefined)
-            return undefined;
+		return undefined;
         if (!(await this.queries.createUser(userId, payload.userName)))
             return undefined;
-        return this.login2(client, userId);
+			this.sockets.storeSocket(userId, client);
+			/**
+			 * TODO: Check if user in dataBase
+			 */
+		const uuid = randomUUID();
+		if ((await this.storeSession(userId, uuid)))
+			return {user_id: userId, auth_cookie: uuid};
+		else {
+			this.logger.error(`Unable to store session for user id [${userId}]`);
+			return undefined;
+		}
     }
 }
