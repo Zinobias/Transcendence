@@ -10,16 +10,21 @@ const   Chat: React.FC = () => {
 	
 	const socket = useContext(SocketContext);
 	const navigate = useNavigate()
-    const [cookies] = useCookies(['userID']);
+    const [cookies] = useCookies(['userID', 'user']);
     const [chatroomName, setChatroomName] = useState<string>("");
 
     useEffect(() => {
-        socket.on("channel_create_success", data => {
-            console.log(`socket.on channel_create_success ${data.channel_name}`);
+        // socket.on("channel_create", data => {
+        //     console.log(`socket.on channel_create ${data.channel_name}`);
+        // })
+
+        socket.on("channels_for_user", data => {
+            console.log(`socket.on channels_for_user`);
         })
 
         return () => {
-            socket.off("channel_create_success");
+            // socket.off("channel_create");
+            socket.off("channels_for_user");
         }
     },[])
 
@@ -29,15 +34,23 @@ const   Chat: React.FC = () => {
         {name: "chat 3", id: 3, password: true},
         {name: "chat 4", id: 4},
     ];
-
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
         if (chatroomName) {
+            // socket.emit("chat", {
+            //     userId: cookies.userID,
+            //     authToken: cookies.user,
+            //     eventPattern: "channel_create", 
+            //     data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
+            // });
+            // console.log("emiting channel_create " + chatroomName);
             socket.emit("chat", {
-                eventPattern: "channel_create", 
-                data: {creator_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
-            });
-            console.log("emiting channel_create " + chatroomName);
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+            console.log("emiting get_channels_user");
             // navigate('chat_window');
         }
         else {

@@ -11,28 +11,41 @@ export class Auth {
         @Inject(Sockets) private readonly sockets: Sockets,
         @Inject(Queries) private readonly queries: Queries,
     ) {
+        this.logger.debug(`Creating Auth Class`)
+        this.map = new Map<number, string[]>();
     }
 
     private logger: Logger = new Logger('Auth');
 
-    private static map = new Map();
+    public readonly map: Map<number, string[]>;
 
+    /**
+     * For some unknown reason the get call does not work on the map in this function, the map does still contain
+     * all the data though, so we iterate over it instead.
+     */
     public validate(userId: number | undefined, accessToken: string | undefined): boolean {
         if (userId === undefined || accessToken === undefined) {
             this.logger.warn(`Received undefined userId [${userId}] or accessToken [${accessToken}] when validating auth`);
             return false;
         }
-        if (Auth.map.has(userId))
-            return Auth.map.get(userId) === accessToken;
-        return false;
+
+        let specialGetFindsAuth: boolean = false;
+        this.map.forEach((value, key) => {
+            if (key != userId) {
+                return;
+            }
+            let result = value.find((val) => {return val === accessToken});
+            specialGetFindsAuth = result !== undefined;
+        })
+        return specialGetFindsAuth;
     }
 
     public async updateAuth(userId: number) {
-        const accessToken: string | undefined = await this.queries.loadSession(
-            userId,
-        );
-        if (accessToken != undefined)
-            Auth.map.set(userId, accessToken);
+        const accessToken: string[] | undefined = await this.queries.loadSession(userId);
+        if (accessToken != undefined) {
+            this.logger.debug(`Storing session token for user: [${userId}] token: [${accessToken}]`)
+            this.map.set(userId, accessToken);
+        }
         else
             Logger.warn(`Received undefined accessToken when loading session for user id [${userId}]`)
     }
@@ -56,7 +69,7 @@ export class Auth {
             },
         );
         if (!oauthResponse.ok || oauthResponse.status !== 200) {
-            this.logger.warn('Failed to get an oauth response')
+            this.logger.warn(`Failed to get an oauth response`)
             return undefined;
         }
         const json: AuthToken = await oauthResponse.json();
@@ -109,7 +122,7 @@ export class Auth {
         if (isSuccessful)
             await this.updateAuth(userId);
         else
-            this.logger.warn('Unable to store auth for user id [' + userId + ']')
+            this.logger.warn(`Unable to store auth for user id [${userId}]`)
         return isSuccessful;
     }
 

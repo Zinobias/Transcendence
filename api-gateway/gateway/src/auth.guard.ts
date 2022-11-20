@@ -14,17 +14,17 @@ export class AuthGuard implements CanActivate {
     }
 
     private logger = new Logger('AuthGuard');
-    canActivate(
-        context: ExecutionContext,
-    ): boolean | Promise<boolean> | Observable<boolean> {
+    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToWs().getData();
-        this.logger.debug(`Auth request data: [${request.msg}]`);
+        this.logger.debug(`Auth request data: [${request.userId}], [${request.authToken}]`);
         return this.validateRequest(request);
     }
 
     validateRequest(request: FrontEndDTO): boolean {
         if (request.userId === undefined || request.authToken === undefined)
             return false;
-        return this.auth.validate(request.userId, request.authToken);
+        let validateResult = this.auth.validate(request.userId, request.authToken);
+        this.logger.debug(`Validate result is: [${validateResult}]`);
+        return validateResult;
     }
 }

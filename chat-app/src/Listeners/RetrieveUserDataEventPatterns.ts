@@ -33,12 +33,23 @@ export class RetrieveUserDataEventPatterns {
 
     //TODO move this data to user class?
     @EventPattern('get_friend_requests')
-    async getFriendsUser(data: GetUserData) {
+    async getFriendsRequestUser(data: GetUserData) {
         const friendRequests = await Queries.getInstance().getFriends(
             data.user_id,
             false,
         );
         this.util.notify([data.user_id], 'get_friend_requests', {
+            friendRequests: friendRequests,
+        });
+    }
+
+    @EventPattern('get_friends')
+    async getFriendsUser(data: GetUserData) {
+        const friendRequests = await Queries.getInstance().getFriends(
+            data.user_id,
+            true,
+        );
+        this.util.notify([data.user_id], 'get_friends', {
             friendRequests: friendRequests,
         });
     }

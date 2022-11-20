@@ -1,6 +1,7 @@
 import React from 'react'
 import { AiOutlineClose } from 'react-icons/ai';
 import { SlBubble } from 'react-icons/sl';
+import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 
 const FooterChat: React.FC = () => {
@@ -17,8 +18,13 @@ const FooterChat: React.FC = () => {
             <SlBubble />
         </div>
         <div id="footerDropdown" className='footerChat__body'>
-            {/* <ChatWindow /> */}
-            CHAT PLACEHOLDER
+            <div className='footerChat__sidebar'>
+                <ChatSidebar/>
+            </div>
+            <div className='footerChat__chat'>
+                <ChatWindow />
+            </div>
+            {/* CHAT PLACEHOLDER */}
         </div>
     </div>   
     )
