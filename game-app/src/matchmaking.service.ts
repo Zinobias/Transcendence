@@ -23,11 +23,11 @@ export class MatchMakingService {
 	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {
 		this.matchMakingQueue = new Map<string, string[]>;
 		this.gameList = [];
+		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	};
 
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
-		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	}
 
 
