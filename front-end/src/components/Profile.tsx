@@ -14,8 +14,8 @@ const Profile: React.FC = () => {
     const socket = useContext(SocketContext);
     const [searchParams, setSearchParams] = useSearchParams();
     const [state, setState] = useState<boolean>(false);
+    const [qrcode, setQrcode] = useState<string>("");
     const [cookies] = useCookies(['userID', 'user']);
-
 
     useEffect(() => {
         if (searchParams.get("id") && !state) {
@@ -32,15 +32,16 @@ const Profile: React.FC = () => {
         }
 
         socket.on("get_user", response => {
-            console.log(`socket.on get_user [${response?.data}]`);
+            console.log("socket.on get_user " + response.data);
         })
 
         socket.on("enable_2fa", response => {
             if (response.success) {
-                console.log(`socket.on enable_2fa ${response.msg} ${response.qrCode}`);
+                console.log(`socket.on ${response.msg} ${response.qrCode}`);
+                setQrcode(response.qrCode);
             }
             else
-                console.log(`socket.on enable_2fa ${response.msg}`);
+                console.log(`socket.on ${response.msg}`);
         })
 
         return () => {
@@ -66,6 +67,11 @@ const Profile: React.FC = () => {
                 <p>Page doest exist</p>
             }
             <button className='defaultButtonA' onClick={(e) => handle2FA(e)}>ENABLE 2FA</button>
+            <br/><br/>
+            {
+                qrcode && 
+                <img src={qrcode}/>
+            }
         </div>
     )
 }
