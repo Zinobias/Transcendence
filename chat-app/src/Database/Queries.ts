@@ -260,6 +260,20 @@ export class Queries {
 		return channelList;
 	}
 
+	async getAllPublicChannels(): Promise<Channel[]> {
+		const myDataSource = await getDataSource();
+		const channel = myDataSource.getRepository(chat_channels);
+		const find_channel = await channel.findBy({
+			owner2Id: null,
+			closed: false,
+		});
+		const channelList: Channel[] = [];
+		for (const [, result] of find_channel.entries()) {
+			channelList.push(Channel.getChannel(result.channelId));
+		}
+		return channelList;
+	}
+
 	/**
 	 * Disable a channel
 	 * @param channelId channel to disable
