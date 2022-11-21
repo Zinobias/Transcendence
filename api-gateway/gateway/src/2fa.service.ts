@@ -15,7 +15,7 @@ const qrcode = require(`qrcode`);
 export class TwoFactorAuthService {
 
 	private readonly logger = new Logger('twoFactorAuthService');
-	private readonly toBeValidatedMap = new Map<number, string>
+	private readonly toBeValidatedMap = new Map<number, string>;
 	
 	constructor() {}
 
