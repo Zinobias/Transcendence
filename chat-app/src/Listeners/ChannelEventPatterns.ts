@@ -71,6 +71,7 @@ export class ChannelEventPatterns {
             this.logger.warn(`Received invalid channel [${channelId}] from channel_create`);
             return;
         }
+        console.log('i have no idea whats going on ' + channelId);
         channel.channelId = channelId;
 
         const userIds = channel.users.map((a) => a.userId);

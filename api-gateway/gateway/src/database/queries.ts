@@ -61,6 +61,7 @@ export class Queries {
     }
 
     public async createUser(userId: number, userName: string) {
+        console.log('testing the createUser function ' + userId);
         const myDataSource = await this.database.getDataSource();
         const userTableRepo = myDataSource.getRepository(UserTable);
         const find = await userTableRepo.findOneBy({

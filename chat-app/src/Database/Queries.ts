@@ -197,6 +197,7 @@ export class Queries {
    * returns the id of the newly created channel
    */
   async createChannel(channel: Channel): Promise<number> {
+    console.log('testing the create channel');
     const myDataSource = await getDataSource();
     const addChannel = myDataSource.getRepository(chat_channels);
     await addChannel.save(new chat_channels(channel));

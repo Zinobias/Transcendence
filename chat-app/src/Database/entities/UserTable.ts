@@ -9,7 +9,7 @@ import { chat_message } from './ChatMessages';
 import { friends } from './Friends';
 import { sessions } from './Sessions';
 
-@Entity()
+@Entity('users')
 export class user_table {
   constructor(userId: number, userName: string) {
     this.userId = userId;
@@ -40,10 +40,10 @@ export class user_table {
   block: blocked[];
 
   @OneToMany(() => chat_channels, (chat) => chat.user, { onDelete: 'CASCADE' })
-  chat: games[];
+  chat: chat_channels[];
 
   @OneToMany(() => chat_channels, (chat) => chat.user2, { onDelete: 'CASCADE' })
-  chat2: games[];
+  chat2: chat_channels[];
 
   @OneToMany(() => chat_channel_settings, (chat) => chat.user, {
     onDelete: 'CASCADE',
