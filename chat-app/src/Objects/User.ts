@@ -17,7 +17,7 @@ export class User {
         this._users.push(user);
     }
 
-    public static async getUser(userId: number): Promise<IUser | undefined> {
+    public static async getUser(userId: number): Promise<User | undefined> {
         const users = this._users.filter((a) => a._userId == userId);
         if (users.length == 1)
             return users[0];
@@ -26,7 +26,7 @@ export class User {
             Logger.warn('Received request for user that does not exist in database.');
             return undefined;
         }
-        return user.getIUser();
+        return user;
     }
 
     public static removeUser(userId: number) {
@@ -108,6 +108,14 @@ export class User {
         this._friends = this._friends.filter((a) => a._userId != friend._userId);
     }
 
+    private async updateBlocked() {
+        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
+    }
+
+    private async updateFriends() {
+        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
+    }
+
     public getIUser(): IUser {
         return {
             userId: this.userId,
@@ -116,13 +124,5 @@ export class User {
             blocked: this.blocked,
             friends: this.friends,
         };
-    }
-
-    private async updateBlocked() {
-        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
-    }
-
-    private async updateFriends() {
-        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
     }
 }

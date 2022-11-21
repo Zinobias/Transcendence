@@ -83,10 +83,6 @@ export class Queries {
 
 	/**
 	 * Get a user from their login id
-	 * @param loginId login id of the user
-	 */
-	/**
-	 * Get a user from their login id
 	 * @param userId user id of the user
 	 */
 	async getUser(userId: number): Promise<User> {

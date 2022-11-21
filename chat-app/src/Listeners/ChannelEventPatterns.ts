@@ -310,6 +310,6 @@ export class ChannelEventPatterns {
     @EventPattern('channels_retrieve')
     async handleRetrieve(data: ChannelsRetrieve) {
         //TODO needs error handling for if query fails
-        this.util.notify([data.user_id], 'channels_retrieve', await Queries.getInstance().getAllPublicChannels());
+        this.util.notify([data.user_id], 'channels_retrieve', (await Queries.getInstance().getAllPublicChannels()).map(channel => {channel.getIChannel()}));
     }
 }
