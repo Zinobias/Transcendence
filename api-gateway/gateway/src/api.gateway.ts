@@ -15,6 +15,7 @@ import {Auth} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {CreateAccountDTO, LoginDTO} from './api.gateway.DTOs';
 import { TwoFactorAuthService } from './2fa.service';
+import {Queries} from "./database/queries";
 
 // TODO : replace frontendDTO from gateway, use the one in api.gateway.DTOS.ts
 export interface FrontEndDTO {
@@ -59,6 +60,7 @@ export class ApiGateway
         @Inject('CHAT_SERVICE') private chatClient: ClientProxy,
         @Inject(Auth) private auth: Auth,
 		@Inject(TwoFactorAuthService) private TFA : TwoFactorAuthService,
+        @Inject(Queries) private readonly queries: Queries,
     ) {
     }
 
@@ -137,19 +139,37 @@ export class ApiGateway
             };
 
         else if (payload.eventPattern === 'create_account') {
-            const createAccountDTO: CreateAccountDTO | undefined = await this.auth.createAccount(
+            const err: boolean | string = await this.queries.userNameExists(payload.data.userName);
+            if (err != false) {
+                return ({
+                    event: 'create_account', data: {
+                        success: false,
+                        msg: err as string
+                    }
+                });
+            }
+            const createAccountDTO: CreateAccountDTO | string = await this.auth.createAccount(
                 client,
                 payload.data,
             );
-
-            if (createAccountDTO === undefined) {
-                this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
-                return ({event: 'create_account', data: {
-					success : false,
-					msg : `account creation failed`,
-				} 
-			});
+            if (typeof createAccountDTO == 'string') {
+                this.logger.debug(`msg: ${createAccountDTO as string}`)
+                return ({
+                    event: 'create_account', data: {
+                        success: false,
+                        msg: createAccountDTO as string
+                    }
+                });
             }
+
+            // if (createAccountDTO === undefined) {
+            //     this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
+            //     return ({event: 'create_account', data: {
+			// 		success : false,
+			// 		msg : `account creation failed`,
+			// 	}
+			// });
+            // }
             this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
                 event: 'create_account',

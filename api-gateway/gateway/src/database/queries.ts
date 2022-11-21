@@ -61,26 +61,46 @@ export class Queries {
         return sessionCodes;
     }
 
-    public async createUser(userId: number, userName: string) {
+    public async userNameExists(userName: string): Promise<boolean | string> {
         const myDataSource = await this.database.getDataSource();
         const userTableRepo = myDataSource.getRepository(UserTable);
-        const find = await userTableRepo.findOneBy({
-            userId: userId,
-            userName: userName,
-        });
-        if (find == null) {
-            try {
-                await userTableRepo.insert({
-                    userId: userId,
-                    userName: userName,
-                });
-            } catch (e) {
-                return false;
+        try { //Check if a user with this name already exists
+            const find = await userTableRepo.findOneBy({
+                userName: userName,
+            });
+            if (find != null) {
+                this.logger.debug(`arleady have an accoiunt named ${userName}`)
+                return `There is already a user with this name`;
             }
-            return true;
-        } else {
-            return false;
+        } catch (e) {
+            return `Unknown error while saving the user in the database`;
         }
+        return false;
+    }
+
+    public async createUser(userId: number, userName: string): Promise<boolean | string> {
+        const myDataSource = await this.database.getDataSource();
+        const userTableRepo = myDataSource.getRepository(UserTable);
+        try { //Check if a user with this id already exists
+            const find = await userTableRepo.findOneBy({
+                userId: userId
+            });
+            if (find != null) {
+                return `You already have an active account.`;
+            }
+        } catch (e) {
+            return `Unknown error while saving the user in the database`;
+        }
+
+        try { //Store the user in the database
+            await userTableRepo.insert({
+                userId: userId,
+                userName: userName,
+            });
+        } catch (e) {
+            return `Unknown error while saving the user in the database`;
+        }
+        return true;
     }
 
     public async storeTfa(userId: number, tfaCode: string) : Promise<boolean> {
