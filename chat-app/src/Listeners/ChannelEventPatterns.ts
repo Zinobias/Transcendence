@@ -44,8 +44,9 @@ export class ChannelEventPatterns {
             return;
         }
         const usersArr: User[] = [await User.getUser(data.user_id)];
+        let user2: User = undefined;
         if (data.creator2_id != undefined) {
-            const user2: User = await this.util.getUser(
+            user2 = await this.util.getUser(
                 data.creator2_id,
                 'channel_create',
             );
@@ -64,6 +65,9 @@ export class ChannelEventPatterns {
             [],
             [],
             false,
+            user2 == undefined ? undefined : user2.userId,
+            undefined, //TODO set these
+            undefined, //TODO set these
         );
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {

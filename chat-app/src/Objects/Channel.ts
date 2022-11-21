@@ -12,6 +12,8 @@ export interface IChannel {
     messages: IMessage[];
     settings: ISetting[];
     closed: boolean;
+    visible: boolean;
+    password: string;
 }
 
 export class Channel {
@@ -45,8 +47,10 @@ export class Channel {
     private readonly _messages: Message[];
     private _settings: Setting[];
     private _closed: boolean;
+    private _visible: boolean;
+    private _password: string;
 
-    constructor(channelId: number, owner: number, channelName: string, users: User[], messages: Message[], settings: Setting[], closed: boolean, otherOwner?: number) {
+    constructor(channelId: number, owner: number, channelName: string, users: User[], messages: Message[], settings: Setting[], closed: boolean, otherOwner: number | undefined, visible: boolean, password: string) {
         this._channelId = channelId;
         this._owner = owner;
         this._channelName = channelName;
@@ -119,6 +123,22 @@ export class Channel {
         );
     }
 
+    get visible(): boolean {
+        return this._visible;
+    }
+
+    set visible(value: boolean) {
+        this._visible = value;
+    }
+
+    get password(): string {
+        return this._password;
+    }
+
+    set password(value: string) {
+        this._password = value;
+    }
+
     public isOwner(userId: number): boolean {
         return this.owner == userId || this.otherOwner == userId;
     }
@@ -150,7 +170,9 @@ export class Channel {
             users: this._users,
             messages: this._messages.map(message => {return message.getIMessage()}),
             settings: this._settings.map(setting => {return setting.getISetting()}),
-            closed: this._closed
+            closed: this._closed,
+            visible: this._visible,
+            password: this._password,
         }
     }
 }
