@@ -6,7 +6,7 @@ import { Sockets } from './sockets.class';
 import { Auth } from './auth.service';
 import { Database } from './database/data-source';
 import { Queries } from './database/queries';
-import { twoFactorAuthService } from './2fa.service';
+import { TwoFactorAuthService } from './2fa.service';
 @Module({
   imports: [
     ClientsModule.register([
@@ -29,6 +29,6 @@ import { twoFactorAuthService } from './2fa.service';
     ]),
   ],
   controllers: [ApiController],
-  providers: [Sockets, Auth, ApiGateway, Database, Queries, twoFactorAuthService],
+  providers: [Sockets, Auth, ApiGateway, Database, Queries, TwoFactorAuthService],
 })
 export class AppModule {}

@@ -26,19 +26,27 @@ export const    SignupButton: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [userName, setUserName] = useState<string>("");
+    const [signup, setSignup] = useState<string>("");
     const socket = useContext(SocketContext);
-    let signupLink : string = '';
 
     useEffect(() => {
-        socket.on("create_account", res => {
-            console.log("socket.on create_acconut " + res.auth_cookie);
-			console.log("socket.on create_acocunt " + res.user_id);
-            setCookie('user', res.auth_cookie, {path: '/'});
-            setCookie('userID', res.user_id, {path: '/'});
-            navigate('/');
+        socket.on("create_account", response => {
+            if (response.success == false) {
+                console.log("Create Account went wrong");
+                searchParams.delete("code");
+                setSearchParams(searchParams);
+                alert(response.msg);
+            }
+            else {
+                console.log("socket.on create_acconut " + response.DTO.auth_cookie);
+                console.log("socket.on create_acocunt " + response.DTO.user_id);
+                setCookie('user', response.DTO.auth_cookie, {path: '/'});
+                setCookie('userID', response.DTO.user_id, {path: '/'});
+                navigate('/');
+            }
         })
-        socket.on('retrieve_redirect', res => {
-            signupLink = res.signup;
+        socket.on('retrieve_redirect', response => {
+            setSignup(response.signup);
         })
         return () => {
             socket.off('retrieve_redirect');
@@ -48,16 +56,16 @@ export const    SignupButton: React.FC = () => {
 
     useEffect(() => {
         if (searchParams.get("code")) {
-            console.log("emitting create_account " + userName);
+            console.log("emitting create_account " + sessionStorage.getItem("userName"));
             socket.emit("auth", {
                 eventPattern: "create_account", 
                 data: {
                     token: searchParams.get("code"), 
-                    userName: "panini"
+                    userName: sessionStorage.getItem("userName")
                 }
             });
+            sessionStorage.clear();
         }
-        console.log("userName " + userName);
     }, [])
 
     useEffect(() => {
@@ -66,8 +74,14 @@ export const    SignupButton: React.FC = () => {
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        console.log("rediricting signup " + userName);
-        window.location.href = signupLink;
+        if (userName) {
+            console.log("Redirecting signup " + userName);
+            sessionStorage.setItem("userName", userName);
+            window.location.href = signup;
+        }
+        else {
+            alert("Name Field is required");
+        }
     };
 
     return (   
@@ -87,18 +101,26 @@ export const    LoginButton: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const socket = useContext(SocketContext);
-    let loginLink : string = '';
+    const [login, setLogin] = useState<string>("");
 
     useEffect(() => {
-        socket.on("login", res => {
-            console.log("socket.on login " + res.auth_cookie);
-			console.log("socket.on login " + res.user_id);
-            setCookie('user', res.auth_cookie, {path: '/'});
-            setCookie('userID', res.user_id, {path: '/'});
-            navigate('/');
+        socket.on("login", response => {
+            if (response.success == false) {
+                console.log("Login went wrong");
+                searchParams.delete("code");
+                setSearchParams(searchParams);
+                alert(response.msg);
+            }
+            else {
+                console.log("socket.on login " + response.DTO.auth_cookie);
+                console.log("socket.on login " + response.DTO.user_id);
+                setCookie('user', response.DTO.auth_cookie, {path: '/'});
+                setCookie('userID', response.DTO.user_id, {path: '/'});
+                navigate('/');
+            }
         })
-        socket.on('retrieve_redirect', res => {
-            loginLink = res.login;
+        socket.on('retrieve_redirect', response => {
+            setLogin(response.login);
         })
         return () => {
             socket.off('retrieve_redirect');
@@ -123,7 +145,7 @@ export const    LoginButton: React.FC = () => {
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         console.log("REDIRECTING LOGIN");
-        window.location.href = loginLink
+        window.location.href = login;
     };
 
     return (
@@ -180,4 +202,3 @@ export const DiscoMatchmaking: React.FC = () => {
     )
 };
 
-//export default LogoutButton; 

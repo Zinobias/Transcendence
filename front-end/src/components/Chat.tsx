@@ -14,17 +14,18 @@ const   Chat: React.FC = () => {
     const [chatroomName, setChatroomName] = useState<string>("");
 
     useEffect(() => {
-        // socket.on("channel_create", data => {
-        //     console.log(`socket.on channel_create ${data.channel_name}`);
-        // })
+        socket.on("channel_create", response => {
+            console.log(`socket.on channel_create ${response.channel_name}`);
+        })
 
-        socket.on("channels_for_user", data => {
-            console.log(`socket.on channels_for_user`);
+        socket.on("channels_retrieve", response => {
+            console.log(`channel retrieve return response ${response}`);
+            console.log(`socket.on channels_retrieve`);
         })
 
         return () => {
-            // socket.off("channel_create");
-            socket.off("channels_for_user");
+            socket.off("channel_create");
+            socket.off("channels_retrieve");
         }
     },[])
 
@@ -37,20 +38,20 @@ const   Chat: React.FC = () => {
     const handleClick = (e: React.FormEvent) => {
 		e.preventDefault()
         if (chatroomName) {
-            // socket.emit("chat", {
-            //     userId: cookies.userID,
-            //     authToken: cookies.user,
-            //     eventPattern: "channel_create", 
-            //     data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
-            // });
-            // console.log("emiting channel_create " + chatroomName);
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
-                eventPattern: "get_channels_user",
+                eventPattern: "channel_create", 
+                data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
+            });
+            console.log("emiting channel_create " + chatroomName);
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channels_retrieve",
                 data: {user_id: cookies.userID}
             })
-            console.log("emiting get_channels_user");
+            console.log("emiting channels_retrieve");
             // navigate('chat_window');
         }
         else {

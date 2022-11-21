@@ -54,7 +54,7 @@ export class Game {
 		//	payload: this.results,
 		//}),
 		//);
-
+		console.log(`GAME ID : ${this.gameId}`);
 		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
 		this.eventEmitter.removeListener("game.player.move." + this.gameId, this.setPlayerMovementState); 
 		return ;

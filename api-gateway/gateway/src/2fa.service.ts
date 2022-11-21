@@ -1,14 +1,18 @@
 import { Injectable, Logger } from "@nestjs/common";
-import speakeasy from 'speakeasy';
-import qrcode from 'qrcode';
+// import speakeasy from 'speakeasy';
+// import qrcode from 'qrcode';
+import { mapGetter } from "./map.tools";
 
+
+const speakeasy = require(`speakeasy`);
+const qrcode = require(`qrcode`);
 
 /**
  * NOTES :
  * 	1. potentially add caching if time left.
  */
 @Injectable()
-export class twoFactorAuthService {
+export class TwoFactorAuthService {
 
 	private readonly logger = new Logger('twoFactorAuthService');
 	private readonly toBeValidatedMap = new Map<number, string>
@@ -21,7 +25,7 @@ export class twoFactorAuthService {
 	 * @returns qrcode as a dataUrl string on success, undefined on failure.
 	 */
 	public async generateSecret(uid : number) : Promise<string | undefined> {
-		let secret : speakeasy.GeneratedSecret | undefined = speakeasy.generateSecret({ // Do not type this, the library functions are inconsistent on required types.
+		let secret : any = speakeasy.generateSecret({ // Do not type this, the library functions are inconsistent on required types.
 			name: "discoPong" // named it will have in authenticator app.,
 		});
 
@@ -36,7 +40,7 @@ export class twoFactorAuthService {
 		let qrCodeResult : string | void;
 
 		if (secret.otpauth_url)
-			qrCodeResult = await qrcode.toDataURL(secret.otpauth_url).catch((e) => {
+			qrCodeResult = await qrcode.toDataURL(secret.otpauth_url).catch((e : any) => {
 					this.logger.warn(`Generating qrcode went wrong`);
 					return (undefined);
 				});
@@ -74,7 +78,7 @@ export class twoFactorAuthService {
 	 * @returns true if validated, false otherwise.
 	 */
 	public async verify(uid : number, token : string) : Promise<boolean> {
-		let clientSecret = this.toBeValidatedMap.get(uid);
+		let clientSecret = mapGetter(uid,this.toBeValidatedMap);
 
 		if (clientSecret !== undefined) {
 			this.logger.log(`adding ${uid} 2fasecret to db a.k.a validating.`);

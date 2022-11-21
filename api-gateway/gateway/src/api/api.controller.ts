@@ -1,6 +1,7 @@
 import {Controller, Inject, Logger} from '@nestjs/common';
 import {EventPattern, Payload, ClientProxy} from '@nestjs/microservices';
 import {WebSocketServer} from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 import {Sockets} from 'src/sockets.class';
 
 //import { Server } from 'http';
@@ -27,11 +28,11 @@ export class ApiController {
     @EventPattern('game')
     gameForwarding(@Payload() payload: microServiceDTO) {
         this.logger.log(`Msg from game to gateway received`);
-        this.sockets.sendData(
-            payload.userIDs,
-            payload.eventPattern,
-            payload.data,
-        );
+		for (const userid of payload.userIDs) {
+			this.sockets
+				.getSocket(userid)
+				?.emit(payload.eventPattern, payload.data);
+		}
     }
 
     @EventPattern('testMsg')
@@ -42,11 +43,11 @@ export class ApiController {
     @EventPattern('chat')
     chatForwarding(@Payload() payload: microServiceDTO) {
         this.logger.log(`Msg from chat to gateway received`);
-        for (const userid of payload.userIDs) {
-            this.sockets
-                .getSocket(userid)
-                ?.emit(payload.eventPattern, payload.data);
-        }
+		for (const userid of payload.userIDs) {
+			this.sockets
+				.getSocket(userid)
+				?.emit(payload.eventPattern, payload.data);
+		}
     }
 
     @EventPattern('chat_to_game')

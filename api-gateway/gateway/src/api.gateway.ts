@@ -14,7 +14,7 @@ import {Sockets} from './sockets.class';
 import {Auth} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {CreateAccountDTO, LoginDTO} from './api.gateway.DTOs';
-import { twoFactorAuthService } from './2fa.service';
+import { TwoFactorAuthService } from './2fa.service';
 
 // TODO : replace frontendDTO from gateway, use the one in api.gateway.DTOS.ts
 export interface FrontEndDTO {
@@ -47,6 +47,7 @@ export class ApiGateway
 			player2UID 	: "234",
 			gameMode	: 'default'
 		});
+		
     }
 
     //private clientList: { userID: number };
@@ -57,7 +58,7 @@ export class ApiGateway
         @Inject('GAME_SERVICE') private gameClient: ClientProxy,
         @Inject('CHAT_SERVICE') private chatClient: ClientProxy,
         @Inject(Auth) private auth: Auth,
-		@Inject(twoFactorAuthService) private TFA : twoFactorAuthService,
+		@Inject(TwoFactorAuthService) private TFA : TwoFactorAuthService,
     ) {
     }
 
@@ -115,16 +116,23 @@ export class ApiGateway
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.eventPattern === 'login') {
-            const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token);
+            const loginDTO: LoginDTO | undefined = await this.auth.login(client, payload.data.token, payload.data.TFAToken ?? undefined);
             return {
                 event: 'login',
-                data: loginDTO === undefined ? false : loginDTO,
+                data: { 
+					DTO : loginDTO,
+					success : loginDTO === undefined || loginDTO.auth_cookie === undefined  ? false : true,
+					msg : loginDTO === undefined || loginDTO.auth_cookie === undefined ? `Login went wrong` : `Login went well`,
+				},
             };
-
         } else if (payload.eventPattern === 'validate')
             return {
-                event: 'valiate',
-                data: this.auth.validate(payload.userId, payload.authToken),
+                event: 'validate',
+                data: {
+					DTO		: this.auth.validate(payload.userId, payload.authToken),
+					success : true,
+					msg 	: 'validating',
+				},
             };
 
         else if (payload.eventPattern === 'create_account') {
@@ -135,12 +143,20 @@ export class ApiGateway
 
             if (createAccountDTO === undefined) {
                 this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
-                return ({event: 'create_account', data: false});
+                return ({event: 'create_account', data: {
+					success : false,
+					msg : `account creation failed`,
+				} 
+			});
             }
             this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
                 event: 'create_account',
-                data: createAccountDTO,
+                data: {
+					DTO : createAccountDTO,
+					success : true,
+					msg : 'Successfully created the account',
+				}
             };
         }
         this.logger.debug(`Received invalid pattern on auth channel, Auth token: [${payload.data.token}], Event pattern: [${payload.eventPattern}]`);
@@ -172,7 +188,7 @@ export class ApiGateway
 		// CHECK IF ALREADY IN DB, IF IN DB, RETURN FAILED.
 		this.logger.log(`user [${payload.userId}] calling enable 2fa`);
 		let qrCode : string | undefined = await this.TFA.generateSecret(payload.userId);
-		let success : boolean = qrCode === undefined;
+		let success : boolean = qrCode !== undefined;
 		return ({event : 'enable_2fa', data : {
 			success : 	success,
 			msg		: 	success === true ? 'enabling 2fa succeeded' : 'enabling 2fa failed.',
