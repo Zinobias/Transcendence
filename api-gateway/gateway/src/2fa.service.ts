@@ -1,7 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import {Inject, Injectable, Logger} from "@nestjs/common";
 // import speakeasy from 'speakeasy';
 // import qrcode from 'qrcode';
 import { mapGetter } from "./map.tools";
+import {Queries} from "./database/queries";
 
 
 const speakeasy = require(`speakeasy`);
@@ -17,7 +18,7 @@ export class TwoFactorAuthService {
 	private readonly logger = new Logger('twoFactorAuthService');
 	private readonly toBeValidatedMap = new Map<number, string>;
 	
-	constructor() {}
+	constructor(@Inject(Queries) private readonly queries: Queries) {}
 
 	/**
 	 * Generates secret for the given user. Stores the secret in asccii in the map.
@@ -52,13 +53,17 @@ export class TwoFactorAuthService {
 	}
 
 	// REMOVE THIS FUNCTION, i JUST COULDN'T HANDLE INTELLISENSE SCREAMING AT ME ;C
-	private dbGetUser2FASecret(uid : number) : string {
-		return ("kek");
+	private async dbGetUser2FASecret(uid : number) : Promise<string | undefined> {
+		return await this.queries.retrieveTfa(uid);
 	}
 	// REMOVE THIS FUNCTION, i JUST COULDN'T HANDLE INTELLISENSE SCREAMING AT ME ;C
 
-	private dbAddUser2FASecret(uid : number, clientSecret : string) : void {
-		return ;
+	private async dbAddUser2FASecret(uid : number, clientSecret : string): Promise<boolean> {
+		if (!(await this.queries.storeTfa(uid, clientSecret))) {
+			this.logger.warn(`Unable to create user ${uid} with secret ${clientSecret}`);
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -67,8 +72,11 @@ export class TwoFactorAuthService {
 	 * @returns true if user has 2FA, false otherwise.
 	 */
 	public async hasTwoFA(uid : number) : Promise<boolean> {
-		// dbHasTFA
-		return false;
+		return await this.queries.retrieveTfa(uid) !== undefined;
+	}
+
+	public async deleteTwoFA(uid: number): Promise<boolean> {
+		return await this.queries.removeTfa(uid);
 	}
 
 	/**
@@ -89,7 +97,7 @@ export class TwoFactorAuthService {
 		}
 		else {
 			this.logger.log(`client : [${uid}] not in map `);
-			clientSecret = this.dbGetUser2FASecret(uid);
+			clientSecret = await this.dbGetUser2FASecret(uid);
 			if (clientSecret === undefined) {
 				this.logger.log(`client : [${uid}] not in map & database `);
 				return false;
