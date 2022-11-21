@@ -29,8 +29,8 @@ export class ChannelEventPatterns {
                 @Inject(Util) private readonly util: Util,
                 /*@Inject(Queries) private readonly queries: Queries*/) {}
 
-    private emitFailedObject(userId: number, channel: string, reason: string) {
-        this.util.notify([userId], channel, {success: false, reason: reason})
+    private emitFailedObject(userId: number, channel: string, msg: string) {
+        this.util.notify([userId], channel, {success: false, msg: msg})
     }
 
     @EventPattern('channel_create')
@@ -281,7 +281,7 @@ export class ChannelEventPatterns {
         if (!channel.hasUser(data.user_id)) {
             this.util.notify([data.user_id], 'channel_message', {
                 success: false,
-                reason: 'You are not a member of this channel',
+                msg: 'You are not a member of this channel',
                 message: undefined
             });
             return;
@@ -297,7 +297,7 @@ export class ChannelEventPatterns {
                 if (res == false) {
                     this.util.notify([data.user_id], 'channel_message', {
                         success: false,
-                        reason: 'Internal server error',
+                        msg: 'Internal server error',
                         message: undefined
                     });
                     return;
@@ -305,7 +305,7 @@ export class ChannelEventPatterns {
                 const userIds = channel.users.map((a) => a.userId);
                 this.util.notify(userIds, 'channel_message', {
                     success: true,
-                    reason: undefined,
+                    msg: undefined,
                     message: message
                 });
             });
