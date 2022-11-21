@@ -3,6 +3,7 @@ import {InsertResult} from 'typeorm';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {Database} from './data-source';
 import {UserTable} from './entities/user-table';
+import {Tfa} from "./entities/tfa";
 
 @Injectable()
 export class Queries {
@@ -80,5 +81,47 @@ export class Queries {
         } else {
             return false;
         }
+    }
+
+    public async storeTfa(userId: number, tfaCode: string) : Promise<boolean> {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            const insert = await tfaTableRepo.upsert([{
+                user_id: userId,
+                tfa_code: tfaCode,
+            }], ['user_id', 'tfa_code']);
+            return insert.identifiers[0] !== undefined;
+        } catch (e) {
+            this.logger.warn(e);
+        }
+        return false;
+    }
+
+    public async retrieveTfa(userId: number) {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            const result = await tfaTableRepo.findOneBy({user_id: userId});
+            if (result?.tfa_code !== undefined)
+                return result.tfa_code
+        } catch (e) {
+            this.logger.warn(e);
+        }
+        return undefined;
+    }
+
+    public async removeTfa(userId: number): Promise<boolean> {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            let deleteResult = await tfaTableRepo.delete({user_id: userId});
+            if (deleteResult.affected != undefined || deleteResult.affected != null) {
+                return deleteResult.affected == 1;
+            }
+        } catch (e) {
+            this.logger.warn(e);
+        }
+        return false
     }
 }
