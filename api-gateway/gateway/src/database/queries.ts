@@ -3,6 +3,7 @@ import {InsertResult} from 'typeorm';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {Database} from './data-source';
 import {UserTable} from './entities/user-table';
+import {Tfa} from "./entities/tfa";
 
 @Injectable()
 export class Queries {
@@ -60,26 +61,87 @@ export class Queries {
         return sessionCodes;
     }
 
-    public async createUser(userId: number, userName: string) {
-        console.log('testing the createUser function ' + userId);
+    public async userNameExists(userName: string): Promise<boolean | string> {
         const myDataSource = await this.database.getDataSource();
         const userTableRepo = myDataSource.getRepository(UserTable);
-        const find = await userTableRepo.findOneBy({
-            userId: userId,
-            userName: userName,
-        });
-        if (find == null) {
-            try {
-                await userTableRepo.insert({
-                    userId: userId,
-                    userName: userName,
-                });
-            } catch (e) {
-                return false;
+        try { //Check if a user with this name already exists
+            const find = await userTableRepo.findOneBy({
+                userName: userName,
+            });
+            if (find != null) {
+                this.logger.debug(`arleady have an accoiunt named ${userName}`)
+                return `There is already a user with this name`;
             }
-            return true;
-        } else {
-            return false;
+        } catch (e) {
+            return `Unknown error while saving the user in the database`;
         }
+        return false;
+    }
+
+    public async createUser(userId: number, userName: string): Promise<boolean | string> {
+        const myDataSource = await this.database.getDataSource();
+        const userTableRepo = myDataSource.getRepository(UserTable);
+        try { //Check if a user with this id already exists
+            const find = await userTableRepo.findOneBy({
+                userId: userId
+            });
+            if (find != null) {
+                return `You already have an active account.`;
+            }
+        } catch (e) {
+            return `Unknown error while saving the user in the database`;
+        }
+
+        try { //Store the user in the database
+            await userTableRepo.insert({
+                userId: userId,
+                userName: userName,
+            });
+        } catch (e) {
+            return `Unknown error while saving the user in the database`;
+        }
+        return true;
+    }
+
+    public async storeTfa(userId: number, tfaCode: string) : Promise<boolean> {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            const insert = await tfaTableRepo.upsert([{
+                user_id: userId,
+                tfa_code: tfaCode,
+            }], ['user_id', 'tfa_code']);
+            return insert.identifiers[0] !== undefined;
+        } catch (e) {
+            this.logger.warn(e);
+        }
+        return false;
+    }
+
+    public async retrieveTfa(userId: number) {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            const result = await tfaTableRepo.findOneBy({user_id: userId});
+            if (result?.tfa_code !== undefined)
+                return result.tfa_code
+        } catch (e) {
+            this.logger.warn(e);
+        }
+        return undefined;
+    }
+
+    public async removeTfa(userId: number): Promise<boolean> {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            let deleteResult = await tfaTableRepo.delete({user_id: userId});
+            if (deleteResult.affected != undefined || deleteResult.affected != null) {
+                return deleteResult.affected == 1;
+            }
+        } catch (e) {
+            this.logger.warn(e);
+        }
+        return false
     }
 }

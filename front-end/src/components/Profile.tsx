@@ -32,7 +32,8 @@ const Profile: React.FC = () => {
         }
 
         socket.on("get_user", response => {
-            console.log("socket.on get_user " + response.data);
+            console.log(response.user);
+            console.log("socket.on get_user " + response.user._name);
         })
 
         socket.on("enable_2fa", response => {

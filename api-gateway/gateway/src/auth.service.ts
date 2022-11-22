@@ -103,14 +103,14 @@ export class Auth {
 					user_id : userId,
 					auth_cookie : undefined,
 				});
-			};
-		};
+			}
+		}
         if ((await this.storeSession(userId, uuid)))
             return {user_id: userId, auth_cookie: uuid};
         else {
             this.logger.error(`Unable to store session for user id [${userId}]`);
             return undefined;
-        };
+        }
     };
 
     private async retrieveUserId(authToken: AuthToken): Promise<number> {
@@ -137,24 +137,22 @@ export class Auth {
         return isSuccessful;
     }
 
-    public async createAccount(client: Socket, payload: any): Promise<any | undefined> {
+    public async createAccount(client: Socket, payload: any): Promise<any | string> {
         this.logger.log(`Creating an account for [${payload.userName}]`);
         const userId = await this.auth(payload.token, true);
 		
         if (userId === undefined)
-		return undefined;
-        if (!(await this.queries.createUser(userId, payload.userName)))
-            return undefined;
-			this.sockets.storeSocket(userId, client);
-			/**
-			 * TODO: Check if user in dataBase
-			 */
+            return 'Failed to get userId from auth, are you an intra user?';
+        let createUserResult: string | boolean = await this.queries.createUser(userId, payload.userName);
+        if (typeof createUserResult == 'string')
+            return createUserResult as string;
+        this.sockets.storeSocket(userId, client);
 		const uuid = randomUUID();
 		if ((await this.storeSession(userId, uuid)))
 			return {user_id: userId, auth_cookie: uuid};
 		else {
 			this.logger.error(`Unable to store session for user id [${userId}]`);
-			return undefined;
+			return `Unknown database error`;
 		}
     }
 }

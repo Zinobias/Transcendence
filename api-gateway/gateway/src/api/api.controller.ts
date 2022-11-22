@@ -1,10 +1,6 @@
 import {Controller, Inject, Logger} from '@nestjs/common';
 import {EventPattern, Payload, ClientProxy} from '@nestjs/microservices';
-import {WebSocketServer} from '@nestjs/websockets';
-import { Socket } from 'socket.io';
 import {Sockets} from 'src/sockets.class';
-
-//import { Server } from 'http';
 
 export interface microServiceDTO {
     eventPattern: string;
@@ -44,9 +40,13 @@ export class ApiController {
     chatForwarding(@Payload() payload: microServiceDTO) {
         this.logger.log(`Msg from chat to gateway received`);
 		for (const userid of payload.userIDs) {
-			this.sockets
-				.getSocket(userid)
-				?.emit(payload.eventPattern, payload.data);
+			let socket = this.sockets.getSocket(userid);
+            if (socket === undefined) {
+                this.logger.debug(`Tried to emit to offline user`);
+            } else {
+                this.logger.debug(`Emitting to ${socket.id} on ${payload.eventPattern}`);
+                socket.emit(payload.eventPattern, payload.data);
+            }
 		}
     }
 

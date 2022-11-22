@@ -113,14 +113,20 @@ export class AppController {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds 		: [payload.userId],
 				eventPattern 	: 'game.user.join.queue',
-				data			: undefined,
+				data			: {
+					success : false,
+					msg 	: `User [${payload.userId}] is already in a game`,
+				},
 			});
 			return ;
 		}
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.user.join.queue',
 			userIds		: [payload.userId],
-			data		: undefined,
+			data		: {
+				success : true,
+				msg		: `User [${payload.userId}] has joined the queue`,
+			},
 		});
 		this.matchMakingService.addToQueue(payload);
 		this.matchMakingService.findMatch();
@@ -136,15 +142,18 @@ export class AppController {
 	 */
 	@EventPattern("game.leave.queue")
 	leaveMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
-	this.logger.log("User : {" + payload.userId + "} has left the queue.");
 	let success = this.matchMakingService.removeFromQueue(payload.userId);
+	if (success === true)
+			this.logger.debug("User : {" + payload.userId + "} has left the queue.");
+	else
+		this.logger.debug(`User : [${payload.userId}] has failed to leave the queue.`);
 
 	this.gatewayClient.emit<string, outDTO>('game', {
 		userIds : [payload.userId],
 		eventPattern : 'game.leave.queue',
 		data : { 
-			status : success,
-			status_msg : success === true ? "Left queue, or was never in the queue." : "Left queue, or was never in the queue.",
+			success : success,
+			msg : success === true ? `User [${payload.userId}] Left the queue, or was never in the queue.` : `User [${payload.userId}] Left the queue, or was never in the queue.`,
 		}
 	});
 	return ;
@@ -157,15 +166,19 @@ export class AppController {
 	 */
 	@EventPattern('game.spectate.start')
 	async startSpectateGame(@Payload() payload : addSpectatorDTO) {
-		this.logger.log("User : {" + payload.userId + "} has started spectating game: " + payload.targetGameId);
 		let success = await this.matchMakingService.addSpectator(payload.userId, payload.targetGameId);
+		if (success === true)
+			this.logger.debug("User : {" + payload.userId + "} has started spectating game: " + payload.targetGameId);
+		else
+			this.logger.debug(`User : [${payload.userId}] has failed spectating game: ${payload.targetGameId}`);
+
 	
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
 			eventPattern : 'game.spectate.start',
 			data : { 
-				status : success,
-				status_msg : success === true ? "Success" : "gameId invalid",
+				success : success,
+				msg : success === true ? "Success" : "gameId invalid",
 			}
 		});
 	}
@@ -177,16 +190,18 @@ export class AppController {
 	 */
 	@EventPattern('game.spectate.stop')
 	async stopSpectateGame(@Payload() payload : addSpectatorDTO) {
-		this.logger.log("User : {" + payload.userId + "} has stopped spectating.");
-
 		let success = await this.matchMakingService.removeSpectator(payload.userId, payload.targetGameId);
+		if (success === true)
+			this.logger.debug("User : {" + payload.userId + "} has stopped spectating game: " + payload.targetGameId);
+		else
+			this.logger.debug(`User : [${payload.userId}] has failed to stop spectating game: ${payload.targetGameId}`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
 			eventPattern : 'game.spectate.stop',
 			data : { 
-				status : success,
-				status_msg : success === true ? "Success" : "gameId invalid",
+				success : success,
+				msg : success === true ? "Success" : "gameId invalid",
 			}
 		});
 	}
@@ -197,15 +212,15 @@ export class AppController {
 	 */
 	@EventPattern('game.isInGame')
 	isInGame(@Payload() payload : any) {
-		this.logger.log("isInGame called");
-
 		let success : boolean = this.matchMakingService.isInGame(payload.userId);
+		this.logger.log(`isInGame called for user [${payload.userId}] result : [${success}]`);
+
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
 			eventPattern : 'game.isInGame',
 			data : {
-				status : success,
-				status_msg : success === true ? "userId in game" : "userId not in game",
+				success : success,
+				msg : success === true ? "userId in game" : "userId not in game",
 			}
 		});
 	}
@@ -217,15 +232,17 @@ export class AppController {
 	 */
 	@EventPattern('game.get.activeGameId')
 	getActiveGameId(@Payload() payload : any) {
-		this.logger.log("getActivegameId called");
-
 		let ret = this.matchMakingService.getUserActiveGameId(payload.userId);
+		this.logger.log(`getActivegameId called, user ${payload.userId} is in game ${ret}`);
 
 		if (ret === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds : [payload.userId],
 				eventPattern : 'game.get.activeGameId',
-				data : undefined
+				data : {
+					success : false,
+					msg		: `user ${payload.userId} is not currently in agame.`,
+				}
 			});
 			return ;
 		}
@@ -233,6 +250,8 @@ export class AppController {
 			userIds : [payload.userId],
 			eventPattern : 'game.get.activeGameId',
 			data : {
+				success : true,
+				msg		: `user ${payload.userId} is in game [${ret}].`,
 				gameId : ret,
 			}
 		});
@@ -252,8 +271,8 @@ export class AppController {
 			userIds : [payload.userId],
 			eventPattern : 'game.isInQueue',
 			data : {
-				status : success,
-				status_msg : success === true ? "userId in queue" : "userId not in queue",
+				success : success,
+				msg : success === true ? `userId : [${payload.userId}] in queue` : `userId [${payload.userId}] not in queue`,
 			}
 		});
 	}
@@ -267,13 +286,15 @@ export class AppController {
 	getGameList(@Payload() payload : any) {
 		this.logger.log("getGameList called");
 
-		let gameListRet = this.matchMakingService.getGameList();
+		let gameListRet = this.matchMakingService.getIGameInfoList();
 
 		if (gameListRet.length === 0) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds : [payload.userId],
 				eventPattern : 'game.get.gameList',
 				data : {
+					success : false,
+					msg		: `retrieving gamelist failed, due to there being no active games.`,
 					gameList : undefined
 				}
 			});
@@ -283,6 +304,8 @@ export class AppController {
 			userIds : [payload.userId],
 			eventPattern : 'game.get.gameList',
 			data : {
+				success : true,
+				msg		: `Retrieving gamelist successfull.`,
 				gameList : gameListRet,
 			}
 		});
@@ -298,14 +321,16 @@ export class AppController {
 	getGameInfo(@Payload() payload : any) {
 		this.logger.log("getGameInfo called");
 
-		let gameInfoRet = this.matchMakingService.getGameInfo(payload.gameId);
+		let gameInfoRet = this.matchMakingService.getIGameInfo(payload.gameId);
 
 		if (gameInfoRet === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds : [payload.userId],
 				eventPattern : 'game.get.gameInfo',
 				data : {
-					gameList : undefined
+					success : true,
+					msg		: `Retrieving gameInfo for game ${payload.gameId} failed.`,
+					gameInfo : undefined
 				}
 			});
 			return ;
@@ -314,7 +339,9 @@ export class AppController {
 			userIds : [payload.userId],
 			eventPattern : 'game.get.gameInfo',
 			data : {
-				gameList : gameInfoRet,
+				success : true,
+				msg		: `Retrieving gameInfo for game ${payload.gameId} successfull.`,
+				gameInfo : gameInfoRet,
 			}
 		});
 	}
@@ -331,10 +358,12 @@ export class AppController {
 		this.logger.debug("Game create payload:" + payload.gameMode);
 		this.logger.debug("Game create payload:" + payload.player1UID);
 		this.logger.debug("Game create payload:" + payload.player2UID);
+		let gameId : number = await this.matchMakingService.createGame(payload);
+		this.logger.debug(`Game created with id : [${gameId}]`);
 
-		await this.matchMakingService.createGame(payload);
 		return ({event : 'game.create', data : {
-			success : true
+			success : true,
+			msg		: `Successfully ccreated a game with gameId : [${gameId}]`
 		}});
 	}
 }

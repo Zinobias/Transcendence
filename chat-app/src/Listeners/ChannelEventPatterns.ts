@@ -29,8 +29,8 @@ export class ChannelEventPatterns {
                 @Inject(Util) private readonly util: Util,
                 /*@Inject(Queries) private readonly queries: Queries*/) {}
 
-    private emitFailedObject(userId: number, channel: string, reason: string) {
-        this.util.notify([userId], channel, {success: false, reason: reason})
+    private emitFailedObject(userId: number, channel: string, msg: string) {
+        this.util.notify([userId], channel, {success: false, msg: msg})
     }
 
     @EventPattern('channel_create')
@@ -44,8 +44,9 @@ export class ChannelEventPatterns {
             return;
         }
         const usersArr: User[] = [await User.getUser(data.user_id)];
+        let user2: User = undefined;
         if (data.creator2_id != undefined) {
-            const user2: User = await this.util.getUser(
+            user2 = await this.util.getUser(
                 data.creator2_id,
                 'channel_create',
             );
@@ -64,6 +65,9 @@ export class ChannelEventPatterns {
             [],
             [],
             false,
+            user2 == undefined ? undefined : user2.userId,
+            undefined, //TODO set these
+            undefined, //TODO set these
         );
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {
@@ -278,7 +282,7 @@ export class ChannelEventPatterns {
         if (!channel.hasUser(data.user_id)) {
             this.util.notify([data.user_id], 'channel_message', {
                 success: false,
-                reason: 'You are not a member of this channel',
+                msg: 'You are not a member of this channel',
                 message: undefined
             });
             return;
@@ -294,7 +298,7 @@ export class ChannelEventPatterns {
                 if (res == false) {
                     this.util.notify([data.user_id], 'channel_message', {
                         success: false,
-                        reason: 'Internal server error',
+                        msg: 'Internal server error',
                         message: undefined
                     });
                     return;
@@ -302,7 +306,7 @@ export class ChannelEventPatterns {
                 const userIds = channel.users.map((a) => a.userId);
                 this.util.notify(userIds, 'channel_message', {
                     success: true,
-                    reason: undefined,
+                    msg: undefined,
                     message: message
                 });
             });
@@ -311,6 +315,6 @@ export class ChannelEventPatterns {
     @EventPattern('channels_retrieve')
     async handleRetrieve(data: ChannelsRetrieve) {
         //TODO needs error handling for if query fails
-        this.util.notify([data.user_id], 'channels_retrieve', await Queries.getInstance().getAllPublicChannels());
+        this.util.notify([data.user_id], 'channels_retrieve', (await Queries.getInstance().getAllPublicChannels()).map(channel => {channel.getIChannel()}));
     }
 }
