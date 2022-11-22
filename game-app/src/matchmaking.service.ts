@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
 import { CreateGameDTO, GameInfo, outDTO } from './dto/dto';
+import { IGameInfo } from './dto/frontend.DTOs';
 import { GameEndedData, gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
 import { gameModes } from './game-object-interfaces';
@@ -148,14 +149,16 @@ export class MatchMakingService {
 	 * @returns void
 	 */
 	@OnEvent("game.create")
-	public async createGame(createGameDTO : CreateGameDTO) {
+	public async createGame(createGameDTO : CreateGameDTO) : Promise<number> {
 		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, this.gameId);
 
 		logger.log("New game instance has been created");
 		this.addNewGameToDatabase(createGameDTO).then(() => {
 			logger.log("new game instance added to DB");
 		});
-		this.addGameToList(createGameDTO, newGameInstance);
+		await this.addGameToList(createGameDTO, newGameInstance);
+		return (this.gameId);
+		
 	}
 
 	/**
@@ -164,7 +167,7 @@ export class MatchMakingService {
 	 * @param gameDto 
 	 * @param gameInstance 
 	 */
-	private addGameToList(gameDto : CreateGameDTO, gameInstance : Game) {
+	private async addGameToList(gameDto : CreateGameDTO, gameInstance : Game) : Promise<void> {
 		this.gameList.push({
 			player1			: gameDto.player1UID, 
 			player2 		: gameDto.player2UID,
@@ -197,6 +200,17 @@ export class MatchMakingService {
 		return (this.gameList);
 	}
 
+		/**
+	 * 
+	 * @returns game list object.
+	 */
+	public getIGameInfoList() : GameInfo[] {
+		let iGameInfoList : IGameInfo[] = [];
+
+		for (let gameInfo of this.gameList) 
+			iGameInfoList.push(this.createIGameInfo(gameInfo));
+		return (this.gameList);
+	}
 
 	/**
 	 *  returns game instance metadata
@@ -209,6 +223,35 @@ export class MatchMakingService {
 		}));
 	}
 
+	/**
+	 *  returns game instance metadata
+	 * @param gameId 
+	 * @returns game metadata object.
+	 */
+	public getIGameInfo(gameId : number) : IGameInfo | undefined {
+		let gameInfo : GameInfo | undefined = this.gameList.find((e) => {
+			return (e.gameId === gameId);
+		});
+		if (gameInfo !== undefined) 
+			return <IGameInfo>(this.createIGameInfo(gameInfo))
+		return undefined;
+	}
+
+	public createIGameInfo(gameInfo : GameInfo) : IGameInfo {
+		return  <IGameInfo> ({
+			players : {
+				player1 : gameInfo.player1,
+				player2 : gameInfo.player2,
+			},
+			spectatorList : gameInfo.spectatorList,
+			gameId : gameInfo.gameId,
+			playerScores : {
+				player1Score : gameInfo.gameInstance.player1.score,
+				player2Score : gameInfo.gameInstance.player2.score,
+			},
+			gameMode : gameInfo.gameMode,
+		});
+	}
 	/**
 	 * Starts spectating a game, adds the spectator to the list of users that should receive frame updates & game ended events.
 	 * @param userId userId that wants to spectate

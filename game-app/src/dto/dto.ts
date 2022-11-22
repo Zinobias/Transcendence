@@ -16,6 +16,8 @@ export interface CreateGameDTO {
 	gameMode 				: 	string,
 };
 
+
+
 export interface GameFrameUpdateDTO {
 	uids : string[],
 	data : any,
