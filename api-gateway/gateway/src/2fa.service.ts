@@ -52,11 +52,9 @@ export class TwoFactorAuthService {
 		return undefined;
 	}
 
-	// REMOVE THIS FUNCTION, i JUST COULDN'T HANDLE INTELLISENSE SCREAMING AT ME ;C
 	private async dbGetUser2FASecret(uid : number) : Promise<string | undefined> {
 		return await this.queries.retrieveTfa(uid);
 	}
-	// REMOVE THIS FUNCTION, i JUST COULDN'T HANDLE INTELLISENSE SCREAMING AT ME ;C
 
 	private async dbAddUser2FASecret(uid : number, clientSecret : string): Promise<boolean> {
 		if (!(await this.queries.storeTfa(uid, clientSecret))) {
@@ -90,7 +88,9 @@ export class TwoFactorAuthService {
 
 		if (clientSecret !== undefined) {
 			this.logger.log(`adding ${uid} 2fasecret to db a.k.a validating.`);
-			this.dbAddUser2FASecret(uid, clientSecret);
+			if (await this.dbAddUser2FASecret(uid, clientSecret) === false) {
+				return false;
+			}
 			this.toBeValidatedMap.delete(uid);
 			this.logger.log(`deleting ${uid} 2fasecret from tobevalidated map`);
 
