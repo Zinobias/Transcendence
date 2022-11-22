@@ -1,5 +1,3 @@
-import { GameInfo } from "./dto";
-
 export interface basicResponse {
 	success : boolean,
 	msg		: string,
