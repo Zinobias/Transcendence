@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryColumn,
   OneToMany,
-  JoinColumn,
+  JoinColumn, OneToOne,
 } from 'typeorm';
 import { Channel } from '../../Objects/Channel';
 import { user_table } from './UserTable';
@@ -17,8 +17,6 @@ import { chat_message } from './ChatMessages';
 export class chat_channels {
   constructor(channel?: Channel) {
     if (channel == undefined) return;
-    console.log(channel);
-    // this.channelId = channel.channelId;
     this.ownerId = channel.owner;
     this.owner2Id = channel.otherOwner;
     this.channelName = channel.channelName;
@@ -33,12 +31,10 @@ export class chat_channels {
   @Column({ nullable: true })
   owner2Id: number;
 
-  @ManyToOne(() => user_table, (user) => user.chat)
-  @JoinColumn({ name: 'ownerId' })
+  @OneToOne(() => user_table, (user) => user.chat)
   user: user_table;
 
-  @ManyToOne(() => user_table, (user) => user.chat2, { nullable: true })
-  @JoinColumn({ name: 'owner2Id' })
+  @OneToOne(() => user_table, (user) => user.chat2, { nullable: true })
   user2: user_table;
 
   @OneToMany(() => chat_channel_settings, (chat) => chat.channel, {

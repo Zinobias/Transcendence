@@ -198,7 +198,8 @@ export class Queries {
     const addChannel = myDataSource.getRepository(chat_channels);
     await addChannel.save(new chat_channels(channel));
     const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
-    return find_channel.channelId;
+    console.log('testing channel id ' + addChannel);
+    return find_channel[0].channelId;
   }
 
   /**
