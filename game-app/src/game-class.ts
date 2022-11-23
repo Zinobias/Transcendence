@@ -6,8 +6,8 @@ import { ClientProxy } from "@nestjs/microservices";
 
 
 export class Game {
-	private readonly player1	: PlayerData;
-	private readonly player2 	: PlayerData;
+	public readonly player1	: PlayerData;
+	public readonly player2 	: PlayerData;
 	private entities 			: Entity[];
 	private	playerPaddles		: PaddleGameData[];
 	private ball 				: Ball;

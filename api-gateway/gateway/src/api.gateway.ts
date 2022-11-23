@@ -161,15 +161,6 @@ export class ApiGateway
                     }
                 });
             }
-
-            // if (createAccountDTO === undefined) {
-            //     this.logger.debug(`Received undefined createAccountDTO from payload data: [${payload.data}]`);
-            //     return ({event: 'create_account', data: {
-			// 		success : false,
-			// 		msg : `account creation failed`,
-			// 	}
-			// });
-            // }
             this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
                 event: 'create_account',
@@ -195,6 +186,13 @@ export class ApiGateway
         }
     }
 
+
+	/**
+	 * 
+	 * @param client client connection Socket
+	 * @param payload no additional data, base FrontEndDTO
+	 * @returns  See 2fa.DTOs.ts file
+	 */
     @UseGuards(AuthGuard)
     @SubscribeMessage('enable_2fa') 
 	async enableTwoFactorAuthentication(client : Socket, payload : FrontEndDTO) {
@@ -217,6 +215,12 @@ export class ApiGateway
 		}});
 	}
 
+	/**
+	 * 
+	 * @param client client connection socket
+	 * @param payload Expects the user generated one-time time-based authentication token. as {TFAToken : string}.
+	 * @returns  See 2fa.DTOs.ts file
+	 */
     @UseGuards(AuthGuard)
     @SubscribeMessage('verify_2fa') 
 	async verifyTFA(client : Socket, payload : FrontEndDTO) {
@@ -232,10 +236,10 @@ export class ApiGateway
 			}
 		});
 		this.logger.log(`user [${payload.userId}] calling verify_2fa`);
-		if (!payload.data.TFAtoken)
+		if (!payload.data.TFAToken)
 			success = false;
 		else
-			success = await this.TFA.verify(payload.userId, payload.data.TFAtoken);
+			success = await this.TFA.verify(payload.userId, payload.data.TFAToken);
 		return ({
 			event : 'verify_2fa', 
 			data : {
@@ -245,13 +249,18 @@ export class ApiGateway
 		});
 		};
 
+	/**
+	 * 
+	 * @param client client connection socket
+	 * @param payload  no additional data, base FrontEndDTO
+	 * @returns See 2fa.DTOs.ts file
+	 */
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('isEnabled_2fa') 
 	async hasTFA(client : Socket, payload : FrontEndDTO) {
 		let success : boolean = false;
 
-		if (payload.userId)
-		success = await this.TFA.hasTwoFA(payload.userId);
+		success = await this.TFA.hasTwoFA(payload.userId!);
 		this.logger.log(`user [${payload.userId}] calling isEnabled2fa`);
 		return ({
 			event : 'isEnabled_2fa',
@@ -262,6 +271,46 @@ export class ApiGateway
 		});
 	}
 
+	/**
+	 * 
+	 * @param client client connection socket
+	 * @param payload  Expects the user generated time-based one-time authentication token. as {TFAToken : string}.
+	 * @returns See 2fa.DTOs.ts file
+	 */
+	@UseGuards(AuthGuard)
+	@SubscribeMessage('remove_2fa') 
+	async removeTFA(client : Socket, payload : FrontEndDTO) {
+		let success : boolean = false;
+
+		if (await this.TFA.hasTwoFA(payload.userId!) === false) {
+			return ({
+				event : 'remove_2fa',
+				data : {
+					 success 	: success,
+					 msg		: `2fa has never been enabled for user, : [${payload.userId}]`,
+			}
+			});
+		}
+		if (await this.TFA.verify(payload.userId!, payload.data.TFAToken) === false) {
+			return ({
+				event : 'remove_2fa',
+				data : {
+					 success 	: success,
+					 msg		: `Verifying token went wrong, please try again, user : ${payload.userId}`,
+			}
+			});
+		}
+		
+		success = await this.TFA.deleteTwoFA(payload.userId!);
+		this.logger.log(`user [${payload.userId}] calling remove2fa`);
+		return ({
+			event : 'remove_2fa',
+			data : {
+				 success 	: success,
+				 msg		: success === true ? `2fa was successfully removed ${payload.userId}` : `Disabling 2fa somehow went wrong, oops ;o ${payload.userId}`,
+		}
+		});
+	}
     /**
      * auth routes
      * route 1 : Login.
