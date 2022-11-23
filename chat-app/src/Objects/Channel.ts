@@ -23,9 +23,10 @@ export class Channel {
         this._channels.push(channel);
     }
 
-    public static getChannel(channelId: number): Channel {
+    public static getChannel(channelId: number): Channel | undefined {
         const channels = this._channels.filter((a) => a._channelId == channelId);
-        if (channels.length == 1) return channels[0];
+        if (channels.length == 1)
+            return channels[0];
         return undefined;
     }
 

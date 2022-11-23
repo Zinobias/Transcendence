@@ -13,6 +13,7 @@ import { Friend } from '../Objects/Friend';
 import { InsertResult } from 'typeorm';
 import { user_table } from './entities/UserTable';
 import { chat_message } from './entities/ChatMessages';
+import {Logger} from "@nestjs/common";
 
 export class Queries {
 	private static _instance: Queries;
@@ -237,7 +238,12 @@ export class Queries {
 		});
 		const channelList: Channel[] = [];
 		for (const [, result] of find_channel.entries()) {
-			channelList.push(Channel.getChannel(result.channelId));
+			const resultChannel = Channel.getChannel(result.channelId);
+			if (resultChannel === undefined) {
+				Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
+				continue;
+			}
+			channelList.push(resultChannel);
 		}
 		return channelList;
 	}
