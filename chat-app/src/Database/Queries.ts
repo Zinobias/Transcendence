@@ -128,12 +128,11 @@ export class Queries {
 	 */
 	async removeBlockedUser(userId: number, blockedUser: number): Promise<void> {
 		const myDataSource = await getDataSource();
-		const blocked_user_repository = myDataSource.getRepository(blocked);
-		const find_user = await blocked_user_repository.findOneBy({
+		const blockedTable = myDataSource.getRepository(blocked);
+		await blockedTable.delete({
 			userId: userId,
 			blockId: blockedUser,
 		});
-		await blocked_user_repository.remove(find_user);
 	}
 
 	//Friends table
@@ -211,6 +210,12 @@ export class Queries {
 		await channel.delete({ channelId: channel_id });
 	}
 
+	async setPassword(channelId: number, password: string) {
+		const myDataSource = await getDataSource();
+		const channel = myDataSource.getRepository(chat_channels);
+		await channel.update({ channelId: channelId }, {password: password});
+	}
+
 	/**
 	 * Get active channels for a user
 	 * @param owner user to get channels for
@@ -252,10 +257,10 @@ export class Queries {
 	 * Disable a channel
 	 * @param channelId channel to disable
 	 */
-	async disableChannel(channelId: number): Promise<void> {
+	async setClosed(channelId: number, closed: boolean): Promise<void> {
 		const myDataSource = await getDataSource();
 		const disable = myDataSource.getRepository(chat_channels);
-		await disable.update({ channelId: channelId }, { closed: true });
+		await disable.update({ channelId: channelId }, { closed: closed });
 	}
 
 	/**
@@ -289,19 +294,14 @@ export class Queries {
 	 * @param userId user to remove setting for
 	 * @param settingType setting type to remove
 	 */
-	async removeSetting(
-		channelId: number,
-		userId: number,
-		settingType: SettingType,
-	) {
+	async removeSetting(channelId: number, userId: number, settingType: SettingType) {
 		const myDataSource = await getDataSource();
 		const setting = myDataSource.getRepository(chat_channel_settings);
-		const find = setting.findBy({
+		await setting.delete({
 			channelId: channelId,
 			affectedUser: userId,
 			setting: settingType,
 		});
-		await setting.remove(await find);
 	}
 
 	/**
@@ -349,11 +349,16 @@ export class Queries {
 	async removeChannelMember(channelId: number, userId: number) {
 		const myDataSource = await getDataSource();
 		const channel = myDataSource.getRepository(chat_members);
-		const find_channel = await channel.findOneBy({
+		await channel.delete({
 			channelId: channelId,
 			userId: userId,
 		});
-		await channel.remove(find_channel);
+	}
+
+	async purgeChannel(channelId: number) {
+		const myDataSource = await getDataSource();
+		const chatMembers = myDataSource.getRepository(chat_members);
+		await chatMembers.delete({channelId: channelId})
 	}
 
 	/**
@@ -415,10 +420,5 @@ export class Queries {
 				new Message(result.message, result.userId, result.timestamp),
 			);
 		return messageList;
-	}
-
-	async storeAuth(id: number, auth: string): Promise<boolean> {
-		//TODO store id and auth token in db
-		return true;
 	}
 }

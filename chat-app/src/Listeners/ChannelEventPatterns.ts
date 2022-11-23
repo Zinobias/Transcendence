@@ -10,7 +10,7 @@ import {
     ChannelKick,
     ChannelLeave,
     ChannelMessage,
-    ChannelPromote, ChannelsRetrieve,
+    ChannelPromote, ChannelsRetrieve, ChannelUpdatePassword,
 } from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
@@ -64,7 +64,7 @@ export class ChannelEventPatterns {
             usersArr,
             [],
             [],
-            false,
+            data.should_get_password != undefined && data.should_get_password == true,
             user2 == undefined ? undefined : user2.userId,
             undefined, //TODO set these
             undefined, //TODO set these
@@ -84,6 +84,40 @@ export class ChannelEventPatterns {
             channel_id: channel.channelId,
             channel_users: channel.users,
         });
+    }
+
+    @EventPattern('channel_update_password')
+    async handlePasswordChange(data: ChannelUpdatePassword) {
+        const channel: Channel = this.util.getChannel(
+            data.channel_id,
+            'channel_update_password',
+        );
+        if (channel == null) {
+            this.emitFailedObject(data.user_id, 'channel_update_password', `Unable to find the channel you're trying to join`);
+            return;
+        }
+
+        const user: User = await this.util.getUser(data.user_id, 'channel_update_password');
+        if (user == null) {
+            this.emitFailedObject(data.user_id, 'channel_update_password', `Unable to find your user`);
+            return;
+        }
+
+        if (this.util.notOwner(channel, data.user_id, 'channel_update_password')) {
+            this.emitFailedObject(data.user_id, 'channel_update_password', `You're not the owner of this channel`);
+            return;
+        }
+
+        if (data.password === undefined || data.password.length != 64) { //This only works for a sha256 hash
+            this.emitFailedObject(data.user_id, 'channel_update_password', `This password is not valid`);
+            return
+        }
+        channel.password = data.password
+        Queries.getInstance().setPassword(channel.channelId, channel.password);
+        if (channel.closed) {
+            channel.closed = false;
+            Queries.getInstance().setClosed(channel.channelId, channel.closed);
+        }
     }
 
     //TODO check if user is invited?
@@ -261,7 +295,8 @@ export class ChannelEventPatterns {
             return;
 
         Channel.removeChannel(data.channel_id);
-        await Queries.getInstance().removeChannel(data.channel_id);
+        await Queries.getInstance().setClosed(data.channel_id, true);
+        Queries.getInstance().purgeChannel(data.channel_id);
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'remove_channel', {

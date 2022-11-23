@@ -1,5 +1,3 @@
-import {Channel} from "../Objects/Channel";
-
 export interface ChannelError {
     reason: string
 }
@@ -8,6 +6,14 @@ export interface ChannelCreate {
     user_id: number;
     channel_name: string;
     creator2_id: number;
+    visible: boolean;
+    should_get_password: boolean;
+}
+
+export interface ChannelUpdatePassword {
+    user_id: number
+    channel_id: number
+    password: string //Password should already be hashed here
 }
 
 export interface ChannelJoin {
