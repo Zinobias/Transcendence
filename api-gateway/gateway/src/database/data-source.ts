@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {DataSource} from 'typeorm';
 import {UserTable} from './entities/user-table';
 import {Sessions} from './entities/sessions';
+import { Tfa } from './entities/tfa';
 
 @Injectable()
 export class Database {
@@ -14,7 +15,7 @@ export class Database {
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            entities: [UserTable, Sessions],
+            entities: [UserTable, Sessions, Tfa],
             synchronize: true,
         });
     }
