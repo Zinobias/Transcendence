@@ -108,11 +108,16 @@ export class AppController {
 	@EventPattern("game.join.queue")
 	joinMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
 		this.logger.log("User : {" + payload.userId + "} has joined the matchmaking queue for : " + payload.gameMode);
+		if (this.matchMakingService.isValidGamemode(payload.gameMode))
+		return ({event : 'game.join.queue', data : {
+			success : false,
+			msg		: `gameMode in payload is invalid : [${payload.gameMode}]`
+		}});
 
 		if (this.matchMakingService.isInGame(payload.userId) === true) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds 		: [payload.userId],
-				eventPattern 	: 'game.user.join.queue',
+				eventPattern 	: 'game.join.queue',
 				data			: {
 					success : false,
 					msg 	: `User [${payload.userId}] is already in a game`,
@@ -121,7 +126,7 @@ export class AppController {
 			return ;
 		}
 		this.gatewayClient.emit<string, outDTO>('game', {
-			eventPattern : 'game.user.join.queue',
+			eventPattern : 'game.join.queue',
 			userIds		: [payload.userId],
 			data		: {
 				success : true,
@@ -358,6 +363,12 @@ export class AppController {
 		this.logger.debug("Game create payload:" + payload.gameMode);
 		this.logger.debug("Game create payload:" + payload.player1UID);
 		this.logger.debug("Game create payload:" + payload.player2UID);
+		if (this.matchMakingService.isValidGamemode(payload.gameMode))
+			return ({event : 'game.create', data : {
+				success : false,
+				msg		: `gameMode in payload is invalid : [${payload.gameMode}]`
+			}});
+
 		let gameId : number = await this.matchMakingService.createGame(payload);
 		this.logger.debug(`Game created with id : [${gameId}]`);
 

@@ -17,7 +17,7 @@ export class MatchMakingService {
 	private gameId 			: number;
 	private readonly gameList			: GameInfo[] = [];
 	private readonly logger				: Logger =  new Logger('matchmakingService');;
-
+	private readonly gameModes			: string[] = ['DEFAULT', 'DISCOPONG'];
 	/**
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
@@ -27,10 +27,35 @@ export class MatchMakingService {
 		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	};
 
+	/**
+	 * Wrapper for sending internal events.
+	 * @param pattern eventPattern
+	 * @param payload Payload to send.
+	 */
 	async emitEvent(pattern : string, payload : {}) {
 		this.eventEmitter.emit(pattern, payload);
 	}
 
+
+	/**
+	 * 
+	 * @returns Returns the lsit of gamemodes.
+	 */
+	public async getGameModes() : Promise<string[]> {
+		return (this.gameModes);
+	}
+
+	/**
+	 * 
+	 * @param gameMode name of gameMode
+	 * @returns true if valid else false. 
+	 */
+	public isValidGamemode(gameMode : string) : boolean {
+		return (this.gameModes.find((e) => {
+			 return (e === gameMode);
+			}) !== undefined
+		);
+	}
 
 	/**
 	 * Returns true if the user is in a game, false otherwise.
