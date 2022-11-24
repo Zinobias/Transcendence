@@ -63,6 +63,7 @@ export class Channel {
             this._otherOwner = otherOwner;
         this._visible = visible;
         this._password = password;
+        Channel.addChannel(this);
     }
 
     public set channelId(value: number) {
