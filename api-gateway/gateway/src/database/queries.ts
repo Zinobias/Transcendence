@@ -129,13 +129,7 @@ export class Queries {
         return false;
     }
 
-    /**
-     * This function returns TRUE if someone has no entry in the tfa table
-     * This function returns FALSE if there was an error retrieving the data (they may or may not have an entry in the tfa table, we don't know)
-     * This function returns the 2fa STRING if it found it in the table
-     * @param userId user to check tfa for
-     */
-    public async retrieveTfa(userId: number): Promise<string | boolean> {
+    public async retrieveTfa(userId: number): Promise<string | Has2FA> {
         try {
             const myDataSource = await this.database.getDataSource();
             const tfaTableRepo = myDataSource.getRepository(Tfa);
@@ -143,10 +137,10 @@ export class Queries {
             if (result?.tfa_code !== undefined)
                 return result.tfa_code
         } catch (e) {
-            this.logger.warn(e);
-            return false;
+            this.logger.error(e);
+            return Has2FA.ERROR;
         }
-        return true;
+        return Has2FA.NO_TFA;
     }
 
     public async removeTfa(userId: number): Promise<boolean> {
@@ -162,4 +156,10 @@ export class Queries {
         }
         return false
     }
+}
+
+export enum Has2FA {
+    ERROR,
+    NO_TFA,
+    HAS_TFA
 }

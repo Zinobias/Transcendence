@@ -1,8 +1,8 @@
 import {Inject, Injectable, Logger} from "@nestjs/common";
 // import speakeasy from 'speakeasy';
 // import qrcode from 'qrcode';
-import { mapGetter } from "./map.tools";
-import {Queries} from "./database/queries";
+import {mapGetter} from "./map.tools";
+import {Has2FA, Queries} from "./database/queries";
 
 
 const speakeasy = require(`speakeasy`);
@@ -52,7 +52,7 @@ export class TwoFactorAuthService {
 		return undefined;
 	}
 
-	private async dbGetUser2FASecret(uid : number) : Promise<string | boolean> {
+	private async dbGetUser2FASecret(uid : number) : Promise<string | Has2FA> {
 		return await this.queries.retrieveTfa(uid);
 	}
 
@@ -69,9 +69,9 @@ export class TwoFactorAuthService {
 	 * @param uid User to check for
 	 * @returns true if user has 2FA, false otherwise.
 	 */
-	public async hasTwoFA(uid : number) : Promise<boolean> {
-		const tfaStatus: string | boolean = await this.queries.retrieveTfa(uid);
-		return (tfaStatus !== false && tfaStatus !== true);
+	public async hasTwoFA(uid : number) : Promise<Has2FA> {
+		const tfaStatus: string | Has2FA = await this.queries.retrieveTfa(uid);
+		return (typeof tfaStatus == 'string' ? Has2FA.HAS_TFA : tfaStatus);
 	}
 
 	public async deleteTwoFA(uid: number): Promise<boolean> {
