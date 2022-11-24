@@ -82,8 +82,10 @@ export class ChannelEventPatterns {
         }
         channel.channelId = channelId;
         usersArr.forEach(a => {
-            if (a != undefined)
+            if (a != undefined) {
+                this.logger.debug(`Adding user: [${a.userId}] to new channel: [${channelId}]`);
                 Queries.getInstance().addChannelMember(channelId, a.userId);
+            }
         });
 
         const userIds = channel.users.map((a) => a.userId);
