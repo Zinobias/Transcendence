@@ -412,6 +412,8 @@ export class ChannelEventPatterns {
         const IChannels = channels
             .filter(channel => channel != undefined)
             .map(channel => {channel.getIChannel()});
-        this.util.notify([data.user_id], 'channels_retrieve', IChannels);
+        this.util.notify([data.user_id], 'channels_retrieve', {
+            channels: IChannels
+        });
     }
 }
