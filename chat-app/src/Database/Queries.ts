@@ -30,7 +30,7 @@ export class Queries {
 	private constructor() {
 		const start = new Date().getUTCMilliseconds();
 		this.loadAllChannels().then(() =>
-			this.logger.log(`Loaded all channels from database, took: ${start - new Date().getUTCMilliseconds()} millis`));
+			this.logger.log(`Loaded all channels from database, took: ${new Date().getUTCMilliseconds() - start} millis`));
 	}
 	//Users table
 	/**
