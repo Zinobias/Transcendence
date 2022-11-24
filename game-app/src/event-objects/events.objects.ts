@@ -107,6 +107,6 @@ export class GameFrameUpdateEvent {
  * Possibly replace gamemode with options object.
  */
 export interface gameMatchmakingEntity{
-	userId 		: string;
+	userId 		: number;
 	gameMode 	: string;
 }

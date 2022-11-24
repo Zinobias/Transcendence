@@ -29,7 +29,7 @@ export class AppController {
 			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
 			return ;
 		}
-		let uids : string[];
+		let uids : number[];
 		if (gameInfo?.spectatorList !== undefined) {
 			uids = gameInfo?.spectatorList;
 			uids.push(gameInfo.player1, gameInfo.player2);
@@ -71,7 +71,7 @@ export class AppController {
 			this.logger.debug('game.frame.update cant find the gameInfo');
 			return ;
 		}
-		let uids : string[];
+		let uids : number[];
 		if (gameInfo?.spectatorList !== undefined) {
 			uids = gameInfo?.spectatorList;
 			uids.push(gameInfo.player1, gameInfo.player2);

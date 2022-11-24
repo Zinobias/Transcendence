@@ -18,7 +18,7 @@ export class Game {
 	constructor(
 			private eventEmitter		: EventEmitter2,
 			private client				: ClientProxy,
-			playersUIDs					: string[], 
+			playersUIDs					: number[], 
 			private readonly gameMode	: string, 
 			private readonly gameId		: number
 		) {
