@@ -14,7 +14,7 @@ const logger = new Logger("AppService");
 @Injectable()
 export class MatchMakingService {
 	private readonly matchMakingQueue	: Map<string , string[]> = new Map<string, string[]>;
-	private gameId 			: number;
+	private gameId 						: number;
 	private readonly gameList			: GameInfo[] = [];
 	private readonly logger				: Logger =  new Logger('matchmakingService');;
 	private readonly gameModes			: string[] = ['DEFAULT', 'DISCOPONG'];
@@ -23,7 +23,9 @@ export class MatchMakingService {
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
 	 */
 	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {
-		// this.matchMakingQueue = new Map<string, string[]>;
+		this.gameModes.forEach((e) => {
+			this.matchMakingQueue.set(e, []);
+		});
 		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	};
 
