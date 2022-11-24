@@ -1,4 +1,4 @@
-import {Friend} from './Friend';
+import {Friend, IFriend} from './Friend';
 import {Queries} from '../Database/Queries';
 import {Logger} from '@nestjs/common';
 
@@ -6,8 +6,8 @@ export interface IUser {
     userId: number;
     name: string;
     avatar: object;
-    blocked: User[];
-    friends: Friend[];
+    blocked: IUser[];
+    friends: IFriend[];
 }
 
 export class User {
@@ -121,8 +121,8 @@ export class User {
             userId: this.userId,
             name: this.name,
             avatar: this.avatar,
-            blocked: this.blocked,
-            friends: this.friends,
-        };
+            blocked: this.blocked.map(blocked => blocked.getIUser()),
+            friends: this.friends.map(blocked => blocked.getIFriend())
+        }
     }
 }
