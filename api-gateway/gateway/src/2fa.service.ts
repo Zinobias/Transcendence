@@ -52,7 +52,7 @@ export class TwoFactorAuthService {
 		return undefined;
 	}
 
-	private async dbGetUser2FASecret(uid : number) : Promise<string | undefined> {
+	private async dbGetUser2FASecret(uid : number) : Promise<string | boolean> {
 		return await this.queries.retrieveTfa(uid);
 	}
 
@@ -70,7 +70,8 @@ export class TwoFactorAuthService {
 	 * @returns true if user has 2FA, false otherwise.
 	 */
 	public async hasTwoFA(uid : number) : Promise<boolean> {
-		return await this.queries.retrieveTfa(uid) !== undefined;
+		const tfaStatus: string | boolean = await this.queries.retrieveTfa(uid);
+		return (tfaStatus !== false && tfaStatus !== true);
 	}
 
 	public async deleteTwoFA(uid: number): Promise<boolean> {
@@ -98,7 +99,7 @@ export class TwoFactorAuthService {
 		else {
 			this.logger.log(`client : [${uid}] not in map `);
 			clientSecret = await this.dbGetUser2FASecret(uid);
-			if (clientSecret === undefined) {
+			if (clientSecret === true) {
 				this.logger.log(`client : [${uid}] not in map & database `);
 				return false;
 			}
