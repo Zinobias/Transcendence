@@ -11,8 +11,8 @@ const ChatSidebar: React.FC = () => {
   const [channels, setChannels] = useState<IChannelInfo[]>([]);
   
   useEffect(() => {
-    socket.on("channels_for_user", response  => {
-      console.log(`socket.on channels_for_user`);
+    socket.on("get_channels_user", response  => {
+      console.log(`socket.on get_channels_user`);
       console.log(response.channels[0]);
       setChannels([]);
       response.channels.forEach((element : IChannelInfo) => {
