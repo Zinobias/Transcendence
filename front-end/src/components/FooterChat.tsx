@@ -22,9 +22,14 @@ const FooterChat: React.FC = () => {
                 <ChatSidebar/>
             </div>
             <div className='footerChat__chat'>
+                {/* 
+                    CHAT NOTES
+                    ChatWindow should get an channelID to know what channel to display
+                    ChatSidebar should also get that ID so on click the ID changes and ChatChannel updates
+                    if there is no ID just dont display anything 
+                */}
                 <ChatWindow />
             </div>
-            {/* CHAT PLACEHOLDER */}
         </div>
     </div>   
     )

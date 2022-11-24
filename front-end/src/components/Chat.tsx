@@ -1,33 +1,44 @@
 import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
-import { useNavigate} from 'react-router-dom';
-import { Chatroom, IChannel } from "../interfaces"
-import ListChatrooms from "./ListChatrooms";
+import { IChannel } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
+import ListPublicChatrooms from "./ListPublicChatrooms";
 
 const   Chat: React.FC = () => {
 	
 	const socket = useContext(SocketContext);
-	const navigate = useNavigate()
     const [cookies] = useCookies(['userID', 'user']);
+    const [state, setState] = useState<boolean>(false);
     const [chatroomName, setChatroomName] = useState<string>("");
     const [visibleCheck, setVisibleCheck] = useState<boolean>(false);
     const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
     const [channels, setChannels] = useState<IChannel[]>([]);
 
     useEffect(() => {
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channels_retrieve",
+            data: {user_id: cookies.userID}
+        })
+        console.log("emiting channels_retrieve");
+    }, [state])
+
+    useEffect(() => {
         socket.on("channel_create", response => {
             console.log(`socket.on channel_create ${response.channel_name}`);
+            setState(!state);
         })
 
         socket.on("channels_retrieve", response  => {
             console.log(`socket.on channels_retrieve`);
-            console.log(`return response ${response.channels[0]}`);
-            // response.channels.forEach((element : IChannel) => {
-            //     console.log(element.channelName);
-            // });
+            setChannels([]);
+            response.channels.forEach((element : IChannel) => {
+                setChannels( channels => [...channels, element])
+            });
+            // setChannels([...channels, response.channels]);
         })
 
         return () => {
@@ -35,21 +46,6 @@ const   Chat: React.FC = () => {
             socket.off("channels_retrieve");
         }
     },[])
-
-    var chats: Chatroom[] = [
-        {name: "chat 1", id: 1},
-        {name: "chat 2", id: 2, password: true},
-        {name: "chat 3", id: 3, password: true},
-        {name: "chat 4", id: 4},
-    ];
-
-    const handleVisible = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setVisibleCheck(!visibleCheck);  
-    };
-
-    const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPasswordCheck(!passwordCheck);
-    }
 
     function validateChatroomName (name: string) : boolean {
         const regExp = new RegExp(`[^a-zA-Z0-9_]`, 'g');
@@ -96,24 +92,11 @@ const   Chat: React.FC = () => {
         setPasswordCheck(false);
     };
 
-    const handleRetrieve = (e : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-
-        socket.emit("chat", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-            eventPattern: "channels_retrieve",
-            data: {user_id: cookies.userID}
-        })
-
-        console.log("emiting channels_retrieve");
-    };
-
     return (
         <>
         <div>
             <span className="heading__small">OPEN CHATROOMS PLACEHOLDER</span>
-            <ListChatrooms chatroom={chats} />
+            <ListPublicChatrooms chatroom={channels} />
         </div>
         <form className="loginform" id="newChatroom">
                 <label className="loginform__label">Name</label>
@@ -124,7 +107,6 @@ const   Chat: React.FC = () => {
                 <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
                 <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
         </form>
-        <button className="defaultButton" onClick={(e) => handleRetrieve(e)}>retrieve channels</button>
         </>
     )
     

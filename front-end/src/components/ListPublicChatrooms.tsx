@@ -1,23 +1,24 @@
 import React from "react";
-import { Chatroom } from "../interfaces"
+import { IChannel } from "../interfaces"
 import { SlLock } from 'react-icons/sl'
 
 interface Props {
-    chatroom: Chatroom[];
+    chatroom: IChannel[];
 }
 
-const ListChatrooms: React.FC<Props> = ({chatroom}) => {
+const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
+        e.preventDefault();
+        console.log("click join");
     };
 
     return (
         <>
         {chatroom.map((e) => (
             // <p key={e.id}>{e.name}</p>
-            <form key={e.id} className="listChat">
-            <span className="listChat__text">{e.name}</span> 
+            <form key={e.channelId} className="listChat">
+            <span className="listChat__text">{e.channelName}</span> 
             {
                 e.password && 
                 <span className="listChat__icon">
@@ -31,4 +32,4 @@ const ListChatrooms: React.FC<Props> = ({chatroom}) => {
     );
 };
 
-export default ListChatrooms;
+export default ListPublicChatrooms;
