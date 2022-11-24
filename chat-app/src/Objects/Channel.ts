@@ -175,7 +175,7 @@ export class Channel {
             owner: this._owner,
             otherOwner: this._otherOwner,
             channelName: this._channelName,
-            users: this._users,
+            users: this._users.map(user => {return user.getIUser()}),
             messages: this._messages.map(message => {return message.getIMessage()}),
             settings: this._settings.map(setting => {return setting.getISetting()}),
             closed: this._closed,
