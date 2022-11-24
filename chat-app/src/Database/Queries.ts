@@ -26,6 +26,12 @@ export class Queries {
 	}
 
 	private readonly logger = new Logger('Queries');
+
+	private constructor() {
+		const start = new Date().getUTCMilliseconds();
+		this.loadAllChannels().then(() =>
+			this.logger.log(`Loaded all channels from database, took: ${start - new Date().getUTCMilliseconds()} millis`));
+	}
 	//Users table
 	/**
 	 * Creates a new user entry
@@ -249,16 +255,28 @@ export class Queries {
 		for (const [, result] of find_channel.entries()) {
 			let resultChannel = Channel.getChannel(result.channelId);
 			if (resultChannel === undefined) {
-				resultChannel = new Channel(result.channelId, result.ownerId, result.channelName,
-					await this.getChannelMembers(result.channelId),
-					await this.getChannelMessages(result.channelId),
-					await this.getSettings(result.channelId),
-					result.closed, result.owner2Id == null ? undefined : result.owner2Id,
-					result.visible, result.password);
+				Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
+				continue;
 			}
 			channelList.push(resultChannel);
 		}
 		return channelList;
+	}
+
+	async loadAllChannels() {
+		const myDataSource = await getDataSource();
+		const channel = myDataSource.getRepository(chat_channels);
+		const find_channel = await channel.findBy({
+			closed: false
+		});
+		for (const [, result] of find_channel.entries()) {
+			new Channel(result.channelId, result.ownerId, result.channelName,
+				await this.getChannelMembers(result.channelId),
+				await this.getChannelMessages(result.channelId),
+				await this.getSettings(result.channelId),
+				result.closed, result.owner2Id == null ? undefined : result.owner2Id,
+				result.visible, result.password);
+		}
 	}
 
 	/**
