@@ -143,13 +143,13 @@ export class PlayerPaddle extends Entity {
  * UserID & the player's current score.
  */
 export interface PlayerData {
-	uid 	:	 string;
+	uid 	:	 number;
 	score 	:	 number;
 }
 
 
 export interface PaddleGameData {
-	uid 			:	 string;
+	uid 			:	 number;
 	playerPaddle 	:	 PlayerPaddle;
 }
 
@@ -164,7 +164,7 @@ export interface GameResult {
 		player2FinalScore : number,
 	}
 	gameId				:	number;
-	winnerUID			:	string;
+	winnerUID			:	number;
 }
 
 export enum MoveStatePaddle {

@@ -13,7 +13,7 @@ const logger = new Logger("AppService");
 
 @Injectable()
 export class MatchMakingService {
-	private readonly matchMakingQueue	: Map<string , string[]> = new Map<string, string[]>;
+	private readonly matchMakingQueue	: Map<string , number[]> = new Map<string, number[]>;
 	private gameId 						: number;
 	private readonly gameList			: GameInfo[] = [];
 	private readonly logger				: Logger =  new Logger('matchmakingService');;
@@ -64,7 +64,7 @@ export class MatchMakingService {
 	 * @param uid user to check if ingame.
 	 * @returns true or false
 	 */
-	public isInGame(uid : string) : boolean{
+	public isInGame(uid : number) : boolean{
 		if (this.getGameList().find((e) => {
 			return ((e.player1 === uid || e.player2 === uid));
 		})!== undefined)
@@ -77,7 +77,7 @@ export class MatchMakingService {
 	 * @param uid user to check
 	 * @returns gameId 
 	 */
-	public getUserActiveGameId(uid : string) : number | undefined{
+	public getUserActiveGameId(uid : number) : number | undefined{
 		let e = this.getGameList().find((e) => {
 			return ((e.player1 === uid || e.player2 === uid));
 		});
@@ -94,9 +94,9 @@ export class MatchMakingService {
 	 * @param uid User to check.
 	 * @returns 
 	 */
-	public isInQueue(uid : string) : boolean {
+	public isInQueue(uid : number) : boolean {
 		for (let gameMode of this.matchMakingQueue.entries()) {
-			for (let user of gameMode) {
+			for (let user of gameMode[1]) {
 				if (uid === user)
 					return (true);
 			}
@@ -128,11 +128,11 @@ export class MatchMakingService {
 	 * @param uuid user to remove from queue
 	 * @returns 
 	 */
-	public removeFromQueue(uuid : string) {
+	public removeFromQueue(uuid : number) {
 		for (let gameMode of this.matchMakingQueue.entries()) {
-			let index = gameMode.findIndex((g) => {
+			let index = gameMode[1].findIndex((g) => {
 				return (g === uuid);
-			})
+			});
 			if (index !== -1)
 				this.gameList.splice(index, 1);
 				return true;
@@ -150,8 +150,8 @@ export class MatchMakingService {
 		for (let gameMode of gameModes) {
 			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
 				let gameDTO : CreateGameDTO = {
-					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as string,
-					player2UID	: this.matchMakingQueue.get(gameMode)?.pop() as string,
+					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as number,
+					player2UID	: this.matchMakingQueue.get(gameMode)?.pop() as number,
 					gameMode 	: gameMode,
 				}
 				this.emitEvent('game.create', gameDTO);
@@ -285,7 +285,7 @@ export class MatchMakingService {
 	 * @param targetGameId game to spectate
 	 * @returns 
 	 */
-	public async addSpectator(userId : string, targetGameId : number) {
+	public async addSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
 				if (game.spectatorList?.includes(userId) === false) {
@@ -303,7 +303,7 @@ export class MatchMakingService {
 	 * @param targetGameId game to stop spectating.
 	 * @returns 
 	 */
-	public async removeSpectator(userId : string, targetGameId : number) {
+	public async removeSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
 				if (game.spectatorList?.includes(userId) === true) {
