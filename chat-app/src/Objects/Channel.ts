@@ -23,9 +23,10 @@ export class Channel {
         this._channels.push(channel);
     }
 
-    public static getChannel(channelId: number): Channel {
+    public static getChannel(channelId: number): Channel | undefined {
         const channels = this._channels.filter((a) => a._channelId == channelId);
-        if (channels.length == 1) return channels[0];
+        if (channels.length == 1)
+            return channels[0];
         return undefined;
     }
 
@@ -58,7 +59,10 @@ export class Channel {
         this._messages = messages;
         this._settings = settings;
         this._closed = closed;
-        if (otherOwner != undefined) this._otherOwner = otherOwner;
+        if (otherOwner != undefined)
+            this._otherOwner = otherOwner;
+        this._visible = visible;
+        this._password = password;
     }
 
     public set channelId(value: number) {
@@ -107,6 +111,10 @@ export class Channel {
 
     get closed(): boolean {
         return this._closed;
+    }
+
+    set closed(value: boolean) {
+        this._closed = value;
     }
 
     public get settings(): Setting[] {
