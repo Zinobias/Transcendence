@@ -25,6 +25,25 @@ export class Queries {
     return this._instance;
   }
 
+  private async userExists(userId: number, userName: string): Promise<boolean> {
+    const AppDataSource = await getDataSource();
+    console.log(AppDataSource.options);
+    const userTableRepo = AppDataSource.getRepository(user_table);
+    try {
+      const find = await userTableRepo.findOneBy({
+        userId: userId,
+        userName: userName,
+      });
+      if (find == null) return false;
+      else return true;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run userExists check query for [${userId}] see error: ${e}`,
+      );
+    }
+    return false;
+  }
+
   //Users table
   /**
    * Creates a new user entry
@@ -37,7 +56,17 @@ export class Queries {
     const AppDataSource = await getDataSource();
     console.log(AppDataSource.options);
     const userRepository = AppDataSource.getRepository(user_table);
-    await userRepository.save(new user_table(loginId, userName));
+    if (await this.userExists(loginId, userName)) {
+      Logger.log(`You already have an active account.`);
+      return;
+    }
+    try {
+      await userRepository.save(new user_table(loginId, userName));
+    } catch (e) {
+      Logger.warn(
+        `Unable to run save user query for [${loginId}] see error: ${e}`,
+      );
+    }
   }
 
   // async uploadDatabaseFile(dataBuffer: Buffer, filename: string) {
@@ -110,6 +139,23 @@ export class Queries {
     return blockedUsers;
   }
 
+  async alreadyBlocked(userId: number, blockedUser: number): Promise<boolean> {
+    const myDataSource = await getDataSource();
+    const blocked_user_repository = myDataSource.getRepository(blocked);
+    try {
+      const find = await blocked_user_repository.findOneBy({
+        userId: userId,
+        blockId: blockedUser,
+      });
+      if (find == null) return false;
+      else return true;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run ExistsBlock check query for [${userId}] see error: ${e}`,
+      );
+    }
+    return false;
+  }
   /**
    * Store a new blocked user for a user
    * @param userId user to store the blocked user for
@@ -118,7 +164,15 @@ export class Queries {
   async addBlockedUser(userId: number, blockedUser: number): Promise<void> {
     const myDataSource = await getDataSource();
     const blocked_user_repository = myDataSource.getRepository(blocked);
-    await blocked_user_repository.save(new blocked(userId, blockedUser));
+    if (await this.alreadyBlocked(userId, blockedUser)) {
+      console.log('user is already block');
+      return;
+    }
+    try {
+      await blocked_user_repository.save(new blocked(userId, blockedUser));
+    } catch (e) {
+      console.log('Unknown error while saving the user in the database');
+    }
   }
 
   /**
@@ -165,6 +219,30 @@ export class Queries {
    * @param toUserId user that the request should be sent to
    * @param confirmed boolean indicating if the friend request was accepted
    */
+
+  async friendExist(
+    fromUserId: number,
+    toUserId: number,
+    confirmed: boolean,
+  ): Promise<boolean> {
+    const myDataSource = await getDataSource();
+    const friends_repository = myDataSource.getRepository(friends);
+    try {
+      const find = await friends_repository.findOneBy({
+        userId: fromUserId,
+        friendId: toUserId,
+        active: confirmed,
+      });
+      if (find == null) return false;
+      else return true;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run userExists check query for [${fromUserId}] see error: ${e}`,
+      );
+    }
+    return false;
+  }
+
   async addFriend(
     fromUserId: number,
     toUserId: number,
@@ -172,7 +250,35 @@ export class Queries {
   ): Promise<void> {
     const myDataSource = await getDataSource();
     const friends_repository = myDataSource.getRepository(friends);
-    await friends_repository.save(new friends(fromUserId, toUserId, confirmed));
+    if (await this.friendExist(fromUserId, toUserId, confirmed)) {
+      console.log('friend already exists');
+      return;
+    }
+    try {
+      await friends_repository.save(
+        new friends(fromUserId, toUserId, confirmed),
+      );
+    } catch (e) {
+      console.log('Unknown error while saving the user in the database');
+    }
+  }
+
+  async existFriend(fromUserId: number, toUserId: number): Promise<boolean> {
+    const myDataSource = await getDataSource();
+    const friends_repository = myDataSource.getRepository(friends);
+    try {
+      const find = await friends_repository.findOneBy({
+        userId: fromUserId,
+        friendId: toUserId,
+      });
+      if (find == null) return false;
+      else return true;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run userExists check query for [${fromUserId}] see error: ${e}`,
+      );
+    }
+    return false;
   }
 
   /**
@@ -183,7 +289,34 @@ export class Queries {
   async removeFriend(userId: number, friendId: number): Promise<void> {
     const myDataSource = await getDataSource();
     const friends_repository = myDataSource.getRepository(friends);
-    await friends_repository.delete({ userId: userId, friendId: friendId });
+    if ((await this.existFriend(userId, friendId)) == false) {
+      console.log(`Unknown error while saving the user in the database`);
+      return;
+    }
+    try {
+      await friends_repository.delete({ userId: userId, friendId: friendId });
+    } catch (e) {
+      Logger.warn(
+        `Unable to run delete friend query for [${userId}] see error: ${e}`,
+      );
+    }
+  }
+
+  async channelExists(channelId: number): Promise<boolean> {
+    const myDataSource = await getDataSource();
+    const addChannel = myDataSource.getRepository(chat_channels);
+    try {
+      const find = await addChannel.findOneBy({
+        ownerId: channelId,
+      });
+      if (find == null) return false;
+      else return true;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run userExists check query for [${channelId}] see error: ${e}`,
+      );
+    }
+    return false;
   }
 
   //ChatChannels table
@@ -195,9 +328,22 @@ export class Queries {
   async createChannel(channel: Channel): Promise<number> {
     const myDataSource = await getDataSource();
     const addChannel = myDataSource.getRepository(chat_channels);
-    await addChannel.save(new chat_channels(channel));
-    const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
-    return find_channel.channelId;
+    if (await this.channelExists(channel.channelId)) {
+      console.log('channel already exists');
+      return -1;
+    }
+    try {
+      await addChannel.save(new chat_channels(channel));
+      const find_channel = await addChannel.findOneBy({
+        ownerId: channel.owner,
+      });
+      return find_channel.channelId;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run chat_channel query for [${channel.owner}] see error: ${e}`,
+      );
+    }
+    return -1;
   }
 
   /**
@@ -207,7 +353,17 @@ export class Queries {
   async removeChannel(channel_id: number) {
     const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(chat_channels);
-    await channel.delete({ channelId: channel_id });
+    if ((await this.channelExists(channel_id)) == false) {
+      console.log("channel doesn't exist");
+      return -1;
+    }
+    try {
+      await channel.delete({ channelId: channel_id });
+    } catch (e) {
+      Logger.warn(
+        `Unable to run chat_channel query for [${channel_id}] see error: ${e}`,
+      );
+    }
   }
 
   async setPassword(channelId: number, password: string) {
@@ -336,6 +492,23 @@ export class Queries {
   }
 
   //ChannelMembers
+  async memberExists(channelId: number, userId: number): Promise<boolean> {
+    const myDataSource = await getDataSource();
+    const channel = myDataSource.getRepository(chat_members);
+    try {
+      const find = await channel.findOneBy({
+        channelId: channelId,
+        userId: userId,
+      });
+      if (find == null) return false;
+      else return true;
+    } catch (e) {
+      Logger.warn(
+        `Unable to run userExists check query for [${channelId}] see error: ${e}`,
+      );
+    }
+    return false;
+  }
   /**
    * Add a user to a channel
    * @param channelId channel to add member to
@@ -344,7 +517,17 @@ export class Queries {
   async addChannelMember(channelId: number, userId: number) {
     const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(chat_members);
-    await channel.save(new chat_members(channelId, userId));
+    if (await this.memberExists(channelId, userId)) {
+      console.log('member already exists');
+      return;
+    }
+    try {
+      await channel.save(new chat_members(channelId, userId));
+    } catch (e) {
+      Logger.warn(
+        `Unable to run insert chat_members query for [${channelId}] see error: ${e}`,
+      );
+    }
   }
 
   /**
@@ -355,10 +538,20 @@ export class Queries {
   async removeChannelMember(channelId: number, userId: number) {
     const myDataSource = await getDataSource();
     const channel = myDataSource.getRepository(chat_members);
-    await channel.delete({
-      channelId: channelId,
-      userId: userId,
-    });
+    if ((await this.memberExists(channelId, userId)) == false) {
+      console.log("member isn't  in the table");
+      return;
+    }
+    try {
+      await channel.delete({
+        channelId: channelId,
+        userId: userId,
+      });
+    } catch (e) {
+      Logger.warn(
+        `Unable to run delete chat_members query for [${channelId}] see error: ${e}`,
+      );
+    }
   }
 
   async purgeChannel(channelId: number) {

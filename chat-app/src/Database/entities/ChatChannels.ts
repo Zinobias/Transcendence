@@ -64,8 +64,8 @@ export class chat_channels {
   closed: boolean;
 
   @Column({ nullable: true })
-  password: string
+  password: string;
 
-  @Column()
-  visible: boolean
+  @Column({ nullable: true })
+  visible: boolean;
 }
