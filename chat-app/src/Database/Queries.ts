@@ -397,10 +397,10 @@ export class Queries {
 		const myDataSource = await getDataSource();
 		const user = myDataSource.getRepository(chat_members);
 		const find = await user.findBy({ channelId: channelId });
-		const channelList: User[] = [];
+		const userList: User[] = [];
 		for (const [, result] of find.entries())
-			channelList.push(await User.getUser(result.userId));
-		return channelList;
+			userList.push(await User.getUser(result.userId));
+		return userList;
 	}
 
 	/**
