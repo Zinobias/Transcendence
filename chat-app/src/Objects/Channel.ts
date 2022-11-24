@@ -24,9 +24,12 @@ export class Channel {
     }
 
     public static getChannel(channelId: number): Channel | undefined {
-        const channels = this._channels.filter((a) => a._channelId == channelId);
-        if (channels.length == 1)
-            return channels[0];
+        // const channels = this._channels.filter((a) => a._channelId == channelId);
+        const channels = this._channels.find((e) => {
+            return (e._channelId == channelId);
+        });
+        if (channels !== undefined)
+            return channels;
         return undefined;
     }
 

@@ -2,7 +2,7 @@ import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import { useNavigate} from 'react-router-dom';
-import { Chatroom } from "../interfaces"
+import { Chatroom, IChannel } from "../interfaces"
 import ListChatrooms from "./ListChatrooms";
 import './Components.css';
 import {Md5} from "ts-md5";
@@ -13,14 +13,22 @@ const   Chat: React.FC = () => {
 	const navigate = useNavigate()
     const [cookies] = useCookies(['userID', 'user']);
     const [chatroomName, setChatroomName] = useState<string>("");
+    const [visibleCheck, setVisibleCheck] = useState<boolean>(false);
+    const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
+    const [channels, setChannels] = useState<IChannel[]>([]);
 
     useEffect(() => {
         socket.on("channel_create", response => {
             console.log(`socket.on channel_create ${response.channel_name}`);
         })
 
-        socket.on("channels_retrieve", response => {
-            console.log(`channel retrieve return response ${response}`);
+        socket.on("channels_retrieve", response  => {
+            // console.log(`channel retrieve return response ${response.channels}`);
+            // response.channels.forEach((element : IChannel) => {
+            //     console.log(element.channelName);
+            // });
+            if (response.success == false)
+                console.log("Channels retrieved undefined");
             console.log(`socket.on channels_retrieve`);
         })
 
@@ -36,18 +44,54 @@ const   Chat: React.FC = () => {
         {name: "chat 3", id: 3, password: true},
         {name: "chat 4", id: 4},
     ];
-    const handleClick = (e: React.FormEvent) => {
+
+    const handleVisible = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setVisibleCheck(!visibleCheck);  
+    };
+
+    const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPasswordCheck(!passwordCheck);
+    }
+
+    function validateChatroomName (name: string) : boolean {
+        const regExp = new RegExp(`[^a-zA-Z0-9_]`, 'g');
+        const match = name.matchAll(regExp);
+        const result = match.next().value;
+
+        if (!name) {
+            alert("Name Field is required");
+            return (false);
+        }
+        if (name.length > 12) {
+            alert("Channel Name needs to be between 3-12 characters");
+            return (false);
+        }
+        if (result != undefined) {
+            alert(`[${result}] is an invalid character`);
+            return (false);
+        }
+        return (true);
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-        if (chatroomName) {
+
+        if (validateChatroomName(chatroomName)) {
             //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
             // console.log(Md5.hashStr(chatroomPassword + chatroomId))
+
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
                 eventPattern: "channel_create", 
-                data: {user_id: cookies.userID, channel_name: chatroomName, creator2_id: undefined}
+                data: { user_id: cookies.userID, 
+                        channel_name: chatroomName, 
+                        creator2_id: undefined, 
+                        visible: visibleCheck, 
+                        should_get_password: passwordCheck }
             });
-            console.log("emiting channel_create " + chatroomName);
+            console.log(`emiting channel_create name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
+
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -55,11 +99,12 @@ const   Chat: React.FC = () => {
                 data: {user_id: cookies.userID}
             })
             console.log("emiting channels_retrieve");
-            // navigate('chat_window');
         }
-        else {
-            alert("Name Field is required");
-        }
+
+        // console.log(`name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
+        setChatroomName("");
+        setVisibleCheck(false);
+        setPasswordCheck(false);
     };
 
     return (
@@ -68,12 +113,14 @@ const   Chat: React.FC = () => {
             <span className="heading__small">OPEN CHATROOMS PLACEHOLDER</span>
             <ListChatrooms chatroom={chats} />
         </div>
-        <form className="loginform">
+        <form className="loginform" id="newChatroom">
                 <label className="loginform__label">Name</label>
-                <input type="input" onChange={(e)=>setChatroomName(e.target.value)} placeholder="email" className="loginform__input"/>
-                <label className="loginform__label">password (optional)</label>
-                <input type="input" placeholder="password" className="loginform__input"/>
-                <button className="loginform__button" onClick={(e) => handleClick(e)}>NEW CHATROOM</button>
+                <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
+                <label className="loginform__label">password</label>
+                <input type="checkbox" checked={passwordCheck} onChange={e => setPasswordCheck(!passwordCheck)}/>
+                <label className="loginform__label">public</label>
+                <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
+                <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
         </form>
         </>
     )
