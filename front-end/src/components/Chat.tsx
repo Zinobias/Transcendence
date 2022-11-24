@@ -23,13 +23,11 @@ const   Chat: React.FC = () => {
         })
 
         socket.on("channels_retrieve", response  => {
-            // console.log(`channel retrieve return response ${response.channels}`);
+            console.log(`socket.on channels_retrieve`);
+            console.log(`return response ${response.channels[0]}`);
             // response.channels.forEach((element : IChannel) => {
             //     console.log(element.channelName);
             // });
-            if (response.success == false)
-                console.log("Channels retrieved undefined");
-            console.log(`socket.on channels_retrieve`);
         })
 
         return () => {
@@ -74,7 +72,7 @@ const   Chat: React.FC = () => {
     }
 
     const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
+		e.preventDefault();
 
         if (validateChatroomName(chatroomName)) {
             //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
@@ -91,20 +89,24 @@ const   Chat: React.FC = () => {
                         should_get_password: passwordCheck }
             });
             console.log(`emiting channel_create name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
-
-            socket.emit("chat", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "channels_retrieve",
-                data: {user_id: cookies.userID}
-            })
-            console.log("emiting channels_retrieve");
         }
-
         // console.log(`name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
         setChatroomName("");
         setVisibleCheck(false);
         setPasswordCheck(false);
+    };
+
+    const handleRetrieve = (e : React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channels_retrieve",
+            data: {user_id: cookies.userID}
+        })
+
+        console.log("emiting channels_retrieve");
     };
 
     return (
@@ -122,6 +124,7 @@ const   Chat: React.FC = () => {
                 <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
                 <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
         </form>
+        <button className="defaultButton" onClick={(e) => handleRetrieve(e)}>retrieve channels</button>
         </>
     )
     
