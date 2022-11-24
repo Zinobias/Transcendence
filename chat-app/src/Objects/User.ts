@@ -43,6 +43,8 @@ export class User {
         this._userId = userId;
         this._name = name;
         this._avatar = avatar;
+        this._blocked = [];
+        this._friends = [];
         User.addUser(this);
         this.updateBlocked();
         this.updateFriends();
