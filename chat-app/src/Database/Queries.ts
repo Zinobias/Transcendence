@@ -146,8 +146,8 @@ export class Queries {
 	 */
 	async getFriends(userId: number, accepted: boolean): Promise<Friend[]> {
 		const myDataSource = await getDataSource();
-		const friend = myDataSource.getRepository(friends);
-		const find_friend = await friend.findBy({
+		const repository = myDataSource.getRepository(friends);
+		const find_friend = await repository.findBy({
 			userId: userId,
 			active: accepted,
 		});
