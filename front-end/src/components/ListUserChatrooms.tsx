@@ -1,8 +1,8 @@
 import React from 'react'
-import { IChannel } from "../interfaces"
+import { IChannelInfo } from "../interfaces"
 
 interface Props {
-    chatroom: IChannel[];
+    chatroom: IChannelInfo[];
 }
 
 const ListUserChatrooms : React.FC<Props> = ({chatroom}) => {

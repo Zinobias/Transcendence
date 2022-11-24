@@ -61,6 +61,13 @@ export interface IChannel {
     password: string;
 }
 
+export interface IChannelInfo {
+    channelId: number;
+    channelName: string;
+    visible: boolean;
+    hasPassword: boolean;
+}
+
 export enum SettingType {
     MUTED,
     BANNED,

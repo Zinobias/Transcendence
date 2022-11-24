@@ -1,20 +1,21 @@
 import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
-import { IChannel } from "../interfaces"
+import { IChannelInfo } from "../interfaces"
 import ListUserChatrooms from "./ListUserChatrooms";
 
 const ChatSidebar: React.FC = () => {
 
   const socket = useContext(SocketContext);
   const [cookies] = useCookies(['userID', 'user']);
-  const [channels, setChannels] = useState<IChannel[]>([]);
+  const [channels, setChannels] = useState<IChannelInfo[]>([]);
   
   useEffect(() => {
     socket.on("channels_for_user", response  => {
       console.log(`socket.on channels_for_user`);
+      console.log(response.channels[0]);
       setChannels([]);
-      response.channels.forEach((element : IChannel) => {
+      response.channels.forEach((element : IChannelInfo) => {
         setChannels( channels => [...channels, element])
         console.log(element.channelName);
       });

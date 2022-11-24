@@ -1,7 +1,7 @@
 import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
-import { IChannel } from "../interfaces"
+import { IChannelInfo } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
 import ListPublicChatrooms from "./ListPublicChatrooms";
@@ -14,7 +14,7 @@ const   Chat: React.FC = () => {
     const [chatroomName, setChatroomName] = useState<string>("");
     const [visibleCheck, setVisibleCheck] = useState<boolean>(false);
     const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
-    const [channels, setChannels] = useState<IChannel[]>([]);
+    const [channels, setChannels] = useState<IChannelInfo[]>([]);
 
     useEffect(() => {
         socket.emit("chat", {
@@ -35,7 +35,7 @@ const   Chat: React.FC = () => {
         socket.on("channels_retrieve", response  => {
             console.log(`socket.on channels_retrieve`);
             setChannels([]);
-            response.channels.forEach((element : IChannel) => {
+            response.channels.forEach((element : IChannelInfo) => {
                 setChannels( channels => [...channels, element])
             });
             // setChannels([...channels, response.channels]);

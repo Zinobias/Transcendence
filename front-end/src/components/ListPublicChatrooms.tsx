@@ -1,9 +1,9 @@
 import React from "react";
-import { IChannel } from "../interfaces"
+import { IChannelInfo } from "../interfaces"
 import { SlLock } from 'react-icons/sl'
 
 interface Props {
-    chatroom: IChannel[];
+    chatroom: IChannelInfo[];
 }
 
 const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
@@ -20,7 +20,7 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
             <form key={e.channelId} className="listChat">
             <span className="listChat__text">{e.channelName}</span> 
             {
-                e.password && 
+                e.hasPassword && 
                 <span className="listChat__icon">
                     <SlLock />
                 </span>
