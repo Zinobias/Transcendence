@@ -17,9 +17,8 @@ export class Queries {
         const myDataSource = await this.database.getDataSource();
         const repo = myDataSource.getRepository(Sessions);
 
-        if (!await this.userExists(id)) //Check if the user is in the database, they can't get a session if they're not
-            return false
-
+        if (!await this.userExists(id) === true) //Check if the user is in the database, they can't get a session if they're not
+            return false;
         this.logger.debug(`Inserting new auth key for user ${id} with key ${auth}`)
         const insertResult: InsertResult = await repo.upsert(
             [
@@ -70,7 +69,7 @@ export class Queries {
                 userName: userName,
             });
             if (find != null) {
-                this.logger.debug(`arleady have an accoiunt named ${userName}`)
+                this.logger.debug(`arleady have an account named ${userName}`)
                 return `There is already a user with this name`;
             }
         } catch (e) {
@@ -86,9 +85,10 @@ export class Queries {
             const find = await userTableRepo.findOneBy({
                 userId: userId
             });
-            if (find != null) {
+            if (find == null) 
                 return false;
-            }
+			else
+				return true;
         } catch (e) {
             Logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`)
         }
