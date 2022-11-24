@@ -48,7 +48,7 @@ export class ChannelEventPatterns {
             this.emitFailedObject(data.user_id, 'channel_create', 'Unable to find dm user');
             return;
         }
-        const usersArr: User[] = [await User.getUser(data.user_id)];
+        const usersArr: User[] = [user];
         let user2: User = undefined;
         if (data.creator2_id != undefined) {
             user2 = await this.util.getUser(
@@ -81,6 +81,10 @@ export class ChannelEventPatterns {
             return;
         }
         channel.channelId = channelId;
+        usersArr.forEach(a => {
+            if (a != undefined)
+                Queries.getInstance().addChannelMember(channelId, a.userId);
+        });
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_create', {
