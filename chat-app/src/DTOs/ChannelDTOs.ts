@@ -66,3 +66,8 @@ export interface ChannelMessage {
 export interface ChannelsRetrieve {
     user_id: number
 }
+
+export interface ChannelRetrieve {
+    user_id: number
+    channel_id: number
+}

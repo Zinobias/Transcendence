@@ -10,7 +10,7 @@ import {
     ChannelKick,
     ChannelLeave,
     ChannelMessage,
-    ChannelPromote, ChannelsRetrieve, ChannelUpdatePassword,
+    ChannelPromote, ChannelRetrieve, ChannelsRetrieve, ChannelUpdatePassword,
 } from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
@@ -415,9 +415,25 @@ export class ChannelEventPatterns {
         }
         const IChannels = channels
             .filter(channel => channel != undefined)
-            .map(channel => channel.getIChannel());
+            .map(channel => {return {
+                    channelId: channel.channelId,
+                    channelName: channel.channelName,
+                    visible: channel.visible,
+                    hasPassword: (channel.password !== undefined)
+                }
+            });
         this.util.notify([data.user_id], 'channels_retrieve', {
             channels: IChannels
+        });
+    }
+
+    @EventPattern('channel_retrieve_by_id')
+    async handleRetrieveOne(data: ChannelRetrieve) {
+        const channel = this.util.getChannel(data.channel_id, 'channel_retrieve_by_id');
+        if (!this.util.userInChannel(channel, data.user_id, 'channel_retrieve_by_id'))
+            return;
+        this.util.notify([data.user_id], 'channel_retrieve_by_id', {
+            channel: channel.getIChannel()
         });
     }
 }

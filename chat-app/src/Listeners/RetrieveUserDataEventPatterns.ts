@@ -19,7 +19,14 @@ export class RetrieveUserDataEventPatterns {
     getChannelsUser(data: GetUserData) {
         const channels = Channel.getUserChannels(data.user_id);
         this.util.notify([data.user_id], 'channels_for_user', {
-            channels: channels?.map(channel => {return channel.getIChannel()}),
+            channels: channels?.map(channel => {
+                return {
+                    channelId: channel.channelId,
+                    channelName: channel.channelName,
+                    visible: channel.visible,
+                    hasPassword: (channel.password !== undefined)
+                }
+            })
         });
     }
 
