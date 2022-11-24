@@ -66,8 +66,8 @@ export class ChannelEventPatterns {
             [],
             data.should_get_password != undefined && data.should_get_password == true,
             user2 == undefined ? undefined : user2.userId,
-            undefined, //TODO set these
-            undefined, //TODO set these
+            data.visible,
+            undefined
         );
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {
