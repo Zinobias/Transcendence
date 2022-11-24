@@ -2,15 +2,15 @@ import { Game } from "src/game-class";
 import { MoveStatePaddle } from "src/game-object-interfaces";
 
 export interface CreateGameDTO {
-	player1UID	: string;
-	player2UID	: string;
+	player1UID	: number;
+	player2UID	: number;
 	gameMode	: string;
   }
 
   export interface GameInfo {
-	readonly player1 		:  	string ,
-	readonly player2		: 	string ,
-	spectatorList? 			:	string[];
+	readonly player1 		:  	number ,
+	readonly player2		: 	number ,
+	spectatorList? 			:	number[];
 	readonly gameId			: 	number,
 	readonly gameInstance 	:	Game;
 	gameMode 				: 	string,
@@ -19,22 +19,22 @@ export interface CreateGameDTO {
 
 
 export interface GameFrameUpdateDTO {
-	uids : string[],
+	uids : number[],
 	data : any,
 }
 
 export interface addSpectatorDTO {
-	userId : string,
+	userId : number,
 	targetGameId : number,
 }
 
 export interface outDTO {
-	userIds : string[],
+	userIds : number[],
 	eventPattern : string,
 	data : any
 }
 
 export interface userKeyInputDTO {
-	userId	 : string,
+	userId	 : number,
 	keyEvent : MoveStatePaddle,
 }
