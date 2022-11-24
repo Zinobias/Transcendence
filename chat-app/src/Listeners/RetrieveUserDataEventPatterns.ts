@@ -18,7 +18,7 @@ export class RetrieveUserDataEventPatterns {
     @EventPattern('get_channels_user')
     getChannelsUser(data: GetUserData) {
         const channels = Channel.getUserChannels(data.user_id);
-        this.util.notify([data.user_id], 'channels_for_user', {
+        this.util.notify([data.user_id], 'get_channels_user', {
             channels: channels?.map(channel => {
                 return {
                     channelId: channel.channelId,
