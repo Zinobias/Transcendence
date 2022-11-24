@@ -154,7 +154,8 @@ export class Queries {
 		const friendList: Friend[] = [];
 		for (const [, result] of find_friend.entries()) {
 			const user = await User.getUser(result.userId);
-			if (user === undefined) continue;
+			if (user === undefined)
+				continue;
 			friendList.push(<Friend>user);
 		}
 		return friendList;
@@ -242,13 +243,18 @@ export class Queries {
 		const find_channel = await channel.findBy({
 			owner2Id: null,
 			closed: false,
+			visible: true,
 		});
 		const channelList: Channel[] = [];
 		for (const [, result] of find_channel.entries()) {
-			const resultChannel = Channel.getChannel(result.channelId);
+			let resultChannel = Channel.getChannel(result.channelId);
 			if (resultChannel === undefined) {
-				Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
-				continue;
+				resultChannel = new Channel(result.channelId, result.ownerId, result.channelName,
+					await this.getChannelMembers(result.channelId),
+					await this.getChannelMessages(result.channelId),
+					await this.getSettings(result.channelId),
+					result.closed, result.owner2Id == null ? undefined : result.owner2Id,
+					result.visible, result.password);
 			}
 			channelList.push(resultChannel);
 		}
@@ -311,7 +317,7 @@ export class Queries {
 	 * @param channelId channel to get the settings for
 	 * @param userId optional user to get the settings for
 	 */
-	async getSettings(channelId: number, userId?: number): Promise<Channel[]> {
+	async getSettings(channelId: number, userId?: number): Promise<Setting[]> {
 		const myDataSource = await getDataSource();
 		const setting = myDataSource.getRepository(chat_channel_settings);
 		let find_setting;
@@ -325,10 +331,12 @@ export class Queries {
 				affectedUser: userId,
 			});
 		}
-		const channelList: Channel[] = [];
-		for (const [, result] of find_setting.entries())
-			channelList.push(Channel.getChannel(result.channelId));
-		return channelList;
+		const settingList: Setting[] = [];
+		for (const [, result] of find_setting.entries()) {
+			settingList.push(new Setting(result.setting, result.channelId, result.affectedUser, result.actorUser,
+				result.from, result.until));
+		}
+		return settingList;
 	}
 
 	//ChannelMembers

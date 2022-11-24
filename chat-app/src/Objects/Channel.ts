@@ -131,7 +131,7 @@ export class Channel {
 
     public removeSetting(userId: number, settingType: SettingType) {
         this._settings = this._settings.filter(
-            (a) => !(a.userId == userId && a.setting === settingType),
+            (a) => !(a.affectedId == userId && a.setting === settingType),
         );
     }
 
@@ -161,7 +161,7 @@ export class Channel {
         return (
             this.settings
                 .filter((a) => a.setting === SettingType.ADMIN)
-                .filter((a) => a.userId === userId).length == 1
+                .filter((a) => a.affectedId === userId).length == 1
         );
     }
 
@@ -169,7 +169,7 @@ export class Channel {
         return (
             this.settings
                 .filter((a) => a.setting == SettingType.BANNED)
-                .filter((a) => a.userId == userId).length == 0
+                .filter((a) => a.affectedId == userId).length == 0
         );
     }
 
