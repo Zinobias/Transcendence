@@ -19,6 +19,7 @@ export interface ChannelUpdatePassword {
 export interface ChannelJoin {
     user_id: number;
     channel_id: number;
+    password?: string
 }
 
 export interface ChannelLeave {

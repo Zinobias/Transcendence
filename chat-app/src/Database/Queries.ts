@@ -25,6 +25,7 @@ export class Queries {
 		return this._instance;
 	}
 
+	private readonly logger = new Logger('Queries');
 	//Users table
 	/**
 	 * Creates a new user entry
@@ -195,9 +196,10 @@ export class Queries {
 	async createChannel(channel: Channel): Promise<number> {
 		const myDataSource = await getDataSource();
 		const addChannel = myDataSource.getRepository(chat_channels);
-		await addChannel.save(new chat_channels(channel));
-		const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
-		return find_channel.channelId;
+		const chatChannels = await addChannel.save(new chat_channels(channel));
+		this.logger.debug(`Channel id for saved channel is ${chatChannels.channelId}`);
+		// const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
+		return chatChannels.channelId;
 	}
 
 	/**

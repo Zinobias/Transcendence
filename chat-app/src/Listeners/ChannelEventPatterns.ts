@@ -35,6 +35,11 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_create')
     async channelCreate(data: ChannelCreate) {
+        if (data.channel_name == undefined || data.channel_name.length < 3 || data.channel_name.length > 12
+            || data.visible == undefined || data.should_get_password == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_create', 'Incorrect data object');
+            return;
+        }
         const user: User = await this.util.getUser(
             data.user_id,
             'channel_create',
@@ -88,6 +93,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_update_password')
     async handlePasswordChange(data: ChannelUpdatePassword) {
+        if (data.channel_id == undefined || data.password == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_update_password', 'Incorrect data object');
+            return;
+        }
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_update_password',
@@ -113,16 +122,20 @@ export class ChannelEventPatterns {
             return
         }
         channel.password = data.password
-        Queries.getInstance().setPassword(channel.channelId, channel.password);
+        await Queries.getInstance().setPassword(channel.channelId, channel.password);
         if (channel.closed) {
             channel.closed = false;
-            Queries.getInstance().setClosed(channel.channelId, channel.closed);
+            await Queries.getInstance().setClosed(channel.channelId, channel.closed);
         }
     }
 
     //TODO check if user is invited?
     @EventPattern('channel_join')
     async handleJoin(data: ChannelJoin) {
+        if (data.channel_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_join', 'Incorrect data object');
+            return;
+        }
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_join',
@@ -130,6 +143,17 @@ export class ChannelEventPatterns {
         if (channel == null) {
             this.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
             return;
+        }
+
+        if (channel.password != undefined) {
+            if (data.password == undefined) {
+                this.emitFailedObject(data.user_id, 'channel_join', `No password provided`);
+                return;
+            }
+            if (data.password != channel.password) {
+                this.emitFailedObject(data.user_id, 'channel_join', `Invalid password`);
+                return
+            }
         }
 
         const user: User = await this.util.getUser(data.user_id, 'channel_join');
@@ -152,7 +176,7 @@ export class ChannelEventPatterns {
         await Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
 
         const userIds = channel.users.map((a) => a.userId);
-        this.util.notify(userIds, 'channel_join_success', {
+        this.util.notify(userIds, 'channel_join', {
             channel_id: channel.channelId,
             user_id: data.user_id,
         });
@@ -160,6 +184,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_leave')
     async handleLeave(data: ChannelLeave) {
+        if (data.channel_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_leave', 'Incorrect data object');
+            return;
+        }
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_leave',
@@ -178,7 +206,7 @@ export class ChannelEventPatterns {
 
         const userIds = channel.users.map((a) => a.userId);
         userIds.push(data.user_id);
-        this.util.notify(userIds, 'channel_leave_success', {
+        this.util.notify(userIds, 'channel_leave', {
             channel_id: channel.channelId,
             user_id: data.user_id,
         });
@@ -186,6 +214,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
     handlePromote(data: ChannelPromote) {
+        if (data.channel_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_leave', 'Incorrect data object');
+            return;
+        }
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_promote',
@@ -208,7 +240,7 @@ export class ChannelEventPatterns {
         channel.addSetting(setting);
         Queries.getInstance().addSetting(setting);
 
-        this.util.notify([data.affected_id], 'channel_promote_success', {
+        this.util.notify([data.affected_id], 'channel_promote', {
             channel_id: channel.channelId,
             user_id: data.affected_id,
         });
@@ -216,6 +248,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_demote')
     async handleDemote(data: ChannelDemote) {
+        if (data.channel_id == undefined || data.affected_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_demote', 'Incorrect data object');
+            return;
+        }
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_demote',
@@ -224,7 +260,7 @@ export class ChannelEventPatterns {
             return;
         if (this.util.userInChannel(channel, data.affected_id, 'channel_demote', true))
             return;
-        if (this.util.notAdmin(channel, data.affected_id, 'channel_kick'))
+        if (this.util.notAdmin(channel, data.affected_id, 'channel_demote'))
             return;
 
         channel.removeSetting(data.affected_id, SettingType.ADMIN);
@@ -237,6 +273,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_kick')
     async handleKick(data: ChannelKick) {
+        if (data.channel_id == undefined || data.affected_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_kick', 'Incorrect data object');
+            return;
+        }
         //TODO send a message to the frontend to notify kicked user somewhere (if we want to do that?)
         const channel: Channel = this.util.getChannel(
             data.channel_id,
@@ -255,6 +295,11 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_ban')
     async handleBan(data: ChannelBan) {
+        if (data.channel_id == undefined || data.until != undefined
+            || (data.until != -1 || data.until <= new Date().getUTCMilliseconds()) || data.affected_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_ban', 'Incorrect data object');
+            return;
+        }
         //TODO send a message to the frontend to notify banned user somewhere (if we want to do that?)
         const channel: Channel = this.util.getChannel(
             data.channel_id,
@@ -284,6 +329,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_disband')
     async handleDisband(data: ChannelDisband) {
+        if (data.channel_id == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_disband', 'Incorrect data object');
+            return;
+        }
         //TODO send a message to the frontend to notify all other users (if we want to do that?)
         const channel: Channel = this.util.getChannel(
             data.channel_id,
@@ -294,11 +343,12 @@ export class ChannelEventPatterns {
         if (this.util.notOwner(channel, data.user_id, 'channel_disband'))
             return;
 
+        const userIds = channel.users.map((a) => a.userId);
+
         Channel.removeChannel(data.channel_id);
         await Queries.getInstance().setClosed(data.channel_id, true);
-        Queries.getInstance().purgeChannel(data.channel_id);
+        await Queries.getInstance().purgeChannel(data.channel_id);
 
-        const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'remove_channel', {
             channel_id: channel.channelId,
         });
@@ -306,6 +356,10 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_message')
     handleMessage(data: ChannelMessage) {
+        if (data.channel_id == undefined || data.message == undefined) {
+            this.emitFailedObject(data.user_id, 'channel_message', 'Incorrect data object');
+            return;
+        }
         const channel: Channel = this.util.getChannel(
             data.channel_id,
             'channel_message',
@@ -348,7 +402,16 @@ export class ChannelEventPatterns {
 
     @EventPattern('channels_retrieve')
     async handleRetrieve(data: ChannelsRetrieve) {
-        //TODO needs error handling for if query fails
-        this.util.notify([data.user_id], 'channels_retrieve', (await Queries.getInstance().getAllPublicChannels()).map(channel => {channel.getIChannel()}));
+        const channels = await Queries.getInstance().getAllPublicChannels();
+        if (channels == undefined) {
+            this.util.notify([data.user_id], 'channels_retrieve', {
+                success: false,
+                msg: 'Unable to find any public channels'
+            });
+        }
+        const IChannels = channels
+            .filter(channel => channel != undefined)
+            .map(channel => {channel.getIChannel()});
+        this.util.notify([data.user_id], 'channels_retrieve', IChannels);
     }
 }
