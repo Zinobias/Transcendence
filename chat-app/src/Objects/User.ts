@@ -115,7 +115,7 @@ export class User {
     }
 
     private async updateFriends() {
-        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
+        this._friends = await Queries.getInstance().getFriends(this._userId, true);
     }
 
     public getIUser(): IUser {
