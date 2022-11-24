@@ -49,7 +49,7 @@ export class chat_channels {
   @Column()
   closed: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   password: string
 
   @Column()
