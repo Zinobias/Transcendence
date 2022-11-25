@@ -189,9 +189,6 @@ export class MatchMakingService {
 		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, this.gameId);
 
 		logger.log("New game instance has been created");
-		this.addNewGameToDatabase(createGameDTO).then(() => {
-			logger.log("new game instance added to DB");
-		});
 		await this.addGameToList(createGameDTO, newGameInstance);
 		return (this.gameId);
 		
@@ -327,22 +324,9 @@ export class MatchMakingService {
 	async addNewGameToDatabase(newGame : CreateGameDTO) {
 		// TODO : add new game to db
 	}
-	async addGameResultToDatabase(gameresult : GameResult) {
-		// logger.log("GameID: [" + gameresult.gameId + "] Game result has been added to the database");
-		// TODO: Go wild abby 
-		/**
-		 * Update database gameId
-		 * Add game to database.
-		 * maybe set a state or so?
-		 * it will have a winner field, so maybe set it to a default value when not defined.
-		 */
-		// {
-			//	gameId : number;
-			//	player1 : string;
-			//	player2 : string;
-			//	player1Score : number;
-			//	player2Score : number;
-			//	winner : string;
-			//	}
+
+	async addGameResultToDatabase(res : GameResult) {
+		this.logger.debug(`ADDING GAME TO DB, METADATA : uid1 : ${res.player1.uid} uid2 : ${res.player1.uid} gameId : ${res.gameId}, player1score ${res.playerScores.player1FinalScore} player2score ${res.playerScores.player2FinalScore}`);
+		this.queries.storeGameResult([res.player1.uid, res.player2.uid], res.gameId, [res.playerScores.player1FinalScore, res.playerScores.player2FinalScore]);
 		}
 }
