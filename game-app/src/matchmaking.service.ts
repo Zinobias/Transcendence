@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ClientProxy, ClientProxyFactory, EventPattern, Payload, Transport } from '@nestjs/microservices';
+import { Queries } from './database/queries';
 import { CreateGameDTO, GameInfo, outDTO } from './dto/dto';
 import { IGameInfo } from './dto/frontend.DTOs';
 import { GameEndedData, gameMatchmakingEntity } from './event-objects/events.objects';
@@ -22,12 +23,20 @@ export class MatchMakingService {
 	 * 
 	 * @param eventEmitter Constructor injection. Gets injected by the module.
 	 */
-	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy) {
+	constructor(private eventEmitter : EventEmitter2, @Inject('gateway') private readonly client : ClientProxy,
+	@Inject(Queries) private readonly queries : Queries) {
 		this.gameModes.forEach((e) => {
 			this.matchMakingQueue.set(e, []);
 		});
-		this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
+		// this.logger.log(`GAMEID IS ${this.queries.getGameId()}`);
+		// this.queries.getGameId()
+		// this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	};
+
+	async onApplicationBootstrap() {
+		this.gameId = await this.queries.getGameId();
+		this.logger.debug(`GAMEID IN MM IS : [${this.gameId}]`);
+    }
 
 	/**
 	 * Wrapper for sending internal events.
