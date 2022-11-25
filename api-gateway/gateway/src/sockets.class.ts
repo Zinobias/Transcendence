@@ -19,29 +19,32 @@ export class Sockets {
 			return false;
 		if (socketMap.find(e => e?.id == socket?.id) === undefined)
 			return false;
-		this.logger.warn(`uid : ${userId} SOCKET ALREADY STORED`)
+		this.logger.debug(`uid : ${userId} SOCKET ALREADY STORED`)
 		return true;
 	}
 
     public storeSocket(userId: number, socket: Socket) {
-        // this.logger.debug(`Storing socket with userId: [${userId}] and socket id ${socket}`);
 		if (socket === undefined) {
-			this.logger.error(`SOCKET UNDEFINED VERY BAD STORESOCKET`)
+			this.logger.error(`SOCKET UNDEFINED. fnc STORESOCKET`)
 			return;
 		}
-		let socketMap : Socket[] = mapGetter(userId, this.socketMap);
+		let socketArray : Socket[] = mapGetter(userId, this.socketMap);
 		if (this.socketIsStored(userId, socket) === true)
 			return ;
-		if (socketMap === undefined)
+		if (socketArray === undefined)
 			this.socketMap.set(userId, [socket]);
 		else {
-			socketMap.push(socket);
+			socketArray.push(socket);
 		}
     }
 
+	/**
+	 * 
+	 * @param userId 
+	 * @returns socketArray or undefined if none found.
+	 */
     public getSocket(userId: number): Socket[] | undefined {
 		let sockets : Socket[] | undefined = mapGetter(userId, this.socketMap);
-	
         this.logger.debug(`Retrieving socket for userId: [${userId}] found [${sockets![0] === undefined ? 'undefined' : sockets![0]}]`);
         return sockets ;
     }
@@ -64,7 +67,7 @@ export class Sockets {
             if (sockets !== undefined) {
 				if (sockets!.length > 0) {
 					sockets.forEach((e : Socket) => {
-					this.logger.debug(`Emitting to socket for userId: [${user}] socketId: ${e} socket length : ${sockets.length}`);
+					this.logger.debug(`Emitting to socket for userId: [${user}] socketId: ${e.id} socket length : ${sockets.length}`);
 					e?.emit(pattern, payload);})
 				}
             } else {
