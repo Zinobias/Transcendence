@@ -47,13 +47,13 @@ export class Queries {
             return undefined;
         let sessionCodes: string[] = []
         for (let output of session) {
-            if (output.time + Queries.expireTime < new Date().getMilliseconds()) {
+            if (output.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
                 this.logger.warn(`Need to remove this session ${output.sessionCode} for ${output.userId}`);
                 break;
             }
             sessionCodes.push(output.sessionCode);
         }
-        // if (session === null || session.time + Queries.expireTime < new Date().getMilliseconds()) {
+        // if (session === null || session.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
         //     this.logger.debug(`Session expired for user ${id}`)
         //     return undefined;
         // }
