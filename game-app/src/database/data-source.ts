@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {DataSource} from 'typeorm';
+import { GameResult } from './entities/game-result';
 import {UserTable} from './entities/user-table';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class Database {
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            entities: [UserTable],
+            entities: [UserTable, GameResult],
             synchronize: true,
         });
     }
