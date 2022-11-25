@@ -401,7 +401,7 @@ export class ChannelEventPatterns {
                 this.util.notify(userIds, 'channel_message', {
                     success: true,
                     msg: undefined,
-                    message: message
+                    message: message.getIMessage()
                 });
             });
     }
