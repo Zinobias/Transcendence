@@ -25,7 +25,7 @@ export class Database {
             .then(async () => {
                 console.log('Connection initialized with database...');
             })
-            .catch(error => console.log('Failed to connec to database', error));
+            .catch(error => console.log('Failed to connect to database', error));
     }
 
     public getDataSource = (delay = 3000): Promise<DataSource> => {

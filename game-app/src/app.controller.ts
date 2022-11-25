@@ -6,6 +6,7 @@ import { Socket } from 'socket.io';
 import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
+import { Queries } from './database/queries';
 
 
 @Controller()
@@ -18,6 +19,7 @@ export class AppController {
 
 	constructor(private matchMakingService: MatchMakingService,
 		@Inject('gateway') private readonly  gatewayClient : ClientProxy,
+		@Inject(Queries) private readonly queries : Queries,
 		private evenEmitter : EventEmitter2) {}
 	private readonly logger = new Logger("game controller");
 
@@ -67,6 +69,7 @@ export class AppController {
 		this.logger.debug("Game-ended event caught & emitted to frontend");
 		this.logger.debug("GameID: [" + payload.gameId + "] Game result has been added to the database");
 
+		// await this.queries.getLeaderboard();
 		if (gameInfo === undefined) {
 			this.logger.debug('game.frame.update cant find the gameInfo');
 			return ;

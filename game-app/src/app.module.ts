@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { MatchMakingService } from './matchmaking.service';
 import { EventEmitterModule, EventEmitter2 } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { Queries } from './database/queries';
+import { Database } from './database/data-source';
 // import { FrontendGateway } from './frontend.gateway';
 
 @Module({
@@ -35,6 +37,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 	  ]),
   ],
   controllers: [AppController],
-  providers: [MatchMakingService],
+  providers: [MatchMakingService, Queries, Database],
 })
 export class AppModule {}
