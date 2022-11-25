@@ -34,9 +34,11 @@ export class Channel {
     }
 
     public static getUserChannels(userId: number): Channel[] {
-        return this._channels.filter(
-            (a) => a._users.filter((b) => b.userId == userId).length == 1,
-        );
+        return this._channels.filter((channel) => {
+            return channel.users.filter((user) => {
+                return user.userId == userId
+            }).length == 1
+        });
     }
 
     public static removeChannel(channelId: number) {

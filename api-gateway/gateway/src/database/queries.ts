@@ -78,7 +78,7 @@ export class Queries {
         return false;
     }
 
-    private async userExists(userId: number): Promise<boolean> {
+    public async userExists(userId: number): Promise<boolean> {
         const myDataSource = await this.database.getDataSource();
         const userTableRepo = myDataSource.getRepository(UserTable);
         try {

@@ -86,6 +86,9 @@ export class Auth {
             this.logger.warn(`Received undefined userId from auth`)
             return undefined;
         }
+        if (!await this.queries.userExists(userId)) {
+            return undefined; //TODO fix this to return a proper error messages
+        }
 		this.sockets.storeSocket(userId, client);
         /**
          * TODO: Check if user in dataBase
