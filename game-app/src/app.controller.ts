@@ -381,6 +381,10 @@ export class AppController {
 		}});
 	}
 
+	/**
+	 * retrieves users + scores from leaderboard.
+	 * @returns see dto file for interface
+	 */
 	@EventPattern('game.get.leaderboard')
 	async getLeaderBoard() {
 		const res = await this.queries.getLeaderboard();
@@ -399,6 +403,10 @@ export class AppController {
 			}});
 	}
 
+	/**
+	 * retrieves user match history.
+	 * @returns see dto file for interface
+	 */
 	@EventPattern('game.user.get.history')
 	async getMatchHistory(@Payload() payload : any) {
 		const res = await this.queries.getUserGameHistory(payload.userId);
