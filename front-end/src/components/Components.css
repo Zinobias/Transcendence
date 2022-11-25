@@ -121,26 +121,6 @@
     font-family: 'Didact Gothic';
 }
 
-.chatroom__text--bubble__left {
-    width: 40%;
-    margin: 2%;
-    border-radius: 5px;
-    padding: 1px;
-    /* border: 1px solid black; */
-    background: #757575;
-    font-family: 'Didact Gothic';
-}
-
-.chatroom__text--bubble__right {
-    width: 40%;
-    margin: 2%;
-    border-radius: 5px;
-    padding: 1px;
-    /* border: 1px solid black; */
-    background: #757575;
-    font-family: 'Didact Gothic';
-}
-
 p.chatp {
     margin-left: 10px;
     margin-right: 10px;

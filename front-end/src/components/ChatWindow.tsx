@@ -1,3 +1,4 @@
+import { time } from "console";
 import React, { useState, useRef, useEffect, useContext }  from "react";
 import { useCookies } from "react-cookie";
 import { IChannel, IMessage } from "../interfaces";
@@ -11,6 +12,7 @@ interface Props {
 const   ChatWindow: React.FC<Props> = ({channelId}) => {
 	
     const [chat, setChat] = useState<IMessage[]>([]);
+    const [oldChat, setOldChat] = useState<IMessage[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
@@ -29,6 +31,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
             console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
         }
         setChat([]);
+        setOldChat([]);
     }, [channelId])
 
 
@@ -48,6 +51,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         socket.on("channel_retrieve_by_id", response => {
             console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
             setChannel(channel => response.channel);
+            setOldChat(oldChat => response.channel.messages);
         })
 
         return () => {
@@ -68,7 +72,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
           element.scroll({
             top: element.scrollHeight,
             left: 0,
-            behavior: "smooth"
+            // behavior: "smooth"
           })
         }
     }, [inputRef, chat, channel])
@@ -76,6 +80,11 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
     function returnName (id: number) : string {
         const ret = channel?.users.find((e) => e.userId == id)?.name
         return (ret == undefined ? "Unknown User": ret);
+    }
+
+    function returnDate (timestamp : number) : string {
+        const date = new Date(timestamp);
+        return(`${date.getHours() < 9 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 9 ? '0' + date.getMinutes() : date.getMinutes()}`);
     }
 
     if (channelId == undefined) {
@@ -92,14 +101,14 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
                 {
                     channel?.messages.map((element, index) => (
                         <div key={index} className="chatroom__text--bubble">
-                            <p className="chatp"><b>{returnName(element.sender)} {element.timestamp}</b><br/>{element.message}</p>
+                            <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p>
                         </div>
                     ))
                 }
                 {
                     chat.map((element, index) => (
                         <div key={index} className="chatroom__text--bubble">
-                        <p className="chatp"><b>{returnName(element.sender)} {element.timestamp}</b><br/>{element.message}</p>
+                        <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p>
                     </div>
                 ))}
             </div>
