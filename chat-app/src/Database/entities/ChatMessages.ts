@@ -38,6 +38,6 @@ export class chat_message {
   @Column()
   message: string;
 
-  @Column()
+  @Column({ default: new Date().getTime(), type: 'bigint' })
   timestamp: number;
 }
