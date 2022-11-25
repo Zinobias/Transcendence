@@ -12,13 +12,12 @@ interface Props {
 const   ChatWindow: React.FC<Props> = ({channelId}) => {
 	
     const [chat, setChat] = useState<IMessage[]>([]);
-    const [oldChat, setOldChat] = useState<IMessage[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
 
-    // IF CHANNEL IF CHANGES EMIT TO GET NEW CHANNEL
+    // IF CHANNEL ID CHANGES EMIT TO GET NEW CHANNEL
     useEffect(() => {
         if (channelId != undefined) {
             socket.emit("chat", {
@@ -31,7 +30,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
             console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
         }
         setChat([]);
-        setOldChat([]);
     }, [channelId])
 
 
@@ -51,7 +49,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         socket.on("channel_retrieve_by_id", response => {
             console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
             setChannel(channel => response.channel);
-            setOldChat(oldChat => response.channel.messages);
         })
 
         return () => {
@@ -65,7 +62,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         inputRef.current?.focus();
     }, [])
 
-    // IF CHAT OR REF CHANGES SCROOL
+    // MAKE CHAT SCROOL TO BOTTOM
     useEffect(() => {
         if(inputRef&& inputRef.current) {
           const element = inputRef.current;
@@ -108,9 +105,10 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
                 {
                     chat.map((element, index) => (
                         <div key={index} className="chatroom__text--bubble">
-                        <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p>
-                    </div>
-                ))}
+                            <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p>
+                        </div>
+                    ))
+                }
             </div>
             <ChatInput channelId={channelId}/>
         </div>
