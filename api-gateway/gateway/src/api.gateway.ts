@@ -78,12 +78,15 @@ export class ApiGateway
     }
 
     handleDisconnect(client: Socket) {
+		this.sockets.removeSocket(client);
         this.logger.log(`Client disconnected: ${client.id}`);
     }
 
     @UseGuards(AuthGuard)
     @SubscribeMessage('chat')
-    handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
+    handleChat(client: Socket, payload: FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
+
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
@@ -96,7 +99,9 @@ export class ApiGateway
 
     @UseGuards(AuthGuard)
     @SubscribeMessage('game')
-    handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
+    handleGame(client: Socket, payload: FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
+
         //TODO verify auth
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
@@ -116,6 +121,8 @@ export class ApiGateway
 
     @SubscribeMessage('auth')
     async handleAuthResp(client: Socket, payload: FrontEndDTO): Promise<boolean | any> {
+		this.sockets.storeSocket(payload.userId!, client);
+
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.eventPattern === 'login') {
@@ -177,6 +184,7 @@ export class ApiGateway
 
     @SubscribeMessage('retrieve_redirect')
     async handleRetrieveRedirect(client: Socket, payload: FrontEndDTO): Promise<any> {
+		this.sockets.storeSocket(payload.userId!, client);
         return {
             event: 'retrieve_redirect',
             data: {
@@ -196,6 +204,7 @@ export class ApiGateway
     @UseGuards(AuthGuard)
     @SubscribeMessage('enable_2fa') 
 	async enableTwoFactorAuthentication(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		if (!payload.userId) // might not be neccessary due to authguard
 		return ({
 			event : 'enable_2fa',
@@ -224,6 +233,7 @@ export class ApiGateway
     @UseGuards(AuthGuard)
     @SubscribeMessage('verify_2fa') 
 	async verifyTFA(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		let success : boolean = false;
 
 		
@@ -258,6 +268,7 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('isEnabled_2fa') 
 	async hasTFA(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		let success : Has2FA;
 
 		success = await this.TFA.hasTwoFA(payload.userId!);
@@ -292,6 +303,7 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('remove_2fa') 
 	async removeTFA(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		let success : boolean = false;
 		const has2FA = await this.TFA.hasTwoFA(payload.userId!);
 
