@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {Entity, Column, PrimaryColumn, Long} from 'typeorm';
 
 @Entity('users')
 export class UserTable {
@@ -14,7 +14,7 @@ export class UserTable {
 	userName: string;
 
 	@Column({ default: new Date().getTime() })
-	createAt: number;
+	createAt: Long;
 
 	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
 	// public sessions: Sessions[];

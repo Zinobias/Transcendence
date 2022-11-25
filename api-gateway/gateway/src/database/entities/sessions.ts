@@ -10,7 +10,7 @@ export class Sessions {
 	sessionCode: string;
 
 	@Column({ default: new Date().getTime() })
-	time: number;
+	time: Long;
 
 	@ManyToOne(() => UserTable, (user) => user.userId)
 	@JoinColumn({ name: 'userId' })

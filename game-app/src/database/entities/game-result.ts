@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
+import {Entity, Column, PrimaryColumn, OneToMany, JoinColumn, Long} from 'typeorm';
 import { UserTable } from './user-table';
 
 @Entity('game_result')
@@ -31,7 +31,7 @@ export class DBGameResult {
 	player2Score : number;
 
 	@Column({ default: new Date().getTime()})
-	createAt: number;
+	createAt: Long;
 
 	@OneToMany(() => UserTable, (user) => user.userId)
 	@JoinColumn({ name: 'userId1' })
