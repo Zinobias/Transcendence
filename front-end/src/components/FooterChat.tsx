@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { AiOutlineClose } from 'react-icons/ai';
 import { SlBubble } from 'react-icons/sl';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 
 const FooterChat: React.FC = () => {
+
+    const [channelId, setChannelId] = useState<number>();
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
@@ -19,7 +21,7 @@ const FooterChat: React.FC = () => {
         </div>
         <div id="footerDropdown" className='footerChat__body'>
             <div className='footerChat__sidebar'>
-                <ChatSidebar/>
+                <ChatSidebar channelId={channelId} setChannelId={setChannelId} />
             </div>
             <div className='footerChat__chat'>
                 {/* 
@@ -28,7 +30,7 @@ const FooterChat: React.FC = () => {
                     ChatSidebar should also get that ID so on click the ID changes and ChatChannel updates
                     if there is no ID just dont display anything 
                 */}
-                <ChatWindow />
+                <ChatWindow channelId={channelId}/>
             </div>
         </div>
     </div>   

@@ -5,6 +5,7 @@ import { IChannelInfo } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
 import ListPublicChatrooms from "./ListPublicChatrooms";
+import { stat } from "fs";
 
 const   Chat: React.FC = () => {
 	
@@ -24,18 +25,13 @@ const   Chat: React.FC = () => {
             data: {user_id: cookies.userID}
         })
         console.log("emiting channels_retrieve");
-    }, [])
+    }, [state])
 
+    // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_create", response => {
             console.log(`socket.on channel_create ${response.channel_name}`);
-            socket.emit("chat", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "channels_retrieve",
-                data: {user_id: cookies.userID}
-            })
-            console.log("emiting channels_retrieve");
+            setState( state => !state);
         })
 
         socket.on("channels_retrieve", response  => {

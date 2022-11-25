@@ -183,6 +183,7 @@ export class ChannelEventPatterns {
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_join', {
+            success: true,
             channel_id: channel.channelId,
             user_id: data.user_id,
         });

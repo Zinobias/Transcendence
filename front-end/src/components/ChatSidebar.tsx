@@ -4,12 +4,18 @@ import { SocketContext } from './Socket';
 import { IChannelInfo } from "../interfaces"
 import ListUserChatrooms from "./ListUserChatrooms";
 
-const ChatSidebar: React.FC = () => {
+interface Props {
+  channelId: number | undefined;
+  setChannelId: React.Dispatch<React.SetStateAction<number | undefined>>;
+}
+
+const ChatSidebar: React.FC<Props> = ({channelId, setChannelId}) => {
 
   const socket = useContext(SocketContext);
   const [cookies] = useCookies(['userID', 'user']);
   const [channels, setChannels] = useState<IChannelInfo[]>([]);
   
+  // EVENT LISTENERS
   useEffect(() => {
     socket.on("get_channels_user", response  => {
       console.log(`socket.on get_channels_user`);
@@ -38,8 +44,13 @@ const ChatSidebar: React.FC = () => {
 
   return (
     <div>
-      ChatSidebar
-      <ListUserChatrooms chatroom={channels} />
+      MY CHATS
+      {channels.map((element) => (
+        // <p key={e.id}>{e.name}</p>
+        <li key={element.channelId} className="listChat">
+            <span className="listChat__text" onClick={(e) => setChannelId(channelId => element.channelId)}>{element.channelName}</span> 
+        </li>
+      ))}
     </div>
   )
 

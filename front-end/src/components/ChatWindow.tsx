@@ -1,14 +1,62 @@
 import React, { useState, useRef, useEffect, useContext }  from "react";
+import { useCookies } from "react-cookie";
+import { IChannel } from "../interfaces";
+import ChatInput from "./ChatInput";
 import { SocketContext } from "./Socket";
 
-const   ChatWindow: React.FC = () => {
+interface Props {
+    channelId: number | undefined;
+}
+
+const   ChatWindow: React.FC<Props> = ({channelId}) => {
 	
-    const [message, setMessage] = useState<string>("");
     const [chat, setChat] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
+    const [cookies] = useCookies(['userID', 'user']);
 
-    
+    useEffect(() => {
+        if (channelId != undefined) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channel_retrieve_by_id", 
+                data: { user_id: cookies.userID, 
+                        channel_id: channelId }
+            });
+            console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
+        }
+        setChat([]);
+    }, [channelId])
+
+
+    // EVENT LISTENERS
+    useEffect(() => {
+        socket.on("channel_message", response => {
+            //console.log(`socket.on channel_message`);
+            if (response.success) {
+                console.log(`socket.on channel_message ${response.message.message}`);
+                // setChat([...chat, response.message.message]);
+                setChat(chat => [...chat, response.message.message]);
+            }
+            else {
+                console.log(`socket.on channel_message ${response.msg}`);
+                //setChat(chat => [...chat, response.msg]);
+            }
+        })
+
+        socket.on("channel_retrieve_by_id", response => {
+            console.log(`channel_retrieve_by_id ${response.channel.channelName}`)
+            setChannel(channel => response.channel);
+        })
+
+        return () => {
+            socket.off("channel_message");
+            socket.off("channel_retrieve_by_id");
+        }
+    }, [])
+
     useEffect(() => {
         inputRef.current?.focus();
     }, [])
@@ -24,32 +72,19 @@ const   ChatWindow: React.FC = () => {
           })
         }
   
-      }, [inputRef, chat])
+    }, [inputRef, chat])
 
-    const handleMessage = (e: React.FormEvent) => {
-        e.preventDefault();
-        // console.log(message);
-        // <ChatMessage message={message}/>
-        setChat([...chat, message]);
-        setMessage("");
+    if (channelId == undefined) {
+        return (
+            <div className="chatroom">
+                No Chatroom loaded
+            </div>
+        )
     }
-
     return (
         <div className="chatroom">
-            New Chat Room
-            <form className="chatroom__form"  onSubmit={(e) => {
-                    handleMessage(e)
-                    // inputRef.current?.blur();
-                    }}>
-                <input 
-                    className="chatroom__form--input" 
-                    ref={inputRef}
-                    type="input"
-                    value={message} 
-                    onChange={(e) => setMessage(e.target.value)}  
-                    // placeholder="Enter your message"
-                />
-            </form>
+            {channel?.channelName}
+            <ChatInput channelId={channelId}/>
             <div className="chatroom__text" ref={inputRef}>
                 {chat.map((element, index) => {
                 return (
@@ -57,7 +92,7 @@ const   ChatWindow: React.FC = () => {
                     <p className="chatp"><b>USER</b><br/>{element}</p>
                 </div>
                 );
-            })}
+                })}
             </div>
         </div>
     )

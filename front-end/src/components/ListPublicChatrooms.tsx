@@ -1,4 +1,6 @@
-import React from "react";
+import React, {  useContext, useState,  useEffect } from "react";
+import { useCookies } from 'react-cookie';
+import { SocketContext } from './Socket';
 import { IChannelInfo } from "../interfaces"
 import { SlLock } from 'react-icons/sl'
 
@@ -7,25 +9,48 @@ interface Props {
 }
 
 const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
+    const socket = useContext(SocketContext);
+    const [cookies] = useCookies(['userID', 'user']);
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    // EVENT LISTENERS
+    useEffect(() => {
+        socket.on("channel_join", response => {
+            if (response.success == true)
+                console.log(`socket.on channel_join success`);
+            else {
+                alert(response.msg);
+                console.log(`socket.on channel_join fail`);
+            }
+        })
+
+        return () => {
+            socket.off("channel_join");
+        }
+    },[])
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId: number) => {
         e.preventDefault();
-        console.log("click join");
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channel_join",
+            data: {user_id: cookies.userID, channel_id: channelId}
+        })
+        console.log("emiting channel_join");
     };
 
     return (
         <>
-        {chatroom.map((e) => (
-            // <p key={e.id}>{e.name}</p>
-            <form key={e.channelId} className="listChat">
-            <span className="listChat__text">{e.channelName}</span> 
+        {chatroom.map((element) => (
+            <form key={element.channelId} className="listChat">
+            <span className="listChat__text">{element.channelName}</span> 
             {
-                e.hasPassword && 
+                element.hasPassword && 
                 <span className="listChat__icon">
                     <SlLock />
                 </span>
             }
-            <button className="boringButton__small" onClick={(e) => handleClick(e)}>JOIN</button>
+            <button className="boringButton__small" onClick={(e) => handleClick(e, element.channelId)}>JOIN</button>
             </form>
         ))}
         </>
