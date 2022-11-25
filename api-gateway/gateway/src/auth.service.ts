@@ -64,8 +64,8 @@ export class Auth {
                     client_secret: process.env.SECRET,
                     code: token,
                     redirect_uri: signup
-                        ? 'http://localhost:3000/signup'
-                        : 'http://localhost:3000/login',
+                        ? `http://${process.env.WEB_HOST}:3000/signup`
+                        : `http://${process.env.WEB_HOST}:3000/login`,
                 }),
                 headers: {'Content-Type': 'application/json'},
             },

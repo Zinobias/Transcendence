@@ -1,4 +1,4 @@
-import {InsertResult} from 'typeorm';
+import {InsertResult, Repository} from 'typeorm';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {Database} from './data-source';
 import {UserTable} from './entities/user-table';
@@ -32,9 +32,6 @@ export class Queries {
 		.catch((e) => this.logger.warn(`Inserting gameResult into DB went wrong. error msg : ${e}`));
 
 		this.logger.warn(`RESULT is ${res}`);
-		// 'SELECT winnerId, COUNT(winnerId) FROM game_result GROUP BY winnerId'
-		// .catch((e) => this.logger.warn('Inserting gameResult into DB went wrong.'));
-		// gameRepository.findAndCountBy({winnerId})
 	}
 
 	public async getUserGameHistory(uid : number) {
@@ -44,4 +41,29 @@ export class Queries {
 		gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
 		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.'));
 	}
+
+	public async getGameId() {
+		const dataSource = await this.database.getDataSource();
+		const gameRepository = dataSource.getRepository(GameResult);
+		let res;
+
+		try {
+			res = await gameRepository.createQueryBuilder()
+			.select(`game_result.gameId`)
+			.from(GameResult, 'game_result')
+			.addOrderBy(`game_result.gameId`, 'DESC')
+			.limit(1)
+			.execute()
+		}
+		catch(e) {
+			this.logger.warn(`Grabbing gameId went wrong : ${e}`);
+			return (-1);
+		}
+		this.logger.debug(`Grabbing gameId   : ${res.gameId}`);
+		if (res.gameId === undefined)
+			return (0);
+		else
+			return (res.gameId);
+	}
+
 }

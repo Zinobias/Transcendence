@@ -37,6 +37,6 @@ import { Database } from './database/data-source';
 	  ]),
   ],
   controllers: [AppController],
-  providers: [MatchMakingService, Queries, Database],
+  providers: [Queries, MatchMakingService, Database],
 })
 export class AppModule {}
