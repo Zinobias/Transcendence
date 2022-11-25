@@ -394,6 +394,7 @@ export class ChannelEventPatterns {
             data.user_id,
             new Date().getTime(),
         );
+        channel.addMessage(message)
         Queries.getInstance()
             .addChannelMessage(data.channel_id, message)
             .then((res) => {

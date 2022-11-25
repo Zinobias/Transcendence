@@ -189,4 +189,8 @@ export class Channel {
             password: this._password,
         }
     }
+
+    addMessage(message: Message) {
+        this.messages.push(message);
+    }
 }
