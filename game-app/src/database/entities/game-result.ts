@@ -1,14 +1,15 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
+import { UserTable } from './user-table';
 
 @Entity('game_result')
 export class GameResult {
-	constructor(uids : number[], gameId : number, playerScores : number[]) {
-		this.userId1 = uids[0];
-		this.userId2 = uids[1];
+	constructor(uid1 : number, uid2 : number, gameId : number, playerScore1 : number, playerScore2 : number) {
+		this.userId1 = uid1;
+		this.userId2 = uid2;
 		this.gameId = gameId;
-		this.player1Score = playerScores[0];
-		this.player2Score = playerScores[1];
-		this.winnerId = playerScores[0] > playerScores[1] ? uids[0] : uids[1];
+		this.player1Score = playerScore1;
+		this.player2Score = playerScore2;
+		this.winnerId = playerScore1 > playerScore2 ? uid1 : uid2;
 	}
 
 	@PrimaryColumn()
@@ -31,4 +32,16 @@ export class GameResult {
 
 	@Column({ default: new Date().getUTCMilliseconds()})
 	createAt: number;
+
+	@OneToMany(() => UserTable, (user) => user.userId)
+	@JoinColumn({ name: 'userId1' })
+	user1: UserTable;
+
+	@OneToMany(() => UserTable, (user) => user.userId)
+	@JoinColumn({ name: 'userId2' })
+	user2: UserTable;
+
+	@OneToMany(() => UserTable, (user) => user.userId)
+	@JoinColumn({ name: 'winnerId' })
+	user3: UserTable;
 }
