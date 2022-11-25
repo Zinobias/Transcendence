@@ -380,4 +380,40 @@ export class AppController {
 			msg		: `Successfully ccreated a game with gameId : [${gameId}]`
 		}});
 	}
+
+	@EventPattern('game.get.leaderboard')
+	async getLeaderBoard() {
+		const res = await this.queries.getLeaderboard();
+
+		this.logger.debug(`Retrieved the leaderboard ${res}.`)
+		if (res === undefined)
+			return ({event : 'game.get.leaderboard', data : {
+				success : 	false,
+				msg		: `Retrieving leaderboard failed [${res}]`
+			}});
+		else
+			return ({event : 'game.get.leaderboard', data : {
+				success : true,
+				msg		: `Retrieving leaderboard succeeded : [${res}]`,
+				leaderboard : res,
+			}});
+	}
+
+	@EventPattern('game.user.get.history')
+	async getMatchHistory(@Payload() payload : any) {
+		const res = await this.queries.getUserGameHistory(payload.userId);
+
+		this.logger.debug(`Retrieved the matchistory for user ${payload.userId}, res val : ${res}.`)
+		if (res === undefined)
+			return ({event : 'game.user.get.history', data : {
+				success : 	false,
+				msg		: `Retrieving user match history failed [${res}]`
+			}});
+		else
+			return ({event : 'game.user.get.history', data : {
+				success : true,
+				msg		: `Retrieving user match history succeeded : [${res}]`,
+				history : res,
+			}});
+	}
 }

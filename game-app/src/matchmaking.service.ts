@@ -28,9 +28,6 @@ export class MatchMakingService {
 		this.gameModes.forEach((e) => {
 			this.matchMakingQueue.set(e, []);
 		});
-		// this.logger.log(`GAMEID IS ${this.queries.getGameId()}`);
-		// this.queries.getGameId()
-		// this.gameId = 0; // TODO : Maybe fetch gameId from the DB.
 	};
 
 	async onApplicationBootstrap() {
