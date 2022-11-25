@@ -24,7 +24,7 @@ export class RetrieveUserDataEventPatterns {
                     channelId: channel.channelId,
                     channelName: channel.channelName,
                     visible: channel.visible,
-                    hasPassword: (channel.password !== undefined)
+                    hasPassword: (channel.password != undefined && channel.password.length == 64)
                 }
             })
         });
