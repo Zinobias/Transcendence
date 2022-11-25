@@ -24,12 +24,18 @@ const   Chat: React.FC = () => {
             data: {user_id: cookies.userID}
         })
         console.log("emiting channels_retrieve");
-    }, [state])
+    }, [])
 
     useEffect(() => {
         socket.on("channel_create", response => {
             console.log(`socket.on channel_create ${response.channel_name}`);
-            setState(!state);
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channels_retrieve",
+                data: {user_id: cookies.userID}
+            })
+            console.log("emiting channels_retrieve");
         })
 
         socket.on("channels_retrieve", response  => {
@@ -38,7 +44,6 @@ const   Chat: React.FC = () => {
             response.channels.forEach((element : IChannelInfo) => {
                 setChannels( channels => [...channels, element])
             });
-            // setChannels([...channels, response.channels]);
         })
 
         return () => {
@@ -56,7 +61,7 @@ const   Chat: React.FC = () => {
             alert("Name Field is required");
             return (false);
         }
-        if (name.length > 12) {
+        if (name.length > 12 || name.length < 3) {
             alert("Channel Name needs to be between 3-12 characters");
             return (false);
         }
