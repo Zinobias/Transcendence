@@ -46,7 +46,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         })
 
         socket.on("channel_retrieve_by_id", response => {
-            console.log(`channel_retrieve_by_id ${response.channel.channelName}`)
+            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
             setChannel(channel => response.channel);
         })
 
@@ -63,7 +63,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
 
     // IF CHAT OR REF CHANGES SCROOL
     useEffect(() => {
-
         if(inputRef&& inputRef.current) {
           const element = inputRef.current;
           element.scroll({
@@ -72,7 +71,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
             behavior: "smooth"
           })
         }
-  
     }, [inputRef, chat, channel])
 
     function returnName (id: number) : string {
@@ -90,22 +88,22 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
     return (
         <div className="chatroom">
             {channel?.channelName}
-            <ChatInput channelId={channelId}/>
             <div className="chatroom__text" ref={inputRef}>
                 {
                     channel?.messages.map((element, index) => (
                         <div key={index} className="chatroom__text--bubble">
-                            <p className="chatp"><b>{returnName(element.sender)}</b><br/>{element.message}</p>
+                            <p className="chatp"><b>{returnName(element.sender)} {element.timestamp}</b><br/>{element.message}</p>
                         </div>
                     ))
                 }
                 {
                     chat.map((element, index) => (
-                    <div key={index} className="chatroom__text--bubble">
-                        <p className="chatp"><b>{returnName(element.sender)}</b><br/>{element.message}</p>
+                        <div key={index} className="chatroom__text--bubble">
+                        <p className="chatp"><b>{returnName(element.sender)} {element.timestamp}</b><br/>{element.message}</p>
                     </div>
                 ))}
             </div>
+            <ChatInput channelId={channelId}/>
         </div>
     )
 };
