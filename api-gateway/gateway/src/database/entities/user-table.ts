@@ -13,8 +13,8 @@ export class UserTable {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date().getTime() })
-	createAt: Long;
+	@Column({ default: new Date().getTime(), type: 'bigint' })
+	createAt: number;
 
 	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
 	// public sessions: Sessions[];
