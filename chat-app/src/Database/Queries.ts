@@ -28,9 +28,9 @@ export class Queries {
 	private readonly logger = new Logger('Queries');
 
 	private constructor() {
-		const start = new Date().getUTCMilliseconds();
+		const start = new Date().getTime();
 		this.loadAllChannels().then(() =>
-			this.logger.log(`Loaded all channels from database, took: ${new Date().getUTCMilliseconds() - start} millis`));
+			this.logger.log(`Loaded all channels from database, took: ${new Date().getTime() - start} millis`));
 	}
 	//Users table
 	/**

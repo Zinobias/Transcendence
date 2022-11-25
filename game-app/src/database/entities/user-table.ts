@@ -13,7 +13,7 @@ export class UserTable {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date().getUTCMilliseconds() })
+	@Column({ default: new Date().getTime() })
 	createAt: number;
 
 	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)

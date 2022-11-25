@@ -244,7 +244,7 @@ export class ChannelEventPatterns {
             data.channel_id,
             data.affected_id,
             data.user_id,
-            new Date().getUTCMilliseconds(),
+            new Date().getTime(),
             -1,
         );
         channel.addSetting(setting);
@@ -332,7 +332,7 @@ export class ChannelEventPatterns {
             data.channel_id,
             data.affected_id,
             data.user_id,
-            new Date().getUTCMilliseconds(),
+            new Date().getTime(),
             data.until,
         );
         channel.addSetting(setting);
@@ -392,7 +392,7 @@ export class ChannelEventPatterns {
         const message = new Message(
             data.message,
             data.user_id,
-            new Date().getUTCMilliseconds(),
+            new Date().getTime(),
         );
         Queries.getInstance()
             .addChannelMessage(data.channel_id, message)

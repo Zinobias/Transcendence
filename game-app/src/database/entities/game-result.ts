@@ -30,7 +30,7 @@ export class DBGameResult {
 	@Column()
 	player2Score : number;
 
-	@Column({ default: new Date().getUTCMilliseconds()})
+	@Column({ default: new Date().getTime()})
 	createAt: number;
 
 	@OneToMany(() => UserTable, (user) => user.userId)

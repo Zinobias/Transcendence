@@ -13,7 +13,7 @@ export class user_table {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date().getUTCMilliseconds() })
+	@Column({ default: new Date().getTime() })
 	createAt: number;
 
 	// @JoinColumn({ name: 'avatarId' })

@@ -9,7 +9,7 @@ export class Sessions {
 	@PrimaryColumn()
 	sessionCode: string;
 
-	@Column({ default: new Date().getUTCMilliseconds() })
+	@Column({ default: new Date().getTime() })
 	time: number;
 
 	@ManyToOne(() => UserTable, (user) => user.userId)
