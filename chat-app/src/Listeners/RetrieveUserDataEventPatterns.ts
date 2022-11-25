@@ -19,6 +19,8 @@ export class RetrieveUserDataEventPatterns {
     getChannelsUser(data: GetUserData) {
         const channels = Channel.getUserChannels(data.user_id);
         this.util.notify([data.user_id], 'get_channels_user', {
+            success: true,
+            msg: undefined,
             channels: channels?.map(channel => {
                 return {
                     channelId: channel.channelId,
@@ -35,6 +37,8 @@ export class RetrieveUserDataEventPatterns {
         const user = await User.getUser(data.user_id);
         this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
         this.util.notify([data.user_id], 'get_user', {
+            success: true,
+            msg: undefined,
             user: user?.getIUser(),
         });
     }
@@ -47,6 +51,8 @@ export class RetrieveUserDataEventPatterns {
             false,
         );
         this.util.notify([data.user_id], 'get_friend_requests', {
+            success: true,
+            msg: undefined,
             friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
         });
     }
@@ -58,6 +64,8 @@ export class RetrieveUserDataEventPatterns {
             true,
         );
         this.util.notify([data.user_id], 'get_friends', {
+            success: true,
+            msg: undefined,
             friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
         });
     }
