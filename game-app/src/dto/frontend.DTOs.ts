@@ -48,3 +48,11 @@ export interface IGameGetGameInfo extends basicResponse {
 export interface IGameCreate extends basicResponse {
 	gameInfo : IGameInfo,
 };
+
+export interface IGameGetLeaderboard extends basicResponse {
+	leaderboard	: any,
+};
+
+export interface IGameUserGetHistory extends basicResponse {
+	history : any,
+};

@@ -244,7 +244,7 @@ export class ChannelEventPatterns {
             data.channel_id,
             data.affected_id,
             data.user_id,
-            new Date().getTime(),
+            new Date().getUTCMilliseconds(),
             -1,
         );
         channel.addSetting(setting);
@@ -332,7 +332,7 @@ export class ChannelEventPatterns {
             data.channel_id,
             data.affected_id,
             data.user_id,
-            new Date().getTime(),
+            new Date().getUTCMilliseconds(),
             data.until,
         );
         channel.addSetting(setting);

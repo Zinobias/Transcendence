@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm';
 import { UserTable } from './user-table';
 
 @Entity('game_result')
-export class GameResult {
+export class DBGameResult {
 	constructor(uid1 : number, uid2 : number, gameId : number, playerScore1 : number, playerScore2 : number) {
 		this.userId1 = uid1;
 		this.userId2 = uid2;

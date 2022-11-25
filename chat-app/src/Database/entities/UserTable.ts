@@ -13,8 +13,8 @@ export class user_table {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date() })
-	createAt: Date;
+	@Column({ default: new Date().getUTCMilliseconds() })
+	createAt: number;
 
 	// @JoinColumn({ name: 'avatarId' })
 	// @OneToOne(() => blob, { nullable: true })
