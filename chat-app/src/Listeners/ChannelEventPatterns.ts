@@ -184,6 +184,7 @@ export class ChannelEventPatterns {
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_join', {
             success: true,
+            msg: undefined,
             channel_id: channel.channelId,
             user_id: data.user_id,
         });
@@ -214,6 +215,8 @@ export class ChannelEventPatterns {
         const userIds = channel.users.map((a) => a.userId);
         userIds.push(data.user_id);
         this.util.notify(userIds, 'channel_leave', {
+            success: true,
+            msg: undefined,
             channel_id: channel.channelId,
             user_id: data.user_id,
         });
@@ -248,6 +251,8 @@ export class ChannelEventPatterns {
         Queries.getInstance().addSetting(setting);
 
         this.util.notify([data.affected_id], 'channel_promote', {
+            success: true,
+            msg: undefined,
             channel_id: channel.channelId,
             user_id: data.affected_id,
         });
@@ -357,6 +362,8 @@ export class ChannelEventPatterns {
         await Queries.getInstance().purgeChannel(data.channel_id);
 
         this.util.notify(userIds, 'remove_channel', {
+            success: true,
+            msg: undefined,
             channel_id: channel.channelId,
         });
     }
@@ -426,6 +433,8 @@ export class ChannelEventPatterns {
                 }
             });
         this.util.notify([data.user_id], 'channels_retrieve', {
+            success: true,
+            msg: undefined,
             channels: IChannels
         });
     }
@@ -436,6 +445,8 @@ export class ChannelEventPatterns {
         if (!this.util.userInChannel(channel, data.user_id, 'channel_retrieve_by_id'))
             return;
         this.util.notify([data.user_id], 'channel_retrieve_by_id', {
+            success: true,
+            msg: undefined,
             channel: channel.getIChannel()
         });
     }
