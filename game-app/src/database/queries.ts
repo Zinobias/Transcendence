@@ -42,6 +42,6 @@ export class Queries {
 		const gameRepository = dataSource.getRepository(GameResult);
 
 		gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
-		.catch((e) => this.logger.warn('Inserting gameResult into DB went wrong.'));
+		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.'));
 	}
 }
