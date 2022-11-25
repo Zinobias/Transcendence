@@ -45,7 +45,7 @@ export class Sockets {
 	 */
     public getSocket(userId: number): Socket[] | undefined {
 		let sockets : Socket[] | undefined = mapGetter(userId, this.socketMap);
-        this.logger.debug(`Retrieving socket for userId: [${userId}] found [${sockets![0] === undefined ? 'undefined' : sockets![0]}]`);
+        // this.logger.debug(`Retrieving socket for userId: [${userId}] found [${sockets![0] === undefined ? 'undefined' : sockets![0]}]`);
         return sockets ;
     }
 

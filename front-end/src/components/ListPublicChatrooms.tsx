@@ -15,8 +15,16 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_join", response => {
-            if (response.success == true)
+            if (response.success == true) {
                 console.log(`socket.on channel_join success`);
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_channels_user",
+                    data: {user_id: cookies.userID}
+                })
+                console.log("emiting get_channels_user");
+            }
             else {
                 alert(response.msg);
                 console.log(`socket.on channel_join fail`);

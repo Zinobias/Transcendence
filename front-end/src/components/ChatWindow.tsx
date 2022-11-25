@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext }  from "react";
 import { useCookies } from "react-cookie";
-import { IChannel } from "../interfaces";
+import { IChannel, IMessage } from "../interfaces";
 import ChatInput from "./ChatInput";
 import { SocketContext } from "./Socket";
 
@@ -10,12 +10,13 @@ interface Props {
 
 const   ChatWindow: React.FC<Props> = ({channelId}) => {
 	
-    const [chat, setChat] = useState<string[]>([]);
+    const [chat, setChat] = useState<IMessage[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
 
+    // IF CHANNEL IF CHANGES EMIT TO GET NEW CHANNEL
     useEffect(() => {
         if (channelId != undefined) {
             socket.emit("chat", {
@@ -34,14 +35,12 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_message", response => {
-            //console.log(`socket.on channel_message`);
             if (response.success) {
-                console.log(`socket.on channel_message ${response.message.message}`);
-                // setChat([...chat, response.message.message]);
-                setChat(chat => [...chat, response.message.message]);
+                console.log(`socket.on channel_message success`);
+                setChat(chat => [...chat, response.message]);
             }
             else {
-                console.log(`socket.on channel_message ${response.msg}`);
+                console.log(`socket.on channel_message fail ${response.msg}`);
                 //setChat(chat => [...chat, response.msg]);
             }
         })
@@ -57,10 +56,12 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         }
     }, [])
 
+    // SET INPUT REF
     useEffect(() => {
         inputRef.current?.focus();
     }, [])
 
+    // IF CHAT OR REF CHANGES SCROOL
     useEffect(() => {
 
         if(inputRef&& inputRef.current) {
@@ -72,7 +73,12 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
           })
         }
   
-    }, [inputRef, chat])
+    }, [inputRef, chat, channel])
+
+    function returnName (id: number) : string {
+        const ret = channel?.users.find((e) => e.userId == id)?.name
+        return (ret == undefined ? "Unknown User": ret);
+    }
 
     if (channelId == undefined) {
         return (
@@ -86,13 +92,19 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
             {channel?.channelName}
             <ChatInput channelId={channelId}/>
             <div className="chatroom__text" ref={inputRef}>
-                {chat.map((element, index) => {
-                return (
-                <div key={index} className="chatroom__text--bubble">
-                    <p className="chatp"><b>USER</b><br/>{element}</p>
-                </div>
-                );
-                })}
+                {
+                    channel?.messages.map((element, index) => (
+                        <div key={index} className="chatroom__text--bubble">
+                            <p className="chatp"><b>{returnName(element.sender)}</b><br/>{element.message}</p>
+                        </div>
+                    ))
+                }
+                {
+                    chat.map((element, index) => (
+                    <div key={index} className="chatroom__text--bubble">
+                        <p className="chatp"><b>{returnName(element.sender)}</b><br/>{element.message}</p>
+                    </div>
+                ))}
             </div>
         </div>
     )

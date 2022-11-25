@@ -30,8 +30,19 @@ const   Chat: React.FC = () => {
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_create", response => {
-            console.log(`socket.on channel_create ${response.channel_name}`);
-            setState( state => !state);
+            if (response.success == true) {
+                console.log(`socket.on channel_create success ${response.channel_name}`);
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_channels_user",
+                    data: {user_id: cookies.userID}
+                  })
+                console.log("emiting get_channels_user");
+                setState( state => !state);
+            }
+            else
+                alert(`[${response.msg}]`);
         })
 
         socket.on("channels_retrieve", response  => {

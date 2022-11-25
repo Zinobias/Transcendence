@@ -178,6 +178,7 @@ p.chatp {
     padding: 5px;
     border: none;
     font-size: 20px;
+    cursor: pointer;
 }
 
 .listChat__icon {
