@@ -106,7 +106,7 @@ const   Chat: React.FC = () => {
     return (
         <>
         <div>
-            <span className="heading__small">OPEN CHATROOMS PLACEHOLDER</span>
+            <span className="heading__small">PUBLIC CHATROOMS</span>
             <ListPublicChatrooms chatroom={channels} />
         </div>
         <form className="loginform" id="newChatroom">

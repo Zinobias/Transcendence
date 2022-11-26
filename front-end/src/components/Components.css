@@ -63,16 +63,7 @@
     width: 100%;
     height: 100%;
     background-color: #646464;
-    /* text-align: left; */
 
-    /* flex-direction: column;
-    align-items: center; */
-
-    /* position: relative;
-    width: 70%;
-    height: 70%;
-    margin-top: 40px;
-    border: 2px solid black; */
 }
 
 .chatroom__settingsicon {
@@ -154,41 +145,59 @@ p.chatp {
 
 .listChat {
     display: flex;
+    font-family: 'Didact Gothic';
     margin: 5px;
-    /* width: 40%;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 25px; */
 }
 
 .listChat__text {
     flex: 1;
     padding: 5px;
-    border: none;
     font-size: 20px;
-    /* cursor: pointer; */
 }
 
 .listChat__icon {
     margin-right: 10px;
     font-size: 25px;
-    /* cursor: pointer; */
 }
 
 .listChatUser__text {
-    flex: 1;
-    padding: 5px;
-    border: none;
+    /* flex: 1; */
+    /* padding: 5px; */
+    width: 100%;
+    /* line-height: 1; */
     font-size: 20px;
     cursor: pointer;
+    /* border: 2px solid; */
 }
 
-.listChatUser__icon {
-    margin-right: 10px;
-    font-size: 25px;
+/*
+    CHAT SETTINGS
+*/
+
+.channelSettings {
+    /* position: relative; */
+    padding: 3px;
+    text-align: left;
+}
+
+.listMembers {
+    /* text-align: left; */
+    font-family: 'Didact Gothic';
+    list-style-type: none;
     cursor: pointer;
 }
 
+.leaveChannel {
+    width:100%;
+    margin-bottom: 5px;
+    font-size: large;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
 
 /*
     PROFILE NAV
@@ -307,7 +316,7 @@ p.chatp {
 }
 
 .boringButton__small {
-    width:10%;
+    /* width:100%; */
     border: 2px solid;
     color: black;
     font-weight: bold;
@@ -367,7 +376,7 @@ p.chatp {
 .footerChat__sidebar {
     flex: 0.5;
     text-align: left;
-    border-right: 1px solid black;
+    border-right: 2px solid black;
 }
 
 .footerChat__chat {
@@ -378,7 +387,7 @@ p.chatp {
     display: none;
     flex: 0.5;
     text-align: right;
-    border-left: 1px solid black;
+    border-left: 2px solid black;
 }
 
 .footerChat__show {
@@ -393,6 +402,7 @@ p.chatp {
 .friendslist {
     text-align: left;
     list-style-type: none;
+    font-family: 'Didact Gothic';
 }
 
 /*

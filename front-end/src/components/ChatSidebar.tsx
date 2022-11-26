@@ -21,7 +21,6 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId}) => {
   useEffect(() => {
     socket.on("get_channels_user", response  => {
       console.log(`socket.on get_channels_user`);
-      console.log(response.channels[0]);
       setChannels([]);
       response.channels.forEach((element : IChannelInfo) => {
         setChannels( channels => [...channels, element])
@@ -70,15 +69,12 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId}) => {
 
   return (
     <div>
-      MY CHATS
+      <p style={{textAlign: "center", lineHeight: "0"}}>MY CHATS:</p>
       {channels.map((element) => (
         // TO DO:
         // only show channels that are visible
         <li key={element.channelId} className="listChat">
             <span className="listChatUser__text" onClick={() => setChannelId(channelId => element.channelId)}>{element.channelName}</span> 
-            {/* <span className="listChatUser__icon" onClick={(e) => handleLeave(e, element.channelId)}>
-                <AiFillCloseSquare />
-            </span> */}
         </li>
       ))}
     </div>

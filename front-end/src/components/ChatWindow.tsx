@@ -3,7 +3,6 @@ import { useCookies } from "react-cookie";
 import { IChannel, IMessage } from "../interfaces";
 import ChatInput from "./ChatInput";
 import { SocketContext } from "./Socket";
-import { TbCrown } from "react-icons/tb";
 import { AiOutlineMenu } from "react-icons/ai";
 
 interface Props {
@@ -13,7 +12,6 @@ interface Props {
 const   ChatWindow: React.FC<Props> = ({channelId}) => {
 	
     const [chat, setChat] = useState<IMessage[]>([]);
-    const [alerts, setAlerts] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
@@ -57,7 +55,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         });
 
         socket.on("channel_join", response => {
-            // if response.channel_id == channelId request new channel object
+            // if we are looking at the channel where a new user joins we want to update the channel
             if (response.success == true && response.channel_id == channelId) {
                 socket.emit("chat", {
                     userId: cookies.userID,
@@ -108,7 +106,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
 
     const toggleSettings = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
         e.preventDefault();
-        console.log("footer click");
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
     };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { AiOutlineClose } from 'react-icons/ai';
 import { SlBubble } from 'react-icons/sl';
+import ChannelSettings from './ChannelSettings';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 
@@ -25,16 +25,10 @@ const FooterChat: React.FC = () => {
                 <ChatSidebar channelId={channelId} setChannelId={setChannelId} />
             </div>
             <div className='footerChat__chat'>
-                {/* 
-                    CHAT NOTES
-                    ChatWindow should get an channelID to know what channel to display
-                    ChatSidebar should also get that ID so on click the ID changes and ChatChannel updates
-                    if there is no ID just dont display anything 
-                */}
                 <ChatWindow channelId={channelId}/>
             </div>
             <div id="chatSettings" className="footerChat__settings">
-                settings
+                <ChannelSettings channelId={channelId}/>
             </div>
         </div>
     </div>   
