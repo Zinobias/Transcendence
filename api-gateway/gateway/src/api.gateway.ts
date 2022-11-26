@@ -89,11 +89,10 @@ export class ApiGateway
 
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
-        // // TODO: fix to get userdata from another user
-        // if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
-        //     this.logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
-        //     return;
-        // }
+        if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
+            this.logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
+            return;
+        }
         this.logger.debug(`Received event from frontend on ${payload.eventPattern}`)
         this.chatClient.emit(payload.eventPattern, payload.data);
     }
