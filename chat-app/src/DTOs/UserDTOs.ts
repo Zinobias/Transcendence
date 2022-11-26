@@ -43,6 +43,11 @@ export interface UserRemoveFriend {
     friend_id: number;
 }
 
-export interface GetUserData {
+export interface GetSelfUserData {
     user_id: number;
+}
+
+export interface GetOtherUserData {
+    user_id: number;
+    requested_user_id: number;
 }
