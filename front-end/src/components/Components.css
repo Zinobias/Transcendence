@@ -63,8 +63,10 @@
     width: 100%;
     height: 100%;
     background-color: #646464;
-    text-align: left;
+    /* text-align: left; */
 
+    /* flex-direction: column;
+    align-items: center; */
 
     /* position: relative;
     width: 70%;
@@ -72,6 +74,15 @@
     margin-top: 40px;
     border: 2px solid black; */
 }
+
+.chatroom__settingsicon {
+    font-size: 15px;
+    padding: 10px;
+    /* text-align: right; */
+    /* align-items: center; */
+    /* right: 0px; */
+}
+
 
 .chatroom__form {
     position: absolute;
@@ -100,15 +111,12 @@
 */
 
 .chatroom__text {
-    margin-top: 20px;
-    height: calc(100% - 75px);
+    /* margin-top: 10px; */
+    height: calc(100% - 65px);
     /* overflow-y: scroll; */
     overflow-y: auto; 
     scrollbar-gutter: stable;
-}
-
-.chatroom__text--user {
-    font-weight: bold;
+    text-align: left;
 }
 
 .chatroom__text--bubble {
@@ -158,12 +166,27 @@ p.chatp {
     padding: 5px;
     border: none;
     font-size: 20px;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 .listChat__icon {
     margin-right: 10px;
     font-size: 25px;
+    /* cursor: pointer; */
+}
+
+.listChatUser__text {
+    flex: 1;
+    padding: 5px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.listChatUser__icon {
+    margin-right: 10px;
+    font-size: 25px;
+    cursor: pointer;
 }
 
 
@@ -334,7 +357,7 @@ p.chatp {
     border: 2px solid #000000;
     border-bottom: none;
     height: 500px;
-    width: 600px;
+    width: 700px;
     background-color: #646464;
     -webkit-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.3);
     -moz-box-shadow: 4px 4px 5px 0px rgba(0,0,0,0.3);
@@ -342,13 +365,20 @@ p.chatp {
 }
 
 .footerChat__sidebar {
-    flex: 0.7;
+    flex: 0.5;
     text-align: left;
     border-right: 1px solid black;
 }
 
 .footerChat__chat {
     flex: 2;
+}
+
+.footerChat__settings {
+    display: none;
+    flex: 0.5;
+    text-align: right;
+    border-left: 1px solid black;
 }
 
 .footerChat__show {

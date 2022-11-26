@@ -1,9 +1,10 @@
-import { time } from "console";
 import React, { useState, useRef, useEffect, useContext }  from "react";
 import { useCookies } from "react-cookie";
 import { IChannel, IMessage } from "../interfaces";
 import ChatInput from "./ChatInput";
 import { SocketContext } from "./Socket";
+import { TbCrown } from "react-icons/tb";
+import { AiOutlineMenu } from "react-icons/ai";
 
 interface Props {
     channelId: number | undefined;
@@ -12,6 +13,7 @@ interface Props {
 const   ChatWindow: React.FC<Props> = ({channelId}) => {
 	
     const [chat, setChat] = useState<IMessage[]>([]);
+    const [alerts, setAlerts] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
@@ -40,10 +42,8 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
                 console.log(`socket.on channel_message success`);
                 setChat(chat => [...chat, response.message]);
             }
-            else {
-                console.log(`socket.on channel_message fail ${response.msg}`);
-                //setChat(chat => [...chat, response.msg]);
-            }
+            else 
+                alert(response.msg);
         })
 
         socket.on("channel_retrieve_by_id", response => {
@@ -51,9 +51,31 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
             setChannel(channel => response.channel);
         })
 
+        socket.on("channel_leave", response  => {
+            if (response.success) 
+                setChat(chat => [...chat, {message: "has left the channel.", sender: response.user_id, timestamp: -1}])
+        });
+
+        socket.on("channel_join", response => {
+            // if response.channel_id == channelId request new channel object
+            if (response.success == true && response.channel_id == channelId) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "channel_retrieve_by_id", 
+                    data: { user_id: cookies.userID, 
+                            channel_id: channelId }
+                });
+            }
+            if (response.success == true)
+                setChat(chat => [...chat, {message: "has joined the channel.", sender: response.user_id, timestamp: -1}])
+        })
+
         return () => {
             socket.off("channel_message");
             socket.off("channel_retrieve_by_id");
+            socket.off("channel_leave");
+            socket.off("channel_join");
         }
     }, [])
 
@@ -80,9 +102,15 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
     }
 
     function returnDate (timestamp : number) : string {
-        const date = new Date(timestamp);
+        const date = new Date(Number(timestamp));
         return(`${date.getHours() < 9 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 9 ? '0' + date.getMinutes() : date.getMinutes()}`);
     }
+
+    const toggleSettings = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+        e.preventDefault();
+        console.log("footer click");
+        document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
+    };
 
     if (channelId == undefined) {
         return (
@@ -92,8 +120,15 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         )
     }
     return (
+        <>
+
         <div className="chatroom">
             {channel?.channelName}
+            {/* <AiOutlineMenu /> */}
+            <span className="chatroom__settingsicon" onClick={(e) => toggleSettings(e)}>
+                <AiOutlineMenu />
+            </span>
+            
             <div className="chatroom__text" ref={inputRef}>
                 {
                     channel?.messages.map((element, index) => (
@@ -105,13 +140,18 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
                 {
                     chat.map((element, index) => (
                         <div key={index} className="chatroom__text--bubble">
-                            <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p>
+                            {
+                                element.timestamp == -1 ?
+                                <p className="chatp">{returnName(element.sender)} {element.message}</p> :
+                                <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p>
+                            }
                         </div>
                     ))
                 }
             </div>
             <ChatInput channelId={channelId}/>
         </div>
+        </>
     )
 };
 

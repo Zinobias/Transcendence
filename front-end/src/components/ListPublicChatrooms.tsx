@@ -51,14 +51,14 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
         <>
         {chatroom.map((element) => (
             <form key={element.channelId} className="listChat">
-            <span className="listChat__text">{element.channelName}</span> 
-            {
-                element.hasPassword && 
-                <span className="listChat__icon">
-                    <SlLock />
-                </span>
-            }
-            <button className="boringButton__small" onClick={(e) => handleClick(e, element.channelId)}>JOIN</button>
+                <span className="listChat__text">{element.channelName}</span> 
+                {
+                    element.hasPassword && 
+                    <span className="listChat__icon">
+                        <SlLock />
+                    </span>
+                }
+                <button className="boringButton__small" onClick={(e) => handleClick(e, element.channelId)}>JOIN</button>
             </form>
         ))}
         </>

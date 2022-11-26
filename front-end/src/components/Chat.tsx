@@ -98,7 +98,6 @@ const   Chat: React.FC = () => {
             });
             console.log(`emiting channel_create name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
         }
-        // console.log(`name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
         setChatroomName("");
         setVisibleCheck(false);
         setPasswordCheck(false);

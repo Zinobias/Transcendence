@@ -20,6 +20,7 @@ const FooterChat: React.FC = () => {
             <SlBubble />
         </div>
         <div id="footerDropdown" className='footerChat__body'>
+
             <div className='footerChat__sidebar'>
                 <ChatSidebar channelId={channelId} setChannelId={setChannelId} />
             </div>
@@ -31,6 +32,9 @@ const FooterChat: React.FC = () => {
                     if there is no ID just dont display anything 
                 */}
                 <ChatWindow channelId={channelId}/>
+            </div>
+            <div id="chatSettings" className="footerChat__settings">
+                settings
             </div>
         </div>
     </div>   

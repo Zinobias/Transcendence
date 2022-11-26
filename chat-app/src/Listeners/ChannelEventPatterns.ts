@@ -201,13 +201,13 @@ export class ChannelEventPatterns {
             'channel_leave',
         );
         if (channel == null) {
-            this.emitFailedObject(data.user_id, 'channel_leave', `Unable to find the channel you're trying to join`);
+            this.emitFailedObject(data.user_id, 'channel_leave', `Unable to find the channel you're trying to leave`);
             return;
         }
-        if (this.util.userInChannel(channel, data.user_id, 'channel_leave')) {
-            this.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
-            return;
-        }
+        // if (this.util.userInChannel(channel, data.user_id, 'channel_leave')) {
+        //     this.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
+        //     return;
+        // }
 
         channel.removeUser(data.user_id);
         await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
