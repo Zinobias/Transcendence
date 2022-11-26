@@ -50,7 +50,10 @@ const Profile: React.FC = () => {
                 userId: cookies.userID,
                 authToken: cookies.user,
                 eventPattern: "get_user", 
-                data: {user_id: searchParams.get("id")}
+                data: {
+                    user_id: cookies.userID,
+                    requested_user_id: searchParams.get("id")
+                }
             });
             console.log(`emiting get_user ${searchParams.get("id")}`);
         }
