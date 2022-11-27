@@ -31,37 +31,34 @@ export class Queries {
     return insertResult.identifiers[0].userId !== undefined;
   }
 
-  private static readonly expireTime = 604800000; // 7 days
-  async loadSession(id: number): Promise<string[] | undefined> {
-    const myDataSource = await this.database.getDataSource();
-    const repo = myDataSource.getRepository(Sessions);
-    const session = await repo
-      .findBy({
-        userId: id,
-      })
-      .catch((e) => {
-        this.logger.warn(e);
-        this.logger.warn(`Unable to retrieve session for user: [${id}]`);
-        return undefined;
-      });
-    if (session === undefined) return undefined;
-    const sessionCodes: string[] = [];
-    for (const output of session) {
-      if (output.time + Queries.expireTime < new Date().getMilliseconds()) {
-        this.logger.warn(
-          `Need to remove this session ${output.sessionCode} for ${output.userId}`,
-        );
-        break;
-      }
-      sessionCodes.push(output.sessionCode);
+    private static readonly expireTime = 604800000; // 7 days
+    async loadSession(id: number): Promise<string[] | undefined> {
+        const myDataSource = await this.database.getDataSource();
+        const repo = myDataSource.getRepository(Sessions);
+        let session = await repo.findBy({
+            userId: id
+        }).catch((e) => {
+            this.logger.warn(e);
+            this.logger.warn(`Unable to retrieve session for user: [${id}]`);
+            return undefined;
+        });
+        if (session === undefined)
+            return undefined;
+        let sessionCodes: string[] = []
+        for (let output of session) {
+            if (output.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
+                this.logger.warn(`Need to remove this session ${output.sessionCode} for ${output.userId}`);
+                break;
+            }
+            sessionCodes.push(output.sessionCode);
+        }
+        // if (session === null || session.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
+        //     this.logger.debug(`Session expired for user ${id}`)
+        //     return undefined;
+        // }
+        // else
+        return sessionCodes;
     }
-    // if (session === null || session.time + Queries.expireTime < new Date().getMilliseconds()) {
-    //     this.logger.debug(`Session expired for user ${id}`)
-    //     return undefined;
-    // }
-    // else
-    return sessionCodes;
-  }
 
   public async userNameExists(userName: string): Promise<boolean | string> {
     const myDataSource = await this.database.getDataSource();
@@ -81,22 +78,22 @@ export class Queries {
     return false;
   }
 
-  private async userExists(userId: number): Promise<boolean> {
-    const myDataSource = await this.database.getDataSource();
-    const userTableRepo = myDataSource.getRepository(UserTable);
-    try {
-      const find = await userTableRepo.findOneBy({
-        userId: userId,
-      });
-      if (find == null) return false;
-      else return true;
-    } catch (e) {
-      Logger.warn(
-        `Unable to run userExists check query for [${userId}] see error: ${e}`,
-      );
+    public async userExists(userId: number): Promise<boolean> {
+        const myDataSource = await this.database.getDataSource();
+        const userTableRepo = myDataSource.getRepository(UserTable);
+        try {
+            const find = await userTableRepo.findOneBy({
+                userId: userId
+            });
+            if (find == null) 
+                return false;
+			else
+				return true;
+        } catch (e) {
+            Logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`)
+        }
+        return false;
     }
-    return false;
-  }
 
   public async createUser(
     userId: number,
@@ -143,17 +140,19 @@ export class Queries {
     return false;
   }
 
-  public async retrieveTfa(userId: number) {
-    try {
-      const myDataSource = await this.database.getDataSource();
-      const tfaTableRepo = myDataSource.getRepository(Tfa);
-      const result = await tfaTableRepo.findOneBy({ user_id: userId });
-      if (result?.tfa_code !== undefined) return result.tfa_code;
-    } catch (e) {
-      this.logger.warn(e);
+    public async retrieveTfa(userId: number): Promise<string | Has2FA> {
+        try {
+            const myDataSource = await this.database.getDataSource();
+            const tfaTableRepo = myDataSource.getRepository(Tfa);
+            const result = await tfaTableRepo.findOneBy({user_id: userId});
+            if (result?.tfa_code !== undefined)
+                return result.tfa_code
+        } catch (e) {
+            this.logger.error(e);
+            return Has2FA.ERROR;
+        }
+        return Has2FA.NO_TFA;
     }
-    return undefined;
-  }
 
   public async removeTfa(userId: number): Promise<boolean> {
     try {
@@ -168,4 +167,10 @@ export class Queries {
     }
     return false;
   }
+}
+
+export enum Has2FA {
+    ERROR,
+    NO_TFA,
+    HAS_TFA
 }

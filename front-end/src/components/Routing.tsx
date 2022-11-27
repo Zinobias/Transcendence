@@ -27,7 +27,6 @@ const Routing: React.FC  = () => {
                 <Route path='leaderboard' element={<Leaderboard />} />
                 <Route path='game' element={<Game />} />
                 <Route path='chat' element={<Chat />} />
-                <Route path='chat/chat_window' element={<ChatWindow />} />
                 <Route path='profile' element={<Profile/>}/>
             </Route>
         </Routes>

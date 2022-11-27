@@ -12,15 +12,15 @@ export interface ISetting {
 export class Setting {
     private readonly _setting: SettingType;
     private readonly _channelId: number;
-    private readonly _userId: number;
+    private readonly _affectedId: number;
     private readonly _from: number;
     private readonly _until: number;
     private readonly _actorId: number;
 
-    constructor(setting: SettingType, channelId: number, userId: number, actorId: number, from: number, until: number) {
+    constructor(setting: SettingType, channelId: number, affectedId: number, actorId: number, from: number, until: number) {
         this._setting = setting;
         this._channelId = channelId;
-        this._userId = userId;
+        this._affectedId = affectedId;
         this._actorId = actorId;
         this._from = from;
         this._until = until;
@@ -34,8 +34,8 @@ export class Setting {
         return this._channelId;
     }
 
-    get userId(): number {
-        return this._userId;
+    get affectedId(): number {
+        return this._affectedId;
     }
 
     get from(): number {
@@ -46,11 +46,15 @@ export class Setting {
         return this._until;
     }
 
+    get actorId(): number {
+        return this._actorId;
+    }
+
     public getISetting(): ISetting {
         return {
             setting: this._setting,
             channelId: this._channelId,
-            userId: this._userId,
+            userId: this._affectedId,
             from: this._from,
             until: this._until,
             actorId: this._actorId

@@ -14,8 +14,8 @@ export class UserTable {
   @Column()
   userName: string;
 
-  @Column({ default: new Date() })
-  createAt: Date;
+	@Column({ default: new Date().getTime(), type: 'bigint' })
+	createAt: number;
 
   @OneToMany(() => Sessions, (session) => session.user, {
     onDelete: 'CASCADE',

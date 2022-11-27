@@ -7,9 +7,11 @@ import { user_table } from './UserTable';
 @Entity()
 export class chat_channel_settings {
   constructor(setting: Setting) {
-    if (setting == undefined) return;
+    if (setting == undefined)
+      return;
     this.channelId = setting.channelId;
-    this.affectedUser = setting.userId;
+    this.actorUser = setting.actorId;
+    this.affectedUser = setting.affectedId;
     this.from = setting.from;
     this.until = setting.until;
     this.setting = setting.setting;
@@ -24,6 +26,9 @@ export class chat_channel_settings {
 
   @PrimaryColumn()
   affectedUser: number;
+
+  @Column()
+  actorUser: number;
 
   @ManyToOne(() => user_table, (user) => user.setting)
   @JoinColumn({ name: 'affectedUser' })

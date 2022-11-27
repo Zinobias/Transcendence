@@ -1,8 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {DataSource} from 'typeorm';
+import { DBGameResult } from './entities/game-result';
 import {UserTable} from './entities/user-table';
-import {Sessions} from './entities/sessions';
-import { Tfa } from './entities/tfa';
 
 @Injectable()
 export class Database {
@@ -15,7 +14,7 @@ export class Database {
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            entities: [UserTable, Sessions, Tfa],
+            entities: [UserTable, DBGameResult],
             synchronize: true,
         });
     }
@@ -26,7 +25,7 @@ export class Database {
             .then(async () => {
                 console.log('Connection initialized with database...');
             })
-            .catch((error) => console.log('Failed to connect to database', error));
+            .catch(error => console.log('Failed to connect to database', error));
     }
 
     public getDataSource = (delay = 3000): Promise<DataSource> => {

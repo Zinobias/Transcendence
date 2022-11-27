@@ -24,11 +24,13 @@ export class ApiController {
     @EventPattern('game')
     gameForwarding(@Payload() payload: microServiceDTO) {
         this.logger.log(`Msg from game to gateway received`);
-		for (const userid of payload.userIDs) {
-			this.sockets
-				.getSocket(userid)
-				?.emit(payload.eventPattern, payload.data);
-		}
+		this.sockets.sendData(payload.userIDs, payload.eventPattern, payload.data);
+		// for (const userid of payload.userIDs) {
+		// 	// this.sockets.sendData()
+		// 	this.sockets
+		// 		.getSocket(userid)
+		// 		?.emit(payload.eventPattern, payload.data);
+		// }
     }
 
     @EventPattern('testMsg')
@@ -39,15 +41,17 @@ export class ApiController {
     @EventPattern('chat')
     chatForwarding(@Payload() payload: microServiceDTO) {
         this.logger.log(`Msg from chat to gateway received`);
-		for (const userid of payload.userIDs) {
-			let socket = this.sockets.getSocket(userid);
-            if (socket === undefined) {
-                this.logger.debug(`Tried to emit to offline user`);
-            } else {
-                this.logger.debug(`Emitting to ${socket.id} on ${payload.eventPattern}`);
-                socket.emit(payload.eventPattern, payload.data);
-            }
-		}
+		this.sockets.sendData(payload.userIDs, payload.eventPattern, payload.data);
+
+		// for (const userid of payload.userIDs) {
+		// 	let socket = this.sockets.getSocket(userid);
+        //     if (socket === undefined) {
+        //         this.logger.debug(`Tried to emit to offline user`);
+        //     } else {
+        //         this.logger.debug(`Emitting to ${socket.id} on ${payload.eventPattern}`);
+        //         socket.emit(payload.eventPattern, payload.data);
+        //     }
+		// }
     }
 
     @EventPattern('chat_to_game')

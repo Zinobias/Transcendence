@@ -10,6 +10,7 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
+import {Queries} from "./Database/Queries";
 
 const logger = new Logger('Main');
 async function bootstrap() {
@@ -28,6 +29,7 @@ async function bootstrap() {
   );
   await app.listen().then(() => {
     logger.log('Microservice is listening');
+    Queries.getInstance();
   });
 }
 
