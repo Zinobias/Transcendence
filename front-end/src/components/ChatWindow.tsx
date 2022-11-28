@@ -121,7 +121,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
 
         <div className="chatroom">
             {channel?.channelName}
-            {/* <AiOutlineMenu /> */}
             <span className="chatroom__settingsicon" onClick={(e) => toggleSettings(e)}>
                 <AiOutlineMenu />
             </span>

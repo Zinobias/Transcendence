@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
-import { IChannel } from '../interfaces';
+import { IChannel, SettingType } from '../interfaces';
 import { SocketContext } from './Socket';
 import { TbCrown } from "react-icons/tb";
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +39,7 @@ const ChannelSettings : React.FC<Props> = ({channelId}) => {
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
     }
 
-    const handleProfile = (e: React.MouseEvent<HTMLLIElement, MouseEvent>,  userId: number) => {
+    const handleProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,  userId: number) => {
         e.preventDefault();
         navigate({
             pathname: '/profile',
@@ -47,20 +47,54 @@ const ChannelSettings : React.FC<Props> = ({channelId}) => {
         })
     }
 
+    function findAdmin (userId : number) : boolean {
+		const res = channel?.settings.find((e) => userId == e.userId && e.setting == SettingType.ADMIN);
+		return (res !== undefined);
+	}
+	
+	const toggleSettings = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, userId: number) => {
+		e.preventDefault();
+		console.log("settings click");
+		document.getElementById(userId.toString())?.classList.toggle("settingsShow");
+	}; 
+
+	/*
+		TO DO:
+		SETTINGS:
+		- Leave channel button
+		- if owner:
+			show password stuff on top
+		- member list:
+			- Member Settings:
+			- Go to Profile
+			- Invite to Game
+			- if Admin/Owner:
+				Mute/Ban
+	*/
+
+	if (channelId == undefined) {
+		return (<></>)
+	}
     return (
         <div className="channelSettings">
-            {
-                channelId != undefined &&    
-                <button className="leaveChannel" onClick={(e) => handleLeave(e)}>LEAVE</button>
-            }
+            <button className="leaveChannel" onClick={(e) => handleLeave(e)}>LEAVE</button>
+			{
+				cookies.userID == channel?.owner &&
+				<button className="leaveChannel">pw</button>
+			}
             MEMBERS:
             {channel?.users.map((element, index) => (
-                <li key={index} className="listMembers" onClick={(e) => handleProfile(e, element.userId)}>
-                    {element.name} 
+                <li key={index} className="listMembers">
+                    <span onClick={(e) => toggleSettings(e, element.userId)}>
+					{element.name} 
                     {
-                        element.userId === channel.owner &&
+                        element.userId == channel.owner &&
                         <TbCrown />
                     }
+					</span>
+					<div id={element.userId.toString()} className="settingsDropdown">
+						<button className="leaveChannel" onClick={(e) => handleProfile(e, element.userId)}>profile</button>
+					</div>
                 </li>
             ))}
         </div>

@@ -8,6 +8,13 @@ interface i_Friendslist {
     // online: boolean;
 }
 
+
+/*
+	TO DO:
+	- Show online/offline
+	- Show ingame or now
+*/
+
 const Friendslist: React.FC = () => {
     const socket = useContext(SocketContext);
     var friends: i_Friendslist[] = [

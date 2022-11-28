@@ -188,7 +188,6 @@ p.chatp {
 }
 
 .leaveChannel {
-    width:100%;
     margin-bottom: 5px;
     font-size: large;
     border: 2px solid;
@@ -197,6 +196,15 @@ p.chatp {
     cursor: pointer;
     font-family: 'Silkscreen', cursive;
     background-color: transparent;
+}
+
+.settingsDropdown {
+	display: none;
+	background-color: #8a8a8a;
+}
+
+.settingsShow {
+	display: flex;
 }
 
 /*
@@ -386,7 +394,7 @@ p.chatp {
 .footerChat__settings {
     display: none;
     flex: 0.5;
-    text-align: right;
+	width: 100%;
     border-left: 2px solid black;
 }
 
