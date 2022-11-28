@@ -18,9 +18,97 @@ export interface IChannel {
 
 export class Channel {
     private static _channels: Channel[] = [];
+    private readonly _owner: number;
+    private readonly _otherOwner: number;
+    private readonly _messages: Message[];
 
-    private static addChannel(channel: Channel): void {
-        this._channels.push(channel);
+    constructor(channelId: number, owner: number, channelName: string, users: User[], messages: Message[], settings: Setting[], closed: boolean, otherOwner: number | undefined, visible: boolean, password: string) {
+        this._channelId = channelId;
+        this._owner = owner;
+        this._channelName = channelName;
+        this._users = users;
+        this._messages = messages;
+        this._settings = settings;
+        this._closed = closed;
+        if (otherOwner != undefined)
+            this._otherOwner = otherOwner;
+        this._visible = visible;
+        this._password = password;
+        Channel.addChannel(this);
+    }
+
+    private _channelId: number;
+
+    public get channelId(): number {
+        return this._channelId;
+    }
+
+    public set channelId(value: number) {
+        this._channelId = value;
+    }
+
+    private _channelName: string;
+
+    public get channelName(): string {
+        return this._channelName;
+    }
+
+    public set channelName(value: string) {
+        this._channelName = value;
+    }
+
+    private _users: User[];
+
+    public get users(): User[] {
+        return this._users;
+    }
+
+    private _settings: Setting[];
+
+    public get settings(): Setting[] {
+        return this._settings;
+    }
+
+    private _closed: boolean;
+
+    get closed(): boolean {
+        return this._closed;
+    }
+
+    set closed(value: boolean) {
+        this._closed = value;
+    }
+
+    private _visible: boolean;
+
+    get visible(): boolean {
+        return this._visible;
+    }
+
+    set visible(value: boolean) {
+        this._visible = value;
+    }
+
+    private _password: string;
+
+    get password(): string {
+        return this._password;
+    }
+
+    set password(value: string) {
+        this._password = value;
+    }
+
+    public get owner(): number {
+        return this._owner;
+    }
+
+    public get otherOwner(): number {
+        return this._otherOwner;
+    }
+
+    public get messages(): Message[] {
+        return this._messages;
     }
 
     public static getChannel(channelId: number): Channel | undefined {
@@ -45,58 +133,8 @@ export class Channel {
         this._channels = this._channels.filter((a) => a._channelId != channelId);
     }
 
-    private _channelId: number;
-    private readonly _owner: number;
-    private readonly _otherOwner: number;
-    private _channelName: string;
-    private _users: User[];
-    private readonly _messages: Message[];
-    private _settings: Setting[];
-    private _closed: boolean;
-    private _visible: boolean;
-    private _password: string;
-
-    constructor(channelId: number, owner: number, channelName: string, users: User[], messages: Message[], settings: Setting[], closed: boolean, otherOwner: number | undefined, visible: boolean, password: string) {
-        this._channelId = channelId;
-        this._owner = owner;
-        this._channelName = channelName;
-        this._users = users;
-        this._messages = messages;
-        this._settings = settings;
-        this._closed = closed;
-        if (otherOwner != undefined)
-            this._otherOwner = otherOwner;
-        this._visible = visible;
-        this._password = password;
-        Channel.addChannel(this);
-    }
-
-    public set channelId(value: number) {
-        this._channelId = value;
-    }
-
-    public get channelId(): number {
-        return this._channelId;
-    }
-
-    public get owner(): number {
-        return this._owner;
-    }
-
-    public get otherOwner(): number {
-        return this._otherOwner;
-    }
-
-    public get channelName(): string {
-        return this._channelName;
-    }
-
-    public set channelName(value: string) {
-        this._channelName = value;
-    }
-
-    public get users(): User[] {
-        return this._users;
+    private static addChannel(channel: Channel): void {
+        this._channels.push(channel);
     }
 
     public addUser(user: User) {
@@ -111,22 +149,6 @@ export class Channel {
         return this._users.filter((a) => a.userId == userId).length == 1;
     }
 
-    public get messages(): Message[] {
-        return this._messages;
-    }
-
-    get closed(): boolean {
-        return this._closed;
-    }
-
-    set closed(value: boolean) {
-        this._closed = value;
-    }
-
-    public get settings(): Setting[] {
-        return this._settings;
-    }
-
     public addSetting(setting: Setting) {
         this._settings.push(setting);
     }
@@ -135,22 +157,6 @@ export class Channel {
         this._settings = this._settings.filter(
             (a) => !(a.affectedId == userId && a.setting === settingType),
         );
-    }
-
-    get visible(): boolean {
-        return this._visible;
-    }
-
-    set visible(value: boolean) {
-        this._visible = value;
-    }
-
-    get password(): string {
-        return this._password;
-    }
-
-    set password(value: string) {
-        this._password = value;
     }
 
     public isOwner(userId: number): boolean {
@@ -181,9 +187,15 @@ export class Channel {
             owner: this._owner,
             otherOwner: this._otherOwner,
             channelName: this._channelName,
-            users: this._users.map(user => {return user.getIUser()}),
-            messages: this._messages.map(message => {return message.getIMessage()}),
-            settings: this._settings.map(setting => {return setting.getISetting()}),
+            users: this._users.map(user => {
+                return user.getIUser()
+            }),
+            messages: this._messages.map(message => {
+                return message.getIMessage()
+            }),
+            settings: this._settings.map(setting => {
+                return setting.getISetting()
+            }),
             closed: this._closed,
             visible: this._visible,
             password: this._password,

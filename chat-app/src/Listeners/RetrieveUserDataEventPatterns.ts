@@ -13,7 +13,8 @@ export class RetrieveUserDataEventPatterns {
 
     constructor(private readonly appService: AppService,
                 @Inject('gateway') private readonly gateway: ClientProxy,
-                @Inject(Util) private readonly util: Util) {}
+                @Inject(Util) private readonly util: Util) {
+    }
 
     @EventPattern('get_channels_user')
     getChannelsUser(data: GetSelfUserData) {
@@ -53,7 +54,9 @@ export class RetrieveUserDataEventPatterns {
         this.util.notify([data.user_id], 'get_friend_requests', {
             success: true,
             msg: undefined,
-            friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
+            friendRequests: friendRequests.map(friend => {
+                return friend.getIFriend()
+            }),
         });
     }
 
@@ -66,7 +69,9 @@ export class RetrieveUserDataEventPatterns {
         this.util.notify([data.user_id], 'get_friends', {
             success: true,
             msg: undefined,
-            friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
+            friendRequests: friendRequests.map(friend => {
+                return friend.getIFriend()
+            }),
         });
     }
 }

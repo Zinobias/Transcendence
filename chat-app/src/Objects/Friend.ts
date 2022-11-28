@@ -6,12 +6,12 @@ export interface IFriend {
 }
 
 export class Friend extends User {
-    private _confirmed: boolean;
-
     constructor(user: User, confirmed: boolean) {
         super(user.userId, user.name, user.avatar);
         this._confirmed = confirmed;
     }
+
+    private _confirmed: boolean;
 
     get confirmed(): boolean {
         return this._confirmed;

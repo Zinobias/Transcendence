@@ -2,15 +2,14 @@ import {Channel} from '../Objects/Channel';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {User} from '../Objects/User';
 import {microServiceDTO} from '../app.controller';
-import {AppService} from '../app.service';
 import {ClientProxy} from '@nestjs/microservices';
 
 @Injectable()
 export class Util {
+    private logger: Logger = new Logger('Util');
+
     constructor(@Inject('gateway') private readonly gateway: ClientProxy) {
     }
-
-    private logger: Logger = new Logger('Util');
 
     //EZ MESSAGE:
 

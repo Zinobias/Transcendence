@@ -1,44 +1,38 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-  PrimaryColumn,
-} from 'typeorm';
-import { Message } from '../../Objects/Message';
-import { chat_channels } from './ChatChannels';
-import { user_table } from './UserTable';
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn,} from 'typeorm';
+import {Message} from '../../Objects/Message';
+import {chat_channels} from './ChatChannels';
+import {user_table} from './UserTable';
 
 @Entity()
 export class chat_message {
-  constructor(channelId: number, message: Message) {
-    if (message === undefined) return;
-    this.channelId = channelId;
-    this.message = message.message;
-    this.userId = message.sender;
-    this.timestamp = message.timestamp;
-  }
-  @PrimaryGeneratedColumn()
-  messageId: number;
+    constructor(channelId: number, message: Message) {
+        if (message === undefined) return;
+        this.channelId = channelId;
+        this.message = message.message;
+        this.userId = message.sender;
+        this.timestamp = message.timestamp;
+    }
 
-  @PrimaryColumn()
-  channelId: number;
+    @PrimaryGeneratedColumn()
+    messageId: number;
 
-  @ManyToOne(() => chat_channels, (chat) => chat.message)
-  @JoinColumn({ name: 'channelId' })
-  chat: chat_channels;
+    @PrimaryColumn()
+    channelId: number;
 
-  @PrimaryColumn()
-  userId: number;
+    @ManyToOne(() => chat_channels, (chat) => chat.message)
+    @JoinColumn({name: 'channelId'})
+    chat: chat_channels;
 
-  @ManyToOne(() => user_table, (user) => user.message)
-  @JoinColumn({ name: 'userId' })
-  user: user_table;
+    @PrimaryColumn()
+    userId: number;
 
-  @Column()
-  message: string;
+    @ManyToOne(() => user_table, (user) => user.message)
+    @JoinColumn({name: 'userId'})
+    user: user_table;
 
-  @Column({ default: new Date().getTime(), type: 'bigint' })
-  timestamp: number;
+    @Column()
+    message: string;
+
+    @Column({default: new Date().getTime(), type: 'bigint'})
+    timestamp: number;
 }

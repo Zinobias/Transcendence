@@ -12,9 +12,53 @@ export interface IUser {
 
 export class User {
     private static _users: User[] = [];
+    private readonly _userId: number;
 
-    private static addUser(user: User): void {
-        this._users.push(user);
+    constructor(userId: number, name: string, avatar: object) {
+        this._userId = userId;
+        this._name = name;
+        this._avatar = avatar;
+        this._blocked = [];
+        this._friends = [];
+        User.addUser(this);
+        this.updateBlocked();
+        this.updateFriends();
+    }
+
+    private _name: string;
+
+    get name(): string {
+        return this._name;
+    }
+
+    set name(value: string) {
+        this._name = value;
+    }
+
+    private _avatar: object;
+
+    get avatar(): object {
+        return this._avatar;
+    }
+
+    set avatar(value: object) {
+        this._avatar = value;
+    }
+
+    private _blocked: User[];
+
+    get blocked(): User[] {
+        return this._blocked;
+    }
+
+    private _friends: Friend[];
+
+    get friends(): Friend[] {
+        return this._friends;
+    }
+
+    get userId(): number {
+        return this._userId;
     }
 
     public static async getUser(userId: number): Promise<User | undefined> {
@@ -33,45 +77,8 @@ export class User {
         this._users = this._users.filter((a) => a._userId != userId);
     }
 
-    private readonly _userId: number;
-    private _name: string;
-    private _avatar: object;
-    private _blocked: User[];
-    private _friends: Friend[];
-
-    constructor(userId: number, name: string, avatar: object) {
-        this._userId = userId;
-        this._name = name;
-        this._avatar = avatar;
-        this._blocked = [];
-        this._friends = [];
-        User.addUser(this);
-        this.updateBlocked();
-        this.updateFriends();
-    }
-
-    get userId(): number {
-        return this._userId;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    set name(value: string) {
-        this._name = value;
-    }
-
-    get avatar(): object {
-        return this._avatar;
-    }
-
-    set avatar(value: object) {
-        this._avatar = value;
-    }
-
-    get blocked(): User[] {
-        return this._blocked;
+    private static addUser(user: User): void {
+        this._users.push(user);
     }
 
     block(user: User) {
@@ -86,10 +93,6 @@ export class User {
 
     unblock(user: User) {
         this._blocked = this._blocked.filter((a) => a._userId != user._userId);
-    }
-
-    get friends(): Friend[] {
-        return this._friends;
     }
 
     friend(friend: Friend) {
@@ -110,14 +113,6 @@ export class User {
         this._friends = this._friends.filter((a) => a._userId != friend._userId);
     }
 
-    private async updateBlocked() {
-        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
-    }
-
-    private async updateFriends() {
-        this._friends = await Queries.getInstance().getFriends(this._userId, true);
-    }
-
     public getIUser(): IUser {
         return {
             userId: this.userId,
@@ -126,5 +121,13 @@ export class User {
             blocked: this.blocked.map(blocked => blocked.getIUser()),
             friends: this.friends.map(blocked => blocked.getIFriend())
         }
+    }
+
+    private async updateBlocked() {
+        this._blocked = await Queries.getInstance().getBlockedUsers(this._userId);
+    }
+
+    private async updateFriends() {
+        this._friends = await Queries.getInstance().getFriends(this._userId, true);
     }
 }

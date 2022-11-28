@@ -10,7 +10,10 @@ import {
     ChannelKick,
     ChannelLeave,
     ChannelMessage,
-    ChannelPromote, ChannelRetrieve, ChannelsRetrieve, ChannelUpdatePassword,
+    ChannelPromote,
+    ChannelRetrieve,
+    ChannelsRetrieve,
+    ChannelUpdatePassword,
 } from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
@@ -27,10 +30,7 @@ export class ChannelEventPatterns {
     constructor(private readonly appService: AppService,
                 @Inject('gateway') private readonly gateway: ClientProxy,
                 @Inject(Util) private readonly util: Util,
-                /*@Inject(Queries) private readonly queries: Queries*/) {}
-
-    private emitFailedObject(userId: number, channel: string, msg: string) {
-        this.util.notify([userId], channel, {success: false, msg: msg})
+                /*@Inject(Queries) private readonly queries: Queries*/) {
     }
 
     @EventPattern('channel_create')
@@ -426,7 +426,8 @@ export class ChannelEventPatterns {
         }
         const IChannels = channels
             .filter(channel => channel != undefined)
-            .map(channel => {return {
+            .map(channel => {
+                return {
                     channelId: channel.channelId,
                     channelName: channel.channelName,
                     visible: channel.visible,
@@ -450,5 +451,9 @@ export class ChannelEventPatterns {
             msg: undefined,
             channel: channel.getIChannel()
         });
+    }
+
+    private emitFailedObject(userId: number, channel: string, msg: string) {
+        this.util.notify([userId], channel, {success: false, msg: msg})
     }
 }
