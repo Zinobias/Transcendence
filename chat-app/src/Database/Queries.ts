@@ -342,11 +342,9 @@ export class Queries {
       return -1;
     }
     try {
-      await addChannel.save(new chat_channels(channel));
-      const find_channel = await addChannel.findOneBy({
-        ownerId: channel.owner,
-      });
-      return find_channel.channelId;
+      const test = await addChannel.save(new chat_channels(channel));
+      console.log("I'm testing the return value of addChannel " + test.channelId);
+      return test.channelId;
     } catch (e) {
       Logger.warn(
         `Unable to run chat_channel query for [${channel.owner}] see error: ${e}`,
