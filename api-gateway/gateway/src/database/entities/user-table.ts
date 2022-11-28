@@ -1,30 +1,27 @@
-import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
-import { Sessions } from './sessions';
+import {Column, Entity, OneToMany, PrimaryColumn} from 'typeorm';
+import {Sessions} from './sessions';
 
 @Entity('users')
 export class UserTable {
-  constructor(userId: number, userName: string) {
-    this.userId = userId;
-    this.userName = userName;
-  }
+    @PrimaryColumn()
+    userId: number;
+    @Column()
+    userName: string;
+    @Column({default: new Date().getTime(), type: 'bigint'})
+    createAt: number;
+    @OneToMany(() => Sessions, (session) => session.user, {
+        onDelete: 'CASCADE',
+    })
+    session: Sessions[];
 
-  @PrimaryColumn()
-  userId: number;
+    constructor(userId: number, userName: string) {
+        this.userId = userId;
+        this.userName = userName;
+    }
 
-  @Column()
-  userName: string;
+    // @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
+    // public sessions: Sessions[];
 
-	@Column({ default: new Date().getTime(), type: 'bigint' })
-	createAt: number;
-
-  @OneToMany(() => Sessions, (session) => session.user, {
-    onDelete: 'CASCADE',
-  })
-  session: Sessions[];
-
-  // @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
-  // public sessions: Sessions[];
-
-  // @Column({ type: 'longblob' })
-  // avatar: Buffer;
+    // @Column({ type: 'longblob' })
+    // avatar: Buffer;
 }

@@ -8,18 +8,17 @@ import {TwoFactorAuthService} from './2fa.service';
 
 @Injectable()
 export class Auth {
+    public readonly map: Map<number, string[]>;
+    private logger: Logger = new Logger('Auth');
+
     constructor(
         @Inject(Sockets) private readonly sockets: Sockets,
         @Inject(Queries) private readonly queries: Queries,
-		@Inject(TwoFactorAuthService) private readonly TFA : TwoFactorAuthService,
+        @Inject(TwoFactorAuthService) private readonly TFA: TwoFactorAuthService,
     ) {
         this.logger.debug(`Creating Auth Class`)
         this.map = new Map<number, string[]>();
     }
-
-    private logger: Logger = new Logger('Auth');
-
-    public readonly map: Map<number, string[]>;
 
     /**
      * For some unknown reason the get call does not work on the map in this function, the map does still contain
@@ -36,7 +35,9 @@ export class Auth {
             if (key != userId) {
                 return;
             }
-            let result = value.find((val) => {return val === accessToken});
+            let result = value.find((val) => {
+                return val === accessToken
+            });
             specialGetFindsAuth = result !== undefined;
         })
         return specialGetFindsAuth;
@@ -47,9 +48,66 @@ export class Auth {
         if (accessToken != undefined) {
             this.logger.debug(`Storing session token for user: [${userId}] token: [${accessToken}]`)
             this.map.set(userId, accessToken);
-        }
-        else
+        } else
             Logger.warn(`Received undefined accessToken when loading session for user id [${userId}]`)
+    }
+
+    public async login(client: Socket, token: string, TFAToken?: string): Promise<any | undefined> {
+        const userId = await this.auth(token, false);
+
+        if (userId === undefined) {
+            this.logger.warn(`Received undefined userId from auth`)
+            return undefined;
+        }
+        if (!await this.queries.userExists(userId)) {
+            return undefined; //TODO fix this to return a proper error messages
+        }
+        this.sockets.storeSocket(userId, client);
+        /**
+         * TODO: Check if user in dataBase
+         */
+        const uuid = randomUUID();
+        const has2FA = await this.TFA.hasTwoFA(userId);
+        if (has2FA === Has2FA.HAS_TFA) {
+            if (TFAToken && await this.TFA.verify(userId, TFAToken) === true) {
+                return ({
+                    user_id: userId,
+                    auth_cookie: uuid,
+                });
+            } else {
+                return ({
+                    user_id: userId,
+                    auth_cookie: undefined,
+                });
+            }
+        } else if (has2FA == Has2FA.ERROR) {
+            return undefined;
+        }
+        if ((await this.storeSession(userId, uuid)))
+            return {user_id: userId, auth_cookie: uuid};
+        else {
+            this.logger.error(`Unable to store session for user id [${userId}]`);
+            return undefined;
+        }
+    };
+
+    public async createAccount(client: Socket, payload: any): Promise<any | string> {
+        this.logger.log(`Creating an account for [${payload.userName}]`);
+        const userId = await this.auth(payload.token, true);
+
+        if (userId === undefined)
+            return 'Failed to get userId from auth, are you an intra user?';
+        let createUserResult: string | boolean = await this.queries.createUser(userId, payload.userName);
+        if (typeof createUserResult == 'string')
+            return createUserResult as string;
+        this.sockets.storeSocket(userId, client);
+        const uuid = randomUUID();
+        if ((await this.storeSession(userId, uuid)))
+            return {user_id: userId, auth_cookie: uuid};
+        else {
+            this.logger.error(`Unable to store session for user id [${userId}]`);
+            return `Unknown database error`;
+        }
     }
 
     private async auth(token: string, signup: boolean): Promise<number | undefined> {
@@ -79,46 +137,6 @@ export class Auth {
         return await this.retrieveUserId(json);
     }
 
-    public async login(client: Socket, token: string, TFAToken? : string): Promise<any | undefined> {
-        const userId = await this.auth(token, false);
-
-        if (userId === undefined) {
-            this.logger.warn(`Received undefined userId from auth`)
-            return undefined;
-        }
-        if (!await this.queries.userExists(userId)) {
-            return undefined; //TODO fix this to return a proper error messages
-        }
-		this.sockets.storeSocket(userId, client);
-        /**
-         * TODO: Check if user in dataBase
-         */
-		const uuid = randomUUID();
-        const has2FA = await this.TFA.hasTwoFA(userId);
-		if (has2FA === Has2FA.HAS_TFA) {
-			if (TFAToken && await this.TFA.verify(userId, TFAToken) === true) {
-				return ({
-					user_id : userId,
-					auth_cookie : uuid,
-				});
-			}
-			else {
-				return ({
-					user_id : userId,
-					auth_cookie : undefined,
-				});
-			}
-		} else if (has2FA == Has2FA.ERROR) {
-            return undefined;
-        }
-        if ((await this.storeSession(userId, uuid)))
-            return {user_id: userId, auth_cookie: uuid};
-        else {
-            this.logger.error(`Unable to store session for user id [${userId}]`);
-            return undefined;
-        }
-    };
-
     private async retrieveUserId(authToken: AuthToken): Promise<number> {
         this.logger.log(authToken.access_token);
         const response = await fetch('https://api.intra.42.fr/v2/me', {
@@ -141,24 +159,5 @@ export class Auth {
         else
             this.logger.warn(`Unable to store auth for user id [${userId}]`)
         return isSuccessful;
-    }
-
-    public async createAccount(client: Socket, payload: any): Promise<any | string> {
-        this.logger.log(`Creating an account for [${payload.userName}]`);
-        const userId = await this.auth(payload.token, true);
-		
-        if (userId === undefined)
-            return 'Failed to get userId from auth, are you an intra user?';
-        let createUserResult: string | boolean = await this.queries.createUser(userId, payload.userName);
-        if (typeof createUserResult == 'string')
-            return createUserResult as string;
-        this.sockets.storeSocket(userId, client);
-		const uuid = randomUUID();
-		if ((await this.storeSession(userId, uuid)))
-			return {user_id: userId, auth_cookie: uuid};
-		else {
-			this.logger.error(`Unable to store session for user id [${userId}]`);
-			return `Unknown database error`;
-		}
     }
 }
