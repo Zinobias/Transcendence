@@ -4,7 +4,7 @@ export interface basicResponse {
 }
 
 export interface IGameEnded {
-	winner : string,
+	winner : number,
 	player1ScoreFinal : number,
 	player2ScoreFinal : number,
 };
@@ -25,10 +25,10 @@ export interface IGameIsInQueue extends basicResponse {};
 
 export interface IGameInfo {
 	players : {
-		readonly player1 	:  	string ,
-		readonly player2	: 	string ,
+		readonly player1 	:  	number ,
+		readonly player2	: 	number ,
 	},
-	spectatorList? 			:	string[];
+	spectatorList? 			:	number[];
 	readonly gameId			: 	number,
 	readonly playerScores 	: {
 		readonly player1Score	: 	number,
@@ -47,4 +47,12 @@ export interface IGameGetGameInfo extends basicResponse {
 
 export interface IGameCreate extends basicResponse {
 	gameInfo : IGameInfo,
+};
+
+export interface IGameGetLeaderboard extends basicResponse {
+	leaderboard	: any,
+};
+
+export interface IGameUserGetHistory extends basicResponse {
+	history : any,
 };

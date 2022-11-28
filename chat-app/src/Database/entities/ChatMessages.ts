@@ -2,9 +2,8 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   JoinColumn,
-  PrimaryColumn,
+  PrimaryColumn, OneToMany,
 } from 'typeorm';
 import { Message } from '../../Objects/Message';
 import { chat_channels } from './ChatChannels';
@@ -25,20 +24,20 @@ export class chat_message {
   @PrimaryColumn()
   channelId: number;
 
-  @ManyToOne(() => chat_channels, (chat) => chat.channelId)
+  @OneToMany(() => chat_channels, (chat) => chat.channelId)
   @JoinColumn({ name: 'channelId' })
   chat: chat_channels;
 
   @PrimaryColumn()
   userId: number;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
+  @OneToMany(() => user_table, (user) => user.userId)
   @JoinColumn({ name: 'userId' })
   user: user_table;
 
   @Column()
   message: string;
 
-  @Column()
+  @Column({ default: new Date().getTime(), type: 'bigint' })
   timestamp: number;
 }

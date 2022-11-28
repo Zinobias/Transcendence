@@ -13,6 +13,7 @@ import { Friend } from '../Objects/Friend';
 import { InsertResult } from 'typeorm';
 import { user_table } from './entities/UserTable';
 import { chat_message } from './entities/ChatMessages';
+import {Logger} from "@nestjs/common";
 
 export class Queries {
 	private static _instance: Queries;
@@ -24,6 +25,13 @@ export class Queries {
 		return this._instance;
 	}
 
+	private readonly logger = new Logger('Queries');
+
+	private constructor() {
+		const start = new Date().getTime();
+		this.loadAllChannels().then(() =>
+			this.logger.log(`Loaded all channels from database, took: ${new Date().getTime() - start} millis`));
+	}
 	//Users table
 	/**
 	 * Creates a new user entry
@@ -127,12 +135,11 @@ export class Queries {
 	 */
 	async removeBlockedUser(userId: number, blockedUser: number): Promise<void> {
 		const myDataSource = await getDataSource();
-		const blocked_user_repository = myDataSource.getRepository(blocked);
-		const find_user = await blocked_user_repository.findOneBy({
+		const blockedTable = myDataSource.getRepository(blocked);
+		await blockedTable.delete({
 			userId: userId,
 			blockId: blockedUser,
 		});
-		await blocked_user_repository.remove(find_user);
 	}
 
 	//Friends table
@@ -145,15 +152,16 @@ export class Queries {
 	 */
 	async getFriends(userId: number, accepted: boolean): Promise<Friend[]> {
 		const myDataSource = await getDataSource();
-		const friend = myDataSource.getRepository(friends);
-		const find_friend = await friend.findBy({
+		const repository = myDataSource.getRepository(friends);
+		const find_friend = await repository.findBy({
 			userId: userId,
 			active: accepted,
 		});
 		const friendList: Friend[] = [];
 		for (const [, result] of find_friend.entries()) {
 			const user = await User.getUser(result.userId);
-			if (user === undefined) continue;
+			if (user === undefined)
+				continue;
 			friendList.push(<Friend>user);
 		}
 		return friendList;
@@ -195,9 +203,10 @@ export class Queries {
 	async createChannel(channel: Channel): Promise<number> {
 		const myDataSource = await getDataSource();
 		const addChannel = myDataSource.getRepository(chat_channels);
-		await addChannel.save(new chat_channels(channel));
-		const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
-		return find_channel.channelId;
+		const chatChannels = await addChannel.save(new chat_channels(channel));
+		this.logger.debug(`Channel id for saved channel is ${chatChannels.channelId}`);
+		// const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
+		return chatChannels.channelId;
 	}
 
 	/**
@@ -208,6 +217,12 @@ export class Queries {
 		const myDataSource = await getDataSource();
 		const channel = myDataSource.getRepository(chat_channels);
 		await channel.delete({ channelId: channel_id });
+	}
+
+	async setPassword(channelId: number, password: string) {
+		const myDataSource = await getDataSource();
+		const channel = myDataSource.getRepository(chat_channels);
+		await channel.update({ channelId: channelId }, {password: password});
 	}
 
 	/**
@@ -234,22 +249,44 @@ export class Queries {
 		const find_channel = await channel.findBy({
 			owner2Id: null,
 			closed: false,
+			visible: true,
 		});
 		const channelList: Channel[] = [];
 		for (const [, result] of find_channel.entries()) {
-			channelList.push(Channel.getChannel(result.channelId));
+			let resultChannel = Channel.getChannel(result.channelId);
+			if (resultChannel === undefined) {
+				Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
+				continue;
+			}
+			channelList.push(resultChannel);
 		}
 		return channelList;
+	}
+
+	async loadAllChannels() {
+		const myDataSource = await getDataSource();
+		const channel = myDataSource.getRepository(chat_channels);
+		const find_channel = await channel.findBy({
+			closed: false
+		});
+		for (const [, result] of find_channel.entries()) {
+			new Channel(result.channelId, result.ownerId, result.channelName,
+				await this.getChannelMembers(result.channelId),
+				await this.getChannelMessages(result.channelId),
+				await this.getSettings(result.channelId),
+				result.closed, result.owner2Id == null ? undefined : result.owner2Id,
+				result.visible, result.password);
+		}
 	}
 
 	/**
 	 * Disable a channel
 	 * @param channelId channel to disable
 	 */
-	async disableChannel(channelId: number): Promise<void> {
+	async setClosed(channelId: number, closed: boolean): Promise<void> {
 		const myDataSource = await getDataSource();
 		const disable = myDataSource.getRepository(chat_channels);
-		await disable.update({ channelId: channelId }, { closed: true });
+		await disable.update({ channelId: channelId }, { closed: closed });
 	}
 
 	/**
@@ -283,19 +320,14 @@ export class Queries {
 	 * @param userId user to remove setting for
 	 * @param settingType setting type to remove
 	 */
-	async removeSetting(
-		channelId: number,
-		userId: number,
-		settingType: SettingType,
-	) {
+	async removeSetting(channelId: number, userId: number, settingType: SettingType) {
 		const myDataSource = await getDataSource();
 		const setting = myDataSource.getRepository(chat_channel_settings);
-		const find = setting.findBy({
+		await setting.delete({
 			channelId: channelId,
 			affectedUser: userId,
 			setting: settingType,
 		});
-		await setting.remove(await find);
 	}
 
 	/**
@@ -303,7 +335,7 @@ export class Queries {
 	 * @param channelId channel to get the settings for
 	 * @param userId optional user to get the settings for
 	 */
-	async getSettings(channelId: number, userId?: number): Promise<Channel[]> {
+	async getSettings(channelId: number, userId?: number): Promise<Setting[]> {
 		const myDataSource = await getDataSource();
 		const setting = myDataSource.getRepository(chat_channel_settings);
 		let find_setting;
@@ -317,10 +349,12 @@ export class Queries {
 				affectedUser: userId,
 			});
 		}
-		const channelList: Channel[] = [];
-		for (const [, result] of find_setting.entries())
-			channelList.push(Channel.getChannel(result.channelId));
-		return channelList;
+		const settingList: Setting[] = [];
+		for (const [, result] of find_setting.entries()) {
+			settingList.push(new Setting(result.setting, result.channelId, result.affectedUser, result.actorUser,
+				result.from, result.until));
+		}
+		return settingList;
 	}
 
 	//ChannelMembers
@@ -343,11 +377,16 @@ export class Queries {
 	async removeChannelMember(channelId: number, userId: number) {
 		const myDataSource = await getDataSource();
 		const channel = myDataSource.getRepository(chat_members);
-		const find_channel = await channel.findOneBy({
+		await channel.delete({
 			channelId: channelId,
 			userId: userId,
 		});
-		await channel.remove(find_channel);
+	}
+
+	async purgeChannel(channelId: number) {
+		const myDataSource = await getDataSource();
+		const chatMembers = myDataSource.getRepository(chat_members);
+		await chatMembers.delete({channelId: channelId})
 	}
 
 	/**
@@ -358,10 +397,10 @@ export class Queries {
 		const myDataSource = await getDataSource();
 		const user = myDataSource.getRepository(chat_members);
 		const find = await user.findBy({ channelId: channelId });
-		const channelList: User[] = [];
+		const userList: User[] = [];
 		for (const [, result] of find.entries())
-			channelList.push(await User.getUser(result.userId));
-		return channelList;
+			userList.push(await User.getUser(result.userId));
+		return userList;
 	}
 
 	/**
@@ -409,10 +448,5 @@ export class Queries {
 				new Message(result.message, result.userId, result.timestamp),
 			);
 		return messageList;
-	}
-
-	async storeAuth(id: number, auth: string): Promise<boolean> {
-		//TODO store id and auth token in db
-		return true;
 	}
 }

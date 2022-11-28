@@ -7,6 +7,8 @@ import {chat_channel_settings} from './entities/ChatChannelSettings';
 import {chat_members} from './entities/ChatMembers';
 import {games} from './entities/Games';
 import {sessions} from './entities/Sessions';
+import {friends} from "./entities/Friends";
+import {chat_message} from "./entities/ChatMessages";
 
 export const myDataSource = new DataSource({
     type: 'postgres',
@@ -21,9 +23,10 @@ export const myDataSource = new DataSource({
         chat_channels,
         chat_channel_settings,
         chat_members,
-        chat_members,
+        chat_message,
         games,
         sessions,
+        friends,
     ],
     synchronize: true,
 });

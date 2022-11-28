@@ -23,16 +23,22 @@ export class Channel {
         this._channels.push(channel);
     }
 
-    public static getChannel(channelId: number): Channel {
-        const channels = this._channels.filter((a) => a._channelId == channelId);
-        if (channels.length == 1) return channels[0];
+    public static getChannel(channelId: number): Channel | undefined {
+        // const channels = this._channels.filter((a) => a._channelId == channelId);
+        const channels = this._channels.find((e) => {
+            return (e._channelId == channelId);
+        });
+        if (channels !== undefined)
+            return channels;
         return undefined;
     }
 
     public static getUserChannels(userId: number): Channel[] {
-        return this._channels.filter(
-            (a) => a._users.filter((b) => b.userId == userId).length == 1,
-        );
+        return this._channels.filter((channel) => {
+            return channel.users.filter((user) => {
+                return user.userId == userId
+            }).length == 1
+        });
     }
 
     public static removeChannel(channelId: number) {
@@ -58,7 +64,11 @@ export class Channel {
         this._messages = messages;
         this._settings = settings;
         this._closed = closed;
-        if (otherOwner != undefined) this._otherOwner = otherOwner;
+        if (otherOwner != undefined)
+            this._otherOwner = otherOwner;
+        this._visible = visible;
+        this._password = password;
+        Channel.addChannel(this);
     }
 
     public set channelId(value: number) {
@@ -109,6 +119,10 @@ export class Channel {
         return this._closed;
     }
 
+    set closed(value: boolean) {
+        this._closed = value;
+    }
+
     public get settings(): Setting[] {
         return this._settings;
     }
@@ -119,7 +133,7 @@ export class Channel {
 
     public removeSetting(userId: number, settingType: SettingType) {
         this._settings = this._settings.filter(
-            (a) => !(a.userId == userId && a.setting === settingType),
+            (a) => !(a.affectedId == userId && a.setting === settingType),
         );
     }
 
@@ -149,7 +163,7 @@ export class Channel {
         return (
             this.settings
                 .filter((a) => a.setting === SettingType.ADMIN)
-                .filter((a) => a.userId === userId).length == 1
+                .filter((a) => a.affectedId === userId).length == 1
         );
     }
 
@@ -157,7 +171,7 @@ export class Channel {
         return (
             this.settings
                 .filter((a) => a.setting == SettingType.BANNED)
-                .filter((a) => a.userId == userId).length == 0
+                .filter((a) => a.affectedId == userId).length == 0
         );
     }
 
@@ -167,12 +181,16 @@ export class Channel {
             owner: this._owner,
             otherOwner: this._otherOwner,
             channelName: this._channelName,
-            users: this._users,
+            users: this._users.map(user => {return user.getIUser()}),
             messages: this._messages.map(message => {return message.getIMessage()}),
             settings: this._settings.map(setting => {return setting.getISetting()}),
             closed: this._closed,
             visible: this._visible,
             password: this._password,
         }
+    }
+
+    addMessage(message: Message) {
+        this.messages.push(message);
     }
 }

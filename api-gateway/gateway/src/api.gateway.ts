@@ -1,21 +1,21 @@
 import {Inject, Logger, UseGuards} from '@nestjs/common';
-import {ClientProxy, MessagePattern, Payload} from '@nestjs/microservices';
+import {ClientProxy} from '@nestjs/microservices';
 import {
-    MessageBody,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-    OnGatewayInit,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer,
+	MessageBody,
+	OnGatewayConnection,
+	OnGatewayDisconnect,
+	OnGatewayInit,
+	SubscribeMessage,
+	WebSocketGateway,
+	WebSocketServer,
 } from '@nestjs/websockets';
-import {Socket, Server} from 'socket.io';
+import {Server, Socket} from 'socket.io';
 import {Sockets} from './sockets.class';
 import {Auth} from './auth.service';
 import {AuthGuard} from './auth.guard';
 import {CreateAccountDTO, LoginDTO} from './api.gateway.DTOs';
-import { TwoFactorAuthService } from './2fa.service';
-import {Queries} from "./database/queries";
+import {TwoFactorAuthService} from './2fa.service';
+import {Has2FA, Queries} from "./database/queries";
 
 // TODO : replace frontendDTO from gateway, use the one in api.gateway.DTOS.ts
 export interface FrontEndDTO {
@@ -78,12 +78,15 @@ export class ApiGateway
     }
 
     handleDisconnect(client: Socket) {
+		this.sockets.removeSocket(client);
         this.logger.log(`Client disconnected: ${client.id}`);
     }
 
     @UseGuards(AuthGuard)
     @SubscribeMessage('chat')
-    handleChat(client: Socket, @MessageBody() payload: FrontEndDTO) {
+    handleChat(client: Socket, payload: FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
+
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
@@ -96,7 +99,9 @@ export class ApiGateway
 
     @UseGuards(AuthGuard)
     @SubscribeMessage('game')
-    handleGame(client: Socket, @MessageBody() payload: FrontEndDTO) {
+    handleGame(client: Socket, payload: FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
+
         //TODO verify auth
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
@@ -116,6 +121,8 @@ export class ApiGateway
 
     @SubscribeMessage('auth')
     async handleAuthResp(client: Socket, payload: FrontEndDTO): Promise<boolean | any> {
+		this.sockets.storeSocket(payload.userId!, client);
+
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         if (payload.eventPattern === 'login') {
@@ -177,6 +184,7 @@ export class ApiGateway
 
     @SubscribeMessage('retrieve_redirect')
     async handleRetrieveRedirect(client: Socket, payload: FrontEndDTO): Promise<any> {
+		this.sockets.storeSocket(payload.userId!, client);
         return {
             event: 'retrieve_redirect',
             data: {
@@ -196,6 +204,7 @@ export class ApiGateway
     @UseGuards(AuthGuard)
     @SubscribeMessage('enable_2fa') 
 	async enableTwoFactorAuthentication(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		if (!payload.userId) // might not be neccessary due to authguard
 		return ({
 			event : 'enable_2fa',
@@ -224,6 +233,7 @@ export class ApiGateway
     @UseGuards(AuthGuard)
     @SubscribeMessage('verify_2fa') 
 	async verifyTFA(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		let success : boolean = false;
 
 		
@@ -258,15 +268,28 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('isEnabled_2fa') 
 	async hasTFA(client : Socket, payload : FrontEndDTO) {
-		let success : boolean = false;
+		this.sockets.storeSocket(payload.userId!, client);
+		let success : Has2FA;
 
 		success = await this.TFA.hasTwoFA(payload.userId!);
 		this.logger.log(`user [${payload.userId}] calling isEnabled2fa`);
+		let msg: string = "";
+		switch (success) {
+			case Has2FA.ERROR:
+				msg = `2fa is unable to be retrieve from the database ${payload.userId}`;
+				break;
+			case Has2FA.NO_TFA:
+				msg = `2fa is disabled for user ${payload.userId}`;
+				break;
+			case Has2FA.HAS_TFA:
+				msg = `2fa is enabled for user ${payload.userId}`;
+				break;
+		}
 		return ({
 			event : 'isEnabled_2fa',
 			data : {
-				 success 	: success,
-				 msg		: success === true ? `2fa is enabled for user ${payload.userId}` : `2fa is disabled for user ${payload.userId}`,
+				 success	: success == Has2FA.NO_TFA ? false : true,
+				 msg		: msg,
 		}
 		});
 	}
@@ -280,22 +303,32 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('remove_2fa') 
 	async removeTFA(client : Socket, payload : FrontEndDTO) {
+		this.sockets.storeSocket(payload.userId!, client);
 		let success : boolean = false;
+		const has2FA = await this.TFA.hasTwoFA(payload.userId!);
 
-		if (await this.TFA.hasTwoFA(payload.userId!) === false) {
+		if (has2FA === Has2FA.NO_TFA) {
 			return ({
 				event : 'remove_2fa',
 				data : {
-					 success 	: success,
+					 success 	: false,
 					 msg		: `2fa has never been enabled for user, : [${payload.userId}]`,
 			}
+			});
+		} else if (has2FA === Has2FA.ERROR) {
+			return ({
+				event : 'remove_2fa',
+				data : {
+					success 	: false,
+					msg			: `2fa was unable to be loaded for user, : [${payload.userId}]`,
+				}
 			});
 		}
 		if (await this.TFA.verify(payload.userId!, payload.data.TFAToken) === false) {
 			return ({
 				event : 'remove_2fa',
 				data : {
-					 success 	: success,
+					 success 	: false,
 					 msg		: `Verifying token went wrong, please try again, user : ${payload.userId}`,
 			}
 			});

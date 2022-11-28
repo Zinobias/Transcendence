@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {Entity, Column, PrimaryColumn, Long} from 'typeorm';
 
 @Entity('users')
 export class UserTable {
@@ -13,7 +13,7 @@ export class UserTable {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date().getTime(), type: 'bigint' })
+	@Column({ default: new Date().getTime(), type: 'bigint'})
 	createAt: number;
 
 	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)

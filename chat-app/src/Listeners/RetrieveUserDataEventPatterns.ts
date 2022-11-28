@@ -3,7 +3,7 @@ import {ClientProxy, EventPattern} from '@nestjs/microservices';
 import {Channel} from '../Objects/Channel';
 import {AppService} from '../app.service';
 import {Util} from './Util';
-import {GetUserData} from '../DTOs/UserDTOs';
+import {GetOtherUserData, GetSelfUserData} from '../DTOs/UserDTOs';
 import {User} from '../Objects/User';
 import {Queries} from '../Database/Queries';
 
@@ -16,41 +16,56 @@ export class RetrieveUserDataEventPatterns {
                 @Inject(Util) private readonly util: Util) {}
 
     @EventPattern('get_channels_user')
-    getChannelsUser(data: GetUserData) {
+    getChannelsUser(data: GetSelfUserData) {
         const channels = Channel.getUserChannels(data.user_id);
-        this.util.notify([data.user_id], 'channels_for_user', {
-            channels: channels?.map(channel => {return channel.getIChannel()}),
+        this.util.notify([data.user_id], 'get_channels_user', {
+            success: true,
+            msg: undefined,
+            channels: channels?.map(channel => {
+                return {
+                    channelId: channel.channelId,
+                    channelName: channel.channelName,
+                    visible: channel.visible,
+                    hasPassword: (channel.password != undefined && channel.password.length == 64)
+                }
+            })
         });
     }
 
     @EventPattern('get_user')
-    async getUser(data: GetUserData) {
-        const user = await User.getUser(data.user_id);
+    async getUser(data: GetOtherUserData) {
+        const user = await User.getUser(data.requested_user_id);
         this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
         this.util.notify([data.user_id], 'get_user', {
+            success: true,
+            msg: undefined,
             user: user?.getIUser(),
         });
     }
 
     //TODO move this data to user class?
     @EventPattern('get_friend_requests')
-    async getFriendsRequestUser(data: GetUserData) {
+    async getFriendsRequestUser(data: GetSelfUserData) {
         const friendRequests = await Queries.getInstance().getFriends(
             data.user_id,
             false,
         );
         this.util.notify([data.user_id], 'get_friend_requests', {
+            success: true,
+            msg: undefined,
             friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
         });
     }
 
     @EventPattern('get_friends')
-    async getFriendsUser(data: GetUserData) {
+    async getFriendsUser(data: GetSelfUserData) {
         const friendRequests = await Queries.getInstance().getFriends(
             data.user_id,
             true,
         );
         this.util.notify([data.user_id], 'get_friends', {
+            success: true,
+            msg: undefined,
             friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
         });
     }

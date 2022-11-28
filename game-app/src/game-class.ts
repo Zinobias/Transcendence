@@ -3,7 +3,9 @@ import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
 import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedData } from "./event-objects/events.objects";
 import { ClientProxy } from "@nestjs/microservices";
+import { Logger } from "@nestjs/common";
 
+const logger = new Logger('random game instance');
 
 export class Game {
 	public readonly player1	: PlayerData;
@@ -18,7 +20,7 @@ export class Game {
 	constructor(
 			private eventEmitter		: EventEmitter2,
 			private client				: ClientProxy,
-			playersUIDs					: string[], 
+			playersUIDs					: number[], 
 			private readonly gameMode	: string, 
 			private readonly gameId		: number
 		) {
@@ -54,7 +56,7 @@ export class Game {
 		//	payload: this.results,
 		//}),
 		//);
-		console.log(`GAME ID : ${this.gameId}`);
+		logger.log(`GAME INSTANCE GAME ID : ${this.gameId}`);
 		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
 		this.eventEmitter.removeListener("game.player.move." + this.gameId, this.setPlayerMovementState); 
 		return ;

@@ -1,10 +1,10 @@
 import {Inject, Injectable, Logger} from '@nestjs/common';
-import {Queries} from './database/queries';
+import {Has2FA, Queries} from './database/queries';
 import {randomUUID} from 'crypto';
 import {Socket} from 'socket.io';
 import {Sockets} from './sockets.class';
 import {AuthToken} from './auth.objects';
-import { TwoFactorAuthService } from './2fa.service';
+import {TwoFactorAuthService} from './2fa.service';
 
 @Injectable()
 export class Auth {
@@ -64,8 +64,8 @@ export class Auth {
                     client_secret: process.env.SECRET,
                     code: token,
                     redirect_uri: signup
-                        ? 'http://localhost:3000/signup'
-                        : 'http://localhost:3000/login',
+                        ? `http://${process.env.WEB_HOST}:3000/signup`
+                        : `http://${process.env.WEB_HOST}:3000/login`,
                 }),
                 headers: {'Content-Type': 'application/json'},
             },
@@ -86,12 +86,16 @@ export class Auth {
             this.logger.warn(`Received undefined userId from auth`)
             return undefined;
         }
+        if (!await this.queries.userExists(userId)) {
+            return undefined; //TODO fix this to return a proper error messages
+        }
 		this.sockets.storeSocket(userId, client);
         /**
          * TODO: Check if user in dataBase
          */
 		const uuid = randomUUID();
-		if (await this.TFA.hasTwoFA(userId) === true) {
+        const has2FA = await this.TFA.hasTwoFA(userId);
+		if (has2FA === Has2FA.HAS_TFA) {
 			if (TFAToken && await this.TFA.verify(userId, TFAToken) === true) {
 				return ({
 					user_id : userId,
@@ -104,7 +108,9 @@ export class Auth {
 					auth_cookie : undefined,
 				});
 			}
-		}
+		} else if (has2FA == Has2FA.ERROR) {
+            return undefined;
+        }
         if ((await this.storeSession(userId, uuid)))
             return {user_id: userId, auth_cookie: uuid};
         else {

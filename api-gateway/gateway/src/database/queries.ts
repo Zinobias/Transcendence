@@ -15,11 +15,11 @@ export class Queries {
 
     public async storeAuth(id: number, auth: string): Promise<boolean> {
         const myDataSource = await this.database.getDataSource();
-        //const userRepo = myDataSource.getRepository(UserTable);
         const repo = myDataSource.getRepository(Sessions);
-        // const repo2 = myDataSource.getRepository(UserTable);
-        // console.log("id : ");
-        this.logger.log(`Inserting new auth key for user ${id} with key ${auth}`)
+
+        if (!await this.userExists(id) === true) //Check if the user is in the database, they can't get a session if they're not
+            return false;
+        this.logger.debug(`Inserting new auth key for user ${id} with key ${auth}`)
         const insertResult: InsertResult = await repo.upsert(
             [
                 {
@@ -47,13 +47,13 @@ export class Queries {
             return undefined;
         let sessionCodes: string[] = []
         for (let output of session) {
-            if (output.time + Queries.expireTime < new Date().getMilliseconds()) {
+            if (output.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
                 this.logger.warn(`Need to remove this session ${output.sessionCode} for ${output.userId}`);
                 break;
             }
             sessionCodes.push(output.sessionCode);
         }
-        // if (session === null || session.time + Queries.expireTime < new Date().getMilliseconds()) {
+        // if (session === null || session.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
         //     this.logger.debug(`Session expired for user ${id}`)
         //     return undefined;
         // }
@@ -69,7 +69,7 @@ export class Queries {
                 userName: userName,
             });
             if (find != null) {
-                this.logger.debug(`arleady have an accoiunt named ${userName}`)
+                this.logger.debug(`arleady have an account named ${userName}`)
                 return `There is already a user with this name`;
             }
         } catch (e) {
@@ -78,19 +78,29 @@ export class Queries {
         return false;
     }
 
-    public async createUser(userId: number, userName: string): Promise<boolean | string> {
+    public async userExists(userId: number): Promise<boolean> {
         const myDataSource = await this.database.getDataSource();
         const userTableRepo = myDataSource.getRepository(UserTable);
-        try { //Check if a user with this id already exists
+        try {
             const find = await userTableRepo.findOneBy({
                 userId: userId
             });
-            if (find != null) {
-                return `You already have an active account.`;
-            }
+            if (find == null) 
+                return false;
+			else
+				return true;
         } catch (e) {
-            return `Unknown error while saving the user in the database`;
+            Logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`)
         }
+        return false;
+    }
+
+    public async createUser(userId: number, userName: string): Promise<boolean | string> {
+        const myDataSource = await this.database.getDataSource();
+        const userTableRepo = myDataSource.getRepository(UserTable);
+
+        if (await this.userExists(userId))
+            return `You already have an active account.`;
 
         try { //Store the user in the database
             await userTableRepo.insert({
@@ -98,6 +108,7 @@ export class Queries {
                 userName: userName,
             });
         } catch (e) {
+            Logger.warn(`Unable to run save user query for [${userId}] see error: ${e}`)
             return `Unknown error while saving the user in the database`;
         }
         return true;
@@ -118,7 +129,7 @@ export class Queries {
         return false;
     }
 
-    public async retrieveTfa(userId: number) {
+    public async retrieveTfa(userId: number): Promise<string | Has2FA> {
         try {
             const myDataSource = await this.database.getDataSource();
             const tfaTableRepo = myDataSource.getRepository(Tfa);
@@ -126,9 +137,10 @@ export class Queries {
             if (result?.tfa_code !== undefined)
                 return result.tfa_code
         } catch (e) {
-            this.logger.warn(e);
+            this.logger.error(e);
+            return Has2FA.ERROR;
         }
-        return undefined;
+        return Has2FA.NO_TFA;
     }
 
     public async removeTfa(userId: number): Promise<boolean> {
@@ -144,4 +156,10 @@ export class Queries {
         }
         return false
     }
+}
+
+export enum Has2FA {
+    ERROR,
+    NO_TFA,
+    HAS_TFA
 }

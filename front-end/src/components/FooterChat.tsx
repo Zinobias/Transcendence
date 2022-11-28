@@ -1,10 +1,12 @@
-import React from 'react'
-import { AiOutlineClose } from 'react-icons/ai';
+import React, { useState } from 'react'
 import { SlBubble } from 'react-icons/sl';
+import ChannelSettings from './ChannelSettings';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
 
 const FooterChat: React.FC = () => {
+
+    const [channelId, setChannelId] = useState<number>();
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
@@ -18,13 +20,16 @@ const FooterChat: React.FC = () => {
             <SlBubble />
         </div>
         <div id="footerDropdown" className='footerChat__body'>
+
             <div className='footerChat__sidebar'>
-                <ChatSidebar/>
+                <ChatSidebar channelId={channelId} setChannelId={setChannelId} />
             </div>
             <div className='footerChat__chat'>
-                <ChatWindow />
+                <ChatWindow channelId={channelId}/>
             </div>
-            {/* CHAT PLACEHOLDER */}
+            <div id="chatSettings" className="footerChat__settings">
+                <ChannelSettings channelId={channelId}/>
+            </div>
         </div>
     </div>   
     )
