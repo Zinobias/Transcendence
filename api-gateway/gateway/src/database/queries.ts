@@ -92,10 +92,7 @@ export class Queries {
         return false;
     }
 
-    public async createUser(
-        userId: number,
-        userName: string,
-    ): Promise<boolean | string> {
+    public async createUser(userId: number, userName: string): Promise<boolean | string> {
         const myDataSource = await this.database.getDataSource();
         const userTableRepo = myDataSource.getRepository(UserTable);
 
