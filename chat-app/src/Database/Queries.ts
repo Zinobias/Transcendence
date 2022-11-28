@@ -28,10 +28,15 @@ export class Queries {
   private readonly logger = new Logger('Queries');
 
   private constructor() {
-	  const start = new Date().getTime();
-	  this.loadAllChannels().then(() =>
-		  this.logger.log(`Loaded all channels from database, took: ${new Date().getTime() - start} millis`));
-	}
+    const start = new Date().getTime();
+    this.loadAllChannels().then(() =>
+      this.logger.log(
+        `Loaded all channels from database, took: ${
+          new Date().getTime() - start
+        } millis`,
+      ),
+    );
+  }
 
   private async userExists(userId: number, userName: string): Promise<boolean> {
     const AppDataSource = await getDataSource();
@@ -101,11 +106,11 @@ export class Queries {
    * @param userId user to get the avatar for
    * @param image image to store as the avatar
    */
-  async setUserAvatar(userId: number, image: Buffer, filename: string) {
+  async setUserAvatar(userId: number, image: Buffer) {
     const myDataSource = await getDataSource();
     const userRepository = myDataSource.getRepository(user_table);
     // const avatar = await this.uploadDatabaseFile(image, filename);
-    // await userRepository.update(userId, { avatarId: avatar.avatarId });
+    await userRepository.update(userId, { avatar: image });
   }
 
   /**
@@ -197,30 +202,29 @@ export class Queries {
     });
   }
 
-	//Friends table
-	/**
-	 * Get an array of all friends of a user
-	 *  Can return a list of active friends, or open requests depending on accepted bool
-	 * @param userId user to get the friends for
-	 * @param accepted boolean indicating if it should retrieve friends, or friend requests
-	 *  (if accepted is true, it returns active friends, if false it returns friend requests)
-	 */
-	async getFriends(userId: number, accepted: boolean): Promise<Friend[]> {
-		const myDataSource = await getDataSource();
-		const repository = myDataSource.getRepository(friends);
-		const find_friend = await repository.findBy({
-			userId: userId,
-			active: accepted,
-		});
-		const friendList: Friend[] = [];
-		for (const [, result] of find_friend.entries()) {
-			const user = await User.getUser(result.userId);
-			if (user === undefined)
-				continue;
-			friendList.push(<Friend>user);
-		}
-		return friendList;
-	}
+  //Friends table
+  /**
+   * Get an array of all friends of a user
+   *  Can return a list of active friends, or open requests depending on accepted bool
+   * @param userId user to get the friends for
+   * @param accepted boolean indicating if it should retrieve friends, or friend requests
+   *  (if accepted is true, it returns active friends, if false it returns friend requests)
+   */
+  async getFriends(userId: number, accepted: boolean): Promise<Friend[]> {
+    const myDataSource = await getDataSource();
+    const repository = myDataSource.getRepository(friends);
+    const find_friend = await repository.findBy({
+      userId: userId,
+      active: accepted,
+    });
+    const friendList: Friend[] = [];
+    for (const [, result] of find_friend.entries()) {
+      const user = await User.getUser(result.userId);
+      if (user === undefined) continue;
+      friendList.push(<Friend>user);
+    }
+    return friendList;
+  }
 
   /**
    * Stores a friend request
@@ -343,7 +347,9 @@ export class Queries {
     }
     try {
       const test = await addChannel.save(new chat_channels(channel));
-      console.log("I'm testing the return value of addChannel " + test.channelId);
+      console.log(
+        "I'm testing the return value of addChannel " + test.channelId,
+      );
       return test.channelId;
     } catch (e) {
       Logger.warn(
@@ -397,51 +403,59 @@ export class Queries {
     return channelList;
   }
 
-	async getAllPublicChannels(): Promise<Channel[]> {
-		const myDataSource = await getDataSource();
-		const channel = myDataSource.getRepository(chat_channels);
-		const find_channel = await channel.findBy({
-			owner2Id: null,
-			closed: false,
-			visible: true,
-		});
-		const channelList: Channel[] = [];
-		for (const [, result] of find_channel.entries()) {
-			let resultChannel = Channel.getChannel(result.channelId);
-			if (resultChannel === undefined) {
-				Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
-				continue;
-			}
-			channelList.push(resultChannel);
-		}
-		return channelList;
-	}
+  async getAllPublicChannels(): Promise<Channel[]> {
+    const myDataSource = await getDataSource();
+    const channel = myDataSource.getRepository(chat_channels);
+    const find_channel = await channel.findBy({
+      owner2Id: null,
+      closed: false,
+      visible: true,
+    });
+    const channelList: Channel[] = [];
+    for (const [, result] of find_channel.entries()) {
+      const resultChannel = Channel.getChannel(result.channelId);
+      if (resultChannel === undefined) {
+        Logger.warn(
+          `Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`,
+        );
+        continue;
+      }
+      channelList.push(resultChannel);
+    }
+    return channelList;
+  }
 
-	async loadAllChannels() {
-		const myDataSource = await getDataSource();
-		const channel = myDataSource.getRepository(chat_channels);
-		const find_channel = await channel.findBy({
-			closed: false
-		});
-		for (const [, result] of find_channel.entries()) {
-			new Channel(result.channelId, result.ownerId, result.channelName,
-				await this.getChannelMembers(result.channelId),
-				await this.getChannelMessages(result.channelId),
-				await this.getSettings(result.channelId),
-				result.closed, result.owner2Id == null ? undefined : result.owner2Id,
-				result.visible, result.password);
-		}
-	}
+  async loadAllChannels() {
+    const myDataSource = await getDataSource();
+    const channel = myDataSource.getRepository(chat_channels);
+    const find_channel = await channel.findBy({
+      closed: false,
+    });
+    for (const [, result] of find_channel.entries()) {
+      new Channel(
+        result.channelId,
+        result.ownerId,
+        result.channelName,
+        await this.getChannelMembers(result.channelId),
+        await this.getChannelMessages(result.channelId),
+        await this.getSettings(result.channelId),
+        result.closed,
+        result.owner2Id == null ? undefined : result.owner2Id,
+        result.visible,
+        result.password,
+      );
+    }
+  }
 
-	/**
-	 * Disable a channel
-	 * @param channelId channel to disable
-	 */
-	async setClosed(channelId: number, closed: boolean): Promise<void> {
-		const myDataSource = await getDataSource();
-		const disable = myDataSource.getRepository(chat_channels);
-		await disable.update({ channelId: channelId }, { closed: closed });
-	}
+  /**
+   * Disable a channel
+   * @param channelId channel to disable
+   */
+  async setClosed(channelId: number, closed: boolean): Promise<void> {
+    const myDataSource = await getDataSource();
+    const disable = myDataSource.getRepository(chat_channels);
+    await disable.update({ channelId: channelId }, { closed: closed });
+  }
 
   /**
    * Set the name of a channel
@@ -488,32 +502,40 @@ export class Queries {
     });
   }
 
-	/**
-	 * Get settings for a channel
-	 * @param channelId channel to get the settings for
-	 * @param userId optional user to get the settings for
-	 */
-	async getSettings(channelId: number, userId?: number): Promise<Setting[]> {
-		const myDataSource = await getDataSource();
-		const setting = myDataSource.getRepository(chat_channel_settings);
-		let find_setting;
-		if (userId == undefined) {
-			find_setting = await setting.findBy({
-				channelId: channelId,
-			});
-		} else {
-			find_setting = await setting.findBy({
-				channelId: channelId,
-				affectedUser: userId,
-			});
-		}
-		const settingList: Setting[] = [];
-		for (const [, result] of find_setting.entries()) {
-			settingList.push(new Setting(result.setting, result.channelId, result.affectedUser, result.actorUser,
-				result.from, result.until));
-		}
-		return settingList;
-	}
+  /**
+   * Get settings for a channel
+   * @param channelId channel to get the settings for
+   * @param userId optional user to get the settings for
+   */
+  async getSettings(channelId: number, userId?: number): Promise<Setting[]> {
+    const myDataSource = await getDataSource();
+    const setting = myDataSource.getRepository(chat_channel_settings);
+    let find_setting;
+    if (userId == undefined) {
+      find_setting = await setting.findBy({
+        channelId: channelId,
+      });
+    } else {
+      find_setting = await setting.findBy({
+        channelId: channelId,
+        affectedUser: userId,
+      });
+    }
+    const settingList: Setting[] = [];
+    for (const [, result] of find_setting.entries()) {
+      settingList.push(
+        new Setting(
+          result.setting,
+          result.channelId,
+          result.affectedUser,
+          result.actorUser,
+          result.from,
+          result.until,
+        ),
+      );
+    }
+    return settingList;
+  }
 
   //ChannelMembers
   async memberExists(channelId: number, userId: number): Promise<boolean> {
@@ -584,19 +606,19 @@ export class Queries {
     await chatMembers.delete({ channelId: channelId });
   }
 
-	/**
-	 * Get all users in a channel
-	 * @param channelId channel to get users for
-	 */
-	async getChannelMembers(channelId: number): Promise<User[]> {
-		const myDataSource = await getDataSource();
-		const user = myDataSource.getRepository(chat_members);
-		const find = await user.findBy({ channelId: channelId });
-		const userList: User[] = [];
-		for (const [, result] of find.entries())
-			userList.push(await User.getUser(result.userId));
-		return userList;
-	}
+  /**
+   * Get all users in a channel
+   * @param channelId channel to get users for
+   */
+  async getChannelMembers(channelId: number): Promise<User[]> {
+    const myDataSource = await getDataSource();
+    const user = myDataSource.getRepository(chat_members);
+    const find = await user.findBy({ channelId: channelId });
+    const userList: User[] = [];
+    for (const [, result] of find.entries())
+      userList.push(await User.getUser(result.userId));
+    return userList;
+  }
 
   /**
    * Get all channels a user is a member of

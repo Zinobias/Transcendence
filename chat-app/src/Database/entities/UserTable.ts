@@ -69,10 +69,7 @@ export class user_table {
     onDelete: 'CASCADE',
   })
   session: sessions[];
-  // @JoinColumn({ name: 'avatarId' })
-  // @OneToOne(() => blob, { nullable: true })
-  // avatar: blob;
-  //
-  // @Column({ nullable: true })
-  // avatarId: number;
+
+  @Column({ nullable: true, type: "bytea"})
+  avatar: Uint8Array;
 }
