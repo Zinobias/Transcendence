@@ -9,8 +9,8 @@ export class achievements {
   @PrimaryColumn()
   achievement: string;
 
-  @ManyToOne(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => user_table, (user) => user.achievement)
+  @JoinColumn({name: 'userId'})
   user: user_table;
 
   @ManyToOne(() => achievements, (achievement) => achievement.achievement)
