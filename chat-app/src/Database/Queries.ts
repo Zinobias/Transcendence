@@ -210,6 +210,21 @@ export class Queries {
 		return friendList;
 	}
 
+	async friendExist(fromUserId: number, toUserId: number, confirmed: boolean): Promise<boolean> {
+		const myDataSource = await getDataSource();
+		const friends_repository = myDataSource.getRepository(friends);
+		try {
+			const find = await friends_repository.findOneBy({
+				userId: fromUserId,
+				friendId: toUserId,
+				active: confirmed,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run userExists check query for [${fromUserId}] see error: ${e}`);
+		}
+		return false;
+	}
 	/**
 	 * Stores a friend request
 	 * @param fromUserId user that created the request
@@ -223,7 +238,11 @@ export class Queries {
 	): Promise<void> {
 		const myDataSource = await getDataSource();
 		const friends_repository = myDataSource.getRepository(friends);
-		await friends_repository.save(new friends(fromUserId, toUserId, confirmed));
+		try {
+			await friends_repository.upsert([new friends(fromUserId, toUserId, confirmed)], ['active']);
+		} catch (e) {
+			this.logger.warn(`Unable to add friend for [${fromUserId}] see error: ${e}`);
+		}
 	}
 
 	/**
