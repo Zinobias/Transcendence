@@ -118,7 +118,7 @@ export class Queries {
 		const userRepository = myDataSource.getRepository(user_table);
 		const findUser = await userRepository.findOneBy({ userId: userId });
 		if (findUser == undefined) return undefined;
-		return new User(findUser.userId, findUser.userName, undefined);
+		return new User(findUser.userId, findUser.userName, findUser.avatar);
 	}
 
 	//Blocked users table
@@ -137,6 +137,21 @@ export class Queries {
 		return blockedUsers;
 	}
 
+	async alreadyBlocked(userId: number, blockedUser: number): Promise<boolean> {
+		const myDataSource = await getDataSource();
+		const blocked_user_repository = myDataSource.getRepository(blocked);
+		try {
+			const find = await blocked_user_repository.findOneBy({
+				userId: userId,
+				blockId: blockedUser,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run ExistsBlock check query for [${userId}] see error: ${e}`);
+		}
+		return false;
+	}
+
 	/**
 	 * Store a new blocked user for a user
 	 * @param userId user to store the blocked user for
@@ -145,7 +160,15 @@ export class Queries {
 	async addBlockedUser(userId: number, blockedUser: number): Promise<void> {
 		const myDataSource = await getDataSource();
 		const blocked_user_repository = myDataSource.getRepository(blocked);
-		await blocked_user_repository.save(new blocked(userId, blockedUser));
+		if (await this.alreadyBlocked(userId, blockedUser)) {
+			this.logger.warn(`Attempted to block already blocked user, user: ${userId} blocked: [${blockedUser}]`);
+			return;
+		}
+		try {
+			await blocked_user_repository.save(new blocked(userId, blockedUser));
+		} catch (e) {
+			this.logger.warn(`Unknown error while blocking user: ${userId} blocked: [${blockedUser}]`);
+		}
 	}
 
 	/**
