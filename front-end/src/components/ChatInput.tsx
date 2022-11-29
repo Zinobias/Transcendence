@@ -9,19 +9,14 @@ interface Props {
 const ChatInput: React.FC<Props> = ({channelId}) => {
 
     const [message, setMessage] = useState<string>("");
-    const [chat, setChat] = useState<string[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
 
     // EVENT LISTENERS
-
     const emitMessage = (e: React.FormEvent) => {
         e.preventDefault();
-
-        setChat([...chat, message]);
         setMessage("");
-        
         socket.emit("chat", {
             userId: cookies.userID,
             authToken: cookies.user,
@@ -31,14 +26,12 @@ const ChatInput: React.FC<Props> = ({channelId}) => {
                     message: message }
         });
         console.log(`emiting channel_message message:[${message}]`);
-
     }
 
     return (
         <>
             <form className="chatroom__form"  onSubmit={(e) => {
                 emitMessage(e)
-                // inputRef.current?.blur();
             }}>
                 <input 
                     className="chatroom__form--input" 
@@ -46,7 +39,6 @@ const ChatInput: React.FC<Props> = ({channelId}) => {
                     type="input"
                     value={message} 
                     onChange={(e) => setMessage(e.target.value)}  
-                    // placeholder="Enter your message"
                 />
             </form>
         </>

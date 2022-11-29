@@ -225,7 +225,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
     handlePromote(data: ChannelPromote) {
         if (data.channel_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_leave', 'Incorrect data object');
+            this.emitFailedObject(data.user_id, 'channel_promote', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(

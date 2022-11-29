@@ -187,11 +187,11 @@ p.chatp {
     cursor: pointer;
 }
 
-.leaveChannel {
+.settingsButton {
     margin-bottom: 5px;
+    width: 100%;
     font-size: large;
-    border: 2px solid;
-    color: black;
+    border: 2px solid black;
     font-weight: bold;
     cursor: pointer;
     font-family: 'Silkscreen', cursive;
@@ -200,7 +200,27 @@ p.chatp {
 
 .settingsDropdown {
 	display: none;
-	background-color: #8a8a8a;
+    flex-direction: column;
+    /* align-items: center; */
+    border: 2px solid black;
+    border-bottom: none;
+	/* background-color: #8a8a8a; */
+}
+
+.memberButton {
+    /* margin-bottom: 5px; */
+    width: 100%;
+    font-size: large;
+    border: none;
+    border-bottom: 2px solid black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.test {
+    width: 100%;
 }
 
 .settingsShow {
@@ -217,6 +237,8 @@ p.chatp {
     right: 3%;
     text-align: right;
     margin: 0;
+
+    word-break: break-word;
 }
 
 .profile__dropdown {
@@ -371,6 +393,7 @@ p.chatp {
 
 .footerChat__body {
     display: none;
+    word-break: break-word;
     border: 2px solid #000000;
     border-bottom: none;
     height: 500px;
@@ -395,6 +418,8 @@ p.chatp {
     display: none;
     flex: 0.5;
 	width: 100%;
+    padding: 3px;
+    text-align: left;
     border-left: 2px solid black;
 }
 
