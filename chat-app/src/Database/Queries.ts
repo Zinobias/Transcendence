@@ -32,7 +32,24 @@ export class Queries {
 		this.loadAllChannels().then(() =>
 			this.logger.log(`Loaded all channels from database, took: ${new Date().getTime() - start} millis`));
 	}
+
 	//Users table
+	private async userExists(userId: number, userName: string): Promise<boolean> {
+		const AppDataSource = await getDataSource();
+		console.log(AppDataSource.options);
+		const userTableRepo = AppDataSource.getRepository(user_table);
+		try {
+			const find = await userTableRepo.findOneBy({
+				userId: userId,
+				userName: userName,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`);
+		}
+		return false;
+	}
+
 	/**
 	 * Creates a new user entry
 	 * @param loginId login id for the user
@@ -44,6 +61,10 @@ export class Queries {
 		const AppDataSource = await getDataSource();
 		console.log(AppDataSource.options);
 		const userRepository = AppDataSource.getRepository(user_table);
+		if (await this.userExists(loginId, userName)) {
+			console.log("user already exist");
+			return;
+		}
 		await userRepository.save(new user_table(loginId, userName));
 	}
 
