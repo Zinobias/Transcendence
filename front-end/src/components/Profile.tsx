@@ -68,6 +68,14 @@ const Profile: React.FC = () => {
         console.log(`emiting enable_2fa`);
     }
 
+	/*
+		TO DO:
+		- Friend Request Button
+		- Avatar
+		- Stats/Match History
+		- Finish 2fa
+	*/
+
     return (
         <div>
             {
