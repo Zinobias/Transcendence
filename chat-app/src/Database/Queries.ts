@@ -257,6 +257,20 @@ export class Queries {
 	}
 
 	//ChatChannels table
+	async channelExists(channelId: number): Promise<boolean> {
+		const myDataSource = await getDataSource();
+		const addChannel = myDataSource.getRepository(chat_channels);
+		try {
+			const find = await addChannel.findOneBy({
+				ownerId: channelId,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run userExists check query for [${channelId}] see error: ${e}`);
+		}
+		return false;
+	}
+
 	/**
 	 * Store a new channel in the database
 	 * @param channel the channel to be created
@@ -265,10 +279,16 @@ export class Queries {
 	async createChannel(channel: Channel): Promise<number> {
 		const myDataSource = await getDataSource();
 		const addChannel = myDataSource.getRepository(chat_channels);
-		const chatChannels = await addChannel.save(new chat_channels(channel));
-		this.logger.debug(`Channel id for saved channel is ${chatChannels.channelId}`);
-		// const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
-		return chatChannels.channelId;
+		if (await this.channelExists(channel.channelId)) {
+			return -1;
+		}
+		try {
+			const test = await addChannel.save(new chat_channels(channel));
+			return test.channelId;
+		} catch (e) {
+			this.logger.warn(`Unable to run chat_channel query for [${channel.owner}] see error: ${e}`);
+		}
+		return -1;
 	}
 
 	/**
