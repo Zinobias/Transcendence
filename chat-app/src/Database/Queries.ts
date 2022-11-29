@@ -92,11 +92,10 @@ export class Queries {
 	 * @param userId user to get the avatar for
 	 * @param image image to store as the avatar
 	 */
-	async setUserAvatar(userId: number, image: Buffer, filename: string) {
+	async setUserAvatar(userId: number, image: Buffer) {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
-		// const avatar = await this.uploadDatabaseFile(image, filename);
-		// await userRepository.update(userId, { avatarId: avatar.avatarId });
+		await userRepository.update(userId, {avatar: image});
 	}
 
 	/**
