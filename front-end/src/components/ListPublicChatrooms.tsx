@@ -11,6 +11,7 @@ interface Props {
 const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
+    const [pw, setPw] = useState<string>("");
 
     // EVENT LISTENERS
     useEffect(() => {
@@ -36,31 +37,58 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
         }
     },[])
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId: number) => {
+    const handleJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId: number, password: boolean) => {
+        e.preventDefault();
+        if (password) 
+            document.getElementById("chatPw")?.classList.toggle("chatPwShow");
+        else {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channel_join",
+                data: {user_id: cookies.userID, channel_id: channelId}
+            })
+            console.log("emiting channel_join");
+        }
+    };
+
+    const handlePwJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId: number) => {
         e.preventDefault();
         socket.emit("chat", {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "channel_join",
-            data: {user_id: cookies.userID, channel_id: channelId}
+            data: {user_id: cookies.userID, channel_id: channelId, password: pw}
         })
-        console.log("emiting channel_join");
+        console.log("emiting channel_join with pw");
+        setPw("");
+        document.getElementById("chatPw")?.classList.toggle("chatPwShow");
     };
 
     return (
         <>
-        {chatroom.map((element) => (
-            <form key={element.channelId} className="listChat">
-                <span className="listChat__text">{element.channelName}</span> 
-                {
-                    element.hasPassword && 
-                    <span className="listChat__icon">
-                        <SlLock />
-                    </span>
-                }
-                <button className="boringButton__small" onClick={(e) => handleClick(e, element.channelId)}>JOIN</button>
-            </form>
-        ))}
+            <div className="chats">
+            {chatroom.map((element) => (
+                <li key={element.channelId} className="listChat">
+                    <span className="listChat__text">{element.channelName}</span> 
+                    <button className="listChat__button" onClick={(e) => handleJoin(e, element.channelId, element.hasPassword)}>JOIN</button>
+                    {
+                        element.hasPassword && 
+                        <span className="listChat__icon">
+                            <SlLock />
+                        </span>
+                    }
+                    <div className="chatPw" id="chatPw">
+                        <form>
+                            <label className="pwform__label">password</label>
+                            <br/>
+                            <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="pwform__input"/>
+                            <button className="pwform__button" onClick={(e) => handlePwJoin(e, element.channelId)}>enter</button>
+                        </form>
+                    </div>
+                </li>
+            ))}
+            </div>
         </>
     );
 };

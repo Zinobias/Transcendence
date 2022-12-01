@@ -20,9 +20,9 @@ const ChannelPassword : React.FC<Props> = ({channelName, channelId}) => {
     return (
         <>
             <form className="loginform" id="newPw">
-            <label className="loginform__label">Enter PW for {channelName}</label>
-            <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
-            <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
+                <label className="loginform__label">Enter PW for {channelName}</label>
+                <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
+                <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
             </form>
         </>
     )
