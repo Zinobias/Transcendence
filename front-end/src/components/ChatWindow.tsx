@@ -6,32 +6,20 @@ import { SocketContext } from "./Socket";
 import { AiOutlineMenu } from "react-icons/ai";
 
 interface Props {
-    channelId: number | undefined;
+    channel: IChannel | undefined;
 }
 
-const   ChatWindow: React.FC<Props> = ({channelId}) => {
+const   ChatWindow: React.FC<Props> = ({channel}) => {
 	
     const [chat, setChat] = useState<IMessage[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
-    const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
 
-    // IF CHANNEL ID CHANGES EMIT TO GET NEW CHANNEL
     useEffect(() => {
-        if (channelId != undefined) {
-            socket.emit("chat", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "channel_retrieve_by_id", 
-                data: { user_id: cookies.userID, 
-                        channel_id: channelId }
-            });
-            console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
-        }
-        setChat([]);
-    }, [channelId])
-
+        if (channel != undefined)
+            setChat([]);
+    }, [channel]);
 
     // EVENT LISTENERS
     useEffect(() => {
@@ -44,11 +32,6 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
                 alert(response.msg);
         })
 
-        socket.on("channel_retrieve_by_id", response => {
-            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
-            setChannel(channel => response.channel);
-        })
-
         socket.on("channel_leave", response  => {
             if (response.success) 
                 setChat(chat => [...chat, {message: "has left the channel.", sender: response.user_id, timestamp: -1}])
@@ -56,17 +39,31 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
 
         socket.on("channel_join", response => {
             // if we are looking at the channel where a new user joins we want to update the channel
-            if (response.success == true && response.channel_id == channelId) {
+            if (response.success == true && response.channel_id == channel?.channelId) {
                 socket.emit("chat", {
                     userId: cookies.userID,
                     authToken: cookies.user,
                     eventPattern: "channel_retrieve_by_id", 
                     data: { user_id: cookies.userID, 
-                            channel_id: channelId }
+                            channel_id: channel?.channelId }
                 });
             }
             if (response.success == true)
                 setChat(chat => [...chat, {message: "has joined the channel.", sender: response.user_id, timestamp: -1}])
+        })
+
+        socket.on("channel_promote", response => {
+            if (response.success == true) 
+                setChat(chat => [...chat, {message: "got promoted!", sender: response.affected_id, timestamp: -1}])
+            else
+                console.log("socket.on channel_promote fail");
+        })
+
+        socket.on("channel_demote", response => {
+            if (response.success == true) 
+                setChat(chat => [...chat, {message: "got promoted!", sender: response.affected_id, timestamp: -1}])
+            else
+                console.log("socket.on channel_demote fail");
         })
 
         return () => {
@@ -74,6 +71,8 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
             socket.off("channel_retrieve_by_id");
             socket.off("channel_leave");
             socket.off("channel_join");
+            socket.off("channel_promote");
+            socket.off("channel_demote");
         }
     }, [])
 
@@ -109,13 +108,14 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
     };
 
-    if (channelId == undefined) {
+    if (channel == undefined) {
         return (
             <div className="chatroom">
                 No Chatroom loaded
             </div>
         )
     }
+    
     return (
         <>
 
@@ -145,7 +145,7 @@ const   ChatWindow: React.FC<Props> = ({channelId}) => {
                     ))
                 }
             </div>
-            <ChatInput channelId={channelId}/>
+            <ChatInput channelId={channel.channelId}/>
         </div>
         </>
     )

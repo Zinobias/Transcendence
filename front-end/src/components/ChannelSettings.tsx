@@ -3,29 +3,16 @@ import { useCookies } from 'react-cookie';
 import { IChannel, SettingType } from '../interfaces';
 import { SocketContext } from './Socket';
 import { TbCrown } from "react-icons/tb";
-import { useNavigate } from 'react-router-dom';
+import { BsGear } from "react-icons/bs";
+import ChannelUtils from './ChannelUtils';
 
 interface Props {
-    channelId: number | undefined;
+    channel: IChannel | undefined;
 }
 
-const ChannelSettings : React.FC<Props> = ({channelId}) => {
-    const [channel, setChannel] = useState<IChannel>();
+const ChannelSettings : React.FC<Props> = ({channel}) => {
     const [cookies] = useCookies(['userID', 'user']);
-    const navigate = useNavigate();
     const socket = useContext(SocketContext);
-
-    // EVENT LISTENERS (all the channel_retrieve emits are happening in ChatWindow)
-    useEffect(() => {
-        socket.on("channel_retrieve_by_id", response => {
-            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
-            setChannel(channel => response.channel);
-        })
-
-        return () => {
-            socket.off("channel_retrieve_by_id");
-        }
-    }, [])
 
     const handleLeave = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -33,24 +20,11 @@ const ChannelSettings : React.FC<Props> = ({channelId}) => {
           userId: cookies.userID,
           authToken: cookies.user,
           eventPattern: "channel_leave",
-          data: {user_id: cookies.userID, channel_id: channelId}
+          data: {user_id: cookies.userID, channel_id: channel?.channelId}
         })
         console.log("emiting channel_leave");
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
     }
-
-    const handleProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,  userId: number) => {
-        e.preventDefault();
-        navigate({
-            pathname: '/profile',
-            search: 'id=' + userId,
-        })
-    }
-
-    function findAdmin (userId : number) : boolean {
-		const res = channel?.settings.find((e) => userId == e.userId && e.setting == SettingType.ADMIN);
-		return (res !== undefined);
-	}
 	
 	const toggleSettings = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, userId: number) => {
 		e.preventDefault();
@@ -58,29 +32,27 @@ const ChannelSettings : React.FC<Props> = ({channelId}) => {
 		document.getElementById(userId.toString())?.classList.toggle("settingsShow");
 	}; 
 
-	/*
-		TO DO:
-		SETTINGS:
-		- Leave channel button
-		- if owner:
-			show password stuff on top
-		- member list:
-			- Member Settings:
-			- Go to Profile
-			- Invite to Game
-			- if Admin/Owner:
-				Mute/Ban
-	*/
+    
+    function findAdmin (userId : number) : boolean {
+        if (userId == channel?.owner) 
+            return (false);
+        const res = channel?.settings.find((e) => userId == e.userId && e.setting == SettingType.ADMIN);
+        return (res !== undefined);
+    }
 
-	if (channelId == undefined) {
+	if (channel == undefined) {
 		return (<></>)
 	}
+
     return (
-        <div className="channelSettings">
-            <button className="leaveChannel" onClick={(e) => handleLeave(e)}>LEAVE</button>
+        <div>
+            {
+                channel?.otherOwner == undefined &&
+                <button className="settingsButton" onClick={(e) => handleLeave(e)}>LEAVE</button>
+            }
 			{
-				cookies.userID == channel?.owner &&
-				<button className="leaveChannel">pw</button>
+				channel?.otherOwner == undefined && cookies.userID == channel?.owner &&
+				<button className="settingsButton">PW</button>
 			}
             MEMBERS:
             {channel?.users.map((element, index) => (
@@ -91,9 +63,13 @@ const ChannelSettings : React.FC<Props> = ({channelId}) => {
                         element.userId == channel.owner &&
                         <TbCrown />
                     }
+                    {
+                        findAdmin(element.userId) &&
+                        <BsGear />
+                    }
 					</span>
 					<div id={element.userId.toString()} className="settingsDropdown">
-						<button className="leaveChannel" onClick={(e) => handleProfile(e, element.userId)}>profile</button>
+                        <ChannelUtils channel={channel} memberUserID={element.userId}/>
 					</div>
                 </li>
             ))}

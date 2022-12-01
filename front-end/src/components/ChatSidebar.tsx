@@ -33,7 +33,7 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId}) => {
         console.log("channel_leave success");
         if (channelId == response.channelId && cookies.userID == response.user_id)
           setChannelId(channelId => undefined);
-        setState( state => !state);
+        setState(state => !state);
       }
       else 
         alert(response.msg);
@@ -56,23 +56,16 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId}) => {
     console.log("emiting get_channels_user");
   },[state])
 
-  const handleLeave = (e:  React.MouseEvent<HTMLSpanElement, MouseEvent>,  id: number) => {
-      e.preventDefault();
-      socket.emit("chat", {
-        userId: cookies.userID,
-        authToken: cookies.user,
-        eventPattern: "channel_leave",
-        data: {user_id: cookies.userID, channel_id: id}
-      })
-      console.log("emiting channel_leave");
-  } 
+
+  /*
+    TODO:
+    only show channes that are visible
+  */
 
   return (
     <div>
       <p style={{textAlign: "center", lineHeight: "0"}}>MY CHATS:</p>
       {channels.map((element) => (
-        // TO DO:
-        // only show channels that are visible
         <li key={element.channelId} className="listChat">
             <span className="listChatUser__text" onClick={() => setChannelId(channelId => element.channelId)}>{element.channelName}</span> 
         </li>
