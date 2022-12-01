@@ -2,7 +2,6 @@ import {Channel} from '../Objects/Channel';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {User} from '../Objects/User';
 import {microServiceDTO} from '../app.controller';
-import {AppService} from '../app.service';
 import {ClientProxy} from '@nestjs/microservices';
 
 @Injectable()
@@ -13,6 +12,10 @@ export class Util {
     private logger: Logger = new Logger('Util');
 
     //EZ MESSAGE:
+
+    public emitFailedObject(userId: number, channel: string, msg: string) {
+        this.notify([userId], channel, {success: false, msg: msg})
+    }
 
     public notify(userIds: number[], channel: string, args: object) {
         const obj: microServiceDTO = {
@@ -51,9 +54,9 @@ export class Util {
      * @param invert if this check should be inverted
      * @private
      */
-    public userInChannel(channel: Channel, userId: number, source: string, invert?: boolean): boolean {
+    public userInChannel(channel: Channel, userId: number, source: string, invert: boolean): boolean {
         if (invert) {
-            if (!channel.hasUser(userId)) {
+            if (channel.hasUser(userId)) {
                 this.logger.debug(`User [${userId}] should be in channel for ${source}`);
                 return false;
             }
@@ -61,9 +64,9 @@ export class Util {
         }
 
         if (channel.hasUser(userId)) {
-            this.logger.debug(`User [${userId}] should not be in channel for ${source}`);
             return true;
         }
+        this.logger.debug(`User [${userId}] should not be in channel for ${source}`);
         return false;
     }
 

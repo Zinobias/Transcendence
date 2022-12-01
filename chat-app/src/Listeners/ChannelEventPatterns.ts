@@ -32,15 +32,11 @@ export class ChannelEventPatterns {
                 @Inject(Util) private readonly util: Util,
                 /*@Inject(Queries) private readonly queries: Queries*/) {}
 
-    private emitFailedObject(userId: number, channel: string, msg: string) {
-        this.util.notify([userId], channel, {success: false, msg: msg})
-    }
-
     @EventPattern('channel_create')
     async channelCreate(data: ChannelCreate) {
         if (data.channel_name == undefined || data.channel_name.length < 3 || data.channel_name.length > 12
             || data.visible == undefined || data.should_get_password == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_create', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_create', 'Incorrect data object');
             return;
         }
         const user: User = await this.util.getUser(
@@ -48,7 +44,7 @@ export class ChannelEventPatterns {
             'channel_create',
         );
         if (user == null) {
-            this.emitFailedObject(data.user_id, 'channel_create', 'Unable to find dm user');
+            this.util.emitFailedObject(data.user_id, 'channel_create', 'Unable to find dm user');
             return;
         }
         const usersArr: User[] = [user];
@@ -59,7 +55,7 @@ export class ChannelEventPatterns {
                 'channel_create',
             );
             if (user2 == null) {
-                this.emitFailedObject(data.user_id, 'channel_create', 'Unable to find second dm user');
+                this.util.emitFailedObject(data.user_id, 'channel_create', 'Unable to find second dm user');
                 return;
             }
             usersArr.push(user2);
@@ -79,7 +75,7 @@ export class ChannelEventPatterns {
         );
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {
-            this.emitFailedObject(data.user_id, 'channel_create', 'Unable to create a new channel');
+            this.util.emitFailedObject(data.user_id, 'channel_create', 'Unable to create a new channel');
             this.logger.warn(`Received invalid channel [${channelId}] from channel_create`);
             return;
         }
@@ -104,7 +100,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_update_password')
     async handlePasswordChange(data: ChannelUpdatePassword) {
         if (data.channel_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_update_password', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_update_password', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(
@@ -112,18 +108,18 @@ export class ChannelEventPatterns {
             'channel_update_password',
         );
         if (channel == null) {
-            this.emitFailedObject(data.user_id, 'channel_update_password', `Unable to find the channel you're trying to join`);
+            this.util.emitFailedObject(data.user_id, 'channel_update_password', `Unable to find the channel you're trying to join`);
             return;
         }
 
         const user: User = await this.util.getUser(data.user_id, 'channel_update_password');
         if (user == null) {
-            this.emitFailedObject(data.user_id, 'channel_update_password', `Unable to find your user`);
+            this.util.emitFailedObject(data.user_id, 'channel_update_password', `Unable to find your user`);
             return;
         }
 
         if (this.util.notOwner(channel, data.user_id, 'channel_update_password')) {
-            this.emitFailedObject(data.user_id, 'channel_update_password', `You're not the owner of this channel`);
+            this.util.emitFailedObject(data.user_id, 'channel_update_password', `You're not the owner of this channel`);
             return;
         }
 
@@ -134,7 +130,7 @@ export class ChannelEventPatterns {
         }
 
         if (data.password.length != 64) { //This only works for a sha256 hash
-            this.emitFailedObject(data.user_id, 'channel_update_password', `This password is not valid`);
+            this.util.emitFailedObject(data.user_id, 'channel_update_password', `This password is not valid`);
             return;
         }
         channel.password = data.password
@@ -149,7 +145,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_join')
     async handleJoin(data: ChannelJoin) {
         if (data.channel_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_join', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_join', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(
@@ -157,35 +153,36 @@ export class ChannelEventPatterns {
             'channel_join',
         );
         if (channel == null) {
-            this.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
+            this.util.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
+            return;
+        }
+
+        const user: User = await this.util.getUser(data.user_id, 'channel_join');
+        if (user == null) {
+            this.util.emitFailedObject(data.user_id, 'channel_join', `Unable to find your user`);
+            return;
+        }
+
+        if (!this.util.userInChannel(channel, data.user_id, 'channel_join', true)) {
+            this.util.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
+            return;
+        }
+
+        if (!channel.canJoin(data.user_id)) {
+
+            this.util.emitFailedObject(data.user_id, 'channel_join', `You've been banned from this channel`);
             return;
         }
 
         if (channel.password != undefined) {
             if (data.password == undefined) {
-                this.emitFailedObject(data.user_id, 'channel_join', `No password provided`);
+                this.util.emitFailedObject(data.user_id, 'channel_join', `No password provided`);
                 return;
             }
             if (data.password != channel.password) {
-                this.emitFailedObject(data.user_id, 'channel_join', `Invalid password`);
+                this.util.emitFailedObject(data.user_id, 'channel_join', `Invalid password`);
                 return
             }
-        }
-
-        const user: User = await this.util.getUser(data.user_id, 'channel_join');
-        if (user == null) {
-            this.emitFailedObject(data.user_id, 'channel_join', `Unable to find your user`);
-            return;
-        }
-
-        if (this.util.userInChannel(channel, data.user_id, 'channel_join')) {
-            this.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
-            return;
-        }
-
-        if (!channel.canJoin(data.user_id)) {
-            this.emitFailedObject(data.user_id, 'channel_join', `You've been banned from this channel`);
-            return;
         }
 
         channel.addUser(user);
@@ -203,7 +200,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_leave')
     async handleLeave(data: ChannelLeave) {
         if (data.channel_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_leave', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_leave', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(
@@ -211,11 +208,11 @@ export class ChannelEventPatterns {
             'channel_leave',
         );
         if (channel == null) {
-            this.emitFailedObject(data.user_id, 'channel_leave', `Unable to find the channel you're trying to leave`);
+            this.util.emitFailedObject(data.user_id, 'channel_leave', `Unable to find the channel you're trying to leave`);
             return;
         }
         // if (this.util.userInChannel(channel, data.user_id, 'channel_leave')) {
-        //     this.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
+        //     this.util.emitFailedObject(data.user_id, 'channel_join', `You're already a member of this channel`);
         //     return;
         // }
 
@@ -265,7 +262,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
     handlePromote(data: ChannelPromote) {
         if (data.channel_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_promote', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_promote', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(
@@ -274,7 +271,7 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.affected_id, 'channel_promote'))
+        if (!this.util.userInChannel(channel, data.affected_id, 'channel_promote', false))
             return;
         if (this.util.notAdmin(channel, data.affected_id, 'channel_promote'))
             return;
@@ -301,7 +298,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_demote')
     async handleDemote(data: ChannelDemote) {
         if (data.channel_id == undefined || data.affected_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_demote', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_demote', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(
@@ -310,7 +307,7 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.affected_id, 'channel_demote', true))
+        if (!this.util.userInChannel(channel, data.affected_id, 'channel_demote', false))
             return;
         if (this.util.notAdmin(channel, data.affected_id, 'channel_demote'))
             return;
@@ -326,7 +323,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_kick')
     async handleKick(data: ChannelKick) {
         if (data.channel_id == undefined || data.affected_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_kick', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_kick', 'Incorrect data object');
             return;
         }
         //TODO send a message to the frontend to notify kicked user somewhere (if we want to do that?)
@@ -336,7 +333,7 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.affected_id, 'channel_kick', true))
+        if (!this.util.userInChannel(channel, data.affected_id, 'channel_kick', false))
             return;
         if (this.util.notOwner(channel, data.affected_id, 'channel_kick'))
             return;
@@ -349,7 +346,7 @@ export class ChannelEventPatterns {
     async handleBan(data: ChannelBan) {
         if (data.channel_id == undefined || data.until != undefined
             || (data.until != -1 || data.until <= new Date().getUTCMilliseconds()) || data.affected_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_ban', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_ban', 'Incorrect data object');
             return;
         }
         //TODO send a message to the frontend to notify banned user somewhere (if we want to do that?)
@@ -359,7 +356,7 @@ export class ChannelEventPatterns {
         );
         if (channel == null)
             return;
-        if (this.util.userInChannel(channel, data.affected_id, 'channel_ban', true))
+        if (!this.util.userInChannel(channel, data.affected_id, 'channel_ban', false))
             return;
         if (this.util.notAdmin(channel, data.affected_id, 'channel_ban'))
             return;
@@ -382,7 +379,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_disband')
     async handleDisband(data: ChannelDisband) {
         if (data.channel_id == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_disband', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_disband', 'Incorrect data object');
             return;
         }
         //TODO send a message to the frontend to notify all other users (if we want to do that?)
@@ -411,7 +408,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_message')
     handleMessage(data: ChannelMessage) {
         if (data.channel_id == undefined || data.message == undefined) {
-            this.emitFailedObject(data.user_id, 'channel_message', 'Incorrect data object');
+            this.util.emitFailedObject(data.user_id, 'channel_message', 'Incorrect data object');
             return;
         }
         const channel: Channel = this.util.getChannel(
@@ -483,7 +480,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_retrieve_by_id')
     async handleRetrieveOne(data: ChannelRetrieve) {
         const channel = this.util.getChannel(data.channel_id, 'channel_retrieve_by_id');
-        if (!this.util.userInChannel(channel, data.user_id, 'channel_retrieve_by_id'))
+        if (!this.util.userInChannel(channel, data.user_id, 'channel_retrieve_by_id', false))
             return;
         this.util.notify([data.user_id], 'channel_retrieve_by_id', {
             success: true,
