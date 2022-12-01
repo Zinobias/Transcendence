@@ -1,5 +1,4 @@
 import {Column, Entity, OneToMany, PrimaryColumn} from 'typeorm';
-import {achievements} from './Achievements';
 import {blocked} from './Blocked';
 import {chat_channels} from './ChatChannels';
 import {chat_channel_settings} from './ChatChannelSettings';
@@ -28,17 +27,17 @@ export class user_table {
     @Column({nullable: true, type: "bytea"})
     avatar: Uint8Array;
 
-    @OneToMany(() => achievements, (achievement) => achievement.achievementUser, {onDelete: 'CASCADE'})
-    achievement: achievements[];
-
     @OneToMany(() => blocked, (block) => block.users, {onDelete: 'CASCADE'})
+    blockingUsers: blocked[];
+
+    @OneToMany(() => blocked, (block) => block.blocked, {onDelete: 'CASCADE'})
     block: blocked[];
 
     @OneToMany(() => chat_channels, (chat) => chat.user, {onDelete: 'CASCADE'})
-    chat: chat_channels[];
+    chatOwner: chat_channels[];
 
     @OneToMany(() => chat_channels, (chat) => chat.user2, {onDelete: 'CASCADE'})
-    chat2: chat_channels[];
+    chatOwnerTwo: chat_channels[];
 
     @OneToMany(() => chat_channel_settings, (chat) => chat.actorUser, {onDelete: 'CASCADE'})
     settingActorUser: chat_channel_settings[];
@@ -47,14 +46,17 @@ export class user_table {
     settingAffectedUser: chat_channel_settings[];
 
     @OneToMany(() => chat_members, (chat) => chat.channel, {onDelete: 'CASCADE'})
-    member: chat_members[];
+    chatChannelMember: chat_members[];
 
     @OneToMany(() => chat_message, (chat) => chat.user, {onDelete: 'CASCADE'})
-    message: chat_message[];
+    messageSender: chat_message[];
+
+    @OneToMany(() => friends, (friend) => friend.user, {onDelete: 'CASCADE'})
+    userWithFriends: friends[];
 
     @OneToMany(() => friends, (friend) => friend.user, {onDelete: 'CASCADE'})
     friend: friends[];
 
     @OneToMany(() => sessions, (session) => session.user, {onDelete: 'CASCADE'})
-    session: sessions[];
+    sessionUser: sessions[];
 }

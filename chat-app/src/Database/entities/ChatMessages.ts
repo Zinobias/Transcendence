@@ -28,9 +28,9 @@ export class chat_message {
     @Column({default: new Date().getTime(), type: 'bigint'})
     timestamp: number;
 
-    @ManyToOne(() => chat_channels, (chat) => chat.message)
+    @ManyToOne(() => chat_channels, (chat) => chat.channelForMessage)
     chat: chat_channels;
 
-    @ManyToOne(() => user_table, (user) => user.message)
+    @ManyToOne(() => user_table, (user) => user.messageSender)
     user: user_table;
 }

@@ -15,9 +15,9 @@ export class chat_members {
     @PrimaryColumn()
     userId: number;
 
-    @ManyToOne(() => chat_channels, (channel) => channel.member)
+    @ManyToOne(() => chat_channels, (channel) => channel.chatChannelForMember)
     channel: chat_channels;
 
-    @ManyToOne(() => user_table, (user) => user.member)
+    @ManyToOne(() => user_table, (user) => user.chatChannelMember)
     user: user_table;
 }

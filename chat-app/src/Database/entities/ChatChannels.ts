@@ -42,18 +42,18 @@ export class chat_channels {
     @Column()
     visible: boolean
 
-    @OneToOne(() => user_table, (user) => user.chat)
+    @OneToOne(() => user_table, (user) => user.chatOwner)
     user: user_table;
 
-    @OneToOne(() => user_table, (user) => user.chat2, {nullable: true})
+    @OneToOne(() => user_table, (user) => user.chatOwnerTwo, {nullable: true})
     user2: user_table;
 
     @OneToMany(() => chat_channel_settings, (chat) => chat.channel, {onDelete: 'CASCADE'})
-    chat: chat_channel_settings[];
+    chatChannelSetting: chat_channel_settings[];
 
     @OneToMany(() => chat_members, (chat) => chat.channel, {onDelete: 'CASCADE'})
-    member: chat_members[];
+    chatChannelForMember: chat_members[];
 
-    @OneToMany(() => chat_message, (chat) => chat.chat, {onDelete: 'SET NULL'})
-    message: chat_message[];
+    @OneToMany(() => chat_message, (chat) => chat.chat, {onDelete: 'CASCADE'})
+    channelForMessage: chat_message[];
 }

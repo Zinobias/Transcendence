@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryColumn,} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn,} from 'typeorm';
 import {user_table} from './UserTable';
 
 @Entity()
@@ -15,13 +15,13 @@ export class friends {
     @PrimaryColumn()
     friendId: number;
 
-    @ManyToOne(() => user_table, (user) => user.friend)
+    @ManyToOne(() => user_table, (user) => user.userWithFriends)
     @JoinColumn({name: 'userId'})
     user: user_table;
 
-    @ManyToMany(() => friends, (friend) => friend.friendId)
+    @ManyToOne(() => user_table, (user) => user.friend)
     @JoinColumn({name: 'friendId'})
-    friend: friends;
+    friend: user_table;
 
     @Column()
     active: boolean;

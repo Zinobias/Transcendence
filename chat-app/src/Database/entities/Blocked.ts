@@ -14,11 +14,11 @@ export class blocked {
     @PrimaryColumn()
     blockId: number;
 
-    @ManyToOne(() => user_table, (user) => user.block)
+    @ManyToOne(() => user_table, (user) => user.blockingUsers)
     @JoinColumn({name: 'userId'})
     users: user_table;
 
-    @ManyToOne(() => blocked, (block) => block.blockId)
+    @ManyToOne(() => user_table, (user) => user.block)
     @JoinColumn({name: 'blockId'})
-    block: blocked;
+    blocked: user_table;
 }
