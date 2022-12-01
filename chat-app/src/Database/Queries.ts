@@ -425,8 +425,8 @@ export class Queries {
 	 */
 	async addChannelMessage(channelId: number, message: Message) {
 		const myDataSource = await getDataSource();
-		const chats = myDataSource.getRepository(chat_message);
-		await chats.insert(new chat_message(channelId, message));
+		// const chats = myDataSource.getRepository(chat_message);
+		// await chats.insert(new chat_message(channelId, message));
 		const chat = myDataSource.getRepository(chat_message);
 		const insertResult: InsertResult = await chat.insert(
 			new chat_message(channelId, message),
