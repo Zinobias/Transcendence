@@ -129,7 +129,7 @@ export class ChannelEventPatterns {
             return;
         }
 
-        if (data.password.length != 64) { //This only works for a sha256 hash
+        if (data.password.length != 32) { //This only works for a MD5 hash
             this.util.emitFailedObject(data.user_id, 'channel_update_password', `This password is not valid`);
             return;
         }
