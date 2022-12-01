@@ -12,7 +12,7 @@ export class Sessions {
 	@Column({ default: new Date().getTime(), type: 'bigint'})
 	time: number;
 
-	@ManyToOne(() => UserTable, (user) => user.userId)
-	@JoinColumn({ name: 'userId' })
+	@ManyToOne(() => UserTable, (user) => user.session)
+	@JoinColumn({name: 'userId'})
 	user: UserTable;
 }

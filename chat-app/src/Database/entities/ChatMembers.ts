@@ -1,4 +1,4 @@
-import {Entity, JoinColumn, OneToMany, PrimaryColumn} from 'typeorm';
+import {Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn} from 'typeorm';
 import { chat_channels } from './ChatChannels';
 import { user_table } from './UserTable';
 
@@ -14,11 +14,9 @@ export class chat_members {
   @PrimaryColumn()
   userId: number;
 
-  @OneToMany(() => chat_channels, (channel) => channel.channelId)
-  @JoinColumn({ name: 'channelId' })
+  @ManyToOne(() => chat_channels, (channel) => channel.member)
   channel: chat_channels;
 
-  @OneToMany(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => user_table, (user) => user.member)
   user: user_table;
 }

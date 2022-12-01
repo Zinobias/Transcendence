@@ -3,7 +3,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   JoinColumn,
-  PrimaryColumn, OneToMany,
+  PrimaryColumn, OneToMany, ManyToOne,
 } from 'typeorm';
 import { Message } from '../../Objects/Message';
 import { chat_channels } from './ChatChannels';
@@ -18,21 +18,20 @@ export class chat_message {
     this.userId = message.sender;
     this.timestamp = message.timestamp;
   }
+
   @PrimaryGeneratedColumn()
   messageId: number;
 
   @PrimaryColumn()
   channelId: number;
 
-  @OneToMany(() => chat_channels, (chat) => chat.channelId)
-  @JoinColumn({ name: 'channelId' })
+  @ManyToOne(() => chat_channels, (chat) => chat.message)
   chat: chat_channels;
 
   @PrimaryColumn()
   userId: number;
 
-  @OneToMany(() => user_table, (user) => user.userId)
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => user_table, (user) => user.message)
   user: user_table;
 
   @Column()

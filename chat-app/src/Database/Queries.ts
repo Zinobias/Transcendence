@@ -32,7 +32,24 @@ export class Queries {
 		this.loadAllChannels().then(() =>
 			this.logger.log(`Loaded all channels from database, took: ${new Date().getTime() - start} millis`));
 	}
+
 	//Users table
+	private async userExists(userId: number, userName: string): Promise<boolean> {
+		const AppDataSource = await getDataSource();
+		console.log(AppDataSource.options);
+		const userTableRepo = AppDataSource.getRepository(user_table);
+		try {
+			const find = await userTableRepo.findOneBy({
+				userId: userId,
+				userName: userName,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`);
+		}
+		return false;
+	}
+
 	/**
 	 * Creates a new user entry
 	 * @param loginId login id for the user
@@ -44,6 +61,10 @@ export class Queries {
 		const AppDataSource = await getDataSource();
 		console.log(AppDataSource.options);
 		const userRepository = AppDataSource.getRepository(user_table);
+		if (await this.userExists(loginId, userName)) {
+			console.log("user already exist");
+			return;
+		}
 		await userRepository.save(new user_table(loginId, userName));
 	}
 
@@ -71,11 +92,10 @@ export class Queries {
 	 * @param userId user to get the avatar for
 	 * @param image image to store as the avatar
 	 */
-	async setUserAvatar(userId: number, image: Buffer, filename: string) {
+	async setUserAvatar(userId: number, image: Buffer) {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
-		// const avatar = await this.uploadDatabaseFile(image, filename);
-		// await userRepository.update(userId, { avatarId: avatar.avatarId });
+		await userRepository.update(userId, {avatar: image});
 	}
 
 	/**
@@ -98,7 +118,7 @@ export class Queries {
 		const userRepository = myDataSource.getRepository(user_table);
 		const findUser = await userRepository.findOneBy({ userId: userId });
 		if (findUser == undefined) return undefined;
-		return new User(findUser.userId, findUser.userName, undefined);
+		return new User(findUser.userId, findUser.userName, findUser.avatar);
 	}
 
 	//Blocked users table
@@ -117,6 +137,21 @@ export class Queries {
 		return blockedUsers;
 	}
 
+	async alreadyBlocked(userId: number, blockedUser: number): Promise<boolean> {
+		const myDataSource = await getDataSource();
+		const blocked_user_repository = myDataSource.getRepository(blocked);
+		try {
+			const find = await blocked_user_repository.findOneBy({
+				userId: userId,
+				blockId: blockedUser,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run ExistsBlock check query for [${userId}] see error: ${e}`);
+		}
+		return false;
+	}
+
 	/**
 	 * Store a new blocked user for a user
 	 * @param userId user to store the blocked user for
@@ -125,7 +160,15 @@ export class Queries {
 	async addBlockedUser(userId: number, blockedUser: number): Promise<void> {
 		const myDataSource = await getDataSource();
 		const blocked_user_repository = myDataSource.getRepository(blocked);
-		await blocked_user_repository.save(new blocked(userId, blockedUser));
+		if (await this.alreadyBlocked(userId, blockedUser)) {
+			this.logger.warn(`Attempted to block already blocked user, user: ${userId} blocked: [${blockedUser}]`);
+			return;
+		}
+		try {
+			await blocked_user_repository.save(new blocked(userId, blockedUser));
+		} catch (e) {
+			this.logger.warn(`Unknown error while blocking user: ${userId} blocked: [${blockedUser}]`);
+		}
 	}
 
 	/**
@@ -167,6 +210,21 @@ export class Queries {
 		return friendList;
 	}
 
+	async friendExist(fromUserId: number, toUserId: number, confirmed: boolean): Promise<boolean> {
+		const myDataSource = await getDataSource();
+		const friends_repository = myDataSource.getRepository(friends);
+		try {
+			const find = await friends_repository.findOneBy({
+				userId: fromUserId,
+				friendId: toUserId,
+				active: confirmed,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run userExists check query for [${fromUserId}] see error: ${e}`);
+		}
+		return false;
+	}
 	/**
 	 * Stores a friend request
 	 * @param fromUserId user that created the request
@@ -180,7 +238,11 @@ export class Queries {
 	): Promise<void> {
 		const myDataSource = await getDataSource();
 		const friends_repository = myDataSource.getRepository(friends);
-		await friends_repository.save(new friends(fromUserId, toUserId, confirmed));
+		try {
+			await friends_repository.upsert([new friends(fromUserId, toUserId, confirmed)], ['active']);
+		} catch (e) {
+			this.logger.warn(`Unable to add friend for [${fromUserId}] see error: ${e}`);
+		}
 	}
 
 	/**
@@ -195,6 +257,20 @@ export class Queries {
 	}
 
 	//ChatChannels table
+	async channelExists(channelId: number): Promise<boolean> {
+		const myDataSource = await getDataSource();
+		const addChannel = myDataSource.getRepository(chat_channels);
+		try {
+			const find = await addChannel.findOneBy({
+				ownerId: channelId,
+			});
+			return find != null;
+		} catch (e) {
+			this.logger.warn(`Unable to run userExists check query for [${channelId}] see error: ${e}`);
+		}
+		return false;
+	}
+
 	/**
 	 * Store a new channel in the database
 	 * @param channel the channel to be created
@@ -203,10 +279,16 @@ export class Queries {
 	async createChannel(channel: Channel): Promise<number> {
 		const myDataSource = await getDataSource();
 		const addChannel = myDataSource.getRepository(chat_channels);
-		const chatChannels = await addChannel.save(new chat_channels(channel));
-		this.logger.debug(`Channel id for saved channel is ${chatChannels.channelId}`);
-		// const find_channel = await addChannel.findOneBy({ ownerId: channel.owner });
-		return chatChannels.channelId;
+		if (await this.channelExists(channel.channelId)) {
+			return -1;
+		}
+		try {
+			const test = await addChannel.save(new chat_channels(channel));
+			return test.channelId;
+		} catch (e) {
+			this.logger.warn(`Unable to run chat_channel query for [${channel.owner}] see error: ${e}`);
+		}
+		return -1;
 	}
 
 	/**

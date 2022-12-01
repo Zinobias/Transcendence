@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import {Entity, Column, PrimaryColumn, OneToMany} from 'typeorm';
+import {Sessions} from "./sessions";
 
 @Entity('users')
 export class UserTable {
@@ -16,9 +17,11 @@ export class UserTable {
 	@Column({ default: new Date().getTime(), type: 'bigint' })
 	createAt: number;
 
-	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
-	// public sessions: Sessions[];
+	@OneToMany(() => Sessions, (session) => session.user, {
+		onDelete: 'CASCADE',
+	})
+	session: Sessions[];
 
-	// @Column({ type: 'longblob' })
-	// avatar: Buffer;
+	@Column({ nullable: true, type: 'bytea' })
+	avatar: Uint8Array;
 }

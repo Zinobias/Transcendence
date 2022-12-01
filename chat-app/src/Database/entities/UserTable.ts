@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
+import { achievements } from './Achievements';
+import { blocked } from './Blocked';
+import { chat_channels } from './ChatChannels';
+import { chat_channel_settings } from './ChatChannelSettings';
+import { chat_members } from './ChatMembers';
+import { chat_message } from './ChatMessages';
+import { friends } from './Friends';
+import { games } from './Games';
+import { sessions } from './Sessions';
 
 @Entity('users')
 export class user_table {
@@ -16,10 +25,51 @@ export class user_table {
 	@Column({ default: new Date().getTime(), type: 'bigint' })
 	createAt: number;
 
-	// @JoinColumn({ name: 'avatarId' })
-	// @OneToOne(() => blob, { nullable: true })
-	// avatar: blob;
-	//
-	// @Column({ nullable: true })
-	// avatarId: number;
+	@OneToMany(() => games, (game) => game.userT, {onDelete: 'CASCADE'})
+	game: games[];
+
+	@OneToMany(() => games, (game) => game.user2T, {onDelete: 'CASCADE'})
+	game1: games[];
+
+	@OneToMany(() => achievements, (achievement) => achievement.achievementUser, {
+		onDelete: 'CASCADE',
+	})
+	achievement: achievements[];
+
+	@OneToMany(() => blocked, (block) => block.users, {onDelete: 'CASCADE'})
+	block: blocked[];
+
+	@OneToMany(() => chat_channels, (chat) => chat.user, {onDelete: 'CASCADE'})
+	chat: chat_channels[];
+
+	@OneToMany(() => chat_channels, (chat) => chat.user2, {onDelete: 'CASCADE'})
+	chat2: chat_channels[];
+
+	@OneToMany(() => chat_channel_settings, (chat) => chat.user, {
+		onDelete: 'CASCADE',
+	})
+	setting: chat_channel_settings[];
+
+	@OneToMany(() => chat_members, (chat) => chat.channel, {
+		onDelete: 'CASCADE',
+	})
+	member: chat_members[];
+
+	@OneToMany(() => chat_message, (chat) => chat.user, {
+		onDelete: 'CASCADE',
+	})
+	message: chat_message[];
+
+	@OneToMany(() => friends, (friend) => friend.user, {
+		onDelete: 'CASCADE',
+	})
+	friend: friends[];
+
+	@OneToMany(() => sessions, (session) => session.user, {
+		onDelete: 'CASCADE',
+	})
+	session: sessions[];
+
+	@Column({nullable: true, type: "bytea"})
+	avatar: Uint8Array;
 }
