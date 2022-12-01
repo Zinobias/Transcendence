@@ -65,7 +65,7 @@ export class Queries {
 			console.log("user already exist");
 			return;
 		}
-		await userRepository.save(new user_table(loginId, userName));
+		await userRepository.save(new user_table(loginId, userName, undefined));
 	}
 
 	// async uploadDatabaseFile(dataBuffer: Buffer, filename: string) {
@@ -117,8 +117,9 @@ export class Queries {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
 		const findUser = await userRepository.findOneBy({ userId: userId });
-		if (findUser == undefined) return undefined;
-		return new User(findUser.userId, findUser.userName, findUser.avatar);
+		if (findUser == undefined)
+			return undefined;
+		return new User(findUser.userId, findUser.userName, undefined); //TODO add avatar
 	}
 
 	//Blocked users table
