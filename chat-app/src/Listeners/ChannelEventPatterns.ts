@@ -139,6 +139,11 @@ export class ChannelEventPatterns {
             channel.closed = false;
             await Queries.getInstance().setClosed(channel.channelId, channel.closed);
         }
+        this.util.notify([data.user_id], 'channel_update_password', {
+            success: true,
+            msg: undefined,
+            channel_id: channel.channelId,
+        });
     }
 
     //TODO check if user is invited?
@@ -467,7 +472,7 @@ export class ChannelEventPatterns {
                     channelId: channel.channelId,
                     channelName: channel.channelName,
                     visible: channel.visible,
-                    hasPassword: (channel.password != undefined && channel.password.length == 64)
+                    hasPassword: (channel.password != undefined && channel.password.length == 32)
                 }
             });
         this.util.notify([data.user_id], 'channels_retrieve', {

@@ -14,8 +14,10 @@ import ChannelPassword from "./ChannelPassword";
 const NavBar: React.FC = () => {
     return (
         <>
-                {/* <ChannelPassword /> */}
             <div className="grid-container">
+                {/* <div className="passwordCenter">
+                    <ChannelPassword />
+                </div> */}
                 <LogoutButton />
                 <ProfileNav />
                 <div id="nav">

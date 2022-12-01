@@ -5,6 +5,7 @@ import { IChannelInfo } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
 import ListPublicChatrooms from "./ListPublicChatrooms";
+import ChannelPassword from "./ChannelPassword";
 
 const   Chat: React.FC = () => {
 	
@@ -15,6 +16,10 @@ const   Chat: React.FC = () => {
     const [visibleCheck, setVisibleCheck] = useState<boolean>(false);
     const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
     const [channels, setChannels] = useState<IChannelInfo[]>([]);
+    const [pwPrompt, setPwPrompt] = useState<boolean>(false);
+    const [pw, setPw] = useState<string>("");
+    const [pwName, setPwName] = useState<string>("");
+    const [pwId, setPwId] = useState<number>(-1);
 
     useEffect(() => {
         socket.emit("chat", {
@@ -29,16 +34,21 @@ const   Chat: React.FC = () => {
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_create", response => {
-            if (response.success == true) {
+            if (response.success == true && response.handlePassword == false) {
                 console.log(`socket.on channel_create success ${response.channel_name}`);
                 socket.emit("chat", {
                     userId: cookies.userID,
                     authToken: cookies.user,
                     eventPattern: "get_channels_user",
                     data: {user_id: cookies.userID}
-                  })
+                })
                 console.log("emiting get_channels_user");
                 setState( state => !state);
+            }
+            else if (response.success == true && response.hasPassword == true) {
+                setPwPrompt( pwPrompt => !pwPrompt);
+                setPwName( pwName => response.channel_name);
+                setPwId( pwId => response.channel_id);
             }
             else
                 alert(`[${response.msg}]`);
@@ -50,6 +60,24 @@ const   Chat: React.FC = () => {
             response.channels.forEach((element : IChannelInfo) => {
                 setChannels( channels => [...channels, element])
             });
+        })
+
+        socket.on("channel_update_password", response => {
+            if (response.success == true) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_channels_user",
+                    data: {user_id: cookies.userID}
+                })
+                console.log("emiting get_channels_user");
+                setPwPrompt( pwPrompt => true);
+                setState( state => !state);
+                setPwName("");
+                setPwId(-1);
+            }
+            else
+                alert(`[${response.msg}]`);
         })
 
         return () => {
@@ -80,11 +108,7 @@ const   Chat: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-
         if (validateChatroomName(chatroomName)) {
-            //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
-            //console.log(Md5.hashStr(chatroomPassword + chatroomId))
-
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -102,21 +126,45 @@ const   Chat: React.FC = () => {
         setPasswordCheck(false);
     };
 
+    const handlePassword = (e: React.FormEvent) => {
+        //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
+        //console.log(Md5.hashStr(chatroomPassword + chatroomId))
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channel_update_password", 
+            data: { user_id: cookies.userID, 
+                    channel_id: pwId, 
+                    password: Md5.hashStr(pw + pwId) }
+        });
+        console.log(`emitting channel_update_password [${Md5.hashStr(pw + pwId)}]`);
+        setPw("");
+    };
+
     return (
         <>
         <div>
             <span className="heading__small">PUBLIC CHATROOMS</span>
             <ListPublicChatrooms chatroom={channels} />
         </div>
-        <form className="loginform" id="newChatroom">
-                <label className="loginform__label">Name</label>
-                <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
-                <label className="loginform__label">password</label>
-                <input type="checkbox" checked={passwordCheck} onChange={e => setPasswordCheck(!passwordCheck)}/>
-                <label className="loginform__label">public</label>
-                <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
-                <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
-        </form>
+        {
+            pwPrompt ?
+            <form className="loginform" id="newPw">
+                <label className="loginform__label">Enter password for {pwName}</label>
+                <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
+                <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
+            </form> :
+            <form className="loginform" id="newChatroom">
+                    <label className="loginform__label">Name</label>
+                    <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
+                    <label className="loginform__label">password</label>
+                    <input type="checkbox" checked={passwordCheck} onChange={e => setPasswordCheck(!passwordCheck)}/>
+                    <label className="loginform__label">public</label>
+                    <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
+                    <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
+            </form>
+        }
         </>
     )
     
