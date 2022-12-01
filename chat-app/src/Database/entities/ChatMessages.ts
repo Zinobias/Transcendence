@@ -19,18 +19,18 @@ export class chat_message {
     @PrimaryColumn()
     channelId: number;
 
-    @ManyToOne(() => chat_channels, (chat) => chat.message)
-    chat: chat_channels;
-
     @PrimaryColumn()
     userId: number;
-
-    @ManyToOne(() => user_table, (user) => user.message)
-    user: user_table;
 
     @Column()
     message: string;
 
     @Column({default: new Date().getTime(), type: 'bigint'})
     timestamp: number;
+
+    @ManyToOne(() => chat_channels, (chat) => chat.message)
+    chat: chat_channels;
+
+    @ManyToOne(() => user_table, (user) => user.message)
+    user: user_table;
 }
