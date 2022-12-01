@@ -94,6 +94,7 @@ export class ChannelEventPatterns {
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_create', {
             success: true,
+            hasPassword: data.should_get_password,
             channel_name: channel.channelName,
             channel_id: channel.channelId,
             channel_users: channel.users,

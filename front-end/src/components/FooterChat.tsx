@@ -16,7 +16,7 @@ const FooterChat: React.FC = () => {
 
     useEffect(() => {
         socket.on("channel_retrieve_by_id", response => {
-            console.log(`socket.on channel_retrieve_by_id settings ${response.channel.channelName}`)
+            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
             setChannel(channel => response.channel);
         })
 
