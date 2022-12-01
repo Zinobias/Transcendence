@@ -1,6 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap');
 
+
+/*
+  COLOR VARIABLES
+*/
+
+:root {
+    --defautGrey: #646464;
+    --lightGrey: #adadad;
+    --neonOrange: #CE5937;
+    --neonGreen: #5dce64;
+}
+  
+
 /*
     LOGIN FORM
 */
@@ -225,6 +238,17 @@ p.chatp {
 
 .settingsShow {
 	display: flex;
+}
+
+/*
+    PASSWORD POPUP
+*/
+
+.passwordPrompt {
+	height: 100vh;
+	line-height: 100vh;
+    border: 2px solid black;
+    background-color: var(--defautGrey);
 }
 
 /*

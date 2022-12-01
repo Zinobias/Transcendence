@@ -5,7 +5,6 @@ import { IChannelInfo } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
 import ListPublicChatrooms from "./ListPublicChatrooms";
-import { stat } from "fs";
 
 const   Chat: React.FC = () => {
 	
@@ -84,7 +83,7 @@ const   Chat: React.FC = () => {
 
         if (validateChatroomName(chatroomName)) {
             //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
-            // console.log(Md5.hashStr(chatroomPassword + chatroomId))
+            //console.log(Md5.hashStr(chatroomPassword + chatroomId))
 
             socket.emit("chat", {
                 userId: cookies.userID,
