@@ -14,7 +14,6 @@ export class chat_channels {
         if (channel == undefined)
             return;
         this.logger.debug(`Initializing channel: ${channel}`);
-        // this.channelId = channel.channelId;
         this.ownerId = channel.owner;
         this.owner2Id = channel.otherOwner;
         this.channelName = channel.channelName;
@@ -43,25 +42,18 @@ export class chat_channels {
     @Column()
     visible: boolean
 
-
     @OneToOne(() => user_table, (user) => user.chat)
     user: user_table;
 
     @OneToOne(() => user_table, (user) => user.chat2, {nullable: true})
     user2: user_table;
 
-    @OneToMany(() => chat_channel_settings, (chat) => chat.channel, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => chat_channel_settings, (chat) => chat.channel, {onDelete: 'CASCADE'})
     chat: chat_channel_settings[];
 
-    @OneToMany(() => chat_members, (chat) => chat.channel, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => chat_members, (chat) => chat.channel, {onDelete: 'CASCADE'})
     member: chat_members[];
 
-    @OneToMany(() => chat_message, (chat) => chat.chat, {
-        onDelete: 'SET NULL',
-    })
+    @OneToMany(() => chat_message, (chat) => chat.chat, {onDelete: 'SET NULL'})
     message: chat_message[];
 }
