@@ -30,9 +30,13 @@ export class chat_channel_settings {
   @Column()
   actorUser: number;
 
-  @ManyToOne(() => user_table, (user) => user.setting)
+  @ManyToOne(() => user_table, (user) => user.settingAffectedUser)
   @JoinColumn({name: 'affectedUser'})
-  user: user_table;
+  affectedUserSetting: user_table;
+
+  @ManyToOne(() => user_table, (user) => user.settingActorUser)
+  @JoinColumn({name: 'actorUser'})
+  actorUserSetting: user_table;
 
   @Column()
   from: number;
