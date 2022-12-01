@@ -11,9 +11,10 @@ import { sessions } from './Sessions';
 
 @Entity('users')
 export class user_table {
-	constructor(userId: number, userName: string) {
+	constructor(userId: number, userName: string, avatar: any) {
 		this.userId = userId;
 		this.userName = userName;
+		this.avatar = avatar;
 	}
 
 	@PrimaryColumn()
@@ -45,10 +46,15 @@ export class user_table {
 	@OneToMany(() => chat_channels, (chat) => chat.user2, {onDelete: 'CASCADE'})
 	chat2: chat_channels[];
 
-	@OneToMany(() => chat_channel_settings, (chat) => chat.user, {
+	@OneToMany(() => chat_channel_settings, (chat) => chat.actorUser, {
 		onDelete: 'CASCADE',
 	})
-	setting: chat_channel_settings[];
+	settingActorUser: chat_channel_settings[];
+
+	@OneToMany(() => chat_channel_settings, (chat) => chat.affectedUser, {
+		onDelete: 'CASCADE',
+	})
+	settingAffectedUser: chat_channel_settings[];
 
 	@OneToMany(() => chat_members, (chat) => chat.channel, {
 		onDelete: 'CASCADE',

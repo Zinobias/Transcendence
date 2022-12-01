@@ -46,7 +46,7 @@ export class Channel {
     }
 
     private _channelId: number;
-    private readonly _owner: number;
+    private _owner: number;
     private readonly _otherOwner: number;
     private _channelName: string;
     private _users: User[];
@@ -81,6 +81,10 @@ export class Channel {
 
     public get owner(): number {
         return this._owner;
+    }
+
+    set owner(value: number) {
+        this._owner = value;
     }
 
     public get otherOwner(): number {

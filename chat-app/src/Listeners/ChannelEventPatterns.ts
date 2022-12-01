@@ -10,7 +10,10 @@ import {
     ChannelKick,
     ChannelLeave,
     ChannelMessage,
-    ChannelPromote, ChannelRetrieve, ChannelsRetrieve, ChannelUpdatePassword,
+    ChannelPromote,
+    ChannelRetrieve,
+    ChannelsRetrieve,
+    ChannelUpdatePassword,
 } from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
@@ -219,7 +222,37 @@ export class ChannelEventPatterns {
         channel.removeUser(data.user_id);
         await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
 
+        if (channel.users.length == 0) {
+            channel.visible = false;
+            await Queries.getInstance().setChannelVisibility(data.channel_id, false);
+            return;
+        }
+
         const userIds = channel.users.map((a) => a.userId);
+        if (channel.owner == data.user_id) {
+            let newOwner: number = -1;
+            const settings = channel.settings.filter(setting => setting.setting == SettingType.ADMIN);
+            if (settings.length == 0) {
+                newOwner = channel.users[0].userId
+            } else {
+                let i = 0;
+                do {
+                    if (channel.hasUser(settings[i].affectedId))
+                        newOwner = settings[i].affectedId
+                } while (newOwner == -1 && i < settings.length)
+                if (newOwner == -1)
+                    newOwner = channel.users[0].userId;
+            }
+            channel.owner = newOwner;
+            Queries.getInstance().setChannelOwner(channel.channelId, newOwner);
+            this.util.notify(userIds, 'channel_new_owner', {
+                success: true,
+                msg: undefined,
+                channel_id: channel.channelId,
+                new_owner: newOwner,
+            });
+        }
+
         userIds.push(data.user_id);
         this.util.notify(userIds, 'channel_leave', {
             success: true,
