@@ -28,9 +28,7 @@ export class user_table {
     @Column({nullable: true, type: "bytea"})
     avatar: Uint8Array;
 
-    @OneToMany(() => achievements, (achievement) => achievement.achievementUser, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => achievements, (achievement) => achievement.achievementUser, {onDelete: 'CASCADE'})
     achievement: achievements[];
 
     @OneToMany(() => blocked, (block) => block.users, {onDelete: 'CASCADE'})
@@ -42,33 +40,21 @@ export class user_table {
     @OneToMany(() => chat_channels, (chat) => chat.user2, {onDelete: 'CASCADE'})
     chat2: chat_channels[];
 
-    @OneToMany(() => chat_channel_settings, (chat) => chat.actorUser, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => chat_channel_settings, (chat) => chat.actorUser, {onDelete: 'CASCADE'})
     settingActorUser: chat_channel_settings[];
 
-    @OneToMany(() => chat_channel_settings, (chat) => chat.affectedUser, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => chat_channel_settings, (chat) => chat.affectedUser, {onDelete: 'CASCADE'})
     settingAffectedUser: chat_channel_settings[];
 
-    @OneToMany(() => chat_members, (chat) => chat.channel, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => chat_members, (chat) => chat.channel, {onDelete: 'CASCADE'})
     member: chat_members[];
 
-    @OneToMany(() => chat_message, (chat) => chat.user, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => chat_message, (chat) => chat.user, {onDelete: 'CASCADE'})
     message: chat_message[];
 
-    @OneToMany(() => friends, (friend) => friend.user, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => friends, (friend) => friend.user, {onDelete: 'CASCADE'})
     friend: friends[];
 
-    @OneToMany(() => sessions, (session) => session.user, {
-        onDelete: 'CASCADE',
-    })
+    @OneToMany(() => sessions, (session) => session.user, {onDelete: 'CASCADE'})
     session: sessions[];
 }
