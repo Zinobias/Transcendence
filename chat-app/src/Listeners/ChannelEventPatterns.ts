@@ -99,7 +99,7 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_update_password')
     async handlePasswordChange(data: ChannelUpdatePassword) {
-        if (data.channel_id == undefined || data.password == undefined) {
+        if (data.channel_id == undefined) {
             this.emitFailedObject(data.user_id, 'channel_update_password', 'Incorrect data object');
             return;
         }
@@ -123,9 +123,15 @@ export class ChannelEventPatterns {
             return;
         }
 
-        if (data.password === undefined || data.password.length != 64) { //This only works for a sha256 hash
+        if (data.password === undefined) {
+            channel.password = data.password
+            await Queries.getInstance().setPassword(channel.channelId, null);
+            return;
+        }
+
+        if (data.password.length != 64) { //This only works for a sha256 hash
             this.emitFailedObject(data.user_id, 'channel_update_password', `This password is not valid`);
-            return
+            return;
         }
         channel.password = data.password
         await Queries.getInstance().setPassword(channel.channelId, channel.password);
