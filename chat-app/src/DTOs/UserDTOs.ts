@@ -15,7 +15,7 @@ export interface UserEditName {
 
 export interface UserEditAvatar {
     user_id: number;
-    new_avatar: string;
+    new_avatar: any;
 }
 
 export interface UserBlockUser {

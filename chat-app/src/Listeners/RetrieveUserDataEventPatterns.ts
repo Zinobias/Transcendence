@@ -3,7 +3,7 @@ import {ClientProxy, EventPattern} from '@nestjs/microservices';
 import {Channel} from '../Objects/Channel';
 import {AppService} from '../app.service';
 import {Util} from './Util';
-import {GetOtherUserData, GetSelfUserData} from '../DTOs/UserDTOs';
+import {GetOtherUserData, GetSelfUserData, UserEditAvatar} from '../DTOs/UserDTOs';
 import {User} from '../Objects/User';
 import {Queries} from '../Database/Queries';
 
@@ -68,5 +68,21 @@ export class RetrieveUserDataEventPatterns {
             msg: undefined,
             friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
         });
+    }
+
+    @EventPattern('update_avatar')
+    async updateAvatar(data: UserEditAvatar) {
+        if (data.new_avatar == undefined) {
+            this.util.emitFailedObject(data.user_id, 'update_avatar', 'Incorrect data object');
+            return;
+        }
+
+        const user: User = await this.util.getUser(data.user_id, 'update_avatar');
+        if (user == undefined)
+            return;
+
+        user.avatar = data.new_avatar;
+        await Queries.getInstance().setUserAvatar(user.userId, data.new_avatar);
+        //TODO add checks and report result back
     }
 }
