@@ -386,6 +386,24 @@ export class Queries {
 		);
 	}
 
+	async setChannelVisibility(channelId: number, visible: boolean) {
+		const myDataSource = await getDataSource();
+		const setChannel = myDataSource.getRepository(chat_channels);
+		await setChannel.update(
+			{ channelId: channelId },
+			{ visible: visible },
+		);
+	}
+
+	async setChannelOwner(channelId: number, newOwner: number) {
+		const myDataSource = await getDataSource();
+		const setChannel = myDataSource.getRepository(chat_channels);
+		await setChannel.update(
+			{ channelId: channelId },
+			{ ownerId: newOwner },
+		);
+	}
+
 	//ChannelSettings table
 	/**
 	 * Store a setting
