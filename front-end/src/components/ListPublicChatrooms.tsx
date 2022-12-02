@@ -3,6 +3,7 @@ import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import { IChannelInfo } from "../interfaces"
 import { SlLock } from 'react-icons/sl'
+import {Md5} from "ts-md5";
 
 interface Props {
     chatroom: IChannelInfo[];
@@ -40,7 +41,7 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
     const handleJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId: number, password: boolean) => {
         e.preventDefault();
         if (password) 
-            document.getElementById("chatPw")?.classList.toggle("chatPwShow");
+            document.getElementById(channelId.toString())?.classList.toggle("chatPwShow");
         else {
             socket.emit("chat", {
                 userId: cookies.userID,
@@ -58,11 +59,11 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "channel_join",
-            data: {user_id: cookies.userID, channel_id: channelId, password: pw}
+            data: {user_id: cookies.userID, channel_id: channelId, password: Md5.hashStr(pw + channelId)}
         })
         console.log("emiting channel_join with pw");
         setPw("");
-        document.getElementById("chatPw")?.classList.toggle("chatPwShow");
+        document.getElementById(channelId.toString())?.classList.toggle("chatPwShow");
     };
 
     return (
@@ -78,7 +79,7 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
                             <SlLock />
                         </span>
                     }
-                    <div className="chatPw" id="chatPw">
+                    <div id={element.channelId.toString()} className="chatPw">
                         <form>
                             <label className="pwform__label">password</label>
                             <br/>

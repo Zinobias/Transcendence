@@ -312,7 +312,6 @@ p.chatp {
 .passwordPrompt {
     width: 200px;
     height: 100px;
-
     border: 2px solid black;
     background-color: var(--defautGrey);
 }
@@ -326,10 +325,109 @@ p.chatp {
 }
 
 /*
-    PROFILE NAV
+    PROFILE
 */
 
 .profile {
+    display: flex;
+    width: 55%;
+    max-width:100%;
+    /* border: solid 2px black; */
+}
+
+.profileLeft {
+    flex: 0.7;
+    /* border-right: solid 2px black; */
+}
+
+.profileRight {
+    flex: 2;
+    margin-left: 30px;
+}
+
+.profileAvatar {
+    width: 100%;
+    /* height: 80%; */
+    object-fit: cover;
+    display: inline-block;
+}
+
+.profileButton {
+    width: 100%;
+    font-size: 100%;
+    margin-bottom: 5px;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+
+.twoFA {
+    display: none;
+}
+
+.twoFA_show {
+    display: inline;
+}
+
+.twoFA_input {
+    width: 100%;
+    font-size: 100%;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    background: transparent;
+    border: 2px solid black;
+}
+
+.twoFA_input::placeholder {
+    color: transparent;
+}
+
+.twoFA_input:focus {
+    outline: none;
+}
+
+.profileButton:active {
+    transform: scale(0.95);
+}
+
+.uploadAvatar {
+    width: 98%;
+    font-size: 100%;
+    margin-bottom: 5px;
+    text-align: center;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    display: inline-block;
+    line-height: 1.5;
+}
+
+.uploadAvatar_input {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+@media (max-width: 1000px) {
+    .profile {
+        width: 100%;
+    }
+}
+
+/*
+    PROFILE NAV
+*/
+
+.profileNav {
     position: fixed;
     top: 2%;
     right: 3%;
@@ -339,7 +437,7 @@ p.chatp {
     word-break: break-word;
 }
 
-.profile__dropdown {
+.profileNav__dropdown {
     display: none;
     height: 200px;
     width: 150px;
@@ -350,7 +448,7 @@ p.chatp {
     border: 2px solid black;
 }
 
-.profile__avatar {
+.profileNav__avatar {
     width: 60px;
     height: 60px;
     display: block;
@@ -360,16 +458,16 @@ p.chatp {
     display: inline-block;
 }
 
-.profile__close {
+.profileNav__close {
     font-size: 20px;
     text-align: right;
 }
 
-.profile__close:hover {
+.profileNav__close:hover {
     cursor: pointer;
 }
 
-.profile__avatar:hover, .profile__avatar:focus {
+.profileNav__avatar:hover, .profileNav__avatar:focus {
     cursor: pointer;
     transform: scale(1.05);
 }

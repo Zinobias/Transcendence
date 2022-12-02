@@ -25,14 +25,14 @@ const ProfileNav: React.FC = () => {
     }
 
     return (
-        <div id="myProfile" className="profile">
+        <div className="profileNav">
             <img
                 src="https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png"
                 alt="defaultAvatar"
-                className="profile__avatar"
+                className="profileNav__avatar"
                 onClick={(e) => handleClick(e)}
             />
-            <div id="myDropdown" className="profile__dropdown">
+            <div id="myDropdown" className="profileNav__dropdown">
                 <span className="profile__close" onClick={(e) => handleClose(e)}>
                     <AiFillCloseSquare />
                 </span>

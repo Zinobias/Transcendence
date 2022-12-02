@@ -32,7 +32,7 @@ export interface Chatroom {
 export interface IUser {
     userId: number;
     name: string;
-    avatar: object;
+    avatar: any;
     blocked: IUser[];
     friends: IFriend[];
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useCookies } from 'react-cookie';
 import { useSearchParams } from 'react-router-dom';
 import { IUser } from '../interfaces';
+import ProfileUser from './ProfileUser';
 import { SocketContext } from './Socket';
 
 /*
@@ -14,7 +15,6 @@ import { SocketContext } from './Socket';
 const Profile: React.FC = () => {
     const socket = useContext(SocketContext);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [state, setState] = useState<boolean>(false);
     const [qrcode, setQrcode] = useState<string>("");
     const [cookies] = useCookies(['userID', 'user']);
     const [user, setUser] = useState<IUser>();
@@ -24,7 +24,6 @@ const Profile: React.FC = () => {
         socket.on("get_user", response => {
             if (response.success) {
                 console.log("get_user success");
-                setState(state => !state);
                 setUser(user => response.user);
             }
         })
@@ -45,7 +44,7 @@ const Profile: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        if (searchParams.get("id") && !state) {
+        if (searchParams.get("id")) {
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -57,7 +56,7 @@ const Profile: React.FC = () => {
             });
             console.log(`emiting get_user ${searchParams.get("id")}`);
         }
-    }, []) 
+    }, [searchParams]) 
 
     const handle2FA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -77,10 +76,10 @@ const Profile: React.FC = () => {
 	*/
 
     return (
-        <div>
+        <div className='profile'>
             {
-                state ?
-                <p>{user?.name}'s Profile</p> :
+                user ?
+                <ProfileUser user={user} queryId={Number(searchParams.get("id"))}/> :
                 <p>User doest exist</p>
             }
             {/* <button className='defaultButtonA' onClick={(e) => handle2FA(e)}>ENABLE 2FA</button>
