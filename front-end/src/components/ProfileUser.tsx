@@ -8,51 +8,27 @@ interface Props {
     queryId: number;
 }
 
-/*
-    IMAGE UPLOAD NOTES
-
-    const [selectedImage, setSelectedImage] = useState<any>(null);
-    {
-        selectedImage && (
-            <>
-            <img src={URL.createObjectURL(selectedImage)} alt="defaultAvatar" className="profileAvatar"/> 
-            <button onClick={()=>setSelectedImage(null)}>Remove</button>
-            </>
-        )
-    }
-    <br/><br/>
-    <input
-        type="file"
-        name="myImage"
-        onChange={(event) => {
-        console.log(event.target.files![0]);
-        setSelectedImage(event.target.files![0]);
-        }}
-    />
-*/
-
 const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     const defaultAvatar = "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png";
     const [cookies] = useCookies(['userID', 'user']);
 
-    console.log(user.avatar);
-
     function toBlob() : Blob {
-        const newBlob = new Blob([user.avatar.data], {type: "image/png"});
-        console.log(user.avatar);
-        console.log(newBlob.type);
+        var imageArray = new Uint8Array(user.avatar.data);
+        const newBlob = new Blob([imageArray]);
         return (newBlob);
     }
 
+    
     return (
     <>
         <div className='profileLeft'>
+            <div className='profileAvatar'>
             {
                 user.avatar ?
-                // <p>avatar</p> :
-                <img src={URL.createObjectURL(toBlob())} alt="userAvatar" className="profileAvatar" /> :
-                <img src={defaultAvatar} alt="defaultAvatar" className="profileAvatar"/> 
+                <img src={URL.createObjectURL(toBlob())} alt="userAvatar" className="profileAvatar_image" /> :
+                <img src={defaultAvatar} alt="defaultAvatar" className="profileAvatar_image"/> 
             }
+            </div>
             {user.name}
             <br/><br/>
             {

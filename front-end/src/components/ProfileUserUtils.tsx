@@ -62,7 +62,6 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 
     // USE EFFECT TO EMIT TO AVATAR WHEN IMAGE CHANGES 
     useEffect(() => {
-        
         if (selectedImage) {
             if (!selectedImage?.name.match(/\.(jpg|jpeg|png)$/)) 
                 alert("Please Select a valid image")
@@ -100,9 +99,9 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         //     userId: cookies.userID,
         //     authToken: cookies.user,
         //     eventPattern: "verify_2fa", 
-        //     data: {user_id: cookies.userID, TFAToken: token}
+        //     data: {TFAToken: token}
         // });
-        console.log(`emiting remove_2fa`);
+        console.log(`emiting verify_2fa`);
         document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
         setToken("");
         setQrcode("");
@@ -115,7 +114,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         //     userId: cookies.userID,
         //     authToken: cookies.user,
         //     eventPattern: "remove_2fa", 
-        //     data: {user_id: cookies.userID, TFAToken: token}
+        //     data: {TFAToken: token}
         // });
         console.log(`emitting remove_2fa`);
         document.getElementById("disable_TwoFA")?.classList.toggle("twoFA_show")
@@ -131,7 +130,6 @@ export const UserSettings : React.FC<Props> = ({user}) => {
                 id='uploadAvatar_input'
                 className='uploadAvatar_input'
                 onChange={(event) => {
-                console.log(event.target.files![0]);
                 setSelectedImage(event.target.files![0]);
                 }}
             />
