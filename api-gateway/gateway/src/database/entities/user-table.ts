@@ -27,7 +27,4 @@ export class UserTable {
 
 	@OneToMany(() => Tfa, (tfa) => tfa.user, {onDelete: 'CASCADE'})
 	tfa: Tfa[];
-
-	@Column({nullable: true, type: 'text'})
-	avatar: string;
 }
