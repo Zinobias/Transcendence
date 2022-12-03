@@ -4,9 +4,10 @@ import {Tfa} from "./tfa";
 
 @Entity('users')
 export class UserTable {
-	constructor(userId: number, userName: string) {
+	constructor(userId: number, userName: string, avatar: any) {
 		this.userId = userId;
 		this.userName = userName;
+		this.avatar = avatar;
 	}
 
 	@PrimaryColumn()
@@ -15,8 +16,11 @@ export class UserTable {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date().getTime(), type: 'bigint' })
+	@Column({default: new Date().getTime(), type: 'bigint'})
 	createAt: number;
+
+	@Column({nullable: true, type: 'text'})
+	avatar: string;
 
 	@OneToMany(() => Sessions, (session) => session.user, {onDelete: 'CASCADE'})
 	session: Sessions[];
