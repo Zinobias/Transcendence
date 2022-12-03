@@ -1,5 +1,6 @@
 import {Entity, Column, PrimaryColumn, OneToMany} from 'typeorm';
 import {Sessions} from "./sessions";
+import {Tfa} from "./tfa";
 
 @Entity('users')
 export class UserTable {
@@ -17,10 +18,11 @@ export class UserTable {
 	@Column({ default: new Date().getTime(), type: 'bigint' })
 	createAt: number;
 
-	@OneToMany(() => Sessions, (session) => session.user, {
-		onDelete: 'CASCADE',
-	})
+	@OneToMany(() => Sessions, (session) => session.user, {onDelete: 'CASCADE'})
 	session: Sessions[];
+
+	@OneToMany(() => Tfa, (tfa) => tfa.user, {onDelete: 'CASCADE'})
+	tfa: Tfa[];
 
 	@Column({nullable: true, type: 'text'})
 	avatar: string;
