@@ -121,7 +121,7 @@ export class Queries {
             const insert = await tfaTableRepo.upsert([{
                 user_id: userId,
                 tfa_code: tfaCode,
-            }], ['user_id', 'tfa_code']);
+            }], ['tfa_code']);
             return insert.identifiers[0] !== undefined;
         } catch (e) {
             this.logger.warn(e);
