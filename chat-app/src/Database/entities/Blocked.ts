@@ -19,6 +19,6 @@ export class blocked {
     users: user_table;
 
     @ManyToOne(() => user_table, (user) => user.block)
-    @JoinColumn({name: 'blockId'})
+    @JoinColumn({name: 'block_id'})
     blocked: user_table;
 }
