@@ -9,7 +9,7 @@ export class Tfa {
     @Column()
     tfa_code: string;
 
-    @ManyToOne(() => UserTable, (user) => user.userId)
+    @ManyToOne(() => UserTable, (user) => user.tfa)
     @JoinColumn({ name: 'userId' })
     user: UserTable;
 }
