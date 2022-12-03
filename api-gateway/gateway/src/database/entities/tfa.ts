@@ -10,6 +10,6 @@ export class Tfa {
     tfa_code: string;
 
     @ManyToOne(() => UserTable, (user) => user.tfa)
-    @JoinColumn({ name: 'userId' })
+    @JoinColumn({ name: 'user_id' })
     user: UserTable;
 }
