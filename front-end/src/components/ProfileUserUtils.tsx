@@ -139,7 +139,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
                 <button className='profileButton' onClick={(e) => enableTwoFA(e)}>enable 2FA</button>
             }
             <div className='twoFA' id="verify_TwoFA">
-                <img src={qrcode} alt="qrCode" className="profileAvatar"/>
+                <img src={qrcode} alt="qrCode" className="profileQR"/>
                 <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="twoFA_input"/>
                 <button className="profileButton" onClick={(e) => verifyTwoFA(e)}>submit 2fa token</button>
             </div>

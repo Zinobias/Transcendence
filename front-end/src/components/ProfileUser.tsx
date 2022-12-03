@@ -12,12 +12,13 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     const defaultAvatar = "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png";
     const [cookies] = useCookies(['userID', 'user']);
 
+    console.log(user.avatar);
+
     function toBlob() : Blob {
         var imageArray = new Uint8Array(user.avatar.data);
         const newBlob = new Blob([imageArray]);
         return (newBlob);
     }
-
     
     return (
     <>
