@@ -22,6 +22,6 @@ export class UserTable {
 	})
 	session: Sessions[];
 
-	@Column({ nullable: true, type: 'bytea' })
-	avatar: Uint8Array;
+	@Column({nullable: true, type: 'text'})
+	avatar: string;
 }

@@ -92,7 +92,7 @@ export class Queries {
 	 * @param userId user to get the avatar for
 	 * @param image image to store as the avatar
 	 */
-	async setUserAvatar(userId: number, image: string) {
+	async setUserAvatar(userId: number, image: any) {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
 		this.logger.debug(`setting avatar for user ${userId} to ${image}`);
@@ -124,8 +124,7 @@ export class Queries {
 		if (findUser.avatar == null)
 			newVar = undefined;
 		else
-			// newVar = await JSON.parse(findUser.avatar).data;
-			newVar = findUser.avatar as unknown as Uint8Array
+			newVar = await JSON.parse(findUser.avatar);
 		return new User(findUser.userId, findUser.userName, newVar); //TODO add avatar
 	}
 

@@ -16,6 +16,9 @@ export class UserTable {
 	@Column({ default: new Date().getTime(), type: 'bigint'})
 	createAt: number;
 
+	@Column({nullable: true, type: 'text'})
+	avatar: string;
+
 	// @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
 	// public sessions: Sessions[];
 

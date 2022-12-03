@@ -85,7 +85,7 @@ export class RetrieveUserDataEventPatterns {
         // const json: string = JSON.stringify(data.new_avatar);
         // this.logger.debug(`File info, stringify: ${json}`)
         user.avatar = data.new_avatar;
-        await Queries.getInstance().setUserAvatar(user.userId, data.new_avatar as string);
+        await Queries.getInstance().setUserAvatar(user.userId, JSON.stringify(data.new_avatar));
         //TODO add checks and report result back
     }
 }
