@@ -5,7 +5,7 @@ import {Logger} from '@nestjs/common';
 export interface IUser {
     userId: number;
     name: string;
-    avatar: object;
+    avatar: any;
     blocked: IUser[];
     friends: IFriend[];
 }
@@ -35,11 +35,11 @@ export class User {
 
     private readonly _userId: number;
     private _name: string;
-    private _avatar: object;
+    private _avatar: any;
     private _blocked: User[];
     private _friends: Friend[];
 
-    constructor(userId: number, name: string, avatar: object) {
+    constructor(userId: number, name: string, avatar: any) {
         this._userId = userId;
         this._name = name;
         this._avatar = avatar;

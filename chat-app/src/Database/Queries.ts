@@ -92,9 +92,10 @@ export class Queries {
 	 * @param userId user to get the avatar for
 	 * @param image image to store as the avatar
 	 */
-	async setUserAvatar(userId: number, image: Buffer) {
+	async setUserAvatar(userId: number, image: string) {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
+		this.logger.debug(`setting avatar for user ${userId} to ${image}`);
 		await userRepository.update(userId, {avatar: image});
 	}
 
@@ -119,7 +120,13 @@ export class Queries {
 		const findUser = await userRepository.findOneBy({ userId: userId });
 		if (findUser == undefined)
 			return undefined;
-		return new User(findUser.userId, findUser.userName, undefined); //TODO add avatar
+		let newVar;
+		if (findUser.avatar == null)
+			newVar = undefined;
+		else
+			// newVar = await JSON.parse(findUser.avatar).data;
+			newVar = findUser.avatar as unknown as Uint8Array
+		return new User(findUser.userId, findUser.userName, newVar); //TODO add avatar
 	}
 
 	//Blocked users table

@@ -24,8 +24,8 @@ export class user_table {
     @Column({default: new Date().getTime(), type: 'bigint'})
     createAt: number;
 
-    @Column({nullable: true, type: "bytea"})
-    avatar: Uint8Array;
+    @Column({nullable: true, type: 'text'})
+    avatar: string;
 
     @OneToMany(() => blocked, (block) => block.users, {onDelete: 'CASCADE'})
     blockingUsers: blocked[];
