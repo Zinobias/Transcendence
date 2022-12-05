@@ -118,8 +118,12 @@ export class Queries {
         try {
             const myDataSource = await this.database.getDataSource();
             const tfaTableRepo = myDataSource.getRepository(Tfa);
-            const insert = await tfaTableRepo.upsert([new Tfa(userId, tfaCode)], ['tfa_code']);
-            return insert.identifiers[0] !== undefined;
+            const findResult = await tfaTableRepo.findOneBy({user_id: userId});
+            if (findResult != null) {
+                await tfaTableRepo.delete(findResult);
+            }
+            const saveResult = await tfaTableRepo.save(new Tfa(userId, tfaCode));
+            return saveResult != null;
         } catch (e) {
             this.logger.warn(e);
         }
