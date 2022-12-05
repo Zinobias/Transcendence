@@ -13,6 +13,7 @@ export class user_table {
         this.userId = userId;
         this.userName = userName;
         this.avatar = avatar;
+        this.createAt = new Date().getTime()
     }
 
     @PrimaryColumn()
@@ -21,7 +22,7 @@ export class user_table {
     @Column()
     userName: string;
 
-    @Column({default: new Date().getTime(), type: 'bigint'})
+    @Column({type: 'bigint'})
     createAt: number;
 
     @Column({nullable: true, type: 'text'})

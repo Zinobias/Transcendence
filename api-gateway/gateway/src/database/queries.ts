@@ -25,6 +25,7 @@ export class Queries {
                 {
                     userId: id,
                     sessionCode: auth,
+                    time: new Date().getTime()
                 },
             ],
             ['userId', 'sessionCode'],

@@ -1,10 +1,11 @@
-import {Entity, Column, PrimaryColumn, Long} from 'typeorm';
+import {Entity, Column, PrimaryColumn} from 'typeorm';
 
 @Entity('users')
 export class UserTable {
 	constructor(userId: number, userName: string) {
 		this.userId = userId;
 		this.userName = userName;
+		this.createAt = new Date().getTime()
 	}
 
 	@PrimaryColumn()
@@ -13,7 +14,7 @@ export class UserTable {
 	@Column()
 	userName: string;
 
-	@Column({ default: new Date().getTime(), type: 'bigint'})
+	@Column({type: 'bigint'})
 	createAt: number;
 
 	@Column({nullable: true, type: 'text'})
