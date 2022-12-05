@@ -16,7 +16,6 @@ const   Chat: React.FC = () => {
     const [visibleCheck, setVisibleCheck] = useState<boolean>(false);
     const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
     const [channels, setChannels] = useState<IChannelInfo[]>([]);
-    const [pwPrompt, setPwPrompt] = useState<boolean>(false);
     const [pw, setPw] = useState<string>("");
     const [pwName, setPwName] = useState<string>("");
     const [pwId, setPwId] = useState<number>(-1);
@@ -46,7 +45,8 @@ const   Chat: React.FC = () => {
                 setState( state => !state);
             }
             else if (response.success == true && response.hasPassword == true) {
-                setPwPrompt( pwPrompt => !pwPrompt);
+                document.getElementById("pwChannel")?.classList.toggle("FormShow");
+                document.getElementById("noPwChannel")?.classList.toggle("FormHide");
                 setPwName( pwName => response.channel_name);
                 setPwId( pwId => response.channel_id);
             }
@@ -71,10 +71,11 @@ const   Chat: React.FC = () => {
                     data: {user_id: cookies.userID}
                 })
                 console.log("emiting get_channels_user");
-                setPwPrompt( pwPrompt => true);
                 setState( state => !state);
                 setPwName("");
                 setPwId(-1);
+                document.getElementById("pwChannel")?.classList.toggle("FormHide");
+                document.getElementById("noPwChannel")?.classList.toggle("FormShow");
             }
             else
                 alert(`[${response.msg}]`);
@@ -83,6 +84,7 @@ const   Chat: React.FC = () => {
         return () => {
             socket.off("channel_create");
             socket.off("channels_retrieve");
+            socket.off("channel_update_password");
         }
     },[])
 
@@ -101,6 +103,18 @@ const   Chat: React.FC = () => {
         }
         if (result != undefined) {
             alert(`[${result}] is an invalid character`);
+            return (false);
+        }
+        return (true);
+    }
+
+    function validatePassword (name: string) : boolean {
+        if (!name) {
+            alert("Password is required");
+            return (false);
+        }
+        if (name.length > 16 || name.length < 8) {
+            alert("Channel Name needs to be between 8-16 characters");
             return (false);
         }
         return (true);
@@ -129,17 +143,23 @@ const   Chat: React.FC = () => {
     const handlePassword = (e: React.FormEvent) => {
         //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
         //console.log(Md5.hashStr(chatroomPassword + chatroomId))
+
         e.preventDefault();
-        socket.emit("chat", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-            eventPattern: "channel_update_password", 
-            data: { user_id: cookies.userID, 
-                    channel_id: pwId, 
-                    password: Md5.hashStr(pw + pwId) }
-        });
-        console.log(`emitting channel_update_password [${Md5.hashStr(pw + pwId)}]`);
-        setPw("");
+        if (validatePassword(pw)) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channel_update_password", 
+                data: { user_id: cookies.userID, 
+                        channel_id: pwId, 
+                        password: Md5.hashStr(pw + pwId) }
+            });
+            console.log(`emitting channel_update_password [${Md5.hashStr(pw + pwId)}]`);
+            setPw("");
+            document.getElementById("Channel")?.classList.toggle("channelShow");
+            document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");
+        }
+
     };
 
     return (
@@ -148,14 +168,15 @@ const   Chat: React.FC = () => {
             <span className="heading__small">PUBLIC CHATROOMS</span>
             <ListPublicChatrooms chatroom={channels} />
         </div>
-        {
-            pwPrompt ?
-            <form className="loginform" id="newPw">
+        <div className="newPwChannel" id="pwChannel">
+            <form className="loginform">
                 <label className="loginform__label">Enter password for {pwName}</label>
                 <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
                 <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
-            </form> :
-            <form className="loginform" id="newChatroom">
+            </form> 
+        </div>
+        <div className="newChannel" id="Channel">
+            <form className="loginform">
                     <label className="loginform__label">Name</label>
                     <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
                     <label className="loginform__label">password</label>
@@ -164,7 +185,7 @@ const   Chat: React.FC = () => {
                     <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
                     <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
             </form>
-        }
+        </div>
         </>
     )
     

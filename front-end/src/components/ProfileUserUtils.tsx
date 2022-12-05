@@ -22,14 +22,17 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         }) 
 
         socket.on("remove_2fa", response => {
-            if (response.success)
+            if (response.success) {
+                console.log("socket.on remove_2fa success");
                 setHasTwoFA(hasTwoFA => false);
+            }
             else
                 alert(response.msg);
         })
 
         socket.on("enable_2fa", response => {
             if (response.success) {
+                console.log("socket.on enable_2fa success");
                 setQrcode(response.qrCode);
                 // toggle verify menu
                 document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
@@ -39,8 +42,10 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         })
 
         socket.on("verify_2fa", response => {
-            if (response.success)
+            if (response.success) {
+                console.log("socket.on varify_2fa success");
                 setHasTwoFA(hasTwoFA => true);
+            }
             else
                 alert(response.msg);
         })
@@ -83,24 +88,24 @@ export const UserSettings : React.FC<Props> = ({user}) => {
     // ENABLE -> SHOW QR CODE -> VERIFY SUCCES -> hasTwoFA true
     const enableTwoFA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        // socket.emit("enable_2fa", {
-        //     userId: cookies.userID,
-        //     authToken: cookies.user,
-        //     eventPattern: "enable_2fa", 
-        //     data: {user_id: cookies.userID}
-        // });
+        socket.emit("enable_2fa", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "enable_2fa", 
+            data: {user_id: cookies.userID}
+        });
         console.log(`emiting enable_2fa`);
     }
 
     // VERIFY THE 2FA TOKEN AFTER SCANNING
     const verifyTwoFA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        // socket.emit("verify_2fa", {
-        //     userId: cookies.userID,
-        //     authToken: cookies.user,
-        //     eventPattern: "verify_2fa", 
-        //     data: {TFAToken: token}
-        // });
+        socket.emit("verify_2fa", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "verify_2fa", 
+            data: {TFAToken: token}
+        });
         console.log(`emiting verify_2fa`);
         document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
         setToken("");
@@ -110,12 +115,12 @@ export const UserSettings : React.FC<Props> = ({user}) => {
     // DISABLE -> USER NEEDS TO ADD HIS ONE TIME TOKEN
     const disableTwoFA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        // socket.emit("remove_2fa", {
-        //     userId: cookies.userID,
-        //     authToken: cookies.user,
-        //     eventPattern: "remove_2fa", 
-        //     data: {TFAToken: token}
-        // });
+        socket.emit("remove_2fa", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "remove_2fa", 
+            data: {TFAToken: token}
+        });
         console.log(`emitting remove_2fa`);
         document.getElementById("disable_TwoFA")?.classList.toggle("twoFA_show")
         setToken("");

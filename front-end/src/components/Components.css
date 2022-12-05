@@ -207,6 +207,22 @@ p.chatp {
     CHAT PW JOIN FORM
 */
 
+.newChannel {
+    display: flex;
+}
+
+.newPwChannel {
+    display: none;
+}
+
+.pwChannelShow {
+    display: flex;
+}
+
+.channelShow {
+    display: none;
+}
+
 .chatPw {
     display: none;
     position: relative;
@@ -489,6 +505,70 @@ p.chatp {
     display: block;
 }
 
+/*
+    LOGIN
+*/
+
+.loginTwoFA {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.loginTwoFA_show {
+    display:  flex;
+}
+
+.loginTwoFA_input {
+    width: 30%;
+    height: 40px;
+    font-size: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    background: transparent;
+    border: 2px solid black;
+}
+
+.loginTwoFA_input::placeholder {
+    color: transparent;
+}
+
+.loginTwoFA_input:focus {
+    outline: none;
+}
+
+.loginButtonDIV {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.loginButton {
+    font-size: 30px;
+    width:30%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    cursor: pointer;
+    box-shadow: 1px 1px 0px 0px #CE5937, 
+    2px 2px 0px 0px #CE5937, 
+    3px 3px 0px 0px #5dce64,  
+    4px 4px 0px 0px #5dce64;
+}
+
+.loginButtonShow {
+    display: none;
+}
+
+.loginButton:hover {
+    transform: scale(1.05);
+}
 
 /*
     BUTTONS

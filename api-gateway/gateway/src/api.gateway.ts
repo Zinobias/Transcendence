@@ -131,8 +131,8 @@ export class ApiGateway
                 event: 'login',
                 data: { 
 					DTO : loginDTO,
-					success : loginDTO === undefined || loginDTO.auth_cookie === undefined  ? false : true,
-					msg : loginDTO === undefined || loginDTO.auth_cookie === undefined ? `Login went wrong` : `Login went well`,
+					success : loginDTO === undefined ? false : true,
+					msg : loginDTO === undefined ? `Login went wrong` : `Login went well`,
 				},
             };
         } else if (payload.eventPattern === 'validate')

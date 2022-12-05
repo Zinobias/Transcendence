@@ -97,6 +97,10 @@ export class Auth {
         const has2FA = await this.TFA.hasTwoFA(userId);
 		if (has2FA === Has2FA.HAS_TFA) {
 			if (TFAToken && await this.TFA.verify(userId, TFAToken) === true) {
+                if (await this.storeSession(userId, uuid) === false) {
+                    this.logger.error(`Unable to store session for user id [${userId}]`);
+                    return undefined;
+                }
 				return ({
 					user_id : userId,
 					auth_cookie : uuid,
