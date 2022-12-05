@@ -104,10 +104,7 @@ export class Queries {
             return `You already have an active account.`;
 
         try { //Store the user in the database
-            await userTableRepo.insert({
-                userId: userId,
-                userName: userName,
-            });
+            await userTableRepo.insert(new UserTable(userId, userName, null));
         } catch (e) {
             Logger.warn(`Unable to run save user query for [${userId}] see error: ${e}`)
             return `Unknown error while saving the user in the database`;
