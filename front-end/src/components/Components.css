@@ -509,17 +509,6 @@ p.chatp {
     LOGIN
 */
 
-.loginTwoFA {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.loginTwoFA_show {
-    display:  flex;
-}
-
 .loginTwoFA_input {
     width: 30%;
     height: 40px;
@@ -560,10 +549,6 @@ p.chatp {
     2px 2px 0px 0px #CE5937, 
     3px 3px 0px 0px #5dce64,  
     4px 4px 0px 0px #5dce64;
-}
-
-.loginButtonShow {
-    display: none;
 }
 
 .loginButton:hover {

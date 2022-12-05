@@ -189,7 +189,6 @@ export const    LoginButton: React.FC = () => {
         e.preventDefault()
         console.log("redirecting login");
         window.location.href = login;
-        
         // sessionStorage.clear();
     };
     
@@ -199,13 +198,12 @@ export const    LoginButton: React.FC = () => {
         console.log("redirecting 2fa login");
         setToken("");
         window.location.href = login;
-
         // sessionStorage.clear();
     }
 
     if (showTwoFA) {
         return (
-            <div className="loginButtonDIV" id="loginTwoFA">
+            <div className="loginButtonDIV">
                 <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="loginTwoFA_input"/>
                 <button className="loginButton" onClick={(e) => handleTwoFA(e)}>submit 2fa token</button>
             </div>
