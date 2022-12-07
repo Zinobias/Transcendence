@@ -98,11 +98,11 @@ export class User {
         this._friends.push(friend);
     }
 
-    isFriends(friend: Friend) {
+    isFriends(friend: User) {
         return (this._friends.filter((a) => a._userId == friend._userId && a.confirmed).length == 1);
     }
 
-    hasRequest(friend: Friend) {
+    hasRequest(friend: User) {
         return (this._friends.filter((a) => a._userId == friend._userId && !a.confirmed).length == 1);
     }
 

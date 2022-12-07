@@ -3,9 +3,17 @@ import {ClientProxy, EventPattern} from '@nestjs/microservices';
 import {Channel} from '../Objects/Channel';
 import {AppService} from '../app.service';
 import {Util} from './Util';
-import {GetOtherUserData, GetSelfUserData, UserEditAvatar} from '../DTOs/UserDTOs';
+import {
+    GetOtherUserData,
+    GetSelfUserData,
+    UserBlockUser,
+    UserEditAvatar,
+    UserFriendUser,
+    UserUnblockUser
+} from '../DTOs/UserDTOs';
 import {User} from '../Objects/User';
 import {Queries} from '../Database/Queries';
+import {Friend} from "../Objects/Friend";
 
 @Controller()
 export class RetrieveUserDataEventPatterns {
@@ -67,6 +75,127 @@ export class RetrieveUserDataEventPatterns {
             success: true,
             msg: undefined,
             friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
+        });
+    }
+
+    @EventPattern('friend_request')
+    async friendRequestUser(data: UserFriendUser) {
+        const user: User = await this.util.getUser(data.user_id, 'friend_request');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', 'Unable to retrieve user');
+            return;
+        }
+        const friend: User = await this.util.getUser(data.user_id, 'friend_request');
+        if (friend == undefined) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', 'Unable to retrieve friend');
+            return;
+        }
+        if (user.hasBlocked(friend)) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', 'You have this user blocked');
+            return;
+        }
+        if (friend.hasBlocked(user)) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', 'This user has you blocked');
+            return;
+        }
+        if (user.isFriends(friend)) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', `You're already friends with this user`);
+            return;
+        }
+        if (user.hasRequest(friend) || friend.hasRequest(user)) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', `There is already an active friend request for this user`);
+            return;
+        }
+        await Queries.getInstance().addFriend(
+            data.user_id,
+            data.friend_id,
+            false
+        );
+        user.friend(new Friend(user, false))
+        this.util.notify([data.user_id], 'friend_request', {
+            success: true,
+            msg: undefined
+        });
+    }
+
+    @EventPattern('un_friend')
+    async unFriendUser(data: UserFriendUser) {
+        const user: User = await this.util.getUser(data.user_id, 'un_friend');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'un_friend', 'Unable to retrieve user');
+            return;
+        }
+        const friend: User = await this.util.getUser(data.user_id, 'un_friend');
+        if (friend == undefined) {
+            this.util.emitFailedObject(data.user_id, 'un_friend', 'Unable to retrieve friend');
+            return;
+        }
+        if (!user.isFriends(friend) || !user.hasRequest(friend)) {
+            this.util.emitFailedObject(data.user_id, 'un_friend', `You aren't friends with this user and you don't have any open requests with them`);
+            return;
+        }
+        await Queries.getInstance().removeFriend(
+            data.user_id,
+            data.friend_id
+        );
+        user.unfriend(friend)
+        this.util.notify([data.user_id], 'un_friend', {
+            success: true,
+            msg: undefined
+        });
+    }
+
+    @EventPattern('block_user')
+    async blockUser(data: UserBlockUser) {
+        const user: User = await this.util.getUser(data.user_id, 'block_user');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user');
+            return;
+        }
+        const toBlock: User = await this.util.getUser(data.user_id, 'block_user');
+        if (toBlock == undefined) {
+            this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user to block');
+            return;
+        }
+        if (user.hasBlocked(toBlock)) {
+            this.util.emitFailedObject(data.user_id, 'block_user', `You already blocked this user`);
+            return;
+        }
+        await Queries.getInstance().addBlockedUser(
+            data.user_id,
+            data.blocked_id
+        );
+        user.block(toBlock)
+        this.util.notify([data.user_id], 'block_user', {
+            success: true,
+            msg: undefined
+        });
+    }
+
+    @EventPattern('unblock_user')
+    async unblockUser(data: UserUnblockUser) {
+        const user: User = await this.util.getUser(data.user_id, 'unblock_user');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user');
+            return;
+        }
+        const toBlock: User = await this.util.getUser(data.user_id, 'unblock_user');
+        if (toBlock == undefined) {
+            this.util.emitFailedObject(data.user_id, 'unblock_user', 'Unable to retrieve user to block');
+            return;
+        }
+        if (!user.hasBlocked(toBlock)) {
+            this.util.emitFailedObject(data.user_id, 'unblock_user', `You don't have this user blocked`);
+            return;
+        }
+        await Queries.getInstance().removeBlockedUser(
+            data.user_id,
+            data.blocked_id
+        );
+        user.unblock(toBlock)
+        this.util.notify([data.user_id], 'unblock_user', {
+            success: true,
+            msg: undefined
         });
     }
 

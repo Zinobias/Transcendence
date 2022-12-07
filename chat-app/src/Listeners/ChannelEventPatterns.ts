@@ -126,6 +126,11 @@ export class ChannelEventPatterns {
         if (data.password === undefined) {
             channel.password = data.password
             await Queries.getInstance().setPassword(channel.channelId, null);
+            this.util.notify([data.user_id], 'channel_update_password', {
+                success: true,
+                msg: undefined,
+                channel_id: channel.channelId,
+            });
             return;
         }
 

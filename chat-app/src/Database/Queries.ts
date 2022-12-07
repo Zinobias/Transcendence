@@ -238,11 +238,7 @@ export class Queries {
 	 * @param toUserId user that the request should be sent to
 	 * @param confirmed boolean indicating if the friend request was accepted
 	 */
-	async addFriend(
-		fromUserId: number,
-		toUserId: number,
-		confirmed: boolean,
-	): Promise<void> {
+	async addFriend(fromUserId: number, toUserId: number, confirmed: boolean): Promise<void> {
 		const myDataSource = await getDataSource();
 		const friends_repository = myDataSource.getRepository(friends);
 		try {
