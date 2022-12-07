@@ -278,7 +278,7 @@ export class ChannelEventPatterns {
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_promote', false))
             return;
-        if (this.util.notAdmin(channel, data.affected_id, 'channel_promote'))
+        if (this.util.notAdmin(channel, data.user_id, 'channel_promote'))
             return;
 
         const setting: Setting = new Setting(
@@ -314,7 +314,7 @@ export class ChannelEventPatterns {
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_demote', false))
             return;
-        if (this.util.notAdmin(channel, data.affected_id, 'channel_demote'))
+        if (this.util.notAdmin(channel, data.user_id, 'channel_demote'))
             return;
 
         channel.removeSetting(data.affected_id, SettingType.ADMIN);
@@ -340,7 +340,7 @@ export class ChannelEventPatterns {
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_kick', false))
             return;
-        if (this.util.notOwner(channel, data.affected_id, 'channel_kick'))
+        if (this.util.notOwner(channel, data.user_id, 'channel_kick'))
             return;
 
         channel.removeUser(data.affected_id);
@@ -363,7 +363,7 @@ export class ChannelEventPatterns {
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_ban', false))
             return;
-        if (this.util.notAdmin(channel, data.affected_id, 'channel_ban'))
+        if (this.util.notAdmin(channel, data.user_id, 'channel_ban'))
             return;
 
         channel.removeUser(data.affected_id);
