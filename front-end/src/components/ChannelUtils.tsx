@@ -32,6 +32,12 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
     const socket = useContext(SocketContext);
     const navigate = useNavigate();
 
+    function returnDate () : number {
+        const date = new Date();
+        const newDate = new Date(date.getTime() + 30*60000);
+        return(newDate.getUTCMilliseconds());
+    }
+
     const handleProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,  userId: number) => {
         e.preventDefault();
         navigate({
@@ -62,6 +68,28 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
         console.log(`emitting channel_promote ${channel.channelId} ${memberUserID}`);
     }
 
+    const handleMute = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        // socket.emit("chat", {
+        //     userId: cookies.userID,
+        //     authToken: cookies.user,
+        //     eventPattern: "channel_mute",
+        //     data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
+        // })
+        console.log(`emitting channel_mute`);
+    }
+
+    const handleBan = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channel_ban",
+            data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
+        })
+        console.log(`emitting channel_ban`);
+    }
+
     function findAdmin (userId : number) : boolean {
         if (userId == channel.owner)
             return (true);
@@ -82,6 +110,7 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
             <>
                 <button className="memberButton" onClick={(e) => handleProfile(e, memberUserID)}>profile</button>
                 <button className="memberButton">invite to pong</button>
+                <button className="memberButton">block</button>
             </>
         )
     }
@@ -90,13 +119,14 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
         <>
             <button className="memberButton" onClick={(e) => handleProfile(e, memberUserID)}>profile</button>
             <button className="memberButton">invite to pong</button>
+            <button className="memberButton">block</button>
             {
                 memberUserID != channel.owner && findAdmin(memberUserID) == false ?
                 <button className="memberButton" onClick={(e) => handlePromote(e)}>promote</button> :
                 <button className="memberButton" onClick={(e) => handleDemote(e)}>demote</button>
             }
-            <button className="memberButton">ban</button>
-            <button className="memberButton">mute</button>
+            <button className="memberButton" onClick={(e) => handleMute(e)}>mute</button>
+            <button className="memberButton" onClick={(e) => handleBan(e)}>ban</button>
 
         </>
     )

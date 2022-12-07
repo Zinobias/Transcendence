@@ -61,7 +61,7 @@ const   ChatWindow: React.FC<Props> = ({channel}) => {
 
         socket.on("channel_demote", response => {
             if (response.success == true) 
-                setChat(chat => [...chat, {message: "got promoted!", sender: response.affected_id, timestamp: -1}])
+                setChat(chat => [...chat, {message: "got demoted!", sender: response.affected_id, timestamp: -1}])
             else
                 console.log("socket.on channel_demote fail");
         })

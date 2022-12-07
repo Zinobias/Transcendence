@@ -33,7 +33,7 @@ const   Chat: React.FC = () => {
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_create", response => {
-            if (response.success == true && response.handlePassword == false) {
+            if (response.success == true && response.hasPassword == false) {
                 console.log(`socket.on channel_create success ${response.channel_name}`);
                 socket.emit("chat", {
                     userId: cookies.userID,
@@ -114,7 +114,7 @@ const   Chat: React.FC = () => {
             return (false);
         }
         if (name.length > 16 || name.length < 8) {
-            alert("Channel Name needs to be between 8-16 characters");
+            alert("Channel password needs to be between 8-16 characters");
             return (false);
         }
         return (true);
