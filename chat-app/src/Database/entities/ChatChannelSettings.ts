@@ -29,10 +29,10 @@ export class chat_channel_settings {
     @Column()
     actorUser: number;
 
-    @Column()
+    @Column({type: 'bigint'})
     from: number;
 
-    @Column()
+    @Column({type: 'bigint'})
     until: number;
 
     @ManyToOne(() => chat_channels, (chat) => chat.chatChannelSetting)
