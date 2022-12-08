@@ -95,9 +95,9 @@ export class Util {
     public isAdminButShouldNotBe(channel: Channel, actorId: number, source: string): boolean {
         if (channel.isAdmin(actorId)) {
             this.logger.debug(`Actor [${actorId}] is an admin and can't be affected by the request ${source}`);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
