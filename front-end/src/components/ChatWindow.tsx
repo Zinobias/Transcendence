@@ -53,17 +53,47 @@ const   ChatWindow: React.FC<Props> = ({channel}) => {
         })
 
         socket.on("channel_promote", response => {
-            if (response.success == true) 
+            if (response.success == true) {
+                console.log("socket.on channel_promote success");
                 setChat(chat => [...chat, {message: "got promoted!", sender: response.affected_id, timestamp: -1}])
-            else
+            }
+            else {
                 console.log("socket.on channel_promote fail");
+                console.log(response.msg);
+            }
         })
 
         socket.on("channel_demote", response => {
-            if (response.success == true) 
+            if (response.success == true) {
+                console.log("socket.on channel_demote success");
                 setChat(chat => [...chat, {message: "got demoted!", sender: response.affected_id, timestamp: -1}])
-            else
+            }
+            else {
                 console.log("socket.on channel_demote fail");
+                console.log(response.msg);
+            }
+        })
+
+        socket.on("channel_ban", response => {
+            if (response.success == true) {
+                console.log("socket.on channel_ban success");
+                setChat(chat => [...chat, {message: "got banned for 30 minutes!", sender: response.affected_id, timestamp: -1}])
+            }
+            else {
+                console.log("socket.on channel_ban fail");
+                console.log(response.msg);
+            }
+        })
+
+        socket.on("channel_mute_user", response => {
+            if (response.success == true) {
+                console.log("socket.on channel_mute_user success");
+                setChat(chat => [...chat, {message: "got muted for 30 minutes!", sender: response.affected_id, timestamp: -1}])
+            }
+            else {
+                console.log("socket.on channel_mute_user fail");
+                console.log(response.msg);
+            }
         })
 
         return () => {
@@ -73,6 +103,8 @@ const   ChatWindow: React.FC<Props> = ({channel}) => {
             socket.off("channel_join");
             socket.off("channel_promote");
             socket.off("channel_demote");
+            socket.off("channel_ban");
+            socket.off("channel_user_mute");
         }
     }, [])
 

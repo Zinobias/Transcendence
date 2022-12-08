@@ -393,7 +393,7 @@ export class ChannelEventPatterns {
     @EventPattern('channel_ban')
     async handleBan(data: ChannelBan) {
         if (data.channel_id == undefined || data.until != undefined
-            || (data.until != -1 || data.until <= new Date().getUTCMilliseconds()) || data.affected_id == undefined) {
+            || (data.until != -1 || data.until <= new Date().getTime()) || data.affected_id == undefined) {
             this.util.emitFailedObject(data.user_id, 'channel_ban', 'Incorrect data object');
             return;
         }

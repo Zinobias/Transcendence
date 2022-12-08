@@ -34,8 +34,10 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
 
     function returnDate () : number {
         const date = new Date();
-        const newDate = new Date(date.getTime() + 30*60000);
-        return(newDate.getUTCMilliseconds());
+        const newDate = new Date(date.getTime() + 30 * 60 * 1000);
+        // console.log(`curr time ${date.getHours()}:${date.getMinutes()} new time ${newDate.getHours()}:${newDate.getMinutes()}`);
+        // console.log(`curr getTime ${date.getTime()} new getTime ${newDate.getTime()}`);
+        return(newDate.getTime());
     }
 
     const handleProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,  userId: number) => {
@@ -70,13 +72,13 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
 
     const handleMute = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        // socket.emit("chat", {
-        //     userId: cookies.userID,
-        //     authToken: cookies.user,
-        //     eventPattern: "channel_mute",
-        //     data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
-        // })
-        console.log(`emitting channel_mute`);
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channel_mute_user",
+            data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
+        })
+        console.log(`emitting channel_mute_user`);
     }
 
     const handleBan = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -88,6 +90,7 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
             data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
         })
         console.log(`emitting channel_ban`);
+        // returnDate();
     }
 
     function findAdmin (userId : number) : boolean {
