@@ -48,7 +48,7 @@ export class Queries {
             return undefined;
         let sessionCodes: string[] = []
         for (let output of session) {
-            if (output.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
+            if (output.time + Queries.expireTime < new Date().getTime()) {
                 this.logger.warn(`Need to remove this session ${output.sessionCode} for ${output.userId}`);
                 break;
             }
