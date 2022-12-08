@@ -108,9 +108,11 @@ export class RetrieveUserDataEventPatterns {
         }
         await Queries.getInstance().addFriend(data.user_id, data.friend_id, false);
         user.friend(new Friend(user, false))
-        this.util.notify([data.user_id], 'friend_request', {
+        this.util.notify([data.user_id, data.friend_id], 'friend_request', {
             success: true,
-            msg: undefined
+            msg: undefined,
+            user: user.userId,
+            friend: friend.userId
         });
     }
 
@@ -148,9 +150,11 @@ export class RetrieveUserDataEventPatterns {
         user.friend(new Friend(friend, true))
         friend.unfriend(user); //TODO check if this is needed?
         friend.friend(new Friend(user, true))
-        this.util.notify([data.user_id], 'accept_friend_request', {
+        this.util.notify([data.user_id, data.friend_id], 'accept_friend_request', {
             success: true,
-            msg: undefined
+            msg: undefined,
+            user: user.userId,
+            friend: friend.userId
         });
     }
 
@@ -174,9 +178,11 @@ export class RetrieveUserDataEventPatterns {
         await Queries.getInstance().removeFriend(data.friend_id, data.user_id);
         user.unfriend(friend);
         friend.unfriend(user);
-        this.util.notify([data.user_id], 'un_friend', {
+        this.util.notify([data.user_id, data.friend_id], 'un_friend', {
             success: true,
-            msg: undefined
+            msg: undefined,
+            user: user.userId,
+            friend: friend.userId
         });
     }
 
