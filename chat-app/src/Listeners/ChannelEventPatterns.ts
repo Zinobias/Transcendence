@@ -344,6 +344,8 @@ export class ChannelEventPatterns {
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_mute_user', false))
             return;
+        if (this.util.isAdminButShouldNotBe(channel, data.affected_id, 'channel_mute_user'))
+            return;
         if (this.util.notAdmin(channel, data.user_id, 'channel_mute_user'))
             return;
 

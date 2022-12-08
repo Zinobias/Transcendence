@@ -106,13 +106,49 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'friend_request', `There is already an active friend request for this user`);
             return;
         }
-        await Queries.getInstance().addFriend(
-            data.user_id,
-            data.friend_id,
-            false
-        );
+        await Queries.getInstance().addFriend(data.user_id, data.friend_id, false);
         user.friend(new Friend(user, false))
         this.util.notify([data.user_id], 'friend_request', {
+            success: true,
+            msg: undefined
+        });
+    }
+
+    @EventPattern('accept_friend_request')
+    async acceptFriendRequestUser(data: UserFriendUser) {
+        const user: User = await this.util.getUser(data.user_id, 'accept_friend_request');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'Unable to retrieve user');
+            return;
+        }
+        const friend: User = await this.util.getUser(data.user_id, 'accept_friend_request');
+        if (friend == undefined) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'Unable to retrieve friend');
+            return;
+        }
+        if (user.hasBlocked(friend)) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'You have this user blocked');
+            return;
+        }
+        if (friend.hasBlocked(user)) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'This user has you blocked');
+            return;
+        }
+        if (user.isFriends(friend)) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', `You're already friends with this user`);
+            return;
+        }
+        if (!friend.hasRequest(user)) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', `There is no active friend request from this user`);
+            return;
+        }
+        await Queries.getInstance().addFriend(data.user_id, data.friend_id, true);
+        await Queries.getInstance().addFriend(data.friend_id, data.user_id, true);
+        user.unfriend(friend); //TODO check if this is needed?
+        user.friend(new Friend(friend, true))
+        friend.unfriend(user); //TODO check if this is needed?
+        friend.friend(new Friend(user, true))
+        this.util.notify([data.user_id], 'accept_friend_request', {
             success: true,
             msg: undefined
         });
@@ -134,11 +170,10 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'un_friend', `You aren't friends with this user and you don't have any open requests with them`);
             return;
         }
-        await Queries.getInstance().removeFriend(
-            data.user_id,
-            data.friend_id
-        );
-        user.unfriend(friend)
+        await Queries.getInstance().removeFriend(data.user_id, data.friend_id);
+        await Queries.getInstance().removeFriend(data.friend_id, data.user_id);
+        user.unfriend(friend);
+        friend.unfriend(user);
         this.util.notify([data.user_id], 'un_friend', {
             success: true,
             msg: undefined
@@ -160,6 +195,20 @@ export class RetrieveUserDataEventPatterns {
         if (user.hasBlocked(toBlock)) {
             this.util.emitFailedObject(data.user_id, 'block_user', `You already blocked this user`);
             return;
+        }
+        if (user.hasRequest(toBlock)) {
+            await Queries.getInstance().removeFriend(toBlock.userId, user.userId)
+            toBlock.unfriend(user);
+        }
+        if (toBlock.hasRequest(user)) {
+            await Queries.getInstance().removeFriend(user.userId, toBlock.userId)
+            user.unfriend(toBlock);
+        }
+        if (user.isFriends(toBlock)) {
+            await Queries.getInstance().removeFriend(user.userId, toBlock.userId);
+            await Queries.getInstance().removeFriend(toBlock.userId, user.userId);
+            user.unfriend(toBlock);
+            toBlock.unfriend(user);
         }
         await Queries.getInstance().addBlockedUser(
             data.user_id,

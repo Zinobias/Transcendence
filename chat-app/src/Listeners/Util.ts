@@ -86,6 +86,21 @@ export class Util {
     }
 
     /**
+     * Checks if a user is an admin in a channel
+     * @param channel
+     * @param actorId
+     * @param source
+     * returns false if user *is* an admin
+     */
+    public isAdminButShouldNotBe(channel: Channel, actorId: number, source: string): boolean {
+        if (channel.isAdmin(actorId)) {
+            this.logger.debug(`Actor [${actorId}] is an admin and can't be affected by the request ${source}`);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Checks if a user does not own the specified channel
      * @param channel
      * @param actorId
