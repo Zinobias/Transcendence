@@ -297,11 +297,12 @@ export class ChannelEventPatterns {
         channel.addSetting(setting);
         Queries.getInstance().addSetting(setting);
 
-        this.util.notify([data.affected_id], 'channel_promote', {
+        this.util.notify(channel.users.map(mapUser => mapUser.userId), 'channel_promote', {
             success: true,
             msg: undefined,
             channel_id: channel.channelId,
-            user_id: data.affected_id,
+            actor_id: data.user_id,
+            affected_id: data.affected_id
         });
     }
 
@@ -328,6 +329,13 @@ export class ChannelEventPatterns {
             data.affected_id,
             SettingType.ADMIN,
         );
+        this.util.notify(channel.users.map(mapUser => mapUser.userId), 'channel_demote', {
+            success: true,
+            msg: undefined,
+            channel_id: channel.channelId,
+            actor_id: data.user_id,
+            affected_id: data.affected_id
+        });
     }
 
     @EventPattern('channel_mute_user')
@@ -360,11 +368,12 @@ export class ChannelEventPatterns {
         channel.addSetting(setting);
         Queries.getInstance().addSetting(setting);
 
-        this.util.notify([data.affected_id], 'channel_mute_user', {
+        this.util.notify(channel.users.map(mapUser => mapUser.userId), 'channel_mute_user', {
             success: true,
             msg: undefined,
             channel_id: channel.channelId,
-            user_id: data.affected_id,
+            actor_id: data.user_id,
+            affected_id: data.affected_id
         });
     }
 
@@ -386,8 +395,16 @@ export class ChannelEventPatterns {
         if (this.util.notOwner(channel, data.user_id, 'channel_kick'))
             return;
 
+        const channelUsers = channel.users.map(mapUser => mapUser.userId);
         channel.removeUser(data.affected_id);
         await Queries.getInstance().removeChannelMember(data.channel_id, data.affected_id);
+        this.util.notify(channelUsers, 'channel_kick', {
+            success: true,
+            msg: undefined,
+            channel_id: channel.channelId,
+            actor_id: data.user_id,
+            affected_id: data.affected_id
+        });
     }
 
     @EventPattern('channel_ban')
@@ -409,6 +426,7 @@ export class ChannelEventPatterns {
         if (this.util.notAdmin(channel, data.user_id, 'channel_ban'))
             return;
 
+        const channelUsers = channel.users.map(mapUser => mapUser.userId);
         channel.removeUser(data.affected_id);
         await Queries.getInstance().removeChannelMember(data.channel_id, data.affected_id);
 
@@ -422,6 +440,13 @@ export class ChannelEventPatterns {
         );
         channel.addSetting(setting);
         await Queries.getInstance().addSetting(setting);
+        this.util.notify(channelUsers, 'channel_ban', {
+            success: true,
+            msg: undefined,
+            channel_id: channel.channelId,
+            actor_id: data.user_id,
+            affected_id: data.affected_id
+        });
     }
 
     @EventPattern('channel_disband')
