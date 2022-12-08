@@ -107,7 +107,7 @@ export class RetrieveUserDataEventPatterns {
             return;
         }
         await Queries.getInstance().addFriend(data.user_id, data.friend_id, false);
-        user.friend(new Friend(user, false))
+        friend.friend(new Friend(user, false))
         this.util.notify([data.user_id, data.friend_id], 'friend_request', {
             success: true,
             msg: undefined,
