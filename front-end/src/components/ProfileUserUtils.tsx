@@ -156,12 +156,60 @@ export const UserSettings : React.FC<Props> = ({user}) => {
     )
 }
 
-export const UserFriendSettings : React.FC<Props> = (user) => {
+export const UserFriendSettings : React.FC<Props> = ({user}) => {
+    const [cookies] = useCookies(['userID', 'user']);
+    const [isFriend, setIsFriend] = useState<boolean>(false);
+    const [isBlocked, setIsBlocked] = useState<boolean>(false);
+    const socket = useContext(SocketContext);
+
+    // EVENT LISTENERS
+    useEffect(() => {
+
+    },)
+
+    // USE EFFECT TO CHECK IF SOMEONE IS A FRIEND
+    useEffect(() => {
+        const retFriend = user.friends.find((e) => cookies.userID === e.IUser.userId && e.confirmed === true);
+        const retBlocked = user.blocked.find((e) => cookies.user === e.userId)
+        setIsBlocked(isBlocked => retBlocked === undefined);
+        setIsFriend(isFriend => retFriend === undefined);
+    },)
+
+    const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "friend_request",
+            data: {user_id: cookies.userID, friend_id: user.userId}
+        })
+        console.log(`emitting friend_request`);
+    }
+
+    const removeFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "un_friend",
+            data: {user_id: cookies.userID, friend_id: user.userId}
+        })
+        console.log(`emitting un_friend`);
+    }
 
     return (
-        <>
-            <button className='profileButton'>Remove/add Friend</button> 
+        <>  
             <button className='profileButton'>Invite to Pong</button> 
+            {
+                isFriend ?
+                <button className='profileButton' onClick={(e) => addFriend(e)}>Add Friend</button> :
+                <button className='profileButton' onClick={(e) => removeFriend(e)}>Remove Friend</button> 
+            }
+            {
+                isBlocked ?
+                <button className='profileButton'>block</button> :
+                <button className='profileButton'>unblock</button> 
+            }
         </>
     )
 }

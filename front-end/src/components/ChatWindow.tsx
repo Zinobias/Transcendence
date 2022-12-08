@@ -4,6 +4,7 @@ import { IChannel, IMessage } from "../interfaces";
 import ChatInput from "./ChatInput";
 import { SocketContext } from "./Socket";
 import { AiOutlineMenu } from "react-icons/ai";
+import { TbCameraMinus } from "react-icons/tb";
 
 interface Props {
     channel: IChannel | undefined;
@@ -12,14 +13,38 @@ interface Props {
 const   ChatWindow: React.FC<Props> = ({channel}) => {
 	
     const [chat, setChat] = useState<IMessage[]>([]);
+    const [notify, setNotify] = useState<IMessage>();
+    const [updateChannel, setUpdateChannel] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
+    var onMount : boolean = false;
 
+    // WHEN THE CHANNEL CHANGES WE UPDATE THE TMP CHAT
     useEffect(() => {
-        if (channel != undefined)
-            setChat([]);
+        if (channel != undefined) {
+            if (notify) {
+                setChat([]);
+                setChat(chat => [...chat, notify]);
+                setNotify(notify => undefined);
+            }
+            else
+                setChat(chat => []);
+        }
     }, [channel]);
+    
+    // USE EFFECT TO UPDATE THE CHANNEL ON CERTAIN EVENTS
+    useEffect(() => {
+        if (channel) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channel_retrieve_by_id", 
+                data: { user_id: cookies.userID, channel_id: channel?.channelId }
+            });
+            console.log(`emitting channel_retrieve_by_id`);
+        }
+    }, [updateChannel]);
 
     // EVENT LISTENERS
     useEffect(() => {
@@ -33,64 +58,85 @@ const   ChatWindow: React.FC<Props> = ({channel}) => {
         })
 
         socket.on("channel_leave", response  => {
-            if (response.success) 
-                setChat(chat => [...chat, {message: "has left the channel.", sender: response.user_id, timestamp: -1}])
+            if (response.success == true && response.channel_id == channel?.channelId) {
+                //setNotify(notify => ({message: "has joined the channel.", sender: response.user_id, timestamp: -1}));
+                setUpdateChannel(updateChannel => !updateChannel);
+            }
+            else if (response.success == true)
+                console.log(`socket.on channel_leave success channel_id ${response.channel_id}`);
+            else if (response.success == false) {
+                console.log("socket.on channel_leave fail");
+                console.log(response.msg);
+            }
         });
 
         socket.on("channel_join", response => {
             // if we are looking at the channel where a new user joins we want to update the channel
             if (response.success == true && response.channel_id == channel?.channelId) {
-                socket.emit("chat", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "channel_retrieve_by_id", 
-                    data: { user_id: cookies.userID, 
-                            channel_id: channel?.channelId }
-                });
+                //setNotify(notify => ({message: "has joined the channel.", sender: response.user_id, timestamp: -1}));
+                setUpdateChannel(updateChannel => !updateChannel);
             }
-            if (response.success == true)
-                setChat(chat => [...chat, {message: "has joined the channel.", sender: response.user_id, timestamp: -1}])
+            else if (response.success == true)
+                console.log(`socket.on channel_join success channel_id ${response.channel_id}`);
+            else if (response.success == false) {
+                console.log("socket.on channel_join fail");
+                console.log(response.msg);
+            }
+            // if (response.success == true && channel?.channelId === response.channel_id)
+            //     setChat(chat => [...chat, {message: "has joined the channel.", sender: response.user_id, timestamp: -1}])
         })
 
         socket.on("channel_promote", response => {
-            if (response.success == true) {
+            if (response.success == true && channel?.channelId === response.channel_id) {
                 console.log("socket.on channel_promote success");
-                setChat(chat => [...chat, {message: "got promoted!", sender: response.affected_id, timestamp: -1}])
+                //setNotify(notify => ({message: `got promoted by ${returnName(response.actor_id)}!`, sender: response.affected_id, timestamp: -1}));
+                setUpdateChannel(updateChannel => !updateChannel);
             }
-            else {
+            else if (response.success == true)
+                console.log(`socket.on channel_promote success channel_id ${response.channel_id}`);
+            else if (response.success == false) {
                 console.log("socket.on channel_promote fail");
                 console.log(response.msg);
             }
         })
 
         socket.on("channel_demote", response => {
-            if (response.success == true) {
+            if (response.success == true && channel?.channelId === response.channel_id) {
                 console.log("socket.on channel_demote success");
-                setChat(chat => [...chat, {message: "got demoted!", sender: response.affected_id, timestamp: -1}])
+                //setNotify(notify => ({message: `got demoted by ${returnName(response.actor_id)}!`, sender: response.affected_id, timestamp: -1}));
+                setUpdateChannel(updateChannel => !updateChannel);
             }
-            else {
+            else if (response.success == true)
+                console.log(`socket.on channel_demote success channel_id ${response.channel_id}`);
+            else if (response.success == false) {
                 console.log("socket.on channel_demote fail");
                 console.log(response.msg);
             }
         })
 
         socket.on("channel_ban", response => {
-            if (response.success == true) {
+            if (response.success == true && channel?.channelId === response.channel_id) {
                 console.log("socket.on channel_ban success");
-                setChat(chat => [...chat, {message: "got banned for 30 minutes!", sender: response.affected_id, timestamp: -1}])
+                setUpdateChannel(updateChannel => !updateChannel);
+                //setChat(chat => [...chat, {message: `got banned for 30 minutes by ${response.actor_id}!`, sender: response.affected_id, timestamp: -1}])
             }
-            else {
+            else if (response.success == true)
+                console.log(`socket.on channel_ban success channel_id ${response.channel_id}`);
+            else if (response.success == false) {
                 console.log("socket.on channel_ban fail");
                 console.log(response.msg);
             }
         })
 
         socket.on("channel_mute_user", response => {
-            if (response.success == true) {
+            if (response.success == true && channel?.channelId == response.channel_id) {
                 console.log("socket.on channel_mute_user success");
-                setChat(chat => [...chat, {message: "got muted for 30 minutes!", sender: response.affected_id, timestamp: -1}])
+                setUpdateChannel(updateChannel => !updateChannel);
+                //setChat(chat => [...chat, {message: `got muted for 30 minutes by ${response.actor_id}!`, sender: response.affected_id, timestamp: -1}])
             }
-            else {
+            else if (response.success == true)
+                console.log(`socket.on channel_mute_user success channel_id ${response.channel_id}`);
+            else if (response.success == false) {
                 console.log("socket.on channel_mute_user fail");
                 console.log(response.msg);
             }
@@ -104,7 +150,7 @@ const   ChatWindow: React.FC<Props> = ({channel}) => {
             socket.off("channel_promote");
             socket.off("channel_demote");
             socket.off("channel_ban");
-            socket.off("channel_user_mute");
+            socket.off("channel_mute_user");
         }
     }, [])
 

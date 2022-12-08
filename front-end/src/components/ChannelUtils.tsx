@@ -9,24 +9,6 @@ interface Props {
     memberUserID: number;
 }
 
-/*
-    TO DO:
-    SETTINGS DM:
-    - Profile
-    - Invite to game
-
-    SETTINGS CHATROOM:
-    - Leave channel button
-    - if owner:
-        show password stuff on top
-    - member list:
-        - Member Settings:
-        - Go to Profile
-        - Invite to Game
-        - if Admin/Owner:
-            MakeAdmin/Mute/Ban
-*/
-
 const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
     const [cookies] = useCookies(['userID', 'user']);
     const socket = useContext(SocketContext);
@@ -124,12 +106,17 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
             <button className="memberButton">invite to pong</button>
             <button className="memberButton">block</button>
             {
-                memberUserID != channel.owner && findAdmin(memberUserID) == false ?
-                <button className="memberButton" onClick={(e) => handlePromote(e)}>promote</button> :
-                <button className="memberButton" onClick={(e) => handleDemote(e)}>demote</button>
+                memberUserID != channel.owner &&
+                <>
+                {
+                    findAdmin(memberUserID) == false ?
+                    <button className="memberButton" onClick={(e) => handlePromote(e)}>promote</button> :
+                    <button className="memberButton" onClick={(e) => handleDemote(e)}>demote</button>
+                }
+                <button className="memberButton" onClick={(e) => handleMute(e)}>mute</button>
+                <button className="memberButton" onClick={(e) => handleBan(e)}>ban</button>
+                </> 
             }
-            <button className="memberButton" onClick={(e) => handleMute(e)}>mute</button>
-            <button className="memberButton" onClick={(e) => handleBan(e)}>ban</button>
 
         </>
     )

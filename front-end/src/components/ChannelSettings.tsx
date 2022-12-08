@@ -2,8 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
 import { IChannel, SettingType } from '../interfaces';
 import { SocketContext } from './Socket';
-import { TbCrown } from "react-icons/tb";
-import { BsGear } from "react-icons/bs";
+import { TbCrown, TbSword } from "react-icons/tb";
 import {Md5} from "ts-md5";
 import ChannelUtils from './ChannelUtils';
 
@@ -140,7 +139,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                     }
                     {
                         findAdmin(element.userId) &&
-                        <BsGear />
+                        <TbSword />
                     }
 					</span>
 					<div id={element.userId.toString()} className="settingsDropdown">

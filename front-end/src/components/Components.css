@@ -501,11 +501,12 @@ p.chatp {
 
 .profileNav__dropdown {
     display: none;
-    height: 200px;
-    width: 150px;
+    /* height: 200px; */
+    width: 200px;
     /* margin: auto; */
     line-height: 1;
-    padding: 2%;
+    /* padding: 2%; */
+    text-align:center;
     background-color: #646464;
     border: 2px solid black;
 }
@@ -516,6 +517,7 @@ p.chatp {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    cursor: pointer;
     /* object-fit: cover; */
     display: inline-block;
 }
@@ -529,13 +531,42 @@ p.chatp {
     cursor: pointer;
 }
 
-.profileNav__avatar:hover, .profileNav__avatar:focus {
+/* .profileNav__avatar:hover, .profileNav__avatar:focus {
     cursor: pointer;
     transform: scale(1.05);
-}
+} */
 
 .show {
     display: block;
+
+}
+/*
+    FRIENDSLIST
+*/
+
+.friendslist {
+    text-align: left;
+    list-style-type: none;
+    font-family: 'Didact Gothic';
+}
+
+.friendInvite {
+    margin: 6px;
+    border: 2px solid black;
+}
+
+.friendslistButton {
+    width: 50%;
+    font-size:100%;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.friendslistButton:active {
+    transform: scale(0.95);
 }
 
 /*
@@ -735,15 +766,6 @@ p.chatp {
 }
 
 
-/*
-    FRIENDSLIST
-*/
-
-.friendslist {
-    text-align: left;
-    list-style-type: none;
-    font-family: 'Didact Gothic';
-}
 
 /*
     GAME
