@@ -9,7 +9,7 @@ import {
     ChannelJoin,
     ChannelKick,
     ChannelLeave,
-    ChannelMessage,
+    ChannelMessage, ChannelMuteUser,
     ChannelPromote,
     ChannelRetrieve,
     ChannelsRetrieve,
@@ -269,7 +269,7 @@ export class ChannelEventPatterns {
         });
     }
 
-    @EventPattern('channel_promote') //TODO verify the actor is allowed to do this action (and maybe save who did it in the db???)
+    @EventPattern('channel_promote')
     handlePromote(data: ChannelPromote) {
         if (data.channel_id == undefined) {
             this.util.emitFailedObject(data.user_id, 'channel_promote', 'Incorrect data object');
@@ -328,6 +328,42 @@ export class ChannelEventPatterns {
             data.affected_id,
             SettingType.ADMIN,
         );
+    }
+
+    @EventPattern('channel_mute_user')
+    handleMute(data: ChannelMuteUser) {
+        if (data.channel_id == undefined || data.until == undefined || data.until < new Date().getTime()) {
+            this.util.emitFailedObject(data.user_id, 'channel_mute_user', 'Incorrect data object');
+            return;
+        }
+        const channel: Channel = this.util.getChannel(
+            data.channel_id,
+            'channel_mute_user',
+        );
+        if (channel == null)
+            return;
+        if (!this.util.userInChannel(channel, data.affected_id, 'channel_mute_user', false))
+            return;
+        if (this.util.notAdmin(channel, data.user_id, 'channel_mute_user'))
+            return;
+
+        const setting: Setting = new Setting(
+            SettingType.MUTED,
+            data.channel_id,
+            data.affected_id,
+            data.user_id,
+            new Date().getTime(),
+            data.until,
+        );
+        channel.addSetting(setting);
+        Queries.getInstance().addSetting(setting);
+
+        this.util.notify([data.affected_id], 'channel_mute_user', {
+            success: true,
+            msg: undefined,
+            channel_id: channel.channelId,
+            user_id: data.affected_id,
+        });
     }
 
     @EventPattern('channel_kick')
