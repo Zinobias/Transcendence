@@ -392,6 +392,8 @@ export class ChannelEventPatterns {
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_kick', false))
             return;
+        if (this.util.isAdminButShouldNotBe(channel, data.affected_id, 'channel_kick'))
+            return;
         if (this.util.notOwner(channel, data.user_id, 'channel_kick'))
             return;
 
@@ -421,6 +423,8 @@ export class ChannelEventPatterns {
         if (channel == null)
             return;
         if (!this.util.userInChannel(channel, data.affected_id, 'channel_ban', false))
+            return;
+        if (this.util.isAdminButShouldNotBe(channel, data.affected_id, 'channel_ban'))
             return;
         if (this.util.notAdmin(channel, data.user_id, 'channel_ban'))
             return;
