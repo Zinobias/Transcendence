@@ -40,7 +40,6 @@ export class chat_channel_settings {
     until: number;
 
     @ManyToOne(() => chat_channels, (chat) => chat.chatChannelSetting)
-    @JoinColumn({name: 'channelId'})
     channel: chat_channels;
 
     @ManyToOne(() => user_table, (user) => user.settingAffectedUser)
