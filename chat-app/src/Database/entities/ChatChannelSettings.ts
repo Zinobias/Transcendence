@@ -3,12 +3,16 @@ import {Setting} from '../../Objects/Setting';
 import {SettingType} from '../../Enums/SettingType';
 import {chat_channels} from './ChatChannels';
 import {user_table} from './UserTable';
+import {Logger} from "@nestjs/common";
 
 @Entity()
 export class chat_channel_settings {
+    private readonly logger = new Logger('chat_channel_settings');
     constructor(setting: Setting) {
-        if (setting == undefined)
+        if (setting == undefined) {
+            this.logger.warn("Received undefined session!")
             return;
+        }
         this.channelId = setting.channelId;
         this.actorUser = setting.actorId;
         this.affectedUser = setting.affectedId;
