@@ -1,5 +1,5 @@
 import {Sessions} from './entities/sessions';
-import {InsertResult} from 'typeorm';
+import {InsertResult, Repository} from 'typeorm';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {Database} from './data-source';
 import {UserTable} from './entities/user-table';
@@ -36,7 +36,7 @@ export class Queries {
     private static readonly expireTime = 604800000; // 7 days
     async loadSession(id: number): Promise<string[] | undefined> {
         const myDataSource = await this.database.getDataSource();
-        const repo = myDataSource.getRepository(Sessions);
+        const repo: Repository<Sessions> = myDataSource.getRepository(Sessions);
         let session = await repo.findBy({
             userId: id
         }).catch((e) => {
@@ -49,17 +49,16 @@ export class Queries {
         let sessionCodes: string[] = []
         for (let output of session) {
             if (output.time + Queries.expireTime < new Date().getTime()) {
-                this.logger.warn(`Need to remove this session ${output.sessionCode} for ${output.userId}`);
+                this.removeSession(repo, output).finally();
                 break;
             }
             sessionCodes.push(output.sessionCode);
         }
-        // if (session === null || session.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
-        //     this.logger.debug(`Session expired for user ${id}`)
-        //     return undefined;
-        // }
-        // else
         return sessionCodes;
+    }
+
+    async removeSession(repo: Repository<Sessions>, session: Sessions) {
+        await repo.remove(session)
     }
 
     public async userNameExists(userName: string): Promise<boolean | string> {
