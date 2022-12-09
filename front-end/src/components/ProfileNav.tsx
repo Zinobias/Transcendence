@@ -19,7 +19,7 @@ const ProfileNav: React.FC = () => {
     var path:string = "/profile?id=" + cookies.userID; 
     const socket = useContext(SocketContext);
 
-    // EMIT TO GET USER ON MOUNT AND STATE CHANGE
+    // emit to get user on mount and state change to update it
     useEffect(() => {
         socket.emit("chat", {
             userId: cookies.userID,
@@ -30,7 +30,7 @@ const ProfileNav: React.FC = () => {
         console.log(`emiting get_user ${cookies.userID}`);
     }, [state])
 
-    // USER EVENT LISTENERS
+    // user event listeners
     useEffect(() => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {

@@ -9,14 +9,16 @@ import { SocketContext } from './Socket';
 
 const FooterChat: React.FC = () => {
 
-    const [channelId, setChannelId] = useState<number>();
-    const [channel, setChannel] = useState<IChannel>();
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
+    const [channelId, setChannelId] = useState<number>();
+    const [channel, setChannel] = useState<IChannel>();
+    const [updateChannel, setUpdateChannel] = useState<boolean>(false);
 
+    // event listener
     useEffect(() => {
         socket.on("channel_retrieve_by_id", response => {
-            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName}`)
+            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName} ${response.channel.channelId}`)
             setChannel(channel => response.channel);
         })
 
@@ -25,6 +27,7 @@ const FooterChat: React.FC = () => {
         }
     }, [])
 
+    // when channelId or updateChannel changes we emit to update the channel
     useEffect(() => {
         if (channelId != undefined) {
             socket.emit("chat", {
@@ -36,7 +39,7 @@ const FooterChat: React.FC = () => {
             });
             console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
         }
-    }, [channelId])
+    }, [channelId, updateChannel])
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
@@ -50,15 +53,23 @@ const FooterChat: React.FC = () => {
             <SlBubble />
         </div>
         <div id="footerDropdown" className='footerChat__body'>
-
             <div className='footerChat__sidebar'>
-                <ChatSidebar channelId={channelId} setChannelId={setChannelId} />
+                <ChatSidebar channelId={channelId} setChannelId={setChannelId} channel={channel} setChannel={setChannel}/>
             </div>
             <div className='footerChat__chat'>
-                <ChatWindow channel={channel}/>
+                {
+                    channel ?
+                    <ChatWindow channel={channel} updateChannel={updateChannel} setUpdateChannel={setUpdateChannel}/> :
+                    <div className="chatroom">
+                        No Chatroom loaded
+                    </div>
+                }
             </div>
             <div id="chatSettings" className="footerChat__settings">
-                <ChannelSettings channel={channel}/>
+                {
+                    channel &&
+                    <ChannelSettings channel={channel}/>
+                }
             </div>
         </div>
     </div>   

@@ -15,7 +15,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
     const [token, setToken] = useState<string>("");
     const [selectedImage, setSelectedImage] = useState<File>();
 
-    // EVENT LISTENERS & EMITTERS ON MOUNT
+    // event listeners and emit on mount
     useEffect(() => {
         socket.on("isEnabled_2fa", response => {
             setHasTwoFA(hasTwoFA => response.success);
@@ -65,7 +65,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         }
     }, [])
 
-    // USE EFFECT TO EMIT TO AVATAR WHEN IMAGE CHANGES 
+    // emit update avatar when selectedImages changes 
     useEffect(() => {
         if (selectedImage) {
             if (!selectedImage?.name.match(/\.(jpg|jpeg|png)$/)) 
@@ -162,18 +162,14 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const socket = useContext(SocketContext);
 
-    // EVENT LISTENERS
-    useEffect(() => {
 
-    },)
-
-    // USE EFFECT TO CHECK IF SOMEONE IS A FRIEND
+    // useEffect on mount check if user is a friend/blocked
     useEffect(() => {
         const retFriend = user.friends.find((e) => cookies.userID === e.IUser.userId && e.confirmed === true);
         const retBlocked = user.blocked.find((e) => cookies.user === e.userId)
         setIsBlocked(isBlocked => retBlocked === undefined);
         setIsFriend(isFriend => retFriend === undefined);
-    },)
+    }, [])
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

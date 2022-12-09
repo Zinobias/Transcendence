@@ -5,7 +5,6 @@ import { IChannelInfo } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
 import ListPublicChatrooms from "./ListPublicChatrooms";
-import ChannelPassword from "./ChannelPassword";
 
 const   Chat: React.FC = () => {
 	
@@ -55,7 +54,7 @@ const   Chat: React.FC = () => {
         })
 
         socket.on("channels_retrieve", response  => {
-            console.log(`socket.on channels_retrieve`);
+            console.log(`socket.on channels_retrieve success`);
             setChannels([]);
             response.channels.forEach((element : IChannelInfo) => {
                 setChannels( channels => [...channels, element])
@@ -141,9 +140,6 @@ const   Chat: React.FC = () => {
     };
 
     const handlePassword = (e: React.FormEvent) => {
-        //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
-        //console.log(Md5.hashStr(chatroomPassword + chatroomId))
-
         e.preventDefault();
         if (validatePassword(pw)) {
             socket.emit("chat", {

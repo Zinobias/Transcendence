@@ -12,7 +12,7 @@ const Profile: React.FC = () => {
     const [cookies] = useCookies(['userID', 'user']);
     const [user, setUser] = useState<IUser>();
 
-    // EVENT LISTENERS
+    // event listeners
     useEffect(() => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == Number(searchParams.get("id"))) {

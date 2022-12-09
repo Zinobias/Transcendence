@@ -7,7 +7,7 @@ import {Md5} from "ts-md5";
 import ChannelUtils from './ChannelUtils';
 
 interface Props {
-    channel: IChannel | undefined;
+    channel: IChannel;
 }
 
 const ChannelSettings : React.FC<Props> = ({channel}) => {
@@ -16,21 +16,25 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
     const socket = useContext(SocketContext);
 
     // EVENT LISTENER
-    socket.on("channel_update_password", response => {
-        if (response.success == true && response.channel_id == channel?.channelId ) {
-            socket.emit("chat", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "channel_retrieve_by_id", 
-                data: { user_id: cookies.userID, 
-                        channel_id: channel?.channelId }
-            });
-            console.log("emiting channel_retrieve_by_id");
-        }
+    useEffect(() => {
+        socket.on("channel_update_password", response => {
+            if (response.success === true && response.channel_id === channel.channelId ) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "channel_retrieve_by_id", 
+                    data: { user_id: cookies.userID, 
+                            channel_id: channel.channelId }
+                });
+                console.log("emiting channel_retrieve_by_id");
+            }
+        })
+
         return () => {
             socket.off("channel_update_password");
         }
-    })
+    }, [channel])
+
 
     const handleLeave = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -38,7 +42,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
           userId: cookies.userID,
           authToken: cookies.user,
           eventPattern: "channel_leave",
-          data: {user_id: cookies.userID, channel_id: channel?.channelId}
+          data: {user_id: cookies.userID, channel_id: channel.channelId}
         })
         console.log("emiting channel_leave");
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
@@ -62,7 +66,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                 userId: cookies.userID,
                 authToken: cookies.user,
                 eventPattern: "channel_update_password", 
-                data: {user_id: cookies.userID, channel_id: channel?.channelId, password: Md5.hashStr(pw + channel?.channelId)}
+                data: {user_id: cookies.userID, channel_id: channel.channelId, password: Md5.hashStr(pw + channel.channelId)}
             });
             console.log(`emitting channel_update_password`);
             setPw("");
@@ -76,15 +80,15 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "channel_update_password", 
-            data: {user_id: cookies.userID, channel_id: channel?.channelId, password: undefined}
+            data: {user_id: cookies.userID, channel_id: channel.channelId, password: undefined}
         });
         console.log(`emitting channel_update_password`);
     }
 
     function findAdmin (userId : number) : boolean {
-        if (userId == channel?.owner) 
+        if (userId === channel.owner) 
             return (false);
-        const res = channel?.settings.find((e) => userId == e.userId && e.setting == SettingType.ADMIN);
+        const res = channel.settings.find((e) => userId === e.userId && e.setting === SettingType.ADMIN);
         return (res !== undefined);
     }
 
@@ -100,21 +104,17 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
         return (true);
     }
 
-	if (channel == undefined) {
-		return (<></>)
-	}
-
     return (
         <div>
             {
-                channel?.otherOwner == undefined &&
+                channel.otherOwner === undefined &&
                 <button className="settingsButton" onClick={(e) => handleLeave(e)}>LEAVE</button>
             }
 			{
-				channel?.otherOwner == undefined && cookies.userID == channel?.owner &&
+				channel.otherOwner === undefined && cookies.userID === channel.owner &&
                 <>
                 {
-                    channel.password == undefined ?
+                    channel.password === undefined ?
                     <div className='settingsPasswordToggle' id="passwordSetButton"><button className="settingsButton" onClick={(e) => setPassword(e)}>set pw</button></div>:
                     <>
                     <button className="settingsButton" onClick={(e) => removePassword(e)}>remove pw</button>
@@ -129,12 +129,12 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                 <button className="settingsButton" onClick={(e) => submitPassword(e)}>submit new pw</button>
             </div>
             MEMBERS:
-            {channel?.users.map((element, index) => (
+            {channel.users.map((element, index) => (
                 <li key={index} className="listMembers">
                     <span onClick={(e) => toggleSettings(e, element.userId)}>
 					{element.name} 
                     {
-                        element.userId == channel.owner &&
+                        element.userId === channel.owner &&
                         <TbCrown />
                     }
                     {

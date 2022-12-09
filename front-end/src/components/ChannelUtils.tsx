@@ -17,8 +17,6 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
     function returnDate () : number {
         const date = new Date();
         const newDate = new Date(date.getTime() + 30 * 60 * 1000);
-        // console.log(`curr time ${date.getHours()}:${date.getMinutes()} new time ${newDate.getHours()}:${newDate.getMinutes()}`);
-        // console.log(`curr getTime ${date.getTime()} new getTime ${newDate.getTime()}`);
         return(newDate.getTime());
     }
 
@@ -72,7 +70,6 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
             data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
         })
         console.log(`emitting channel_ban`);
-        // returnDate();
     }
 
     function findAdmin (userId : number) : boolean {

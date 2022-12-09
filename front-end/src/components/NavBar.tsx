@@ -4,7 +4,6 @@ import { LogoutButton } from './Buttons';
 import ProfileNav from "./ProfileNav";
 import FooterChat from "./FooterChat";
 import '../App.css'
-import ChannelPassword from "./ChannelPassword";
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 
@@ -15,9 +14,6 @@ const NavBar: React.FC = () => {
     return (
         <>
             <div className="grid-container">
-                {/* <div className="passwordCenter">
-                    <ChannelPassword />
-                </div> */}
                 <LogoutButton />
                 <ProfileNav />
                 <div id="nav">

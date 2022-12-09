@@ -7,7 +7,6 @@ interface Props {
     user: IUser;
 }
 
-
 /*
 	TO DO:
 	- Show online/offline

@@ -14,30 +14,6 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
     const [cookies] = useCookies(['userID', 'user']);
     const [pw, setPw] = useState<string>("");
 
-    // EVENT LISTENERS
-    useEffect(() => {
-        socket.on("channel_join", response => {
-            if (response.success == true) {
-                console.log(`socket.on channel_join success`);
-                socket.emit("chat", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "get_channels_user",
-                    data: {user_id: cookies.userID}
-                })
-                console.log("emiting get_channels_user");
-            }
-            else {
-                alert(response.msg);
-                console.log(`socket.on channel_join fail`);
-            }
-        })
-
-        return () => {
-            socket.off("channel_join");
-        }
-    },[])
-
     const handleJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId: number, password: boolean) => {
         e.preventDefault();
         if (password) 
