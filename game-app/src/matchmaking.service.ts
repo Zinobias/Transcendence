@@ -140,7 +140,7 @@ export class MatchMakingService {
 				return (g === uuid);
 			});
 			if (index !== -1)
-				this.gameList.splice(index, 1);
+				gameMode[1].splice(index, 1);
 				return true;
 		}
 		return false;
