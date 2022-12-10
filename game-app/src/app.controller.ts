@@ -41,7 +41,7 @@ export class AppController {
 		this.logger.debug("GAME FRAME UPDATE RECEIVED");
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.frame.update.' + gameInfo.gameId,
-			targets : uids,
+			userIds : uids,
 			data 	: payload.payload}); // Forwarding entities of the game. to render in frontend.
 	}
 
@@ -83,7 +83,7 @@ export class AppController {
 			uids = [gameInfo.player1, gameInfo.player2];
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.ended.' + gameInfo.gameId,
-			targets : uids,
+			userIds : uids,
 			data 	: {
 				winner : payload.payload.winnerUID,
 				player1ScoreFinal : 2,
