@@ -214,7 +214,7 @@ export class Game {
 			
 			*/
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
-			this.eventEmitter.emit('game.frameUpdate',
+			this.eventEmitter.emit('game.frame.update',
 			new GameFrameUpdateEvent({
 				gameId:	 this.gameId,
 				payload: this.entities,
