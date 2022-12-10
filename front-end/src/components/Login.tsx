@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate} from 'react-router-dom';
-import { LoginButton, SignupButton } from "./Buttons";
+import { LoginButton } from "./LoginUtils";
 import '../App.css'
 import './Components.css';
 

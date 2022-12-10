@@ -765,8 +765,22 @@ p.chatp {
     display: flex;
 }
 
-
-
 /*
     GAME
 */
+
+.gameButton {
+    font-size: 30px;
+    width:30%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.gameButton:active {
+    transform: scale(0.95);
+}

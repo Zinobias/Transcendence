@@ -1,12 +1,13 @@
 import React from "react";
-import { DefaultMatchmaking, DiscoMatchmaking } from "./Buttons";
+import { DefaultMatchmaking, DiscoMatchmaking, LeavetMatchmaking } from "./GameUtils";
 
 const   Game: React.FC = () => {
     return (
         <>
             <p>game</p>
             <DefaultMatchmaking />
-            <DiscoMatchmaking />
+            <LeavetMatchmaking />
+            {/* <DiscoMatchmaking /> */}
         </>
     )
 };

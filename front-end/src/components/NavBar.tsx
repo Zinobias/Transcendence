@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, Link } from 'react-router-dom';
-import { LogoutButton } from './Buttons';
+import { LogoutButton } from './LoginUtils';
 import ProfileNav from "./ProfileNav";
 import FooterChat from "./FooterChat";
 import '../App.css'

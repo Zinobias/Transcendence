@@ -111,7 +111,7 @@ export class AppController {
 	@EventPattern("game.join.queue")
 	joinMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
 		this.logger.log("User : {" + payload.userId + "} has joined the matchmaking queue for : " + payload.gameMode);
-		if (this.matchMakingService.isValidGamemode(payload.gameMode))
+		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false)
 		return ({event : 'game.join.queue', data : {
 			success : false,
 			msg		: `gameMode in payload is invalid : [${payload.gameMode}]`
@@ -128,6 +128,7 @@ export class AppController {
 			});
 			return ;
 		}
+		this.logger.log(`before success emit`);
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.join.queue',
 			userIds		: [payload.userId],
@@ -161,7 +162,7 @@ export class AppController {
 		eventPattern : 'game.leave.queue',
 		data : { 
 			success : success,
-			msg : success === true ? `User [${payload.userId}] Left the queue, or was never in the queue.` : `User [${payload.userId}] Left the queue, or was never in the queue.`,
+			msg : success === true ? `User [${payload.userId}] Left the queue, or was never in the queue.` : `User [${payload.userId}] has failed leaving the queue.`,
 		}
 	});
 	return ;
