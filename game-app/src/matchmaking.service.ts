@@ -164,7 +164,9 @@ export class MatchMakingService {
 				this.client.emit<string, outDTO>("game", {
 					userIds 		: [gameDTO.player1UID, gameDTO.player2UID],
 					eventPattern 	: 'game.found',
-					data 			: undefined
+					data 			: {
+						playerIds : [gameDTO.player1UID, gameDTO.player2UID],
+					}
 				});
 				logger.log("Game found event emitted to client");
 			}
