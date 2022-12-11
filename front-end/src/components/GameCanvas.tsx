@@ -47,12 +47,14 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
     // game frame event listener
     useEffect(() => {
         console.log("Canvas component did mount with gameId " + gameId);
-        
+
         socket.on(`game.frame.update.` + gameId, response => {
             // setEntities(entities => response);
 
             setEntities([]);
+            // console.log("--- ENTITIES ---");
             response.forEach((element : IEntity) => {
+                // console.log(element);
                 setEntities(entities => [...entities, element]);
             });
             // console.log("socket.on game.frame.update");
@@ -80,12 +82,12 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
 
     // get translated x position value
     function getX (x : number, width : number) : number {
-        return (((ogCanvWidth/2) + x + (width/2)) * 2);
+        return (((ogCanvWidth/2) + x - (width/2)) * 2);
     }
 
     // get translated y position value
     function getY (y : number, height : number) : number {
-        return (((ogCanvHeight/2) + y - (height/2)) * 2);
+        return (((ogCanvHeight/2) - y - (height/2)) * 2);
     }
     
     return (

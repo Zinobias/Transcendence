@@ -40,7 +40,7 @@ export class AppController {
 		else
 			uids = [gameInfo.player1, gameInfo.player2];
 		const IEntityList = Game.EntityArrayToIEntityArray(payload.payload);
-		this.logger.debug("GAME FRAME UPDATE RECEIVED");
+		// this.logger.debug("GAME FRAME UPDATE RECEIVED");
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.frame.update.' + gameInfo.gameId,
 			userIds : uids,

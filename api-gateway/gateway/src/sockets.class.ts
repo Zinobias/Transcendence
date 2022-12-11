@@ -67,7 +67,7 @@ export class Sockets {
             if (sockets !== undefined) {
 				if (sockets!.length > 0) {
 					sockets.forEach((e : Socket) => {
-					this.logger.debug(`Emitting to socket for userId: [${user}] eventPattern: ${pattern} socketId: ${e.id} socket length : ${sockets.length}`);
+					// this.logger.debug(`Emitting to socket for userId: [${user}] eventPattern: ${pattern} socketId: ${e.id} socket length : ${sockets.length}`);
 					e?.emit(pattern, payload);})
 				}
             } else {

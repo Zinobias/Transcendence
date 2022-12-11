@@ -145,6 +145,7 @@ export class Game {
 
 
 	private		serveBall() {
+		logger.log("serving ball");
 		this._toServe = false;
 		[this.ball.pos.x, this.ball.pos.y] = [0, 0];
 		if (this.ball.velocityVector) 
@@ -187,7 +188,7 @@ export class Game {
 
 			if (this.checkBallHit(entity) === true)
 				if (entity.onHit) {
-					
+					logger.log(`intersection with ${entity.type}`);
 					entity.onHit(this.ball);
 				}
 		}
