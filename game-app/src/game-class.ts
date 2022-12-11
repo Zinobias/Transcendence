@@ -4,6 +4,8 @@ import {GameConfig, Direction} from "./enums" ;
 import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedData } from "./event-objects/events.objects";
 import { ClientProxy } from "@nestjs/microservices";
 import { Logger } from "@nestjs/common";
+import { Vec2 } from "./vectorLib/vector-lib";
+import { IEntity, IVec2 } from "./dto/frontend.DTOs";
 
 const logger = new Logger('random game instance');
 
@@ -253,5 +255,48 @@ export class Game {
 	private createDefaultBall() : void {
 		this.ball = new Ball(); // probably do not need to create a new one here?
 		this.entities.push(this.ball);
+	}
+
+	/**
+	 * Constructs IVec2 interface out of Vec2
+	 * @param vec2 Vec2 base class
+	 * @returns Vec2 interface of said Vec2
+	 */
+	public static IVec2Constructor(vec2 : Vec2 | undefined) : IVec2 | undefined {
+		if (vec2 === undefined)
+			return undefined;
+		return ({
+			x : vec2.x,
+			y : vec2.y,
+		});
+	}
+
+	/**
+	 * Construct IEntity out of Entity
+	 * @param e takes base Entity abstract class
+	 * @returns interface of said class.
+	 */
+	public static IEntityConstructor(e : Entity) : IEntity {
+		return ({
+			pos : Game.IVec2Constructor(e.pos)!,
+			velocityVector : Game.IVec2Constructor(e.velocityVector),
+			height : e.height,
+			width : e.width,
+			type : e.type,
+		});
+	}
+
+	/**
+	 * Converts Entity array into IEntity array.
+	 * @param e array of abstract class Entity
+	 * @returns Array of IEntity interfaces.
+	 */
+	public static EntityArrayToIEntityArray(entityArray : Entity[]) {
+		const IEntityArray : IEntity[] = [];
+
+		entityArray.forEach((e) => {
+			IEntityArray.push(Game.IEntityConstructor(e));
+		});
+		return (IEntityArray);
 	}
 }

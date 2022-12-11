@@ -7,6 +7,7 @@ import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
 import { Queries } from './database/queries';
+import { Game } from './game-class';
 
 
 @Controller()
@@ -38,11 +39,12 @@ export class AppController {
 		}
 		else
 			uids = [gameInfo.player1, gameInfo.player2];
+		const IEntityList = Game.EntityArrayToIEntityArray(payload.payload);
 		this.logger.debug("GAME FRAME UPDATE RECEIVED");
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.frame.update.' + gameInfo.gameId,
 			userIds : uids,
-			data 	: payload.payload}); // Forwarding entities of the game. to render in frontend.
+			data 	: IEntityList}); // Forwarding entities of the game. to render in frontend.
 	}
 
 	/**
