@@ -118,11 +118,24 @@ export class PlayerPaddle extends Entity {
 		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2, -GameConfig.PADDLE_WIDTH / 2];
 		// [this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
+		// this.onHit = (ball : Ball ) => {
+		// 	if (ball.velocityVector) {
+		// 		ball.velocityVector.x *= -1.0;
+		// 		ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, GameConfig.BOARD_HEIGHT / 2);
+		// 	}
+		// }
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
-				ball.velocityVector.x *= -1.0;
-				ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, GameConfig.BOARD_HEIGHT / 2);
+				if (ball.velocityVector.x < ball.height / 2)
+					ball.velocityVector.x *= -1.03;
+				else
+					ball.velocityVector.x *= -1;
+				if (ball.velocityVector.y < 0)
+					ball.velocityVector.y = getRandomInt(0, GameConfig.BOARD_HEIGHT / 2);
+				else
+					ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, 0);
 			}
+			ball.pos.x = this.pos.x < 0 ? this.pos.x - (this.width / 2) - (ball.width / 2): this.pos.x + (this.width / 2) + (ball.width / 2);
 		}
 	}
 
@@ -138,6 +151,7 @@ export class PlayerPaddle extends Entity {
 
 	// TODO: Maybe add a set height if we want to create some fun powerup that reduces the paddle height.
 }
+
 
 /**
  * UserID & the player's current score.
