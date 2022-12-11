@@ -207,12 +207,12 @@ export class Game {
 				this.serveBall();
 			this.movePlayer(); // first thing to do, handle player input.
 			this.moveBall(); // move ball
-			logger.debug(`Ball pos before check intersections ${this.ball.pos}`);
+			logger.debug(`Ball pos before check intersections x : [${this.ball.pos.x}] y : [${this.ball.pos.y}]`);
 
 			this.checkIntersections(); // checks for intersections.
-			logger.debug(`Ball pos after check intersections ${this.ball.pos}`);
+			logger.debug(`Ball pos after check intersections x : [${this.ball.pos.x}] y : [${this.ball.pos.y}]`);
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
-			logger.debug(`Ball pos after checkBallPosition ${this.ball.pos}`);
+			logger.debug(`Ball pos after checkBallPosition x : [${this.ball.pos.x}] y : [${this.ball.pos.y}]`);
 
 			/*
 			steps :
