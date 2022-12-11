@@ -74,7 +74,8 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
             ctx.beginPath();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             entities.forEach((e) => {
-                ctx.rect(getX(e.pos.x, e.width), getY(e.pos.y, e.height), (e.width*2), (e.height*2));
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(getX(e.pos.x, e.width), getY(e.pos.y, e.height), (e.width*2), (e.height*2));
             });
             ctx.stroke();
         }
