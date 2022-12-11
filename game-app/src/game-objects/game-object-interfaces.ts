@@ -132,13 +132,13 @@ export class PlayerPaddle extends Entity {
 					ball.velocityVector.x *= -1;
 
 				if (ball.pos.y <= this._pos.y - (this.height / 4))
-					ball.velocityVector.y = 1; // positive
+					ball.velocityVector.y = -1; // positive
 				else if (ball.pos.y >= this._pos.y - (this.height / 4))
-					ball.velocityVector.y = -1; // negative
+					ball.velocityVector.y = 1; // negative
 				else if (ball.pos.y < this.pos.y)
-					ball.velocityVector.y = 0.5; // positive
+					ball.velocityVector.y = -0.5; // positive
 				else if (ball.pos.y > this.pos.y)
-					ball.velocityVector.y = -0.5; // negative
+					ball.velocityVector.y = 0.5; // negative
 
 
 				// if (ball.pos.y < this._pos.y)
