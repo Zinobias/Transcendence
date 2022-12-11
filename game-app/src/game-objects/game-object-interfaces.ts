@@ -115,7 +115,7 @@ export class PlayerPaddle extends Entity {
 	constructor(_playerNumber : number) {
 		super('player_paddle', GameConfig.PADDLE_HEIGHT, GameConfig.PADDLE_WIDTH);
 		//[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
-		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  (-GameConfig.BOARD_WIDTH / 2) + (GameConfig.PADDLE_WIDTH / 2) + 28 : (GameConfig.BOARD_WIDTH / 2) - 28 - (GameConfig.PADDLE_WIDTH / 2), 0];
+		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  (-GameConfig.BOARD_WIDTH / 2) + (GameConfig.PADDLE_WIDTH / 2) + 14 : (GameConfig.BOARD_WIDTH / 2) - 14 - (GameConfig.PADDLE_WIDTH / 2), 0];
 		// [this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
 		// this.onHit = (ball : Ball ) => {
