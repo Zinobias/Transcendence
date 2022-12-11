@@ -43,12 +43,6 @@ export class ApiGateway
         // this.gameClient.connect();
         this.gameClient.emit('testMsg', 'msg from frontend');
         this.chatClient.emit('testMsg', 'msg from frontend');
-		this.gameClient.emit('game.create', {
-			player1UID 	: "123",
-			player2UID 	: "234",
-			gameMode	: 'default'
-		});
-		
     }
 
     //private clientList: { userID: number };
