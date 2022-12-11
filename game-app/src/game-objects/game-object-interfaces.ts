@@ -120,7 +120,7 @@ export class PlayerPaddle extends Entity {
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
-				ball.velocityVector.x *= -1.3;
+				ball.velocityVector.x *= -1.0;
 				ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, GameConfig.BOARD_HEIGHT / 2);
 			}
 		}
