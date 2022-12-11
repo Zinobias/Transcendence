@@ -88,8 +88,8 @@ export class AppController {
 			userIds : uids,
 			data 	: {
 				winner : payload.payload.winnerUID,
-				player1ScoreFinal : 2,
-				player2ScoreFinal : 5,
+				player1ScoreFinal : payload.payload.playerScores.player1FinalScore,
+				player2ScoreFinal : payload.payload.playerScores.player2FinalScore,
 			}
 		}); // Forwarding entities of the game. to render in frontend.
 		// TODO : not hardcode.

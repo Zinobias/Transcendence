@@ -135,6 +135,11 @@ export class PlayerPaddle extends Entity {
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1 : 1;
 				else if (ball.pos.y <= this.pos.y || ball.pos.y >= this.pos.y )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -0.5 : 0.5;
+
+				// 	if (ball.pos.y < this._pos.y)
+				// 	ball.velocityVector.y = getRandomInt(0, GameConfig.BOARD_HEIGHT / 4); // positive
+				// else
+				// 	ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 4, 0); // negative
 			}
 			ball.pos.x = this.pos.x < 0 ? this.pos.x + (this.width / 2) + (ball.width / 2) : this.pos.x - (this.width / 2) - (ball.width / 2);
 		}

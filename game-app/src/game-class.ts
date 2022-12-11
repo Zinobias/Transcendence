@@ -115,7 +115,7 @@ export class Game {
 	}
 	// Entrypoint for the game class.
 	private async start() {
-		this.loop();
+		await this.loop();
 		this.gameFinishedHandler();
 	}
 
