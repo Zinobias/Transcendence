@@ -138,7 +138,8 @@ export class Game {
 
 		if (this.ball.pos.y + this.ball.height / 2 >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.y - this.ball.height / 2 <= -GameConfig.BOARD_HEIGHT / 2)
 			if (this.ball.velocityVector) {
-				this.ball.pos.y = this.ball.pos.y >= GameConfig.BOARD_HEIGHT / 2 ? -(this.ball.height / 2) + GameConfig.BOARD_HEIGHT / 2 : (this.ball.height / 2) - (GameConfig.BOARD_HEIGHT / 2)
+				this.ball.pos.y = this.ball.pos.y + (this.ball.height / 2) >= GameConfig.BOARD_HEIGHT / 2 ? 
+					-(this.ball.height / 2) + (GameConfig.BOARD_HEIGHT / 2) : (this.ball.height / 2) - (GameConfig.BOARD_HEIGHT / 2)
 				this.ball.velocityVector.y *= -1;
 			}
 	}
