@@ -127,10 +127,9 @@ export class PlayerPaddle extends Entity {
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
 				if (ball.velocityVector.x < ball.width / 2)
-				ball.velocityVector.x *= -1; // 1.003
+					ball.velocityVector.x *= -1.003; // 1.003
 				else
-				ball.velocityVector.x *= -1;
-				const paddleSegment : number = this.height / 4;
+					ball.velocityVector.x *= -1;
 				if (ball.pos.y <= this._pos.y - (this.height / 2))
 					ball.velocityVector.y = 1; // positive
 				else if (ball.pos.y >= this._pos.y - (this.height / 2))
