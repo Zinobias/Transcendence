@@ -126,7 +126,7 @@ export class PlayerPaddle extends Entity {
 		// }
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
-				if (ball.velocityVector.x < ball.height / 2)
+				if (ball.velocityVector.x < ball.width / 2)
 					ball.velocityVector.x *= -1.03;
 				else
 					ball.velocityVector.x *= -1;
@@ -135,7 +135,7 @@ export class PlayerPaddle extends Entity {
 				else
 					ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, 0);
 			}
-			ball.pos.x = this.pos.x < 0 ? this.pos.x - (this.width / 2) - (ball.width / 2): this.pos.x + (this.width / 2) + (ball.width / 2);
+			ball.pos.x = this.pos.x < 0 ? this.pos.x - (this.width / 2) - (ball.width / 2) : this.pos.x + (this.width / 2) + (ball.width / 2);
 		}
 	}
 

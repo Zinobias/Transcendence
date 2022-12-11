@@ -186,8 +186,10 @@ export class Game {
 			// console.debug("Game debug checkintersections : Entity pos y : {" + entity.pos.y + "}");
 
 			if (this.checkBallHit(entity) === true)
-				if (entity.onHit)
+				if (entity.onHit) {
+					
 					entity.onHit(this.ball);
+				}
 		}
 	}
 
