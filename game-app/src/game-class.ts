@@ -167,10 +167,10 @@ export class Game {
 		// console.debug("CHECKBALLHIT ENTITY INFO height val: {" + rect2.height + "}");
 
 		if (
-			(this.ball.pos.x - this.ball.width 	/ 2	>= rect2.pos.x + rect2.width  / 2) 	&& 	
-			(this.ball.pos.x + this.ball.width 	/ 2 <= rect2.pos.x - rect2.width  / 2) 	&& 	
-			(this.ball.pos.y - this.ball.height 	/ 2 >= rect2.pos.y + rect2.height / 2) 	&& 
-			(this.ball.pos.y + this.ball.height 	/ 2 <= rect2.pos.y - rect2.height / 2))
+			!(this.ball.pos.x - this.ball.width 	/ 2	>= rect2.pos.x + rect2.width  / 2) 	&& 	
+			!(this.ball.pos.x + this.ball.width 	/ 2 <= rect2.pos.x - rect2.width  / 2) 	&& 	
+			!(this.ball.pos.y - this.ball.height 	/ 2 >= rect2.pos.y + rect2.height / 2) 	&& 
+			!(this.ball.pos.y + this.ball.height 	/ 2 <= rect2.pos.y - rect2.height / 2))
 			return true;
 		else 
 			return (false);
