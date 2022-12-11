@@ -769,6 +769,12 @@ p.chatp {
     GAME
 */
 
+.gameCanvas {
+    /* height: 100px;
+    width: 200px; */
+    border: 2px solid #000000; 
+}
+
 .gameButton {
     font-size: 30px;
     width:30%;

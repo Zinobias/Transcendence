@@ -38,7 +38,7 @@ export const DefaultMatchmaking: React.FC = () => {
 
     return (
         <>
-            <button className="boringButton" onClick={(e) => handleJoin(e)}>DEFAULT</button>
+            <button className="gameButton" onClick={(e) => handleJoin(e)}>DEFAULT</button>
         </>
     )
 
@@ -73,14 +73,14 @@ export const LeavetMatchmaking: React.FC = () => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.leave.queue", 
-            data: { userId: cookies.userID, gameMode: "DEFAULT" }
+            data: { userId: cookies.userID }
         });
-        console.log(`socket.emit game.leave.queue default`);
+        console.log(`socket.emit game.leave.queue`);
     };
 
     return (
         <>
-            <button className="boringButton" onClick={(e) => handleLeave(e)}>leave</button>
+            <button className="gameButton" onClick={(e) => handleLeave(e)}>leave</button>
         </>
     )
 
