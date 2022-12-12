@@ -10,7 +10,7 @@ export class chat_channel_settings {
     private readonly logger = new Logger('chat_channel_settings');
     constructor(setting: Setting) {
         if (setting == undefined) {
-            this.logger.warn("Received undefined session!")
+            this.logger.warn("Received undefined setting!")
             return;
         }
         this.channelId = setting.channelId;
