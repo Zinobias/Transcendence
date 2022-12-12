@@ -60,7 +60,7 @@ export class Game {
 		//);
 		logger.log(`GAME INSTANCE GAME ID : ${this.gameId}`);
 		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
-		this.eventEmitter.off("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this)); 
+		this.eventEmitter.removeAllListeners("game.player.move." + this.gameId); 
 		return ;
 	}
 	// DTO for this should be
