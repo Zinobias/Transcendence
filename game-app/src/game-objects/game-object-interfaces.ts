@@ -83,26 +83,16 @@ export abstract class Entity {
  */
 export class Ball extends Entity {
 	private _color : Color;
-	//private _radius	: number;
-	private _speed : number;
 
 	constructor () {
 		super("ball", GameConfig.DEFAULT_BALL_RADIUS,GameConfig.DEFAULT_BALL_RADIUS);
 		this._color = new Color(211, 211, 211);
 		this.velocityVector = new Vec2(1, 0);
 		[this.pos.x, this.pos.y] = [0, 0];
-		//this.speed = GameConfig.DEFAULT_BALL_SPEED;
 	}
 
 	get color() {return this._color;};
-	//get radius() {return this._radius;};
-	get speed() {return this._speed;};
-
-
 	set color(color : Color) {this._color = color;};
-	//set radius(radius : number) {this._radius = radius;};
-	set speed(speed : number) {this.speed = speed;};
-
 }
 
 /**
@@ -114,16 +104,8 @@ export class PlayerPaddle extends Entity {
 
 	constructor(_playerNumber : number) {
 		super('player_paddle', GameConfig.PADDLE_HEIGHT, GameConfig.PADDLE_WIDTH);
-		//[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
 		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  (-GameConfig.BOARD_WIDTH / 2) + (GameConfig.PADDLE_WIDTH / 2) + 14 : (GameConfig.BOARD_WIDTH / 2) - 14 - (GameConfig.PADDLE_WIDTH / 2), 0];
-		// [this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
-		// this.onHit = (ball : Ball ) => {
-		// 	if (ball.velocityVector) {
-		// 		ball.velocityVector.x *= -1.0;
-		// 		ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, GameConfig.BOARD_HEIGHT / 2);
-		// 	}
-		// }
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
 				if (ball.velocityVector.x < ball.width / 2)
@@ -136,11 +118,6 @@ export class PlayerPaddle extends Entity {
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1 : 1;
 				else if (ball.pos.y <= this.pos.y || ball.pos.y >= this.pos.y )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -0.5 : 0.5;
-
-				// 	if (ball.pos.y < this._pos.y)
-				// 	ball.velocityVector.y = getRandomInt(0, GameConfig.BOARD_HEIGHT / 4); // positive
-				// else
-				// 	ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 4, 0); // negative
 			}
 			ball.pos.x = this.pos.x < 0 ? this.pos.x + (this.width / 2) + (ball.width / 2) : this.pos.x - (this.width / 2) - (ball.width / 2);
 		}
