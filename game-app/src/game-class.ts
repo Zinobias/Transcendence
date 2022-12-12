@@ -42,7 +42,7 @@ export class Game {
 		// this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(2)];
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
 		this.ballFactory();
-		this.eventEmitter.addListener("game.player.move." + this.gameId, this.setPlayerMovementState); // documentation for this is absolutely disastrous. In case this doesn't work, try binding it.
+		this.eventEmitter.addListener("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this)); // documentation for this is absolutely disastrous. In case this doesn't work, try binding it.
 		this.start(); // prob put this in the calling function.
 	};
 
@@ -68,6 +68,7 @@ export class Game {
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	
 	private setPlayerMovementState(payload: any) {
+
 		const		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 
 		switch (payload.newState) {
