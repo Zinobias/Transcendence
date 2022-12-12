@@ -71,7 +71,7 @@ export class Game {
 
 		const		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 
-		switch (payload.newState) {
+		switch (payload.keyEvent) {
 			case MoveStatePaddle.keyPressDown: {
 				playerPaddle.keyPressDown = true;
 				break ;
