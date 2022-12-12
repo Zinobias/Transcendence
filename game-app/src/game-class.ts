@@ -74,18 +74,25 @@ export class Game {
 		switch (payload.keyEvent) {
 			case MoveStatePaddle.keyPressDown: {
 				playerPaddle.keyPressDown = true;
+				logger.log("KeyPressDown");
 				break ;
 			}
 			case MoveStatePaddle.keyReleaseDown: {
 				playerPaddle.keyPressDown = false;
+				logger.log("KeyReleaseDown");
+
 				break ;
 			}
 			case MoveStatePaddle.keyPressUp: {
 				playerPaddle.keyPressUp = true;
+				logger.log("KeyPressUp");
+
 				break ;
 			}
 			case MoveStatePaddle.keyReleaseUp: {
 				playerPaddle.keyPressUp = false;
+				logger.log("KeyReleaseUp");
+
 				break ;
 			}
 		}
