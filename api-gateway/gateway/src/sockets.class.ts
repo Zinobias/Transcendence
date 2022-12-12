@@ -61,6 +61,10 @@ export class Sockets {
 		}
 	}
 
+	public removeAllSocketsUser(userId : number) {
+		this.socketMap.delete(userId);
+	}
+
     public sendData(users: number[], pattern: string, payload: object) {
         for (const user of users) {
             const sockets : Socket[] | undefined = this.getSocket(user);
