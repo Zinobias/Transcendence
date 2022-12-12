@@ -361,42 +361,11 @@ export class ApiGateway
 		}
 		});
 	}
-    /**
-     * auth routes
-     * route 1 : Login.
-     * {
-     * 	userId? : number,
-     * 	token? : string,
-     * 	eventPattern : login
-     * 	payload: { token : accessToken },
-     * }
-     * return (app accessToken);
-     * route 2 : validating token w/ userId.
-     *  {
-     * 	userId? : number,
-     * 	token? : string,
-     * 	eventPattern : Validate
-     * 	payload: {},
-     * }
-     * return (boolean);
-     *
-     * route 3 : Create account.
-     *  {
-     * 	userId? : number,
-     * 	token? : string,
-     * 	eventPattern : Validate
-     * 	payload: {
-     * 		token : accessToken,
-     * 		userName : string,
-     * },
-     * }
-     * return (accessToken);
-     */
 
-    // export interface FrontEndDTO {
-    // 	userId?: number;
-    // 	token?: string;
-    // 	eventPattern: string;
-    // 	payload: {};
-    //   }
+	@UseGuards(AuthGuard)
+	@SubscribeMessage('logout')
+	async logoutUser(client : Socket, payload : FrontEndDTO) {
+		await this.queries.removeAllSessions(payload.userId!);
+		this.sockets.removeAllSocketsUser(payload.userId!);
+	}
 }
