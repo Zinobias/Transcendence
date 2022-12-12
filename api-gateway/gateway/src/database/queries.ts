@@ -49,7 +49,7 @@ export class Queries {
         let sessionCodes: string[] = []
         for (let output of session) {
             if (output.time + Queries.expireTime < new Date().getTime()) {
-                this.removeSession(repo, output).finally();
+                this.removeSessionWithRepo(repo, output).finally();
                 break;
             }
             sessionCodes.push(output.sessionCode);
@@ -57,7 +57,13 @@ export class Queries {
         return sessionCodes;
     }
 
-    async removeSession(repo: Repository<Sessions>, session: Sessions) {
+    async removeSessionWithRepo(repo: Repository<Sessions>, session: Sessions) {
+        await repo.remove(session)
+    }
+
+    async removeSession(session: Sessions) {
+        const myDataSource = await this.database.getDataSource();
+        const repo: Repository<Sessions> = myDataSource.getRepository(Sessions);
         await repo.remove(session)
     }
 
