@@ -42,7 +42,7 @@ export class Game {
 		// this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(2)];
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
 		this.ballFactory();
-		this.eventEmitter.addListener("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this)); // documentation for this is absolutely disastrous. In case this doesn't work, try binding it.
+		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this)); // documentation for this is absolutely disastrous. In case this doesn't work, try binding it.
 		this.start(); // prob put this in the calling function.
 	};
 
@@ -60,7 +60,7 @@ export class Game {
 		//);
 		logger.log(`GAME INSTANCE GAME ID : ${this.gameId}`);
 		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
-		this.eventEmitter.removeListener("game.player.move." + this.gameId, this.setPlayerMovementState); 
+		this.eventEmitter.off("game.player.move." + this.gameId, this.setPlayerMovementState); 
 		return ;
 	}
 	// DTO for this should be
@@ -74,24 +74,18 @@ export class Game {
 		switch (payload.keyEvent) {
 			case MoveStatePaddle.keyPressDown: {
 				playerPaddle.keyPressDown = true;
-				logger.log("KeyPressDown");
 				break ;
 			}
 			case MoveStatePaddle.keyReleaseDown: {
 				playerPaddle.keyPressDown = false;
-				logger.log("KeyReleaseDown");
 				break ;
 			}
 			case MoveStatePaddle.keyPressUp: {
 				playerPaddle.keyPressUp = true;
-				logger.log("KeyPressUp");
-
 				break ;
 			}
 			case MoveStatePaddle.keyReleaseUp: {
 				playerPaddle.keyPressUp = false;
-				logger.log("KeyReleaseUp");
-
 				break ;
 			}
 		}
@@ -106,9 +100,9 @@ export class Game {
 		if (this.playerPaddles[0].playerPaddle.keyPressDown === true)
 			this.playerPaddles[0].playerPaddle.pos.y -= this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[1].playerPaddle.keyPressUp === true)
-			this.playerPaddles[1].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (GameConfig.PADDLE_HEIGHT * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (GameConfig.PADDLE_HEIGHT * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[1].playerPaddle.keyPressDown === true)
-			this.playerPaddles[1].playerPaddle.pos.y -= this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1].playerPaddle.pos.y -= this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 	}
 
 	/**
