@@ -242,7 +242,16 @@ export class Queries {
 		const myDataSource = await getDataSource();
 		const friends_repository = myDataSource.getRepository(friends);
 		try {
-			await friends_repository.upsert([new friends(fromUserId, toUserId, confirmed)], ['active']);
+			const find = await friends_repository.findOneBy({userId: fromUserId, friendId: toUserId});
+			if (find != null) {
+				if (find.active == confirmed) {
+					return;
+				} else {
+					await friends_repository.update({userId: fromUserId, friendId: toUserId}, {active: confirmed});
+					return;
+				}
+			}
+			await friends_repository.insert(new friends(fromUserId, toUserId, confirmed));
 		} catch (e) {
 			this.logger.warn(`Unable to add friend for [${fromUserId}] see error: ${e}`);
 		}
