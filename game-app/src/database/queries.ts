@@ -32,6 +32,7 @@ export class Queries {
 		.catch((e) => this.logger.warn(`Inserting gameResult into DB went wrong. error msg : ${e}`));
 
 		this.logger.warn(`RESULT is ${res}`);
+		return (res);
 	}
 
 	public async getUserGameHistory(uid : number) {

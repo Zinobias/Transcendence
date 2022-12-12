@@ -430,8 +430,8 @@ export class AppController {
 			}});
 		else
 			return ({event : 'game.get.leaderboard', data : {
-				success : true,
-				msg		: `Retrieving leaderboard succeeded : [${res}]`,
+				success 	: true,
+				msg			: `Retrieving leaderboard succeeded : [${res}]`,
 				leaderboard : res,
 			}});
 	}

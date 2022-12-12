@@ -40,7 +40,6 @@ export class ApiGateway
 
     async onApplicationBootstrap() {
         this.logger.log(`Starting bootstrap gateway...`);
-        // this.gameClient.connect();
         this.gameClient.emit('testMsg', 'msg from frontend');
         this.chatClient.emit('testMsg', 'msg from frontend');
     }
