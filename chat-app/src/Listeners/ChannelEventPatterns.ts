@@ -339,7 +339,7 @@ export class ChannelEventPatterns {
     }
 
     @EventPattern('channel_mute_user')
-    handleMute(data: ChannelMuteUser) {
+    async handleMute(data: ChannelMuteUser) {
         if (data.channel_id == undefined || data.until == undefined || data.until < new Date().getTime()) {
             this.util.emitFailedObject(data.user_id, 'channel_mute_user', 'Incorrect data object');
             return;
@@ -366,7 +366,7 @@ export class ChannelEventPatterns {
             data.until,
         );
         channel.addSetting(setting);
-        Queries.getInstance().addSetting(setting);
+        await Queries.getInstance().addSetting(setting);
 
         this.util.notify(channel.users.map(mapUser => mapUser.userId), 'channel_mute_user', {
             success: true,

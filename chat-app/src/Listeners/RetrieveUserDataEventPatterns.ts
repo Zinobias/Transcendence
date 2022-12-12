@@ -116,6 +116,36 @@ export class RetrieveUserDataEventPatterns {
         });
     }
 
+    @EventPattern('decline_friend_request')
+    async declineFriendRequestUser(data: UserFriendUser) {
+        const user: User = await this.util.getUser(data.user_id, 'decline_friend_request');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'decline_friend_request', 'Unable to retrieve user');
+            return;
+        }
+        const friend: User = await this.util.getUser(data.user_id, 'decline_friend_request');
+        if (friend == undefined) {
+            this.util.emitFailedObject(data.user_id, 'decline_friend_request', `Unable to retrieve user who's request you're denying`);
+            return;
+        }
+        if (user.isFriends(friend)) {
+            this.util.emitFailedObject(data.user_id, 'decline_friend_request', `You're already friends with this user`);
+            return;
+        }
+        if (!user.hasRequest(friend)) {
+            this.util.emitFailedObject(data.user_id, 'decline_friend_request', `There is no active friend request for this user`);
+            return;
+        }
+        await Queries.getInstance().removeFriend(data.user_id, data.friend_id);
+        user.unfriend(friend);
+        this.util.notify([data.user_id, data.friend_id], 'decline_friend_request', {
+            success: true,
+            msg: undefined,
+            user: user.userId,
+            friend: friend.userId
+        });
+    }
+
     @EventPattern('accept_friend_request')
     async acceptFriendRequestUser(data: UserFriendUser) {
         const user: User = await this.util.getUser(data.user_id, 'accept_friend_request');
