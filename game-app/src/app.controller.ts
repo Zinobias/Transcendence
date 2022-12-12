@@ -53,7 +53,8 @@ export class AppController {
 	 */
 	@EventPattern("game.player.move")
 	async userMoveEvent(@Payload() payload : userKeyInputDTO) {
-		this.logger.log("player : {" + payload.userId + "} has moved.");
+		// this.logger.log("player : {" + payload.userId + "} has moved.");
+		this.logger.log("player : {" + payload.userId + "} has moved with key event {" + payload.keyEvent + "}");
 		let res = this.matchMakingService.getUserActiveGameId(payload.userId);
 		if (res === undefined)
 			return ;
