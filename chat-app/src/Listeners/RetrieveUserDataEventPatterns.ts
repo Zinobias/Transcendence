@@ -106,7 +106,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'friend_request', `There is already an active friend request for this user`);
             return;
         }
-        await Queries.getInstance().addFriend(data.user_id, data.friend_id, false);
+        await Queries.getInstance().addFriend(data.friend_id, data.user_id, false);
         friend.friend(new Friend(user, false))
         this.util.notify([data.user_id, data.friend_id], 'friend_request', {
             success: true,
