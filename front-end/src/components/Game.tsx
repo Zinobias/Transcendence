@@ -19,30 +19,41 @@ const   Game: React.FC = () => {
     const [vs, setVs] = useState<string>("");
     const [activeGameId, setActiveGameId] = useState<number>();
 
-    // game frame event listener
+    // const [up, setUp] = useState<boolean>(false);
+    // const [down, setDown] = useState<boolean>(false); 
+
+    // // key event listener
     // useEffect(() => {
+    //     const keyPress = (event: KeyboardEvent) => {
+    //         if (event.key === "ArrowUp" && up === false) {
+    //             setUp(up => true);
+    //             console.log(`${event.key} is being pressed`);
+    //         }
+    //         if (event.key === "ArrowDown" && down === false) {
+    //             setDown(down => true);
+    //             console.log(`${event.key} is being pressed`);
+    //         }
+    //     };
 
-    //     console.log(activeGameId);
-    //     console.log(`game.frame.update.` + activeGameId);
+    //     const keyRelease = (event: KeyboardEvent) => {
+    //         if (event.key === "ArrowUp") {
+    //             setUp(up => false);                
+    //             console.log(`${event.key} is being released`)
+    //         }
+    //         if (event.key === "ArrowDown") {
+    //             setDown(down => false);
+    //             console.log(`${event.key} is being released`)
+    //         }
+    //     };
+
+    //     window.addEventListener('keydown', keyPress);
+    //     window.addEventListener('keyup', keyRelease);
         
-    //     // if (activeGameId !== undefined) {
-    //     //     console.log("listener set up");
-    //     //     socket.on(`game.frame.update.` + activeGameId, response => {
-    //     //         console.log("socket.on game.frame.update");
-    //     //         console.log(response.payload[0]);
-    //     //     })
-    //     // }
-
-    //     socket.on(`game.frame.update.` + activeGameId, response => {
-    //         console.log("socket.on game.frame.update");
-    //         console.log(response[0]);
-    //     })
-
     //     return () => {
-    //         socket.off(`game.frame.update.` + activeGameId);
-    //     }
-    // }, [activeGameId])
-
+    //         window.removeEventListener('keydown', keyPress);
+    //         window.removeEventListener('keyup', keyRelease);
+    //     };
+    // }, [up, down]);
 
     // game event listeners
     useEffect(() => {
@@ -59,13 +70,6 @@ const   Game: React.FC = () => {
                 data: { userId: cookies.userID }
             });
             console.log(`socket.emit game.get.activeGameId`);
-        })
-
-        socket.off("game.ended", response => {
-            // change state to display winning prompt to be clicked away and then normal page again
-            // chaange activeGameId
-            console.log(`socket.on game.ended winner ${response.winner}`);
-            setActiveGameId(activeGameId => undefined);
         })
 
         socket.on("game.isInGame", response => {
@@ -86,7 +90,6 @@ const   Game: React.FC = () => {
 
         return () => {
             socket.off("game.found");
-            socket.off("gmae.ended");
             socket.off("game.isInGame");
             socket.off("game.get.activeGameId");
             socket.off("game.get.gameInfo");
@@ -139,10 +142,12 @@ const   Game: React.FC = () => {
                     <p>{cookies.userID} vs {vs}</p>
                 </>
             } */}
+
+
             <DefaultMatchmaking />
             <LeavetMatchmaking />
-            <button className="gameButton" onClick={(e) => isInGame(e)}>is in game</button>
-            <button className="gameButton" onClick={(e) => getGameId(e)}>game id</button>
+            {/* <button className="gameButton" onClick={(e) => isInGame(e)}>is in game</button>
+            <button className="gameButton" onClick={(e) => getGameId(e)}>game id</button> */}
 
             {/* <DiscoMatchmaking /> */}
         </>

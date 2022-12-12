@@ -3,6 +3,12 @@ import { useCookies } from 'react-cookie';
 import { IEntity } from '../DTOs/frontend.DTOs.game.matchmaking';
 import { SocketContext } from './Socket';
 
+enum Move {
+	keyPressUp = 0,
+	keyReleaseUp = 1,
+	keyPressDown = 2,
+	keyReleaseDown = 3,
+}
 interface Props {
     gameId : number;
 };
@@ -31,6 +37,15 @@ interface Props {
 
         all entities are going to be rectangles
         players(1 and 2), ball
+    
+    MOVE PADDLE ENUM
+
+    export enum MoveStatePaddle {
+        keyPressUp = 0,
+        keyReleaseUp = 1,
+        keyPressDown = 2,
+        keyReleaseDown = 3,
+    }
 
 */
 
@@ -38,19 +53,89 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [entities, setEntities] = useState<IEntity[]>([]);
+    const [up, setUp] = useState<boolean>(false);
+    const [down, setDown] = useState<boolean>(false); 
 
     const canvasWidth : number = 512*2;
     const canvasHeight : number = 256*2;
     const ogCanvWidth : number = 512;
     const ogCanvHeight : number = 256;
 
+    useEffect(() => {
+        const keyPress = (event: KeyboardEvent) => {
+            if (event.key === "ArrowUp" && up === false) {
+                setUp(up => true);
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.player.move", 
+                    data: { userId: cookies.userID, keyEvent: Move.keyPressUp }
+                });
+                console.log(`socket.emit ${event.key} is being pressed`);
+            }
+            if (event.key === "ArrowDown" && down === false) {
+                setDown(down => true);
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.player.move", 
+                    data: { userId: cookies.userID, keyEvent: Move.keyPressDown }
+                });
+                console.log(`socket.emit ${event.key} is being pressed`);
+            }
+        };
+
+        const keyRelease = (event: KeyboardEvent) => {
+            if (event.key === "ArrowUp") {
+                setUp(up => false);   
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.player.move", 
+                    data: { userId: cookies.userID, keyEvent: Move.keyReleaseUp }
+                });             
+                console.log(`socket.emit ${event.key} is being released`)
+            }
+            if (event.key === "ArrowDown") {
+                setDown(down => false);
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.player.move", 
+                    data: { userId: cookies.userID, keyEvent: Move.keyReleaseDown }
+                });
+                console.log(`socket.emit ${event.key} is being released`)
+            }
+        };
+
+        window.addEventListener('keydown', keyPress);
+        window.addEventListener('keyup', keyRelease);
+        
+        return () => {
+            window.removeEventListener('keydown', keyPress);
+            window.removeEventListener('keyup', keyRelease);
+        };
+    }, [up, down]);
+
+   
+    // event listener for game.ended
+    useEffect(() => {
+        socket.off(`game.ended.` + gameId, response => {
+            // change state to display winning prompt to be clicked away and then normal page again
+            // chaange activeGameId
+            console.log(`socket.on game.ended winner ${response.winner}`);
+        })
+
+        return () => {
+            socket.off(`game.ended.` + gameId);
+        }
+    }, [])
+
     // game frame event listener
     useEffect(() => {
         console.log("Canvas component did mount with gameId " + gameId);
 
         socket.on(`game.frame.update.` + gameId, response => {
-            // setEntities(entities => response);
-
             setEntities([]);
             // console.log("--- ENTITIES ---");
             response.forEach((element : IEntity) => {
