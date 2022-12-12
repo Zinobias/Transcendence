@@ -59,12 +59,11 @@ export class Queries {
 			this.logger.warn(`Grabbing gameId went wrong : ${e}`);
 			return (-1);
 		}
-		this.logger.debug(`Grabbing gameId   : ${res.game_result_gameId}`);
-		this.logger.debug(res);
-		if (res.game_result_gameId === undefined)
+		this.logger.debug(`Grabbing gameId   : ${res}`);
+		if (res[0] === undefined)
 			return (0);
 		else
-			return (res.gameId);
+			return (res[0].game_result_gameId);
 	}
 
 }
