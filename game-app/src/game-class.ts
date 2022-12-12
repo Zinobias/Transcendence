@@ -1,7 +1,7 @@
 import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle, PaddleGameData} from "./game-objects/game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
-import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedData } from "./event-objects/events.objects";
+import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedData, MoveStateEvent } from "./event-objects/events.objects";
 import { ClientProxy } from "@nestjs/microservices";
 import { Logger } from "@nestjs/common";
 import { Vec2 } from "./vectorLib/vector-lib";
@@ -67,7 +67,7 @@ export class Game {
 	// TODO: Hook to frontend for user input.
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	
-	private setPlayerMovementState(payload: any) {
+	private setPlayerMovementState(payload: MoveStateEvent) {
 
 		const		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 

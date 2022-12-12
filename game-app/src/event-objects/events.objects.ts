@@ -9,33 +9,37 @@ interface MoveStateData {
 /**
  * keyinput from the frontend processed.
  */
-export class GamePlayerMoveEvent {
-
-	/**
-	 * 
-	 * @param moveStateData Objects interface 
-	 * @gameFrameData gameFrameData {
-	 * 	playerNumber : number;
-	 * 	newState : number; }
-	 */
-	constructor(moveStateData : MoveStateData){
-		this._playerNumber = moveStateData.playerNumber;
-		this._newState = moveStateData.newState;
-	};
-	private _playerNumber	: number;
-	private _newState		: number;
-
-	// ------------------------------------------------------------------------------------------------
-	// Getters
-	get	playerNumber() { return (this._playerNumber); }
-	get	newState() { return (this._newState); }
-
+export interface MoveStateEvent {
+	readonly userId : number,
+	readonly keyEvent : MoveStatePaddle,
 }
+// export class GamePlayerMoveEvent {
 
-export interface GameFrameData {
-	gameId : number;
-	payload : Entity[];
-}
+// 	/**
+// 	 * 
+// 	 * @param moveStateData Objects interface 
+// 	 * @gameFrameData gameFrameData {
+// 	 * 	playerNumber : number;
+// 	 * 	newState : number; }
+// 	 */
+// 	constructor(moveStateData : MoveStateData){
+// 		this._playerNumber = moveStateData.playerNumber;
+// 		this._newState = moveStateData.newState;
+// 	};
+// 	private _playerNumber	: number;
+// 	private _newState		: number;
+
+// 	// ------------------------------------------------------------------------------------------------
+// 	// Getters
+// 	get	playerNumber() { return (this._playerNumber); }
+// 	get	newState() { return (this._newState); }
+
+// }
+
+// export interface GameFrameData {
+// 	gameId : number;
+// 	payload : Entity[];
+// }
 
 /**
  * Frameupdate event to forward to the frontend
