@@ -86,13 +86,13 @@ export class Game {
 	 */	
 	private movePlayer() : void {
 		if (this.playerPaddles[0].playerPaddle.keyPressUp === true)
-			this.playerPaddles[0].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (GameConfig.PADDLE_HEIGHT * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[0].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (this.playerPaddles[0].playerPaddle.height * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[0].playerPaddle.keyPressDown === true)
-			this.playerPaddles[0].playerPaddle.pos.y -= this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[0].playerPaddle.pos.y -= this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[0].playerPaddle.height * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[1].playerPaddle.keyPressUp === true)
-			this.playerPaddles[1].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (GameConfig.PADDLE_HEIGHT * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (this.playerPaddles[1].playerPaddle.height * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
 		if (this.playerPaddles[1].playerPaddle.keyPressDown === true)
-			this.playerPaddles[1].playerPaddle.pos.y -= this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (GameConfig.PADDLE_HEIGHT * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1].playerPaddle.pos.y -= this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[1].playerPaddle.height * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
 	}
 
 	/**
@@ -119,7 +119,7 @@ export class Game {
 			gameId : this.gameId
 		});
 	}
-	
+
 	/**
 	 * Checks whether a player has scored a point.
 	 */
@@ -202,7 +202,6 @@ export class Game {
 			this.moveBall(); // move ball
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
-
 			/*
 			steps :
 			1. Serve the ball if neccessary. Or move ball.
