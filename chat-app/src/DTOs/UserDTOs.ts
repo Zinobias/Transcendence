@@ -51,3 +51,14 @@ export interface GetOtherUserData {
     user_id: number;
     requested_user_id: number;
 }
+
+export interface InviteGameUser {
+    user_id: number;
+    request_user_id: number;
+    game_mode: string;
+}
+
+export interface AcceptGameRequest {
+    user_id: number;
+    request_user_id: number;
+}

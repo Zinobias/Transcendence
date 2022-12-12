@@ -4,8 +4,10 @@ import {Channel} from '../Objects/Channel';
 import {AppService} from '../app.service';
 import {Util} from './Util';
 import {
+    AcceptGameRequest,
     GetOtherUserData,
     GetSelfUserData,
+    InviteGameUser,
     UserBlockUser,
     UserEditAvatar,
     UserFriendUser,
@@ -21,7 +23,8 @@ export class RetrieveUserDataEventPatterns {
 
     constructor(private readonly appService: AppService,
                 @Inject('gateway') private readonly gateway: ClientProxy,
-                @Inject(Util) private readonly util: Util) {}
+                @Inject(Util) private readonly util: Util) {
+    }
 
     @EventPattern('get_channels_user')
     getChannelsUser(data: GetSelfUserData) {
@@ -61,7 +64,9 @@ export class RetrieveUserDataEventPatterns {
         this.util.notify([data.user_id], 'get_friend_requests', {
             success: true,
             msg: undefined,
-            friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
+            friendRequests: friendRequests.map(friend => {
+                return friend.getIFriend()
+            }),
         });
     }
 
@@ -74,7 +79,9 @@ export class RetrieveUserDataEventPatterns {
         this.util.notify([data.user_id], 'get_friends', {
             success: true,
             msg: undefined,
-            friendRequests: friendRequests.map(friend => {return friend.getIFriend()}),
+            friendRequests: friendRequests.map(friend => {
+                return friend.getIFriend()
+            }),
         });
     }
 
@@ -85,7 +92,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'friend_request', 'Unable to retrieve user');
             return;
         }
-        const friend: User = await this.util.getUser(data.user_id, 'friend_request');
+        const friend: User = await this.util.getUser(data.friend_id, 'friend_request');
         if (friend == undefined) {
             this.util.emitFailedObject(data.user_id, 'friend_request', 'Unable to retrieve friend');
             return;
@@ -123,7 +130,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'decline_friend_request', 'Unable to retrieve user');
             return;
         }
-        const friend: User = await this.util.getUser(data.user_id, 'decline_friend_request');
+        const friend: User = await this.util.getUser(data.friend_id, 'decline_friend_request');
         if (friend == undefined) {
             this.util.emitFailedObject(data.user_id, 'decline_friend_request', `Unable to retrieve user who's request you're denying`);
             return;
@@ -153,7 +160,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'Unable to retrieve user');
             return;
         }
-        const friend: User = await this.util.getUser(data.user_id, 'accept_friend_request');
+        const friend: User = await this.util.getUser(data.friend_id, 'accept_friend_request');
         if (friend == undefined) {
             this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'Unable to retrieve friend');
             return;
@@ -195,7 +202,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'un_friend', 'Unable to retrieve user');
             return;
         }
-        const friend: User = await this.util.getUser(data.user_id, 'un_friend');
+        const friend: User = await this.util.getUser(data.friend_id, 'un_friend');
         if (friend == undefined) {
             this.util.emitFailedObject(data.user_id, 'un_friend', 'Unable to retrieve friend');
             return;
@@ -223,7 +230,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user');
             return;
         }
-        const toBlock: User = await this.util.getUser(data.user_id, 'block_user');
+        const toBlock: User = await this.util.getUser(data.blocked_id, 'block_user');
         if (toBlock == undefined) {
             this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user to block');
             return;
@@ -302,4 +309,94 @@ export class RetrieveUserDataEventPatterns {
         await Queries.getInstance().setUserAvatar(user.userId, JSON.stringify(data.new_avatar));
         //TODO add checks and report result back
     }
+
+    private inviteMap: Map<number, GameUser> = new Map();
+
+    @EventPattern('invite_game_user')
+    async gameRequest(data: InviteGameUser) {
+        const user: User = await this.util.getUser(data.user_id, 'invite_game_user');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'invite_game_user', 'Unable to retrieve user');
+            return;
+        }
+        const invitedUser: User = await this.util.getUser(data.request_user_id, 'invite_game_user');
+        if (invitedUser == undefined) {
+            this.util.emitFailedObject(data.user_id, 'invite_game_user', 'Unable to retrieve invited user');
+            return;
+        }
+        if (user.hasBlocked(invitedUser)) {
+            this.util.emitFailedObject(data.user_id, 'invite_game_user', 'You have this user blocked');
+            return;
+        }
+        if (invitedUser.hasBlocked(user)) {
+            this.util.emitFailedObject(data.user_id, 'invite_game_user', 'This user has you blocked');
+            return;
+        }
+        if (this.inviteMap.has(user.userId) && this.inviteMap.get(user.userId).user_id == invitedUser.userId) {
+            this.util.emitFailedObject(data.user_id, 'invite_game_user', `You already an active game request for this user`);
+            return;
+        }
+        const obj: GameUser = {
+            user_id: invitedUser.userId,
+            game_mode: data.game_mode
+        }
+        this.inviteMap.set(user.userId, obj)
+        this.util.notify([data.user_id, data.request_user_id], 'invite_game_user', {
+            success: true,
+            msg: undefined,
+            user: user.userId,
+            request_user_id: invitedUser.userId,
+            game_mode: data.game_mode
+        });
+    }
+
+    @EventPattern('accept_invite_game_user')
+    async acceptGameRequest(data: AcceptGameRequest) {
+        const user: User = await this.util.getUser(data.user_id, 'accept_invite_game_user');
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', 'Unable to retrieve user');
+            return;
+        }
+        const invitingUser: User = await this.util.getUser(data.request_user_id, 'accept_invite_game_user');
+        if (invitingUser == undefined) {
+            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', 'Unable to retrieve invited user');
+            return;
+        }
+        if (!this.inviteMap.has(invitingUser.userId)) {
+            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request for you from this user`);
+            return;
+        }
+
+        const gameUser = this.inviteMap.get(invitingUser.userId);
+        if (gameUser.user_id != user.userId) {
+            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request for you from this user`);
+            return;
+        }
+
+        this.util.notify([data.user_id, data.request_user_id], 'accept_invite_game_user', {
+            success: true,
+            msg: undefined,
+            user: user.userId,
+            request_user_id: invitingUser.userId,
+            game_mode: gameUser.game_mode
+        });
+        const obj: GameRequest = {
+            userId1: data.request_user_id,
+            userId2: data.user_id,
+            gameMode: gameUser.game_mode
+        };
+        this.inviteMap.delete(user.userId)
+        this.gateway.emit('game_to_chat', obj);
+    }
+}
+
+interface GameRequest {
+    userId1: number;
+    userId2: number;
+    gameMode: string;
+}
+
+interface GameUser {
+    user_id: number;
+    game_mode: string;
 }
