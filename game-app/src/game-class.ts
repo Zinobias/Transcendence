@@ -68,7 +68,7 @@ export class Game {
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	
 	private setPlayerMovementState(payload: any) {
-		let		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
+		const		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 
 		switch (payload.newState) {
 			case MoveStatePaddle.keyPressDown: {
