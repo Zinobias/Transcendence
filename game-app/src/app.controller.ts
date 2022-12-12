@@ -367,7 +367,7 @@ export class AppController {
 	 * @param payload create Game DTO
 	 * @returns 
 	 */
-	@EventPattern('game.create')
+	@EventPattern('internal.game.create')
 	async createGame(@Payload() payload : CreateGameDTO) {
 		this.logger.log("a game has been created for users : {" + payload.player1UID + "} and + {" + payload.player2UID +"}");
 

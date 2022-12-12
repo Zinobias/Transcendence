@@ -61,7 +61,7 @@ export class ApiController {
 
     @EventPattern('game_to_chat')
     gameToChat(@Payload() payload: microServiceDTO) {
-        this.game_client.emit(payload.eventPattern, payload.data);
+        this.game_client.emit('internal.game.create', payload.data);
     }
 
 }

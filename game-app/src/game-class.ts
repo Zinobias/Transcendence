@@ -47,26 +47,17 @@ export class Game {
 	};
 
 	private gameFinishedHandler() {
-		// TODO: Upload gameresults to the database.
-		// TODO: Send gameFinishedEvent to the frontEnd service.
-		// TODO: This has to happen in the app GameFinishedEventHandler.
-		// TODO: Maybe construct results here.
-
-		//this.eventEmitter.emit('game.ended', 
-		//	new GameEndedEvent({
-		//	gameId: this.gameId,
-		//	payload: this.results,
-		//}),
-		//);
 		logger.log(`GAME INSTANCE GAME ID : ${this.gameId}`);
 		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
 		this.eventEmitter.removeAllListeners("game.player.move." + this.gameId); 
 		return ;
 	}
-	// DTO for this should be
-	// TODO: Hook to frontend for user input.
-	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
-	
+
+	/**
+	 * Listener function that wil lchange the player movestate based on events.
+	 * @param payload event with data for moving.
+	 * @returns void
+	 */
 	private setPlayerMovementState(payload: MoveStateEvent) {
 
 		const		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
@@ -91,6 +82,7 @@ export class Game {
 		}
 		return;
 	}
+
 	/**
 	 * Moves the player based on keyPressStates and checks whether it is a possible move.
 	 */	
@@ -121,20 +113,31 @@ export class Game {
 	}
 
 
+	private emitPlayerScore() : void {
+		this.client.emit('game', {
+			userIds : [this.player1.uid, this.player2.uid],
+			eventPattern : 'game.score.' + this.gameId,
+			data : {
+				player1Score : this.player1.score,
+				player2Score : this.player2.score,
+			}
+		});
+	}
 	/**
 	 * Checks whether a player has scored a point.
 	 */
-
 	private checkBallPosition() {
 		if (this.ball.pos.x + this.ball.width / 2 >= GameConfig.BOARD_WIDTH / 2) {
 			this.player1.score += 1;
 			this._player1Serves = false;
 			this._toServe = true;
+			this.emitPlayerScore();
 		}
 		else if (this.ball.pos.x - this.ball.width / 2 <= -GameConfig.BOARD_WIDTH / 2) {
 			this.player2.score += 1;
 			this._player1Serves = true;
 			this._toServe = true;
+			this.emitPlayerScore();
 		}
 
 		if (this.ball.pos.y + this.ball.height / 2 >= GameConfig.BOARD_HEIGHT / 2 || this.ball.pos.y - this.ball.height / 2 <= -GameConfig.BOARD_HEIGHT / 2)
