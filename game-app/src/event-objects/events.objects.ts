@@ -13,6 +13,7 @@ export interface MoveStateEvent {
 	readonly userId : number,
 	readonly keyEvent : MoveStatePaddle,
 }
+
 // export class GamePlayerMoveEvent {
 
 // 	/**
@@ -36,10 +37,10 @@ export interface MoveStateEvent {
 
 // }
 
-// export interface GameFrameData {
-// 	gameId : number;
-// 	payload : Entity[];
-// }
+export interface GameFrameData {
+	gameId : number;
+	payload : Entity[];
+}
 
 /**
  * Frameupdate event to forward to the frontend

@@ -1,7 +1,7 @@
 import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle, PaddleGameData} from "./game-objects/game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
-import { GamePlayerMoveEvent, GameFrameUpdateEvent, GameEndedData, MoveStateEvent } from "./event-objects/events.objects";
+import { GameFrameUpdateEvent, GameEndedData, MoveStateEvent } from "./event-objects/events.objects";
 import { ClientProxy } from "@nestjs/microservices";
 import { Logger } from "@nestjs/common";
 import { Vec2 } from "./vectorLib/vector-lib";
@@ -80,7 +80,6 @@ export class Game {
 			case MoveStatePaddle.keyReleaseDown: {
 				playerPaddle.keyPressDown = false;
 				logger.log("KeyReleaseDown");
-
 				break ;
 			}
 			case MoveStatePaddle.keyPressUp: {
