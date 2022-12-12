@@ -115,7 +115,7 @@ export class Game {
 	 * Emits the score to all players and spectators in the game, in case of goal.
 	 */
 	private emitPlayerScore() : void {
-		this.client.emit('game', {
+		this.eventEmitter.emit('game.emit.score', {
 			gameId : this.gameId
 		});
 	}
