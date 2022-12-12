@@ -6,7 +6,7 @@ import { CreateGameDTO, GameInfo, outDTO } from './dto/dto';
 import { IGameInfo } from './dto/frontend.DTOs';
 import { GameEndedData, gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
-import { gameModes } from './game-object-interfaces';
+// import { gameModes } from './game-object-interfaces';
 import { GameResult } from './game-objects/game-object-interfaces';
 import { mapGetter } from './map.tools';
 const logger = new Logger("AppService");
@@ -153,7 +153,7 @@ export class MatchMakingService {
 	 * calling createGame().
 	 */
 	public findMatch() {
-		for (let gameMode of gameModes) {
+		for (let gameMode of this.gameModes) {
 			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
 				let gameDTO : CreateGameDTO = {
 					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as number,

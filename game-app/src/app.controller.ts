@@ -8,7 +8,6 @@ import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './ev
 import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
 import { Queries } from './database/queries';
 import { Game } from './game-class';
-import { GamePlayerMoveEvent } from './game-object-interfaces';
 
 
 @Controller()
