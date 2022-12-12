@@ -1,5 +1,4 @@
 import { Game } from "src/game-class";
-import { MoveStatePaddle } from "src/game-object-interfaces";
 
 export interface CreateGameDTO {
 	player1UID	: number;
@@ -34,6 +33,12 @@ export interface outDTO {
 	data : any
 }
 
+export enum MoveStatePaddle {
+	keyPressUp = 0,
+	keyReleaseUp = 1,
+	keyPressDown = 2,
+	keyReleaseDown = 3,
+}
 export interface userKeyInputDTO {
 	userId	 : number,
 	keyEvent : MoveStatePaddle,
