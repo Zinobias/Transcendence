@@ -71,7 +71,7 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressUp }
                 });
-                console.log(`socket.emit ${event.key} is being pressed`);
+                // console.log(`socket.emit ${event.key} is being pressed`);
             }
             if (event.key === "ArrowDown" && down === false) {
                 setDown(down => true);
@@ -81,7 +81,7 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressDown }
                 });
-                console.log(`socket.emit ${event.key} is being pressed`);
+                // console.log(`socket.emit ${event.key} is being pressed`);
             }
         };
 
@@ -94,7 +94,7 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseUp }
                 });             
-                console.log(`socket.emit ${event.key} is being released`)
+                // console.log(`socket.emit ${event.key} is being released`)
             }
             if (event.key === "ArrowDown") {
                 setDown(down => false);
@@ -104,7 +104,7 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseDown }
                 });
-                console.log(`socket.emit ${event.key} is being released`)
+                // console.log(`socket.emit ${event.key} is being released`)
             }
         };
 
@@ -120,10 +120,10 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
    
     // event listener for game.ended
     useEffect(() => {
-        socket.off(`game.ended.` + gameId, response => {
+        socket.on(`game.ended.` + gameId, response => {
             // change state to display winning prompt to be clicked away and then normal page again
             // chaange activeGameId
-            console.log(`socket.on game.ended winner ${response.winner}`);
+            console.log("socket.on game.ended winner " + response.winner);
         })
 
         return () => {
