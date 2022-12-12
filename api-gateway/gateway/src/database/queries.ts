@@ -61,10 +61,10 @@ export class Queries {
         await repo.remove(session)
     }
 
-    async removeSession(session: Sessions) {
+    async removeAllSessions(userId: number) {
         const myDataSource = await this.database.getDataSource();
         const repo: Repository<Sessions> = myDataSource.getRepository(Sessions);
-        await repo.remove(session)
+        await repo.delete({userId: userId});
     }
 
     public async userNameExists(userName: string): Promise<boolean | string> {
