@@ -49,7 +49,7 @@ export class Queries {
 
 		try {
 			res = await gameRepository.createQueryBuilder()
-			.select(`gameId`)
+			.select(`game_result.gameId`)
 			.from(DBGameResult, 'game_result')
 			.addOrderBy(`game_result.gameId`, 'DESC')
 			.limit(1)
