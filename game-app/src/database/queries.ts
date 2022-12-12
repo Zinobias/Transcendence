@@ -60,6 +60,7 @@ export class Queries {
 			return (-1);
 		}
 		this.logger.debug(`Grabbing gameId   : ${res.gameId}`);
+		this.logger.debug(res);
 		if (res.gameId === undefined)
 			return (0);
 		else
