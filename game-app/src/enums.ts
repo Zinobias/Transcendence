@@ -14,8 +14,8 @@ const GAME_SCALAR : number = 1;
 
 export enum GameConfig {
 	PADDLE_HEIGHT           = 28                       * GAME_SCALAR,
-    PADDLE_STEP_SIZE        = 0.75                      * GAME_SCALAR,
-    PADDLE_WIDTH            = 8                       * GAME_SCALAR,
+    PADDLE_STEP_SIZE        = 0.8                      * GAME_SCALAR,
+    PADDLE_WIDTH            = 8                        * GAME_SCALAR,
 
 	BOARD_WIDTH             = 512                      * GAME_SCALAR,
     BOARD_HEIGHT            = 256                      * GAME_SCALAR,
