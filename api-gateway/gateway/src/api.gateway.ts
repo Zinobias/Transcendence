@@ -25,6 +25,11 @@ export interface FrontEndDTO {
     data: any;
 }
 
+interface Online {
+	userId: number;
+	checkIds: number[];
+}
+
 @WebSocketGateway(8084, {
     cors: {
         origin: '*',
@@ -111,6 +116,25 @@ export class ApiGateway
     //     this.logger.debug("auth event " + payload.code);
     //     await this.auth.auth(client, payload);
     //   }
+
+	@UseGuards(AuthGuard)
+	@SubscribeMessage('check_online')
+	async handleCheckOnline(client: Socket, payload: Online) {
+		const online: number[] = []
+		const offline: number[] = []
+		for (let i = 0; i < payload.checkIds.length; i++) {
+			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.checkIds[i]);
+			if (socketList != undefined && socketList.length != 0) {
+				online.push(payload.checkIds[i])
+			} else {
+				offline.push(payload.checkIds[i])
+			}
+		}
+		client.emit('check_online', {
+			onlineUsers: online,
+			offlineUsers: offline
+		});
+	}
 
     @SubscribeMessage('auth')
     async handleAuthResp(client: Socket, payload: FrontEndDTO): Promise<boolean | any> {
