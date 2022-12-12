@@ -38,11 +38,9 @@ export class Game {
 		this.entities = [];
 		this.playerPaddles.push( {uid : this.player1.uid, playerPaddle : new PlayerPaddle(1)});
 		this.playerPaddles.push( {uid : this.player2.uid, playerPaddle : new PlayerPaddle(2)});
-		// this.playerPaddles[0] = [this.player1.uid, new PlayerPaddle(1)];
-		// this.playerPaddles[1] = [this.player2.uid, new PlayerPaddle(2)];
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
 		this.ballFactory();
-		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this)); // documentation for this is absolutely disastrous. In case this doesn't work, try binding it.
+		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this));
 		this.start(); // prob put this in the calling function.
 	};
 
@@ -113,16 +111,15 @@ export class Game {
 	}
 
 
+	/**
+	 * Emits the score to all players and spectators in the game, in case of goal.
+	 */
 	private emitPlayerScore() : void {
 		this.client.emit('game', {
-			userIds : [this.player1.uid, this.player2.uid],
-			eventPattern : 'game.score.' + this.gameId,
-			data : {
-				player1Score : this.player1.score,
-				player2Score : this.player2.score,
-			}
+			gameId : this.gameId
 		});
 	}
+	
 	/**
 	 * Checks whether a player has scored a point.
 	 */
@@ -163,15 +160,6 @@ export class Game {
 	 * @returns True if a collision occurs.
 	 */
 	private	checkBallHit(rect2 : Entity ) : Boolean {
-		// console.debug("CHECKBALLHIT BALL INFO x val : {" + this.ball.pos.x + "}");
-		// console.debug("CHECKBALLHIT BALL INFO y val: {" + this.ball.pos.y + "}");
-		// console.debug("CHECKBALLHIT BALL INFO width val: {" + this.ball.width + "}");
-
-		// console.debug("CHECKBALLHIT ENTITY INFO x val : {" + rect2.pos.x + "}");
-		// console.debug("CHECKBALLHIT ENTITY INFO y val: {" + rect2.pos.y + "}");
-		// console.debug("CHECKBALLHIT ENTITY INFO width val: {" + rect2.width + "}");
-		// console.debug("CHECKBALLHIT ENTITY INFO height val: {" + rect2.height + "}");
-
 		if (
 			!(this.ball.pos.x - this.ball.width 	/ 2	>= rect2.pos.x + rect2.width  / 2) 	&& 	
 			!(this.ball.pos.x + this.ball.width 	/ 2 <= rect2.pos.x - rect2.width  / 2) 	&& 	

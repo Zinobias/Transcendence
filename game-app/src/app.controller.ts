@@ -64,6 +64,32 @@ export class AppController {
 		});
 	}
 
+	@OnEvent('game.emit.score')
+	async emitPlayerScore(@Payload() payload : {gameId : number}) {
+		const gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
+
+		if (gameInfo === undefined) {
+			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
+			return ;
+		}
+		let uids : number[];
+		if (gameInfo?.spectatorList !== undefined) {
+			uids = gameInfo?.spectatorList;
+			uids.push(gameInfo.player1, gameInfo.player2);
+		}
+		else
+			uids = [gameInfo.player1, gameInfo.player2];
+
+		this.gatewayClient.emit<string, outDTO>('game', {
+			eventPattern : 'game.score.' + payload.gameId,
+			userIds : uids,
+			data : {
+				player1Score : gameInfo.gameInstance.player1.score,
+				player2Score : gameInfo.gameInstance.player2.score,
+			},
+		})
+	}
+
 	/**
 	 * Catches internal game.ended event, handles it & forwards it to all uids that are part of the game.
 	 * removes game from the active game list.
