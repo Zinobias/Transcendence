@@ -325,7 +325,7 @@ export class MatchMakingService {
 	}
 
 	async addGameResultToDatabase(res : GameResult) {
-		this.logger.debug(`ADDING GAME TO DB, METADATA : uid1 : ${res.player1.uid} uid2 : ${res.player1.uid} gameId : ${res.gameId}, player1score ${res.playerScores.player1FinalScore} player2score ${res.playerScores.player2FinalScore}`);
+		// this.logger.debug(`ADDING GAME TO DB, METADATA : uid1 : ${res.player1.uid} uid2 : ${res.player1.uid} gameId : ${res.gameId}, player1score ${res.playerScores.player1FinalScore} player2score ${res.playerScores.player2FinalScore}`);
 		this.queries.storeGameResult([res.player1.uid, res.player2.uid], res.gameId, [res.playerScores.player1FinalScore, res.playerScores.player2FinalScore]);
 		}
 }

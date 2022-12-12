@@ -74,13 +74,11 @@ export class AppController {
 
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
 		this.logger.debug("Game-ended event caught & emitted to frontend");
-		this.logger.debug("GameID: [" + payload.gameId + "] Game result has been added to the database");
-
-		// await this.queries.getLeaderboard();
 		if (gameInfo === undefined) {
 			this.logger.debug('game.frame.update cant find the gameInfo');
 			return ;
 		}
+		await this.matchMakingService.addGameResultToDatabase(payload.payload);
 		let uids : number[];
 		if (gameInfo?.spectatorList !== undefined) {
 			uids = gameInfo?.spectatorList;
@@ -88,6 +86,7 @@ export class AppController {
 		}
 		else
 			uids = [gameInfo.player1, gameInfo.player2];
+		this.logger.debug(`Player1UID : ${gameInfo.player1} player2UID ${gameInfo.player2}`);
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.ended.' + gameInfo.gameId,
 			userIds : uids,
