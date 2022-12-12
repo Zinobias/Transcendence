@@ -8,6 +8,7 @@ import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './ev
 import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
 import { Queries } from './database/queries';
 import { Game } from './game-class';
+import { GamePlayerMoveEvent } from './game-object-interfaces';
 
 
 @Controller()
@@ -56,7 +57,10 @@ export class AppController {
 		let res = this.matchMakingService.getUserActiveGameId(payload.userId);
 		if (res === undefined)
 			return ;
-		this.matchMakingService.emitEvent("game.player.move." + res, payload.keyEvent);
+		this.matchMakingService.emitEvent("game.player.move." + res, {
+			keyEvent	: payload.keyEvent,
+			userId 		: payload.userId,
+		});
 	}
 
 	/**

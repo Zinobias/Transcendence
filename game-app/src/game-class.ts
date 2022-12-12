@@ -67,8 +67,8 @@ export class Game {
 	// TODO: Hook to frontend for user input.
 	// TODO: Revaluate this event/function. possibly just set a state for keypress & release. To then check in the loop.
 	
-	private setPlayerMovementState(payload: GamePlayerMoveEvent) {
-		let		playerPaddle : PlayerPaddle = payload.playerNumber === 1 ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
+	private setPlayerMovementState(payload: any) {
+		let		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 
 		switch (payload.newState) {
 			case MoveStatePaddle.keyPressDown: {
