@@ -63,7 +63,7 @@ export class Queries {
 		if (res[0] === undefined)
 			return (0);
 		else
-			return (res[0].game_result_gameId);
+			return (res[0].game_result_gameId + 1);
 	}
 
 }

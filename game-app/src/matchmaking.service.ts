@@ -31,7 +31,7 @@ export class MatchMakingService {
 	};
 
 	async onApplicationBootstrap() {
-		this.gameId = await this.queries.getGameId() + 1;
+		this.gameId = await this.queries.getGameId();
 		this.logger.debug(`GAMEID IN MM IS : [${this.gameId}]`);
     }
 
