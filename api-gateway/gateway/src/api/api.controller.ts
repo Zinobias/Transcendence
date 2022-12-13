@@ -23,7 +23,7 @@ export class ApiController {
 
     @EventPattern('game')
     gameForwarding(@Payload() payload: any) {
-        // this.logger.log(`Msg from game to gateway received`);
+        this.logger.log(`Msg from game to gateway received`);
 		this.sockets.sendData(payload.userIds, payload.eventPattern, payload.data);
 		// for (const userid of payload.userIDs) {
 		// 	// this.sockets.sendData()

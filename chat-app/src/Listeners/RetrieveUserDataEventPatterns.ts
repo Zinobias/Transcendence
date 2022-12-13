@@ -177,7 +177,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'accept_friend_request', `You're already friends with this user`);
             return;
         }
-        if (!friend.hasRequest(user)) {
+        if (!user.hasRequest(friend)) {
             this.util.emitFailedObject(data.user_id, 'accept_friend_request', `There is no active friend request from this user`);
             return;
         }

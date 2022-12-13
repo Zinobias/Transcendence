@@ -42,10 +42,11 @@ const ProfileNav: React.FC = () => {
         socket.on("friend_request", response => {
             if (response.success) {
                 console.log(`socket.on friend_request success from ${response.user} to ${response.friend}`);
-                if (response.friend === cookies.userID) {
-                    setState(state => !state);
-                    document.getElementById("myDropdown")?.classList.toggle("show");
-                }
+                setState(state => !state);
+                // if (response.friend === cookies.userID) {
+                //     setState(state => !state);
+                //     document.getElementById("myDropdown")?.classList.toggle("show");
+                // }
             }
             else
                 console.log(`socket.on friend_request fail ${response.msg}`);

@@ -25,19 +25,19 @@ const Friendslist: React.FC<Props> = ({user}) => {
             eventPattern: "accept_friend_request", 
             data: {user_id: cookies.userID, friend_id: friendId}
         })
-        console.log(`emiting accept_friend_request`);
+        console.log(`emiting accept_friend_request for users ` + friendId + ` ` + cookies.userID);
     }
 
     const handleDecline = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
         e.preventDefault();
         console.log("click decline");
-        // socket.emit("chat", {
-        //     userId: cookies.userID,
-        //     authToken: cookies.user,
-        //     eventPattern: "accept_friend_request", 
-        //     data: {user_id: cookies.userID, friend_id: friendId}
-        // })
-        // console.log(`emiting accept_friend_request`);
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "decline_friend_request", 
+            data: {user_id: cookies.userID, friend_id: friendId}
+        })
+        console.log(`emiting decline_friend_request`);
     }
 
     /*
@@ -53,22 +53,26 @@ const Friendslist: React.FC<Props> = ({user}) => {
 
     return (
         <>  
-            {user.friends.map((e) => (
-                <>{
-                    e.confirmed ==false &&
-                    <div className="friendInvite">
-                        <p><b>{e.IUser.name}</b> send you a friend request</p>
-                        <button className="friendslistButton" onClick={(event) => handleAccept(event, e.IUser.userId)}>Accept</button>
-                        <button className="friendslistButton" onClick={(event) => handleDecline(event, e.IUser.userId)}>Decline</button>
-                    </div>
-                }</>
+            {user.friends.map((element, index) => (
+                <div key={index} className="friendInvite">
+                {
+                    element.confirmed == false &&
+                    <>
+                        <p><b>{element.IUser.name} {element.IUser.userId}</b> send you a friend request</p>
+                        <button className="friendslistButton" onClick={(event) => handleAccept(event, element.IUser.userId)}>Accept</button>
+                        <button className="friendslistButton" onClick={(event) => handleDecline(event, element.IUser.userId)}>Decline</button>
+                    </>
+                }
+                </div>
             ))}
             <p><b>Friendslist:</b></p>
-            {user.friends.map((e) => (
-                <>{
-                    e.confirmed &&
-                    <li key={e.IUser.userId} className="friendslist">{e.IUser.name}</li>
-                }</>
+            {user.friends.map((e, index) => (
+                <div key={index} className="friendslist">
+                    {
+                        e.confirmed &&
+                        <li key={e.IUser.userId} className="friendslist">{e.IUser.name}</li>
+                    }
+                </div>
             ))}
         </>
     );
