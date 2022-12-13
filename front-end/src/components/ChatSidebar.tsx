@@ -63,10 +63,10 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
 
         socket.on("channel_ban", response  => {
             // if current user got banned update sidechannels
-            if (response.success && cookies.userID === response.affected_id)
+            if (response.success && cookies.userID == response.affected_id)
                 setState(state => !state);
             // if current user got banned and was looking at the channel set channel to undefined
-            if (response.success && channelId === response.channel_id && cookies.userID === response.affected_id)
+            if (response.success && channelId == response.channel_id && cookies.userID == response.affected_id)
                 setChannel(channel => undefined);
         });
 

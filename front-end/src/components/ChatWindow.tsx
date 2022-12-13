@@ -33,71 +33,71 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
     useEffect(() => {
         socket.on("channel_message", response => {
             // only set the tmp chat when we are looking at that chat
-            if (response.success && response.channel_id === channel.channelId) 
+            if (response.success && response.channel_id == channel.channelId) 
                 setChat(chat => [...chat, response.message]);
             if (response.success)
                 console.log(`socket.on channel_message success ${response.channel_id} current_id ${channel.channelId}`);
-            else if (response.success === false)
+            else 
                 alert(response.msg);
         })
 
         socket.on("channel_leave", response  => {
             // if we are looking at the channel where a user leaves and we are NOT the user that left we want to update the channel
-            if (response.success === true && response.channel_id === channel.channelId && response.user_id !== cookies.userID) 
+            if (response.success && response.channel_id == channel.channelId && response.user_id != cookies.userID) 
                 setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success === true)
+            if (response.success)
                 console.log(`socket.on channel_leave success current_id ${channel.channelId} affected_id ${response.channel_id}`);
-            else if (response.success === false) 
+            else 
                 console.log(`socket.on channel_leave fail ${response.msg}`);
         });
 
         socket.on("channel_join", response => {
             // if we are looking at the channel where a new user joins we want to update the channel
-            if (response.success === true && response.channel_id === channel.channelId)
+            if (response.success && response.channel_id == channel.channelId)
                 setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success === true)
+            if (response.success)
                 console.log(`socket.on channel_join success current_id ${channel.channelId} affected_id ${response.channel_id}`);
-            else if (response.success === false)
+            else 
                 console.log(`socket.on channel_join fail ${response.msg}`);
         })
 
         socket.on("channel_promote", response => {
             // if we are looking at the channel where a user got promoted we want to update the channel
-            if (response.success === true && channel.channelId === response.channel_id)
+            if (response.success && channel.channelId == response.channel_id)
                 setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success === true)
+            if (response.success )
                 console.log(`socket.on channel_promote success channel_id ${response.channel_id}`);
-            else if (response.success === false) 
+            else
                 console.log(`socket.on channel_promote fail ${response.msg}`);
         })
 
         socket.on("channel_demote", response => {
             // if we are looking at the channel where a user got demoted we want to update the channel
-            if (response.success === true && channel.channelId === response.channel_id)
+            if (response.success && channel.channelId == response.channel_id)
                 setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success === true)
+            if (response.success)
                 console.log(`socket.on channel_demote success channel_id ${response.channel_id}`);
-            else if (response.success === false) 
+            else 
                 console.log(`socket.on channel_demote fail ${response.msg}`);
         })
 
         socket.on("channel_ban", response => {
             // if we are looking at the channel where a user got banned and we are NOT the banned user we want to update the channel
-            if (response.success === true && channel.channelId === response.channel_id && response.affected_id !== cookies.userID)
+            if (response.success  && channel.channelId == response.channel_id && response.affected_id != cookies.userID)
                 setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success === true)
+            if (response.success)
                 console.log(`socket.on channel_ban success channel_id ${response.channel_id} banned_id ${response.affected_id}`);
-            else if (response.success === false) 
+            else 
                 console.log(`socket.on channel_ban fail ${response.msg}`);
         })
 
         socket.on("channel_mute_user", response => {
             // if we are looking at the channel where a user got banned and we are the muted user, we want to update the channel
-            if (response.success === true && channel.channelId === response.channel_id && response.affected_id === cookies.userID)
+            if (response.success && channel.channelId == response.channel_id && response.affected_id == cookies.userID)
                 setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success === true)
+            if (response.success)
                 console.log(`socket.on channel_mute_user success channel_id ${response.channel_id}`);
-            else if (response.success === false) 
+            else  
                 console.log(`socket.on channel_mute_user fail ${response.msg}`);
         })
 

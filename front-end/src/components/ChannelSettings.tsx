@@ -132,9 +132,9 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
             {channel.users.map((element, index) => (
                 <li key={index} className="listMembers">
                     <span onClick={(e) => toggleSettings(e, element.userId)}>
-					{element.name} 
+					{element.name}
                     {
-                        element.userId === channel.owner &&
+                        element.userId == channel.owner &&
                         <TbCrown />
                     }
                     {

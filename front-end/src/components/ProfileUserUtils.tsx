@@ -162,14 +162,29 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const socket = useContext(SocketContext);
 
+    console.log(`profile of ` + user.name);
 
     // useEffect on mount check if user is a friend/blocked
     useEffect(() => {
-        const retFriend = user.friends.find((e) => cookies.userID === e.IUser.userId && e.confirmed === true);
-        const retBlocked = user.blocked.find((e) => cookies.user === e.userId)
+
+        const retFriend = user.friends.find((e) => cookies.userID == e.IUser.userId && e.confirmed == true);
+        const retBlocked = user.blocked.find((e) => cookies.userID == e.userId)
+        
+        /*
+            in order to check wether or not a user we are looking at is blocked by current user
+            we need to check the user object of current user
+            either we grab it again or make a global
+        */
+       
+        // console.log(`useEffect profile of ` + user.name);
+        // user.blocked.forEach((e) => {
+        //     console.log(user.name + " has " + e.name + " blocked ");
+        // });
+        // console.log(retBlocked);
+
         setIsBlocked(isBlocked => retBlocked === undefined);
         setIsFriend(isFriend => retFriend === undefined);
-    }, [])
+    }, [user])
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -193,6 +208,28 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         console.log(`emitting un_friend`);
     }
 
+    const blockUser = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "block_user",
+            data: {user_id: cookies.userID, blocked_id: user.userId}
+        })
+        console.log(`emitting block_user`);
+    }
+
+    const unblockUser = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "unblock_user",
+            data: {user_id: cookies.userID, blocked_id: user.userId}
+        })
+        console.log(`emitting unblock_user`);
+    }
+
     return (
         <>  
             <button className='profileButton'>Invite to Pong</button> 
@@ -201,11 +238,11 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 <button className='profileButton' onClick={(e) => addFriend(e)}>Add Friend</button> :
                 <button className='profileButton' onClick={(e) => removeFriend(e)}>Remove Friend</button> 
             }
-            {
+            {/* {
                 isBlocked ?
-                <button className='profileButton'>block</button> :
-                <button className='profileButton'>unblock</button> 
-            }
+                <button className='profileButton' onClick={(e) => blockUser(e)}>block</button> :
+                <button className='profileButton' onClick={(e) => unblockUser(e)}>unblock</button> 
+            } */}
         </>
     )
 }

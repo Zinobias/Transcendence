@@ -15,6 +15,7 @@ const Profile: React.FC = () => {
     // event listeners
     useEffect(() => {
         socket.on("get_user", response => {
+            console.log("search params " + searchParams.get("id"));
             if (response.success && response.user.userId == Number(searchParams.get("id"))) {
                 console.log("get_user success profile");
                 setUser(user => response.user);
@@ -24,7 +25,7 @@ const Profile: React.FC = () => {
         return () => {
             socket.off("get_user");
         }
-    }, [])
+    }, [searchParams])
 
     useEffect(() => {
         if (searchParams.get("id")) {
@@ -41,16 +42,20 @@ const Profile: React.FC = () => {
         }
     }, [searchParams]) 
 
-
-    return (
-        <div className='profile'>
-            {
-                user ?
-                <ProfileUser user={user} queryId={Number(searchParams.get("id"))}/> :
-                <p>User doest exist</p>
-            }
-        </div>
-    )
+    if (!user) {
+        return (
+            <div className='profile'>
+                    <p>User doest exist</p>
+            </div>
+        )
+    }
+    else {
+        return (
+            <div className='profile'>
+                    <ProfileUser user={user} queryId={Number(searchParams.get("id"))}/> 
+            </div>
+        )
+    }
 }
 
 export default Profile
