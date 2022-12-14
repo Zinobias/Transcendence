@@ -185,12 +185,12 @@ export enum MoveStatePaddle {
 		super('mushroom', GameConfig.DEFAULT_MUSHROOM_HEIGHT, GameConfig.DEFAULT_MUSHROOM_WIDTH);
 		this.onHit = (ball : Ball ) => {
 			if (ball.height < 32) {
-				ball.height += 32;
-				ball.width += 32;
+				ball.height = ball.height + 32;
+				ball.width = ball.width + 32;
 			}
 			else {
-				ball.height += 6;
-				ball.width += 6;
+				ball.height = ball.height + 6;
+				ball.width = ball.width + 6;
 			}
 			console.log(`MUSHROOM ONHIT FNC WIDTH ${ball.width} height ${ball.height}`);
 		}
