@@ -158,32 +158,65 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 
 export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const [cookies] = useCookies(['userID', 'user']);
+    const [me, setMe] = useState<IUser>();
     const [isFriend, setIsFriend] = useState<boolean>(false);
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const socket = useContext(SocketContext);
 
-    console.log(`profile of ` + user.name);
-
-    // useEffect on mount check if user is a friend/blocked
+    // get my own user profile to check on mount
     useEffect(() => {
+        socket.on("get_user", response => {
+            if (response.success && response.user.userId == cookies.userID) {
+                setMe(me => response.user);
+                setIsBlocked(isBlocked => !response.user.blocked.find((e : IUser) => user.userId == e.userId));
+            }
+        })
 
-        const retFriend = user.friends.find((e) => cookies.userID == e.IUser.userId && e.confirmed == true);
-        const retBlocked = user.blocked.find((e) => cookies.userID == e.userId)
-        
-        /*
-            in order to check wether or not a user we are looking at is blocked by current user
-            we need to check the user object of current user
-            either we grab it again or make a global
-        */
-       
-        // console.log(`useEffect profile of ` + user.name);
-        // user.blocked.forEach((e) => {
-        //     console.log(user.name + " has " + e.name + " blocked ");
-        // });
-        // console.log(retBlocked);
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "get_user", 
+            data: { user_id: cookies.userID, requested_user_id: cookies.userID }
+        });
 
-        setIsBlocked(isBlocked => retBlocked === undefined);
-        setIsFriend(isFriend => retFriend === undefined);
+        socket.on("block_user", response => {
+            if (response.success) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_user", 
+                    data: { user_id: cookies.userID, requested_user_id: cookies.userID }
+                });
+            }
+            else 
+                console.log(response.msg);
+        })
+
+        socket.on('unblock_user', response => {
+            if (response.success) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_user", 
+                    data: { user_id: cookies.userID, requested_user_id: cookies.userID }
+                });
+            }
+            else 
+                console.log(response.msg);
+
+        })
+
+        return () => {
+            socket.off("get_user");
+            socket.off('block_user');
+            socket.off('unblock_user');
+        }
+
+    }, [])
+    
+    // useEffect on mount/change to check if user is a friend/blocked
+    useEffect(() => {
+        setIsFriend(isFriend => !user.friends.find((e) => cookies.userID == e.IUser.userId && e.confirmed == true));
     }, [user])
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -238,11 +271,11 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 <button className='profileButton' onClick={(e) => addFriend(e)}>Add Friend</button> :
                 <button className='profileButton' onClick={(e) => removeFriend(e)}>Remove Friend</button> 
             }
-            {/* {
+            {
                 isBlocked ?
                 <button className='profileButton' onClick={(e) => blockUser(e)}>block</button> :
                 <button className='profileButton' onClick={(e) => unblockUser(e)}>unblock</button> 
-            } */}
+            }
         </>
     )
 }

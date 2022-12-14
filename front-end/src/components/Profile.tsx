@@ -15,7 +15,7 @@ const Profile: React.FC = () => {
     // event listeners
     useEffect(() => {
         socket.on("get_user", response => {
-            console.log("search params " + searchParams.get("id"));
+            // console.log("search params " + searchParams.get("id"));
             if (response.success && response.user.userId == Number(searchParams.get("id"))) {
                 console.log("get_user success profile");
                 setUser(user => response.user);

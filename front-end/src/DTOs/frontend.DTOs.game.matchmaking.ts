@@ -69,3 +69,8 @@ export interface IEntity {
 	width 			: number,
 	type			: string,
 };
+
+export interface IGameScore {
+	player1Score : number,
+	player2Score : number,
+}

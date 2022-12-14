@@ -279,12 +279,12 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user');
             return;
         }
-        const toBlock: User = await this.util.getUser(data.user_id, 'unblock_user');
-        if (toBlock == undefined) {
+        const unBlock: User = await this.util.getUser(data.blocked_id, 'unblock_user');
+        if (unBlock == undefined) {
             this.util.emitFailedObject(data.user_id, 'unblock_user', 'Unable to retrieve user to block');
             return;
         }
-        if (!user.hasBlocked(toBlock)) {
+        if (!user.hasBlocked(unBlock)) {
             this.util.emitFailedObject(data.user_id, 'unblock_user', `You don't have this user blocked`);
             return;
         }
@@ -292,7 +292,7 @@ export class RetrieveUserDataEventPatterns {
             data.user_id,
             data.blocked_id
         );
-        user.unblock(toBlock)
+        user.unblock(unBlock)
         this.util.notify([data.user_id], 'unblock_user', {
             success: true,
             msg: undefined
