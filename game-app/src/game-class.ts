@@ -1,4 +1,4 @@
-import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle, PaddleGameData} from "./game-objects/game-object-interfaces";
+import { PlayerData, Entity, Ball , GameResult, PlayerPaddle, MoveStatePaddle, PaddleGameData, powerUpMushroom, powerUpPepper, IRectangle} from "./game-objects/game-object-interfaces";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import {GameConfig, Direction} from "./enums" ;
 import { GameFrameUpdateEvent, GameEndedData, MoveStateEvent } from "./event-objects/events.objects";
@@ -6,6 +6,7 @@ import { ClientProxy } from "@nestjs/microservices";
 import { Logger } from "@nestjs/common";
 import { Vec2 } from "./vectorLib/vector-lib";
 import { IEntity, IVec2 } from "./dto/frontend.DTOs";
+import { getRandomInt } from "./utils";
 
 const logger = new Logger('random game instance');
 
@@ -18,6 +19,7 @@ export class Game {
 	private results 			: GameResult;
 	private _player1Serves		: Boolean;
 	private	_toServe			: Boolean;
+	private _set				: IRectangle[];
 
 	constructor(
 			private eventEmitter		: EventEmitter2,
@@ -34,6 +36,7 @@ export class Game {
 			uid	 : playersUIDs[1],
 			score : 0,
 		};
+		this._set = [];
 		this.playerPaddles = [];
 		this.entities = [];
 		this.playerPaddles.push( {uid : this.player1.uid, playerPaddle : new PlayerPaddle(1)});
@@ -170,6 +173,23 @@ export class Game {
 			return (false);
 	}
 
+	private removeEntity (ent : Entity) : void {
+		const setIndex = this._set.findIndex((e) => {
+			return (e.pos.x == ent.pos.x && e.pos.y == ent.pos.y);
+		});
+		if (setIndex !== -1)
+			this.entities.splice(setIndex, 1);
+		logger.debug('RemovingEntity from the set');
+
+		const entityArrayIndex = this.entities.findIndex((e) => {
+			return ((e.pos.x == ent.pos.x && e.pos.y == ent.pos.y) && e.type != 'ball');
+		});
+
+		if (entityArrayIndex !== -1)
+			this.entities.splice(entityArrayIndex, 1);
+		logger.debug(`RemovingEntity from the entities array, successfull : [${(setIndex !== -1 && entityArrayIndex !== -1) ? true : false}]`);
+		return ;
+	}
 	/**
 	 * Goes through all entities to see if they collide with the ball.
 	 * on collission calls the corresponding onhit method of the Entity class.
@@ -183,17 +203,101 @@ export class Game {
 				if (entity.onHit) {
 					logger.log(`intersection with ${entity.type}`);
 					entity.onHit(this.ball);
+					if (entity.toDelete === true) {
+						logger.debug(`ToDelete is true for object ${entity.type}`);
+						this.removeEntity(entity);
+						logger.debug(`Deleted object`);
+					}
 				}
 		}
 	}
 
+	/**
+	 * Converts entity to IRectangle.
+	 */
+	private static EntityToIRectangle(e : Entity) : IRectangle{
+		return ({
+			width : e.width,
+			height : e.height,
+			pos : Game.IVec2Constructor(e.pos)!,
+		});
+	}
+
+		/**
+	 * Converts entity to IRectangle.
+	 */
+		private static IRectangleConstructor(width : number, height : number, pos : IVec2) : IRectangle{
+		return ({
+			width : width,
+			height : height,
+			pos : pos,
+		});
+	}
+
+	private	calculateRectangleIntersection(rect1 : IRectangle, rect2 : IRectangle) : Boolean {
+		if (
+			!(rect1.pos.x - rect1.width 	/ 2	>= rect2.pos.x + rect2.width  / 2) 	&& 	
+			!(rect1.pos.x + rect1.width 	/ 2 <= rect2.pos.x - rect2.width  / 2) 	&& 	
+			!(rect1.pos.y - rect1.height 	/ 2 >= rect2.pos.y + rect2.height / 2) 	&& 
+			!(rect1.pos.y + rect1.height 	/ 2 <= rect2.pos.y - rect2.height / 2))
+			return true;
+		else 
+			return (false);
+	}
+
+	private getAvailableEntityPosition(type : string) : IVec2 {
+		let isAvailable : boolean = false;
+		let entityPosition : IVec2;
+		let entitySize : {
+			width : number,
+			height : number,
+		};
+		if (type === 'mushroom') 
+			entitySize = {width : GameConfig.DEFAULT_MUSHROOM_WIDTH, height : GameConfig.DEFAULT_MUSHROOM_HEIGHT};
+		else if (type === 'pepper')
+			entitySize = {width : GameConfig.DEFAULT_PEPPER_WIDTH, height : GameConfig.DEFAULT_PEPPER_HEIGHT};
+
+		while (isAvailable === false) {
+			entityPosition = {
+				x : getRandomInt((-(GameConfig.BOARD_WIDTH / 2) + GameConfig.PADDLE_WIDTH + 14) + entitySize!.width / 2, ((GameConfig.BOARD_WIDTH / 2) - GameConfig.PADDLE_WIDTH - 14) - entitySize!.width / 2),
+				y : getRandomInt(-(GameConfig.BOARD_HEIGHT / 2) + entitySize!.height / 2, (GameConfig.BOARD_HEIGHT / 2) - entitySize!.height / 2),
+			};
+			isAvailable = this._set.find((e) => {
+				return (this.calculateRectangleIntersection(e, {
+					width : entitySize.width, 
+					height : entitySize.height,
+					pos : entityPosition,
+				}));
+			}) !== undefined;
+		}
+		return (entityPosition!);
+	}
+
+	private generatePowerUps() {
+		const powerUpPicker  : number = getRandomInt(1, 2);
+		let newEntityPos : IVec2;
+		let newEntity : Entity;
+		if (powerUpPicker == 1) {
+			newEntityPos = this.getAvailableEntityPosition('mushroom');
+			newEntity = new powerUpMushroom(newEntityPos);
+		}
+		else {
+			newEntityPos = this.getAvailableEntityPosition('pepper')
+			newEntity = new powerUpPepper(newEntityPos);
+		}
+		this._set.push(Game.EntityToIRectangle(newEntity));
+		this.entities.push(newEntity);
+		logger.debug(`Generated powerUp of type ${newEntity.type}`);
+	}
 	/**
 	 * Basic gameloop.
 	 */
 	private async loop() {
 		let loopState : Boolean = true;
 		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-		
+		let powerUptimer : number = 0; // time since last powerup
+		let powerUpInterval : number = 5000; // every 5 seconds
+		logger.debug(`GameMode for new gameInstance is : ${this.gameMode}`);
 
 		while (loopState === true) {
 			if (this._toServe === true)
@@ -202,6 +306,11 @@ export class Game {
 			this.moveBall(); // move ball
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
+			if (this.gameMode === 'DISCOPONG' && powerUptimer === 5000) {
+			logger.debug(`Generating a powerUp`);
+				this.generatePowerUps();
+				powerUptimer = 0;
+			}
 			/*
 			steps :
 			1. Serve the ball if neccessary. Or move ball.
@@ -209,7 +318,6 @@ export class Game {
 			3. Check for intersections.
 			4. Transmit frameData to frontend to render.
 			5. loop.
-			
 			*/
 			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
 			this.eventEmitter.emit('game.frame.update',
@@ -219,6 +327,7 @@ export class Game {
 			}),
 			);
 			await sleep(3.33);
+			powerUptimer += 3.33;
 			if (this.player1.score === 11 || this.player2.score === 11)
 				loopState = false;
 		}

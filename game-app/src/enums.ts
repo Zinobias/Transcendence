@@ -24,11 +24,16 @@ export enum GameConfig {
     DEFAULT_BALL_SPEED      = 1                        * GAME_SCALAR, // max 7
     DEFAULT_BALL_MAX_SPEED  = DEFAULT_BALL_SPEED * 7   * GAME_SCALAR, // in either direction.
     DEFAULT_BALL_INCREMENT  = 1                        * GAME_SCALAR,
+
+	DEFAULT_MUSHROOM_HEIGHT = 14					   * GAME_SCALAR,
+	DEFAULT_MUSHROOM_WIDTH  = 14					   * GAME_SCALAR,
+	DEFAULT_PEPPER_HEIGHT   = 28					   * GAME_SCALAR,
+	DEFAULT_PEPPER_WIDTH    = 8					 	   * GAME_SCALAR,
 }
 
 // height 28 pixels
 // move 4 pixels per movement
-// Tics at 1/30 second
+// Tics at 1/300 second
 
 /* on hit of paddle, 
     moves in opposite x direction.

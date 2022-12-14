@@ -1,6 +1,7 @@
 import { Vec2 } from "../vectorLib/vector-lib";
 import {GameConfig, Direction} from "../enums" ;
 import { getRandomInt } from "../utils";
+import { IVec2 } from "src/dto/frontend.DTOs";
 
 // Colors in R G B
 export class Color {
@@ -31,7 +32,8 @@ export class Color {
  * Simple abstract class to form the base of any type of entity.
  */
 export abstract class Entity {
-	public		onHit?(ball : Ball) : void; 
+	public		onHit?(ball : Ball) : void;
+	public		toDelete			: boolean;
 	protected 	_pos 				: Vec2;
 	protected	_velocityVector? 	: Vec2;
 	private		_type 				: string;
@@ -51,6 +53,7 @@ export abstract class Entity {
 		if (width && height)
 			[this._width, this._height] = [width, height];
 		this._pos = new Vec2();
+		this.toDelete = false;
 	}
 
 	// ------------------------------------------------------------------------------------------------
@@ -85,7 +88,7 @@ export class Ball extends Entity {
 	private _color : Color;
 
 	constructor () {
-		super("ball", GameConfig.DEFAULT_BALL_RADIUS,GameConfig.DEFAULT_BALL_RADIUS);
+		super("ball", GameConfig.DEFAULT_BALL_RADIUS, GameConfig.DEFAULT_BALL_RADIUS);
 		this._color = new Color(211, 211, 211);
 		this.velocityVector = new Vec2(1, 0);
 		[this.pos.x, this.pos.y] = [0, 0];
@@ -170,4 +173,49 @@ export enum MoveStatePaddle {
 	keyReleaseUp 	= 1,
 	keyPressDown 	= 2,
 	keyReleaseDown 	= 3,
+}
+
+/**
+ * MushroomPowerUp
+ * Increases the ball size.
+ */
+ export class powerUpMushroom extends Entity {
+
+	constructor(v2 : IVec2) {
+		super('mushroom', GameConfig.DEFAULT_MUSHROOM_HEIGHT, GameConfig.DEFAULT_MUSHROOM_WIDTH);
+		this.onHit = (ball : Ball ) => {
+			if (ball.height < 32) {
+				ball.height += 4;
+				ball.width += 4;
+			}
+			else {
+				ball.height += 1;
+				ball.width += 1;
+			}
+		}
+		this._pos.x = v2.x;
+		this._pos.y = v2.y;
+		this.toDelete = true;
+	}
+}
+
+/**
+ * Pepper powerUp 
+ * Increases the ball velocity.
+ */
+ export class powerUpPepper extends Entity {
+
+	constructor(v2 : IVec2) {
+		super('pepper', GameConfig.DEFAULT_PEPPER_HEIGHT, GameConfig.DEFAULT_PEPPER_WIDTH);
+		this.onHit = (ball : Ball ) => {
+			ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.2 : 0.2;
+		}
+		this.toDelete = true;
+	}
+}
+
+export interface IRectangle {
+	pos : IVec2,
+	width : number,
+	height : number,
 }
