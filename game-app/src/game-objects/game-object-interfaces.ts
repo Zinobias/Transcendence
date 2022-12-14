@@ -209,8 +209,8 @@ export enum MoveStatePaddle {
 	constructor(v2 : IVec2) {
 		super('pepper', GameConfig.DEFAULT_PEPPER_HEIGHT, GameConfig.DEFAULT_PEPPER_WIDTH);
 		this.onHit = (ball : Ball ) => {
-			if (ball.velocityVector!.x + 0.2 <= GameConfig.DEFAULT_BALL_RADIUS)
-				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.6 : 0.6;
+			if (ball.velocityVector!.x + 0.4 <= GameConfig.DEFAULT_BALL_RADIUS)
+				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.4 : 0.4;
 
 		}
 		this.toDelete = true;
