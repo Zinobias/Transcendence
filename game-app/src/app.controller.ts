@@ -460,16 +460,26 @@ export class AppController {
 		const res = await this.queries.getUserGameHistory(payload.userId);
 
 		this.logger.debug(`Retrieved the matchistory for user ${payload.userId}, res val : ${res}.`)
-		if (res === undefined)
-			return ({event : 'game.user.get.history', data : {
-				success : 	false,
-				msg		: `Retrieving user match history failed [${res}]`
-			}});
-		else
-			return ({event : 'game.user.get.history', data : {
-				success : true,
-				msg		: `Retrieving user match history succeeded : [${res}]`,
-				history : res,
-			}});
+		if (res === undefined) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.user.get.history',
+				userIds : [payload.userId],
+				data : {
+					success : 	false,
+					msg		: `Retrieving user match history failed [${res}]`
+				}
+			})
+		}
+		else {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.user.get.history',
+				userIds : [payload.userId],
+				data : {
+					success : true,
+					msg		: `Retrieving user match history succeeded : [${res}]`,
+					history : res,
+				}
+			})
+		}
 	}
 }
