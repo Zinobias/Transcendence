@@ -275,7 +275,7 @@ export class Game {
 	}
 
 	private generatePowerUps() {
-		const powerUpPicker  : number = getRandomInt(1, 2);
+		const powerUpPicker  : number = getRandomInt(0, 2);
 		let newEntityPos : IVec2;
 		let newEntity : Entity;
 		if (powerUpPicker == 1) {
