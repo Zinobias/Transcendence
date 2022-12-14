@@ -153,6 +153,7 @@ export class Game {
 		logger.log("serving ball");
 		this._toServe = false;
 		[this.ball.pos.x, this.ball.pos.y] = [0, 0];
+		[this.ball.height, this.ball.width] = [GameConfig.DEFAULT_BALL_RADIUS, GameConfig.DEFAULT_BALL_RADIUS];
 		if (this.ball.velocityVector) 
 			[this.ball.velocityVector.x, this.ball.velocityVector.y] = [this._player1Serves === true ? 1 : -1, 0];
 	}
