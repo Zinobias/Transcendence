@@ -307,8 +307,8 @@ export class Game {
 			this.moveBall(); // move ball
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
-			if (this.gameMode === 'DISCOPONG' && powerUptimer === 5000) {
-			logger.debug(`Generating a powerUp`);
+			if (this.gameMode == 'DISCOPONG' && powerUptimer == 5000) {
+				logger.debug(`Generating a powerUp`);
 				this.generatePowerUps();
 				powerUptimer = 0;
 			}
@@ -329,6 +329,7 @@ export class Game {
 			);
 			await sleep(3.33);
 			powerUptimer += 3.33;
+			logger.debug(`powerUptimer value : ${powerUptimer}`);
 			if (this.player1.score === 11 || this.player2.score === 11)
 				loopState = false;
 		}
