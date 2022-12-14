@@ -75,8 +75,6 @@ export abstract class Entity {
 	set pos(newPos : Vec2) { this._pos = newPos; }
 	set height(height : number) { this._height = height; }
 	set width(width : number) { this._width = width; }
-
-
 }
 
 /**
@@ -115,10 +113,18 @@ export class PlayerPaddle extends Entity {
 					ball.velocityVector.x *= -1.003; // 1.003
 				else
 					ball.velocityVector.x *= -1;
-				if (ball.velocityVector.y == 0)
+				if (ball.velocityVector.y == 0) // in case both players are not inputtin any actions and hit the paddle exactly on the middle.
 					ball.velocityVector.y =  getRandomInt(0, 12) % 2 === 0 ? -1 : 1;
-				if (ball.pos.y <= this._pos.y - (this.height / 4) || ball.pos.y >= this._pos.y + (this.height / 4) )
+				// --------------------------------------------
+				// Paddle segments.
+				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 1) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1.5 : 1.5;
+				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 2) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1.25 : 1.25;
+				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 3) )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1 : 1;
+				if (ball.pos.y <= this._pos.y - (this.height / 4) || ball.pos.y >= this._pos.y + (this.height / 4) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -.75 : .75;
 				else if (ball.pos.y <= this.pos.y || ball.pos.y >= this.pos.y )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -0.5 : 0.5;
 			}
