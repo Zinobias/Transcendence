@@ -73,8 +73,8 @@ export abstract class Entity {
 	// Setters
 	set velocityVector(newVelocityVector : Vec2 | undefined) { this._velocityVector = newVelocityVector instanceof Vec2 ? new Vec2(newVelocityVector.x, newVelocityVector.y) : undefined; }
 	set pos(newPos : Vec2) { this._pos = newPos; }
-	set height(height : number) { this._height = this.height; }
-	set width(width : number) { this._width = this.width; }
+	set height(height : number) { this._height = height; }
+	set width(width : number) { this._width = width; }
 
 
 }
@@ -185,12 +185,12 @@ export enum MoveStatePaddle {
 		super('mushroom', GameConfig.DEFAULT_MUSHROOM_HEIGHT, GameConfig.DEFAULT_MUSHROOM_WIDTH);
 		this.onHit = (ball : Ball ) => {
 			if (ball.height < 32) {
-				ball.height = ball.height + 32;
-				ball.width = ball.width + 32;
+				ball.height += 32;
+				ball.width +=  32;
 			}
 			else {
-				ball.height = ball.height + 6;
-				ball.width = ball.width + 6;
+				ball.height +=  6;
+				ball.width += 6;
 			}
 			console.log(`MUSHROOM ONHIT FNC WIDTH ${ball.width} height ${ball.height}`);
 		}
