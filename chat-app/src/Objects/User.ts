@@ -1,13 +1,17 @@
-import {Friend, IFriend} from './Friend';
+import {Friend} from './Friend';
 import {Queries} from '../Database/Queries';
-import {Logger} from '@nestjs/common';
 
 export interface IUser {
     userId: number;
     name: string;
     avatar: any;
-    blocked: IUser[];
-    friends: IFriend[];
+    blocked: SmallUser[];
+    friends: SmallUser[];
+}
+
+export interface SmallUser {
+    userId: number;
+    name: string;
 }
 
 export class User {
@@ -117,13 +121,17 @@ export class User {
         this._friends = await Queries.getInstance().getFriends(this._userId, true);
     }
 
+    private getSmallUser(): SmallUser {
+        return {userId: this.userId, name: this.name}
+    }
+
     public getIUser(): IUser {
         return {
             userId: this.userId,
             name: this.name,
             avatar: this.avatar,
-            blocked: this.blocked.map(blocked => blocked.getIUser()),
-            friends: this.friends.map(friend => friend.getIFriend())
+            blocked: this.blocked.map(blocked => blocked.getSmallUser()),
+            friends: this.friends.map(friend => friend.getSmallUser())
         }
     }
 }
