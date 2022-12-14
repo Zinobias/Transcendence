@@ -143,12 +143,17 @@ export class AppController {
 	@EventPattern("game.join.queue")
 	joinMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
 		this.logger.log("User : {" + payload.userId + "} has joined the matchmaking queue for : " + payload.gameMode);
-		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false)
-		return ({event : 'game.join.queue', data : {
-			success : false,
-			msg		: `gameMode in payload is invalid : [${payload.gameMode}]`
-		}});
+		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+			eventPattern : 'game.join.queue',
+			userIds		: [payload.userId],
+			data		: {
+				success : false,
+				msg		: `gameMode in payload is invalid : [${payload?.gameMode}]`
+			},
+		});
 
+		}
 		if (this.matchMakingService.isInGame(payload.userId) === true) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds 		: [payload.userId],
@@ -419,21 +424,31 @@ export class AppController {
 	 * @returns see dto file for interface
 	 */
 	@EventPattern('game.get.leaderboard')
-	async getLeaderBoard() {
+	async getLeaderBoard(@Payload() payload : any) {
 		const res = await this.queries.getLeaderboard();
 
 		this.logger.debug(`Retrieved the leaderboard ${res}.`)
-		if (res === undefined)
-			return ({event : 'game.get.leaderboard', data : {
-				success : 	false,
-				msg		: `Retrieving leaderboard failed [${res}]`
-			}});
-		else
-			return ({event : 'game.get.leaderboard', data : {
-				success 	: true,
-				msg			: `Retrieving leaderboard succeeded : [${res}]`,
-				leaderboard : res,
-			}});
+		if (res === undefined) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.get.leaderboard',
+				userIds : [payload.userId],
+				data : {
+					success : 	false,
+					msg		: `Retrieving leaderboard failed [${res}]`
+				}
+			})
+		}
+		else {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.get.leaderboard',
+				userIds : [payload.userId],
+				data : {
+					success : 	true,
+					msg			: `Retrieving leaderboard succeeded : [${res}]`,
+					leaderboard : res,
+				}
+			})
+		}
 	}
 
 	/**
