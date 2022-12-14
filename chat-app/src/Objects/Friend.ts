@@ -1,4 +1,4 @@
-import {IUser, User} from './User';
+import {IUser, SmallUser, User} from './User';
 
 export interface IFriend {
     IUser: IUser;
@@ -26,5 +26,9 @@ export class Friend extends User {
             IUser: this.getIUser(),
             confirmed: this._confirmed
         }
+    }
+
+    public getSmallFriend(): SmallUser {
+        return {userId: this.userId, name: this.name, state: this._confirmed}
     }
 }

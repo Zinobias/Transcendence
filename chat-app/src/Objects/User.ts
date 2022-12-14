@@ -12,6 +12,7 @@ export interface IUser {
 export interface SmallUser {
     userId: number;
     name: string;
+    state: boolean;
 }
 
 export class User {
@@ -122,7 +123,7 @@ export class User {
     }
 
     private getSmallUser(): SmallUser {
-        return {userId: this.userId, name: this.name}
+        return {userId: this.userId, name: this.name, state: true}
     }
 
     public getIUser(): IUser {
@@ -131,7 +132,7 @@ export class User {
             name: this.name,
             avatar: this.avatar,
             blocked: this.blocked.map(blocked => blocked.getSmallUser()),
-            friends: this.friends.map(friend => friend.getSmallUser())
+            friends: this.friends.map(friend => friend.getSmallFriend())
         }
     }
 }
