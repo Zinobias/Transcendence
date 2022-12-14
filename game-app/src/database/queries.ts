@@ -29,7 +29,7 @@ export class Queries {
 		.from(DBGameResult, 'game_result')
 		.addGroupBy('game_result.winnerId')
 		.execute()
-		.catch((e) => this.logger.warn(`Inserting gameResult into DB went wrong. error msg : ${e}`));
+		.catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
 
 		this.logger.warn(`RESULT is ${res}`);
 		return (res);
