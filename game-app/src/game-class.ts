@@ -307,7 +307,7 @@ export class Game {
 			this.moveBall(); // move ball
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
-			if (this.gameMode == 'DISCOPONG' && powerUptimer == 5000) {
+			if (this.gameMode === 'DISCOPONG' && powerUptimer >= 5000) {
 				logger.debug(`Generating a powerUp`);
 				this.generatePowerUps();
 				powerUptimer = 0;
