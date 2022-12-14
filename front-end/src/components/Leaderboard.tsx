@@ -28,17 +28,18 @@ const   Leaderboard: React.FC = () => {
         socket.on("game.get.leaderboard", response => {
             if (response.success) {
                 console.log("socket.on game.get.leaderboard success");
-
                 // need to translate all the id's to names to display it
                 response.leaderboard.forEach((e : any) => {
-                    setLeaderboard([...leaderboard, {id: e.winnerId, count: e.count}]);
+                    setLeaderboard(leaderboard => [...leaderboard, {id: e.winnerId, count: e.count}]);
+                    // console.log(e);
+                    
                     socket.emit("chat", {
                         userId: cookies.userID,
                         authToken: cookies.user,
                         eventPattern: "get_user", 
                         data: { user_id: cookies.userID, requested_user_id: e.winnerId }
                     });
-                    console.log(e);
+
                 });
             }
             else 
@@ -53,10 +54,8 @@ const   Leaderboard: React.FC = () => {
     // listener to update the name in the leaderboard array
     useEffect(() => {
         socket.on("get_user", response => {
-            if (response.success) {
+            if (response.success) 
                 setLeaderboard(leaderboard.map((entry) => (entry.id == response.user.userId ? {...entry, name: response.user.name} : entry)));
-                console.log(response.user.name);
-            }
         })
 
         return () => {

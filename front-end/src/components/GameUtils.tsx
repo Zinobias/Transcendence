@@ -31,7 +31,7 @@ export const DefaultMatchmaking: React.FC = () => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.join.queue", 
-            data: { userId: cookies.userID, gameMode: "DEFAULT" }
+            data: { userId: cookies.userID, gameMode: "DISCOPONG" }
         });
         console.log(`socket.emit game.join.queue default`);
     };

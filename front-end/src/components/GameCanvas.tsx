@@ -138,8 +138,8 @@ const GameCanvas : React.FC<Props> = ({gameId}) => {
         socket.on(`game.frame.update.` + gameId, response => {
             setEntities([]);
             // console.log("--- ENTITIES ---");
+            // console.log(response);
             response.forEach((element : IEntity) => {
-                // console.log(element);
                 setEntities(entities => [...entities, element]);
             });
             // console.log("socket.on game.frame.update");

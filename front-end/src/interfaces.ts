@@ -33,15 +33,15 @@ export interface IUser {
     userId: number;
     name: string;
     avatar: any;
-    blocked: IUser[];
-    friends: IFriend[];
+    blocked: SmallUser[];
+    friends: SmallUser[];
 }
 
-export interface IFriend {
-    IUser: IUser;
-    confirmed: boolean;
+export interface SmallUser {
+    userId: number;
+    name: string;
+    state: boolean;
 }
-
 export interface IMessage {
     message: string;
     sender: number;

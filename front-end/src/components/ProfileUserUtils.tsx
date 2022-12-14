@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
-import { IUser } from '../interfaces';
+import { IUser, SmallUser } from '../interfaces';
 import { SocketContext } from './Socket';
 
 interface Props {
@@ -168,7 +168,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
                 setMe(me => response.user);
-                setIsBlocked(isBlocked => !response.user.blocked.find((e : IUser) => user.userId == e.userId));
+                setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
             }
         })
 
@@ -216,7 +216,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     
     // useEffect on mount/change to check if user is a friend/blocked
     useEffect(() => {
-        setIsFriend(isFriend => !user.friends.find((e) => cookies.userID == e.IUser.userId && e.confirmed == true));
+        setIsFriend(isFriend => !user.friends.find((e) => cookies.userID == e.userId && e.state == true));
     }, [user])
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

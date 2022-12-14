@@ -56,11 +56,11 @@ const Friendslist: React.FC<Props> = ({user}) => {
             {user.friends.map((element, index) => (
                 <div key={index} className="friendInvite">
                 {
-                    element.confirmed == false &&
+                    element.state == false &&
                     <>
-                        <p><b>{element.IUser.name} {element.IUser.userId}</b> send you a friend request</p>
-                        <button className="friendslistButton" onClick={(event) => handleAccept(event, element.IUser.userId)}>Accept</button>
-                        <button className="friendslistButton" onClick={(event) => handleDecline(event, element.IUser.userId)}>Decline</button>
+                        <p><b>{element.name} {element.userId}</b> send you a friend request</p>
+                        <button className="friendslistButton" onClick={(event) => handleAccept(event, element.userId)}>Accept</button>
+                        <button className="friendslistButton" onClick={(event) => handleDecline(event, element.userId)}>Decline</button>
                     </>
                 }
                 </div>
@@ -68,11 +68,10 @@ const Friendslist: React.FC<Props> = ({user}) => {
             <p><b>Friendslist:</b></p>
             {user.friends.map((e, index) => (
                 <div key={index} className="friendslist">
-                    <p>{e.IUser.name} {e.confirmed}</p>
-                    {/* <li className="friendslist">{e.IUser.name} {e.confirmed}</li> */}
+                    <p>{e.name} {e.state}</p>
                     {/* {
-                        e.confirmed &&
-                        <li key={e.IUser.userId} className="friendslist">{e.IUser.name}</li>
+                        e.state &&
+                        <li key={e.userId} className="friendslist">{e.name}</li>
                     } */}
                 </div>
             ))}
