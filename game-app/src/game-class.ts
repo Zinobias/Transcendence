@@ -269,7 +269,7 @@ export class Game {
 					height : entitySize.height,
 					pos : entityPosition,
 				}));
-			}) !== undefined;
+			}) === undefined;
 			logger.warn(`IN THE getAvailableEntityPosition LOOP`);
 		}
 		return (entityPosition!);
