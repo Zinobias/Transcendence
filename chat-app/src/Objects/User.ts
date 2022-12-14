@@ -124,7 +124,7 @@ export class User {
             name: this.name,
             avatar: this.avatar,
             blocked: this.blocked.map(blocked => blocked.getIUser()),
-            friends: this.friends.map(blocked => blocked.getIFriend())
+            friends: this.friends.map(friend => friend.getIFriend())
         }
     }
 }
