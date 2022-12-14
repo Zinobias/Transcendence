@@ -13,7 +13,7 @@ export enum Direction {
 const GAME_SCALAR : number = 1;
 
 export enum GameConfig {
-	PADDLE_HEIGHT           = 28                       * GAME_SCALAR,
+	PADDLE_HEIGHT           = 42                       * GAME_SCALAR, //28
     PADDLE_STEP_SIZE        = 0.8                      * GAME_SCALAR,
     PADDLE_WIDTH            = 8                        * GAME_SCALAR,
 
