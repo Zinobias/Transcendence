@@ -23,7 +23,6 @@ export class User {
             return users[0];
         const user: User = await Queries.getInstance().getUser(userId);
         if (user === undefined) {
-            Logger.warn('Received request for user that does not exist in database.');
             return undefined;
         }
         return user;
