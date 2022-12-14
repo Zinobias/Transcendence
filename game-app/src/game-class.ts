@@ -179,13 +179,12 @@ export class Game {
 			return (e.pos.x == ent.pos.x && e.pos.y == ent.pos.y);
 		});
 		if (setIndex !== -1)
-			this.entities.splice(setIndex, 1);
+			this._set.splice(setIndex, 1);
 		logger.debug('RemovingEntity from the set');
 
 		const entityArrayIndex = this.entities.findIndex((e) => {
 			return ((e.pos.x == ent.pos.x && e.pos.y == ent.pos.y) && e.type != 'ball');
 		});
-
 		if (entityArrayIndex !== -1)
 			this.entities.splice(entityArrayIndex, 1);
 		logger.debug(`RemovingEntity from the entities array, successfull : [${(setIndex !== -1 && entityArrayIndex !== -1) ? true : false}]`);
