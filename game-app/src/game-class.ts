@@ -202,10 +202,10 @@ export class Game {
 			if (this.checkBallHit(entity) === true)
 				if (entity.onHit) {
 					logger.log(`intersection with ${entity.type}`);
-					logger.debug(`ball width before  ${entity.width} height ${entity.height}`);
+					logger.debug(`ball width before  ${this.ball.width} height ${this.ball.height}`);
 
 					entity.onHit(this.ball);
-					logger.debug(`ball width after  ${entity.width} height ${entity.height}`);
+					logger.debug(`ball width after  ${this.ball.width} height ${this.ball.height}`);
 					if (entity.toDelete === true) {
 						logger.debug(`ToDelete is true for object ${entity.type}`);
 						this.removeEntity(entity);
