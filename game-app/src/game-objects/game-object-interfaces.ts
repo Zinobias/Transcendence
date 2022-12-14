@@ -192,6 +192,7 @@ export enum MoveStatePaddle {
 				ball.height += 6;
 				ball.width += 6;
 			}
+			console.log(`MUSHROOM ONHIT FNC WIDTH ${ball.width} height ${ball.height}`);
 		}
 		this._pos.x = v2.x;
 		this._pos.y = v2.y;
@@ -209,7 +210,7 @@ export enum MoveStatePaddle {
 		super('pepper', GameConfig.DEFAULT_PEPPER_HEIGHT, GameConfig.DEFAULT_PEPPER_WIDTH);
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector!.x + 0.2 <= GameConfig.DEFAULT_BALL_RADIUS)
-				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.2 : 0.2;
+				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.6 : 0.6;
 
 		}
 		this.toDelete = true;
