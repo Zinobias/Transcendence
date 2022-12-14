@@ -270,6 +270,7 @@ export class Game {
 					pos : entityPosition,
 				}));
 			}) !== undefined;
+			logger.warn(`IN THE getAvailableEntityPosition LOOP`);
 		}
 		return (entityPosition!);
 	}
