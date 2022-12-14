@@ -329,7 +329,6 @@ export class Game {
 			);
 			await sleep(3.33);
 			powerUptimer += 3.33;
-			logger.debug(`powerUptimer value : ${powerUptimer}`);
 			if (this.player1.score === 11 || this.player2.score === 11)
 				loopState = false;
 		}
