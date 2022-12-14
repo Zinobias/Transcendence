@@ -119,11 +119,11 @@ export class PlayerPaddle extends Entity {
 				// Paddle segments.
 				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 1) )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1.5 : 1.5;
-				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 2) )
+				else if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 2) )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1.25 : 1.25;
-				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 3) )
+				else if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 3) )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1 : 1;
-				if (ball.pos.y <= this._pos.y - (this.height / 4) || ball.pos.y >= this._pos.y + (this.height / 4) )
+				else if (ball.pos.y <= this._pos.y - (this.height / 4) || ball.pos.y >= this._pos.y + (this.height / 4) )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -.75 : .75;
 				else if (ball.pos.y <= this.pos.y || ball.pos.y >= this.pos.y )
 					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -0.5 : 0.5;
