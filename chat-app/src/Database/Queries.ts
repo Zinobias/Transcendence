@@ -212,7 +212,7 @@ export class Queries {
 			const user = await User.getUser(result.userId);
 			if (user === undefined)
 				continue;
-			friendList.push(<Friend>user);
+			friendList.push(new Friend(user, accepted));
 		}
 		return friendList;
 	}
