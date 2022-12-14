@@ -9,7 +9,8 @@ import {
     ChannelJoin,
     ChannelKick,
     ChannelLeave,
-    ChannelMessage, ChannelMuteUser,
+    ChannelMessage,
+    ChannelMuteUser,
     ChannelPromote,
     ChannelRetrieve,
     ChannelsRetrieve,
@@ -498,6 +499,14 @@ export class ChannelEventPatterns {
             this.util.notify([data.user_id], 'channel_message', {
                 success: false,
                 msg: 'You are not a member of this channel',
+                message: undefined
+            });
+            return;
+        }
+        if (channel.hasSetting(data.user_id, SettingType.MUTED)) {
+            this.util.notify([data.user_id], 'channel_message', {
+                success: false,
+                msg: 'You are muted in this channel',
                 message: undefined
             });
             return;

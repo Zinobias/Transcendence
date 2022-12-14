@@ -131,6 +131,10 @@ export class Channel {
         return this._settings;
     }
 
+    public hasSetting(affectedId: number, settingType: SettingType) {
+        return this._settings.find((setting: Setting) => setting.affectedId == affectedId && setting.setting == settingType) != undefined;
+    }
+
     public addSetting(setting: Setting) {
         this._settings.push(setting);
     }
