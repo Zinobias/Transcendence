@@ -35,8 +35,8 @@ export class Queries {
 		const dataSource = await this.database.getDataSource();
 		const gameRepository = dataSource.getRepository(DBGameResult);
 
-		gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
-		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.'));
+		return (gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
+		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.')));
 	}
 
 	public async getGameId() {
