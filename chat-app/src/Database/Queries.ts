@@ -114,7 +114,12 @@ export class Queries {
 	 * Get a user from their login id
 	 * @param userId user id of the user
 	 */
+	private _user_list: User[] = [];
 	async getUser(userId: number): Promise<User> {
+		const foundUser = this._user_list.find((user) => user.userId == userId);
+		if (foundUser != null) {
+			return foundUser;
+		}
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
 		const findUser = await userRepository.findOneBy({ userId: userId });
@@ -125,7 +130,9 @@ export class Queries {
 			newVar = undefined;
 		else
 			newVar = await JSON.parse(findUser.avatar);
-		return new User(findUser.userId, findUser.userName, newVar); //TODO add avatar
+		const newUser = new User(findUser.userId, findUser.userName, newVar);
+		this._user_list.push(newUser);
+		return newUser; //TODO add avatar
 	}
 
 	//Blocked users table
