@@ -49,15 +49,15 @@ export class Queries {
 		// 		// winnerMap.set(winnerMap.get(Number(entry)),  + 1);
 		//
 		// }
-		// let res = await gameRepository.createQueryBuilder()
+		let res = await gameRepository.query("SELECT winnerId, COUNT(winnerId) GROUP BY winnerId");
 		// .select('game_result.winnerId, COUNT(game_result.winnerId)')
 		// .from(DBGameResult, 'game_result')
 		// .groupBy('game_result.winnerId')
 		// .execute()
 		// .catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
 
-		this.logger.warn(`RESULT is ${winnerMap}`);
-		return (winnerMap);
+		this.logger.warn(`RESULT is ${res}`);
+		return (res);
 	}
 
 	// {winnerId: userId, count : 72}
