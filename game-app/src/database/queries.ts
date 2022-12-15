@@ -26,22 +26,29 @@ export class Queries {
 
 		// let res = await gameRepository
 
-		let res  = await gameRepository.createQueryBuilder()
-		.select('game_result.winnerId')
-		.from(DBGameResult, 'game_result')
-		.execute()
-		.catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
 		let winnerMap : Map<number, number> = new Map();
-
-		for (let entry in res) {
-			if (winnerMap.has(Number(entry)))
-				winnerMap.set(Number(entry), winnerMap.get(Number(entry))! + 1);
-			else	
-				winnerMap.set(Number(entry), 1);
-			
-				// winnerMap.set(winnerMap.get(Number(entry)),  + 1);
-
+		for (const objectLiteral of await gameRepository.findBy({})) {
+			if (winnerMap.has(objectLiteral.winnerId))
+				winnerMap.set(objectLiteral.winnerId, winnerMap.get(objectLiteral.winnerId)! + 1);
+			else
+				winnerMap.set(objectLiteral.winnerId, 1);
 		}
+		// let res  = await gameRepository.createQueryBuilder()
+		// .select('game_result.winnerId')
+		// .from(DBGameResult, 'game_result')
+		// .execute()
+		// .catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
+		// let winnerMap : Map<number, number> = new Map();
+		//
+		// for (let entry in res) {
+		// 	if (winnerMap.has(Number(entry)))
+		// 		winnerMap.set(Number(entry), winnerMap.get(Number(entry))! + 1);
+		// 	else
+		// 		winnerMap.set(Number(entry), 1);
+		//
+		// 		// winnerMap.set(winnerMap.get(Number(entry)),  + 1);
+		//
+		// }
 		// let res = await gameRepository.createQueryBuilder()
 		// .select('game_result.winnerId, COUNT(game_result.winnerId)')
 		// .from(DBGameResult, 'game_result')
@@ -49,8 +56,8 @@ export class Queries {
 		// .execute()
 		// .catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
 
-		this.logger.warn(`RESULT is ${res}`);
-		return (res);
+		this.logger.warn(`RESULT is ${winnerMap}`);
+		return (winnerMap);
 	}
 
 	// {winnerId: userId, count : 72}
