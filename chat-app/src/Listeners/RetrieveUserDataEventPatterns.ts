@@ -95,6 +95,10 @@ export class RetrieveUserDataEventPatterns {
 
     @EventPattern('friend_request')
     async friendRequestUser(data: UserFriendUser) {
+        if (data.user_id == data.friend_id) {
+            this.util.emitFailedObject(data.user_id, 'friend_request', `You can't friend yourself`);
+            return;
+        }
         const user: User = await this.util.getUser(data.user_id, 'friend_request');
         if (user == undefined) {
             this.util.emitFailedObject(data.user_id, 'friend_request', 'Unable to retrieve user');
@@ -133,6 +137,10 @@ export class RetrieveUserDataEventPatterns {
 
     @EventPattern('decline_friend_request')
     async declineFriendRequestUser(data: UserFriendUser) {
+        if (data.user_id == data.friend_id) {
+            this.util.emitFailedObject(data.user_id, 'decline_friend_request', `You can't not friend yourself`);
+            return;
+        }
         const user: User = await this.util.getUser(data.user_id, 'decline_friend_request');
         if (user == undefined) {
             this.util.emitFailedObject(data.user_id, 'decline_friend_request', 'Unable to retrieve user');
@@ -163,6 +171,10 @@ export class RetrieveUserDataEventPatterns {
 
     @EventPattern('accept_friend_request')
     async acceptFriendRequestUser(data: UserFriendUser) {
+        if (data.user_id == data.friend_id) {
+            this.util.emitFailedObject(data.user_id, 'accept_friend_request', `You can't accept yourself`);
+            return;
+        }
         const user: User = await this.util.getUser(data.user_id, 'accept_friend_request');
         if (user == undefined) {
             this.util.emitFailedObject(data.user_id, 'accept_friend_request', 'Unable to retrieve user');
@@ -205,6 +217,10 @@ export class RetrieveUserDataEventPatterns {
 
     @EventPattern('un_friend')
     async unFriendUser(data: UserFriendUser) {
+        if (data.user_id == data.friend_id) {
+            this.util.emitFailedObject(data.user_id, 'un_friend', `You can't unfriend yourself`);
+            return;
+        }
         const user: User = await this.util.getUser(data.user_id, 'un_friend');
         if (user == undefined) {
             this.util.emitFailedObject(data.user_id, 'un_friend', 'Unable to retrieve user');
@@ -233,6 +249,10 @@ export class RetrieveUserDataEventPatterns {
 
     @EventPattern('block_user')
     async blockUser(data: UserBlockUser) {
+        if (data.user_id == data.blocked_id) {
+            this.util.emitFailedObject(data.user_id, 'block_user', `You can't block yourself`);
+            return;
+        }
         const user: User = await this.util.getUser(data.user_id, 'block_user');
         if (user == undefined) {
             this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user');
@@ -274,9 +294,13 @@ export class RetrieveUserDataEventPatterns {
 
     @EventPattern('unblock_user')
     async unblockUser(data: UserUnblockUser) {
+        if (data.user_id == data.blocked_id) {
+            this.util.emitFailedObject(data.user_id, 'unblock_user', `You can't unblock yourself`);
+            return;
+        }
         const user: User = await this.util.getUser(data.user_id, 'unblock_user');
         if (user == undefined) {
-            this.util.emitFailedObject(data.user_id, 'block_user', 'Unable to retrieve user');
+            this.util.emitFailedObject(data.user_id, 'unblock_user', 'Unable to retrieve user');
             return;
         }
         const unBlock: User = await this.util.getUser(data.blocked_id, 'unblock_user');
