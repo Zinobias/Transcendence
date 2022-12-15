@@ -3,6 +3,7 @@ import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 import { DefaultMatchmaking, DiscoMatchmaking, LeavetMatchmaking } from "./GameUtils";
 import GameCanvas from "./GameCanvas";
+import GameTestCanvas from "./GameTestCanvas";
 
 
 /*
@@ -18,42 +19,6 @@ const   Game: React.FC = () => {
     const [gameFound, setGameFound] = useState<boolean>(false);
     const [vs, setVs] = useState<string>("");
     const [activeGameId, setActiveGameId] = useState<number>();
-
-    // const [up, setUp] = useState<boolean>(false);
-    // const [down, setDown] = useState<boolean>(false); 
-
-    // // key event listener
-    // useEffect(() => {
-    //     const keyPress = (event: KeyboardEvent) => {
-    //         if (event.key === "ArrowUp" && up === false) {
-    //             setUp(up => true);
-    //             console.log(`${event.key} is being pressed`);
-    //         }
-    //         if (event.key === "ArrowDown" && down === false) {
-    //             setDown(down => true);
-    //             console.log(`${event.key} is being pressed`);
-    //         }
-    //     };
-
-    //     const keyRelease = (event: KeyboardEvent) => {
-    //         if (event.key === "ArrowUp") {
-    //             setUp(up => false);                
-    //             console.log(`${event.key} is being released`)
-    //         }
-    //         if (event.key === "ArrowDown") {
-    //             setDown(down => false);
-    //             console.log(`${event.key} is being released`)
-    //         }
-    //     };
-
-    //     window.addEventListener('keydown', keyPress);
-    //     window.addEventListener('keyup', keyRelease);
-        
-    //     return () => {
-    //         window.removeEventListener('keydown', keyPress);
-    //         window.removeEventListener('keyup', keyRelease);
-    //     };
-    // }, [up, down]);
 
     // game event listeners
     useEffect(() => {
@@ -129,12 +94,15 @@ const   Game: React.FC = () => {
 
     return (
         <>
+            <GameTestCanvas />
             {/* <canvas className="gameCanvas" id="gameCanvas" width={512*2} height={256*2} />
             <button className="gameButton" onClick={(e) => draw(e)}>draw</button> */}
-            {
+
+            {/* {
                 activeGameId !== undefined &&
                 <GameCanvas gameId={activeGameId}/>
-            }
+            } */}
+
             {/* {
                 gameFound &&
                 <>
@@ -144,8 +112,9 @@ const   Game: React.FC = () => {
             } */}
 
 
-            <DefaultMatchmaking />
-            <LeavetMatchmaking />
+            {/* <DefaultMatchmaking />
+            <LeavetMatchmaking /> */}
+
             {/* <button className="gameButton" onClick={(e) => isInGame(e)}>is in game</button>
             <button className="gameButton" onClick={(e) => getGameId(e)}>game id</button> */}
 

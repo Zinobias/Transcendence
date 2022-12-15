@@ -5,13 +5,28 @@ import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 
 export const   LogoutButton: React.FC = () => {
+    const socket = useContext(SocketContext);
     const [cookies, setCookie, removeCookie] = useCookies(['user', 'userID']);
+
+    // eventn listener to remove cookies and log user out
+    useEffect(() => {
+        socket.on("logout", response => {
+            removeCookie('user');
+            removeCookie('userID');
+        })
+
+        return () => {
+            socket.off("logout");
+        }
+    }, [])
 
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        removeCookie('user');
-        removeCookie('userID')
         console.log("click logout");
+        socket.emit("logout", {
+            userId: cookies.userID,
+            authToken: cookies.user
+        });
     };
 
     return (

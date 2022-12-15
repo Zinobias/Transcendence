@@ -365,6 +365,7 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('logout')
 	async logoutUser(client : Socket, payload : FrontEndDTO) {
+		this.sockets.sendData([payload.userId!], 'logout', {sucess: true});
 		await this.queries.removeAllSessions(payload.userId!);
 		this.sockets.removeAllSocketsUser(payload.userId!);
 	}

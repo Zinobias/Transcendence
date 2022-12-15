@@ -8,9 +8,9 @@ export interface GuardProps {
 }
 
 const Guard: React.FC<GuardProps> = ({outlet}) => {
-    const [cookies] = useCookies(['user']);
+    const [cookies] = useCookies(['user', 'userID']);
 
-    if (cookies.user)
+    if (cookies.user && cookies.userID)
         return outlet;
     return  <Navigate to='/login' />;
 };
