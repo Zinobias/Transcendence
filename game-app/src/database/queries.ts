@@ -49,7 +49,7 @@ export class Queries {
 		// 		// winnerMap.set(winnerMap.get(Number(entry)),  + 1);
 		//
 		// }
-		let res = await gameRepository.query("SELECT winnerId, COUNT(winnerId) GROUP BY winnerId");
+		let res = await gameRepository.query(`SELECT "winnerId", COUNT("winnerId") GROUP BY "winnerId"`);
 		// .select('game_result.winnerId, COUNT(game_result.winnerId)')
 		// .from(DBGameResult, 'game_result')
 		// .groupBy('game_result.winnerId')
