@@ -66,6 +66,10 @@ export class Sockets {
 	}
 
     public sendData(users: number[], pattern: string, payload: object) {
+		if (users.length < 1 || users[0] === null) {
+			this.logger.error(`USERS ARRAY EMPTY`);
+			return ;
+		}
         for (const user of users) {
             const sockets : Socket[] | undefined = this.getSocket(user);
             if (sockets !== undefined) {
