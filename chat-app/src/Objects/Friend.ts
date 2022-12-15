@@ -5,11 +5,11 @@ export interface IFriend {
     confirmed: boolean;
 }
 
-export class Friend extends User {
+export class Friend {
     private _confirmed: boolean;
+    private _user: User;
 
     constructor(user: User, confirmed: boolean) {
-        super(user.userId, user.name, user.avatar);
         this._confirmed = confirmed;
     }
 
@@ -23,12 +23,12 @@ export class Friend extends User {
 
     public getIFriend(): IFriend {
         return {
-            IUser: this.getIUser(),
+            IUser: this._user.getIUser(),
             confirmed: this._confirmed
         }
     }
 
     public getSmallFriend(): SmallUser {
-        return {userId: this.userId, name: this.name, state: this._confirmed}
+        return {userId: this._user.userId, name: this._user.name, state: this._confirmed}
     }
 }
