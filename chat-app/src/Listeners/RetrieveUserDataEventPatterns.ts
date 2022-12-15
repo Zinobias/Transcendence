@@ -231,7 +231,7 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'un_friend', 'Unable to retrieve friend');
             return;
         }
-        if (!user.isFriends(friend) || !user.hasRequest(friend)) {
+        if (!user.isFriends(friend) && !user.hasRequest(friend)) {
             this.util.emitFailedObject(data.user_id, 'un_friend', `You aren't friends with this user and you don't have any open requests with them`);
             return;
         }
