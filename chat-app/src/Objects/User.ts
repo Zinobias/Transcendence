@@ -97,21 +97,21 @@ export class User {
     }
 
     friend(friend: Friend) {
-        if (this._friends.filter((a) => a._userId == friend._userId).length >= 1)
+        if (this._friends.filter((a) => a.user._userId == friend.user._userId).length >= 1)
             return;
         this._friends.push(friend);
     }
 
     isFriends(friend: User) {
-        return (this._friends.filter((a) => a._userId == friend._userId && a.confirmed).length == 1);
+        return (this._friends.filter((a) => a.user._userId == friend._userId && a.confirmed).length == 1);
     }
 
     hasRequest(friend: User) {
-        return (this._friends.filter((a) => a._userId == friend._userId && !a.confirmed).length == 1);
+        return (this._friends.filter((a) => a.user._userId == friend._userId && !a.confirmed).length == 1);
     }
 
     unfriend(friend: User) {
-        this._friends = this._friends.filter((a) => a._userId != friend._userId);
+        this._friends = this._friends.filter((a) => a.user._userId != friend._userId);
     }
 
     private async updateBlocked() {

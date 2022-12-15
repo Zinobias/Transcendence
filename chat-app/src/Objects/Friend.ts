@@ -21,6 +21,10 @@ export class Friend {
         this._confirmed = value;
     }
 
+    get user(): User {
+        return this._user;
+    }
+
     public getIFriend(): IFriend {
         return {
             IUser: this._user.getIUser(),
