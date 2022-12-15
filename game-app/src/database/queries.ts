@@ -27,13 +27,16 @@ export class Queries {
 		let res = await gameRepository.createQueryBuilder()
 		.select('game_result.winnerId, COUNT(game_result.winnerId)')
 		.from(DBGameResult, 'game_result')
-		.addGroupBy('game_result.winnerId')
+		.groupBy('game_result.winnerId')
 		.execute()
 		.catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
 
 		this.logger.warn(`RESULT is ${res}`);
 		return (res);
 	}
+
+	// {winnerId: userId, count : 72}
+	// {winnerId: userId, count : 9}
 
 	public async getUserGameHistory(uid : number) {
 		const dataSource = await this.database.getDataSource();
