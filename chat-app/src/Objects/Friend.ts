@@ -7,10 +7,11 @@ export interface IFriend {
 
 export class Friend {
     private _confirmed: boolean;
-    private _user: User;
+    private readonly _user: User;
 
     constructor(user: User, confirmed: boolean) {
         this._confirmed = confirmed;
+        this._user = user;
     }
 
     get confirmed(): boolean {
