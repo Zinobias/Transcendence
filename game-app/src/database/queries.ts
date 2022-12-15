@@ -23,39 +23,7 @@ export class Queries {
 	public async getLeaderboard() {
 		const dataSource = await this.database.getDataSource();
 		const gameRepository = dataSource.getRepository(DBGameResult);
-
-		// let res = await gameRepository
-
-		let winnerMap : Map<number, number> = new Map();
-		for (const objectLiteral of await gameRepository.findBy({})) {
-			if (winnerMap.has(objectLiteral.winnerId))
-				winnerMap.set(objectLiteral.winnerId, winnerMap.get(objectLiteral.winnerId)! + 1);
-			else
-				winnerMap.set(objectLiteral.winnerId, 1);
-		}
-		// let res  = await gameRepository.createQueryBuilder()
-		// .select('game_result.winnerId')
-		// .from(DBGameResult, 'game_result')
-		// .execute()
-		// .catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
-		// let winnerMap : Map<number, number> = new Map();
-		//
-		// for (let entry in res) {
-		// 	if (winnerMap.has(Number(entry)))
-		// 		winnerMap.set(Number(entry), winnerMap.get(Number(entry))! + 1);
-		// 	else
-		// 		winnerMap.set(Number(entry), 1);
-		//
-		// 		// winnerMap.set(winnerMap.get(Number(entry)),  + 1);
-		//
-		// }
-		let res = await gameRepository.query(`SELECT game_result."winnerId", COUNT(game_result."winnerId") FROM game_result GROUP BY game_result."winnerId"`);
-		// .select('game_result.winnerId, COUNT(game_result.winnerId)')
-		// .from(DBGameResult, 'game_result')
-		// .groupBy('game_result.winnerId')
-		// .execute()
-		// .catch((e) => this.logger.warn(`Retrieving leaderboard from database went wrong : ${e}`));
-
+		const res = await gameRepository.query(`SELECT game_result."winnerId", COUNT(game_result."winnerId") FROM game_result GROUP BY game_result."winnerId"`);
 		this.logger.warn(`RESULT is ${res}`);
 		return (res);
 	}
