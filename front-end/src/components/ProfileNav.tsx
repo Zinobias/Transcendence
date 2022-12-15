@@ -52,6 +52,15 @@ const ProfileNav: React.FC = () => {
                 console.log(`socket.on friend_request fail ${response.msg}`);
         })
 
+        socket.on("decline_friend_request", response => {
+            if (response.success && response.user == cookies.userID) {
+                console.log(`socket.on decline_friend_request success`);
+                setState(state => !state);
+            }
+            else if (!response.success)
+                console.log(`socket.on decline_friend_request fail ${response.msg}`)
+        })
+
         socket.on("accept_friend_request", response => {
             if (response.success) {
                 console.log(`socket.on accept_friend_request success`);

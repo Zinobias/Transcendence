@@ -68,11 +68,11 @@ const Friendslist: React.FC<Props> = ({user}) => {
             <p><b>Friendslist:</b></p>
             {user.friends.map((e, index) => (
                 <div key={index} className="friendslist">
-                    <p>{e.name} {e.state}</p>
-                    {/* {
+                    {/* <p>{e.name} {e.state}</p> */}
+                    {
                         e.state &&
                         <li key={e.userId} className="friendslist">{e.name}</li>
-                    } */}
+                    }
                 </div>
             ))}
         </>

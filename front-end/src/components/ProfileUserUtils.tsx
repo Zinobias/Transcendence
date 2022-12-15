@@ -169,6 +169,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             if (response.success && response.user.userId == cookies.userID) {
                 setMe(me => response.user);
                 setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
+                setIsFriend(isFriend => !response.user.friends.find((e : SmallUser) => user.userId == e.userId && e.state == true));
             }
         })
 
@@ -215,9 +216,9 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     }, [])
     
     // useEffect on mount/change to check if user is a friend/blocked
-    useEffect(() => {
-        setIsFriend(isFriend => !user.friends.find((e) => cookies.userID == e.userId && e.state == true));
-    }, [user])
+    // useEffect(() => {
+    //     setIsFriend(isFriend => !user.friends.find((e) => cookies.userID == e.userId && e.state == true));
+    // }, [user])
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

@@ -21,7 +21,7 @@ const   Leaderboard: React.FC = () => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.get.leaderboard", 
-            data: {}
+            data: {userId: cookies.userID}
         });
         console.log("emiting game.get.leaderboard");
 

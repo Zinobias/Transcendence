@@ -25,10 +25,10 @@ const GameTestCanvas : React.FC = () => {
             ctx.fillRect(20, 236, 20, 50);
             ctx.strokeStyle = '#ffffff';
             pepper.onload = () => {
-                ctx.drawImage(pepper, 30, 30, 8, 28);
+                ctx.drawImage(pepper, 30, 30, 8*2, 28*2);
             }
             mushroom.onload = () => {
-                ctx.drawImage(mushroom, 80, 80, 14, 14)
+                ctx.drawImage(mushroom, 80, 80, 14*2, 14*2)
             }
             ctx.stroke();
         }

@@ -94,14 +94,14 @@ const   Game: React.FC = () => {
 
     return (
         <>
-            <GameTestCanvas />
+            {/* <GameTestCanvas /> */}
             {/* <canvas className="gameCanvas" id="gameCanvas" width={512*2} height={256*2} />
             <button className="gameButton" onClick={(e) => draw(e)}>draw</button> */}
 
-            {/* {
+            {
                 activeGameId !== undefined &&
                 <GameCanvas gameId={activeGameId}/>
-            } */}
+            }
 
             {/* {
                 gameFound &&
@@ -112,8 +112,8 @@ const   Game: React.FC = () => {
             } */}
 
 
-            {/* <DefaultMatchmaking />
-            <LeavetMatchmaking /> */}
+            <DefaultMatchmaking />
+            <LeavetMatchmaking />
 
             {/* <button className="gameButton" onClick={(e) => isInGame(e)}>is in game</button>
             <button className="gameButton" onClick={(e) => getGameId(e)}>game id</button> */}
