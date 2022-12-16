@@ -125,6 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* font-size: 2vw; */
   /* border: 2px solid black; */
   padding: 20px;
   grid-area: 2 / 1 / 6 / 6;

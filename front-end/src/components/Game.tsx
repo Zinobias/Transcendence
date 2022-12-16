@@ -18,6 +18,7 @@ const   Game: React.FC = () => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [gameInfo, setGameinfo] = useState<IGameInfo>();
+    const [queue, setQueue] = useState<boolean>(false);
 
     // game event listeners
     useEffect(() => {
@@ -69,8 +70,20 @@ const   Game: React.FC = () => {
         })
 
         socket.on("game.get.gameInfo", response => {
-            if (response.gameInfo) 
+            if (response.gameInfo) {
+                setQueue(queue => false);
                 setGameinfo(gameInfo => response.gameInfo);
+            }
+        })
+
+        socket.on("game.join.queue", response => {
+            if (response.success) 
+                setQueue(queue => true);
+        })
+
+        socket.on("game.leave.queue", response => {
+            if (response.success) 
+                setQueue(queue => false);
         })
 
         return () => {
@@ -78,6 +91,8 @@ const   Game: React.FC = () => {
             socket.off("game.isInGame");
             socket.off("game.get.activeGameId");
             socket.off("game.get.gameInfo");
+            socket.off("game.join.queue");
+            socket.off("game.leave.queue");
 
             // emit to leave queue when we leave the page
             // console.log(`socket.emit game.leave.queue default`);
@@ -97,12 +112,23 @@ const   Game: React.FC = () => {
             {
                 gameInfo !== undefined ?
                 <GameCanvas gameInfo={gameInfo} setGameinfo={setGameinfo}/> :
-                <>                
-                    <DefaultMatchmaking />
-                    <DiscoMatchmaking />
-                    <LeavetMatchmaking />
+                <>  
+                    {
+                        queue ?
+                        <>
+                            <div className="gameSearch">
+                                <span style={{marginRight: "30px", fontSize: "2vw", fontWeight: "bold"}}>Looking for game</span>
+                                <div className="dot-elastic" />
+                            </div>
+                            <LeavetMatchmaking /> 
+                        </> :
+                        <div className="gameQueue">
+                            <DefaultMatchmaking /><DiscoMatchmaking />
+                        </div>
+                    }     
                 </>
-            }
+            }          
+
         </>
     )
 };
