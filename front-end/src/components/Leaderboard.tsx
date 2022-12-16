@@ -27,6 +27,8 @@ const   Leaderboard: React.FC = () => {
 
         socket.on("game.get.leaderboard", response => {
             if (response.success) {
+                // empty leaderboard just to be sure
+                setLeaderboard(leaderboard => []);
                 console.log("socket.on game.get.leaderboard success");
                 // sort the leaderboard
                 response.leaderboard.sort((a : leaderboardArray, b: leaderboardArray) => (a.count < b.count) ? 1 : -1);
@@ -65,18 +67,14 @@ const   Leaderboard: React.FC = () => {
     }, [leaderboard])
 
     return (
-        <div>
-            <b>Leaderboard</b>
-            <br/>
-            <br/>
-            <div className="chats">
-
+        <div className="leaderboard">
             {leaderboard.map((element, index) => (
-                <div key={index} className="listChat__text">
-                   user: <b>{element.name}</b> games won: <b>{element.count}</b>
+                <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} className="listLeaderboard">
+                    <span style={{float: "left"}}>{index+1}. <b>{element.name}</b></span>
+                    <span style={{float: "right"}}>games won: <b>{element.count}</b></span><br/>
+                    {/* {index+1}. <b>{element.name}</b> games won: <b>{element.count}</b> */}
                 </div>
             ))}
-            </div>
         </div>
     )
 };

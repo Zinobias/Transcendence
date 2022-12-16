@@ -45,8 +45,8 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
     return (
         <>
             <div className="chats">
-            {chatroom.map((element) => (
-                <li key={element.channelId} className="listChat">
+            {chatroom.map((element, index) => (
+                <li key={index} className="listChat">
                     <span className="listChat__text">{element.channelName}</span> 
                     <button className="listChat__button" onClick={(e) => handleJoin(e, element.channelId, element.hasPassword)}>JOIN</button>
                     {

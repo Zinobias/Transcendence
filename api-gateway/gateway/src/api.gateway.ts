@@ -119,21 +119,29 @@ export class ApiGateway
 
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('check_online')
-	async handleCheckOnline(client: Socket, payload: Online) {
+	async handleCheckOnline(client: Socket, payload: any) {
 		const online: number[] = []
 		const offline: number[] = []
-		for (let i = 0; i < payload.checkIds.length; i++) {
-			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.checkIds[i]);
+		this.logger.debug("event check_online " + payload.data.checkIds);
+		for (let i = 0; i < payload.data.checkIds.length; i++) {
+			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.data.checkIds[i]);
 			if (socketList != undefined && socketList.length != 0) {
-				online.push(payload.checkIds[i])
+				online.push(payload.data.checkIds[i])
 			} else {
-				offline.push(payload.checkIds[i])
+				offline.push(payload.data.checkIds[i])
 			}
 		}
-		client.emit('check_online', {
-			onlineUsers: online,
-			offlineUsers: offline
-		});
+		// client.emit('check_online', {
+		// 	onlineUsers: online,
+		// 	offlineUsers: offline
+		// });
+		return {
+			event: `check_online`,
+			data: {
+				onlineUsers: online,
+				offlineUsers: offline
+			}
+		}
 	}
 
     @SubscribeMessage('auth')

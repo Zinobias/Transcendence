@@ -28,7 +28,7 @@ const   Game: React.FC = () => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.isInGame", 
-            data: { userId: cookies.userID }
+            data: { userId: cookies.userID, requestedId: cookies.userID }
         });
 
         // we found a game so we ask for the activeGameId

@@ -44,7 +44,7 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
 
         socket.on("channel_join", response => {
             // if current user joined a channel update side channels
-            if (response.success === true && response.user_id === cookies.userID) {
+            if (response.success && response.user_id == cookies.userID) {
                 console.log("socket.on channel join success");
                 setState(state => !state);
             }

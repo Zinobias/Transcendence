@@ -72,10 +72,17 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
         console.log(`emitting channel_ban`);
     }
 
-    function findAdmin (userId : number) : boolean {
+    function isAdmin (userId : number) : boolean {
         if (userId == channel.owner)
             return (true);
-        const res = channel?.settings.find((e) => userId == e.userId && e.setting == SettingType.ADMIN);
+        const res = channel.settings.find((e) => userId == e.userId && e.setting == SettingType.ADMIN);
+        // if res is not undefined return true else false
+        return (res !== undefined);
+    }
+
+    function isMuted(userId: number) : boolean {
+        const res = channel.settings.find((e) => userId == e.userId && e.setting == SettingType.MUTED);
+        // if res is not undefined return true else false
         return (res !== undefined);
     }
 	
@@ -87,7 +94,7 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
         )
     }
 
-    else if (channel.otherOwner != undefined || findAdmin(cookies.userID) == false) {
+    else if (channel.otherOwner != undefined || isAdmin(cookies.userID) == false) {
         return (
             <>
                 <button className="memberButton" onClick={(e) => handleProfile(e, memberUserID)}>profile</button>
@@ -106,12 +113,15 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
                 memberUserID != channel.owner &&
                 <>
                 {
-                    findAdmin(memberUserID) == false ?
+                    isAdmin(memberUserID) == false ?
                     <button className="memberButton" onClick={(e) => handlePromote(e)}>promote</button> :
                     <button className="memberButton" onClick={(e) => handleDemote(e)}>demote</button>
                 }
-                <button className="memberButton" onClick={(e) => handleMute(e)}>mute</button>
-                <button className="memberButton" onClick={(e) => handleBan(e)}>ban</button>
+                {
+                    isMuted(memberUserID) == false &&
+                    <button className="memberButton" onClick={(e) => handleMute(e)}>mute</button>
+                }
+                    <button className="memberButton" onClick={(e) => handleBan(e)}>ban</button>
                 </> 
             }
 

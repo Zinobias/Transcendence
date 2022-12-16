@@ -168,7 +168,7 @@ p.chatp {
     /* display: flex; */
     font-family: 'Didact Gothic';
     list-style-type: none;
-    margin: 5px;
+    margin: 4px;
 }
 
 .listChat__text {
@@ -194,13 +194,14 @@ p.chatp {
     color: black;
     font-weight: bold;
     cursor: pointer;
+    font-size: 100%;
     text-align: right;
     font-family: 'Silkscreen', cursive;
     background-color: transparent;
 }
 
-.listChat__button:hover {
-    transform: scale(1.02);
+.listChat__button:active {
+    transform: scale(0.95);
 }
 
 /*
@@ -379,8 +380,9 @@ p.chatp {
 
 .profile {
     display: flex;
-    width: 55%;
+    width: 60%;
     max-width:100%;
+    height: 80%;
     /* border: solid 2px black; */
 }
 
@@ -391,7 +393,43 @@ p.chatp {
 
 .profileRight {
     flex: 2;
-    margin-left: 30px;
+    margin-left: 40px;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 80%;
+}
+
+.floatLeft {
+    float: left;
+}
+
+.floatRight {
+    float: right;
+}
+
+.rightTop {
+    flex: 0.5;
+    /* height: 100%; */
+    overflow-y: auto; 
+    scrollbar-gutter: stable;
+    /* border: solid 2px black; */
+}
+
+.rightBottom {
+    flex: 1;
+    height: 100%;
+    /* overflow-y: auto; 
+    scrollbar-gutter: stable; */
+    /* border: solid 2px black; */
+}
+
+
+.listHistory {
+    height: 90%;
+    /* min-width: 0; */
+    overflow-y: auto; 
+    scrollbar-gutter: stable;
 }
 
 .profileAvatar {
@@ -766,6 +804,39 @@ p.chatp {
 }
 
 /*
+    LEADERBOARD
+*/
+
+.leaderboard {
+    width: 50%;
+    height: 100%;
+    padding: 2%;
+    /* max-height: 300px; */
+    /* margin-bottom: 40px; */
+    overflow-y: auto; 
+    /* scrollbar-gutter: stable; */
+    /* border: 2px solid black; */
+}
+
+.listLeaderboard {
+    font-size: 1.7vw;
+}
+
+.leaderboardLeft {
+    float: left;
+    overflow: hidden; 
+    white-space: nowrap;
+}
+
+.leaderboardRight {
+    float: right;
+}
+
+.leaderboardLeft:after { 
+    content: " .................................................................................." 
+}
+
+/*
     GAME
 */
 
@@ -801,12 +872,12 @@ p.chatp {
 }
 
 .gameLeft {
-    float:left;
+    float: left;
     font-weight: bold;
 }
 
 .gameRight {
-    float:right;
+    float: right;
     font-weight: bold;
 }
 

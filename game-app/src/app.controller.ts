@@ -258,8 +258,8 @@ export class AppController {
 	 */
 	@EventPattern('game.isInGame')
 	isInGame(@Payload() payload : any) {
-		let success : boolean = this.matchMakingService.isInGame(payload.userId);
-		this.logger.log(`isInGame called for user [${payload.userId}] result : [${success}]`);
+		let success : boolean = this.matchMakingService.isInGame(payload.requestedId);
+		this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}]`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
@@ -457,9 +457,9 @@ export class AppController {
 	 */
 	@EventPattern('game.user.get.history')
 	async getMatchHistory(@Payload() payload : any) {
-		const res = await this.queries.getUserGameHistory(payload.userId);
+		const res = await this.queries.getUserGameHistory(payload.requestedId);
 
-		this.logger.debug(`Retrieved the matchistory for user ${payload.userId}, res val : ${res}.`)
+		this.logger.debug(`Retrieved the matchistory for user ${payload.requestedId}`)
 		if (res === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				eventPattern : 'game.user.get.history',

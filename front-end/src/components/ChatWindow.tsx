@@ -114,7 +114,7 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
 
         socket.on("channel_mute_user", response => {
             // if we are looking at the channel where a user got banned and we are the muted user, we want to update the channel
-            if (response.success && channel.channelId == response.channel_id && response.affected_id == cookies.userID)
+            if (response.success && channel.channelId == response.channel_id)
                 setUpdateChannel(updateChannel => !updateChannel);
             if (response.success)
                 console.log(`socket.on channel_mute_user success channel_id ${response.channel_id}`);

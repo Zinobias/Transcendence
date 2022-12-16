@@ -50,6 +50,12 @@ export const UserSettings : React.FC<Props> = ({user}) => {
                 alert(response.msg);
         })
 
+        socket.on("update_avatar", response => {
+            // maybe update the user profile?
+            if (response.success)
+                console.log("update avatar succes");
+        }) 
+
         socket.emit("isEnabled_2fa", {
             userId: cookies.userID,
             authToken: cookies.user,
@@ -62,6 +68,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
             socket.off("verify_2fa");
             socket.off("enable_2fa");
             socket.off("remove_2fa");
+            socket.off("update_avatar");
         }
     }, [])
 
@@ -163,7 +170,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const socket = useContext(SocketContext);
 
-    // get my own user profile to check on mount
+    // event listeners and emits on mount
     useEffect(() => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
@@ -214,11 +221,6 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         }
 
     }, [])
-    
-    // useEffect on mount/change to check if user is a friend/blocked
-    // useEffect(() => {
-    //     setIsFriend(isFriend => !user.friends.find((e) => cookies.userID == e.userId && e.state == true));
-    // }, [user])
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

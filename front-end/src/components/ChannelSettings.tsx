@@ -107,14 +107,14 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
     return (
         <div>
             {
-                channel.otherOwner === undefined &&
+                channel.otherOwner == undefined &&
                 <button className="settingsButton" onClick={(e) => handleLeave(e)}>LEAVE</button>
             }
 			{
-				channel.otherOwner === undefined && cookies.userID === channel.owner &&
+				channel.otherOwner == undefined && cookies.userID == channel.owner &&
                 <>
                 {
-                    channel.password === undefined ?
+                    channel.password == undefined ?
                     <div className='settingsPasswordToggle' id="passwordSetButton"><button className="settingsButton" onClick={(e) => setPassword(e)}>set pw</button></div>:
                     <>
                     <button className="settingsButton" onClick={(e) => removePassword(e)}>remove pw</button>
