@@ -7,6 +7,7 @@ import { MatchMakingService } from './matchmaking.service';
 import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './event-objects/events.objects';
 import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
 import { Queries } from './database/queries';
+import { Game } from './game-class';
 
 
 @Controller()
@@ -38,11 +39,12 @@ export class AppController {
 		}
 		else
 			uids = [gameInfo.player1, gameInfo.player2];
-		this.logger.debug("GAME FRAME UPDATE RECEIVED");
+		const IEntityList = Game.EntityArrayToIEntityArray(payload.payload);
+		// this.logger.debug("GAME FRAME UPDATE RECEIVED");
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.frame.update.' + gameInfo.gameId,
-			targets : uids,
-			data 	: payload.payload}); // Forwarding entities of the game. to render in frontend.
+			userIds : uids,
+			data 	: IEntityList}); // Forwarding entities of the game. to render in frontend.
 	}
 
 	/**
@@ -50,11 +52,41 @@ export class AppController {
 	 */
 	@EventPattern("game.player.move")
 	async userMoveEvent(@Payload() payload : userKeyInputDTO) {
-		this.logger.log("player : {" + payload.userId + "} has moved.");
+		// this.logger.log("player : {" + payload.userId + "} has moved.");
+		this.logger.log("player : {" + payload.userId + "} has moved with key event {" + payload.keyEvent + "}");
 		let res = this.matchMakingService.getUserActiveGameId(payload.userId);
 		if (res === undefined)
 			return ;
-		this.matchMakingService.emitEvent("game.player.move." + res, payload.keyEvent);
+		this.matchMakingService.emitEvent("game.player.move." + res, {
+			keyEvent	: payload.keyEvent,
+			userId 		: payload.userId,
+		});
+	}
+
+	@OnEvent('game.emit.score')
+	async emitPlayerScore(@Payload() payload : {gameId : number}) {
+		const gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
+
+		if (gameInfo === undefined) {
+			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
+			return ;
+		}
+		let uids : number[];
+		if (gameInfo?.spectatorList !== undefined) {
+			uids = gameInfo?.spectatorList;
+			uids.push(gameInfo.player1, gameInfo.player2);
+		}
+		else
+			uids = [gameInfo.player1, gameInfo.player2];
+
+		this.gatewayClient.emit<string, outDTO>('game', {
+			eventPattern : 'game.score.' + payload.gameId,
+			userIds : uids,
+			data : {
+				player1Score : gameInfo.gameInstance.player1.score,
+				player2Score : gameInfo.gameInstance.player2.score,
+			},
+		})
 	}
 
 	/**
@@ -67,13 +99,11 @@ export class AppController {
 
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
 		this.logger.debug("Game-ended event caught & emitted to frontend");
-		this.logger.debug("GameID: [" + payload.gameId + "] Game result has been added to the database");
-
-		// await this.queries.getLeaderboard();
 		if (gameInfo === undefined) {
 			this.logger.debug('game.frame.update cant find the gameInfo');
 			return ;
 		}
+		await this.matchMakingService.addGameResultToDatabase(payload.payload);
 		let uids : number[];
 		if (gameInfo?.spectatorList !== undefined) {
 			uids = gameInfo?.spectatorList;
@@ -81,15 +111,17 @@ export class AppController {
 		}
 		else
 			uids = [gameInfo.player1, gameInfo.player2];
+		this.logger.debug(`Player1UID : ${gameInfo.player1} player2UID ${gameInfo.player2}`);
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.ended.' + gameInfo.gameId,
-			targets : uids,
+			userIds : uids,
 			data 	: {
 				winner : payload.payload.winnerUID,
-				player1ScoreFinal : 2,
-				player2ScoreFinal : 5,
+				player1ScoreFinal : payload.payload.playerScores.player1FinalScore,
+				player2ScoreFinal : payload.payload.playerScores.player2FinalScore,
 			}
 		}); // Forwarding entities of the game. to render in frontend.
+		// TODO : not hardcode.
 		this.matchMakingService.removeGameFromList(payload.gameId);
 	}
 
@@ -111,12 +143,17 @@ export class AppController {
 	@EventPattern("game.join.queue")
 	joinMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
 		this.logger.log("User : {" + payload.userId + "} has joined the matchmaking queue for : " + payload.gameMode);
-		if (this.matchMakingService.isValidGamemode(payload.gameMode))
-		return ({event : 'game.join.queue', data : {
-			success : false,
-			msg		: `gameMode in payload is invalid : [${payload.gameMode}]`
-		}});
+		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+			eventPattern : 'game.join.queue',
+			userIds		: [payload.userId],
+			data		: {
+				success : false,
+				msg		: `gameMode in payload is invalid : [${payload?.gameMode}]`
+			},
+		});
 
+		}
 		if (this.matchMakingService.isInGame(payload.userId) === true) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				userIds 		: [payload.userId],
@@ -128,6 +165,7 @@ export class AppController {
 			});
 			return ;
 		}
+		this.logger.log(`before success emit`);
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.join.queue',
 			userIds		: [payload.userId],
@@ -161,7 +199,7 @@ export class AppController {
 		eventPattern : 'game.leave.queue',
 		data : { 
 			success : success,
-			msg : success === true ? `User [${payload.userId}] Left the queue, or was never in the queue.` : `User [${payload.userId}] Left the queue, or was never in the queue.`,
+			msg : success === true ? `User [${payload.userId}] Left the queue, or was never in the queue.` : `User [${payload.userId}] has failed leaving the queue.`,
 		}
 	});
 	return ;
@@ -359,7 +397,7 @@ export class AppController {
 	 * @param payload create Game DTO
 	 * @returns 
 	 */
-	@EventPattern('game.create')
+	@EventPattern('internal.game.create')
 	async createGame(@Payload() payload : CreateGameDTO) {
 		this.logger.log("a game has been created for users : {" + payload.player1UID + "} and + {" + payload.player2UID +"}");
 
@@ -386,21 +424,31 @@ export class AppController {
 	 * @returns see dto file for interface
 	 */
 	@EventPattern('game.get.leaderboard')
-	async getLeaderBoard() {
+	async getLeaderBoard(@Payload() payload : any) {
 		const res = await this.queries.getLeaderboard();
 
 		this.logger.debug(`Retrieved the leaderboard ${res}.`)
-		if (res === undefined)
-			return ({event : 'game.get.leaderboard', data : {
-				success : 	false,
-				msg		: `Retrieving leaderboard failed [${res}]`
-			}});
-		else
-			return ({event : 'game.get.leaderboard', data : {
-				success : true,
-				msg		: `Retrieving leaderboard succeeded : [${res}]`,
-				leaderboard : res,
-			}});
+		if (res === undefined) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.get.leaderboard',
+				userIds : [payload.userId],
+				data : {
+					success : 	false,
+					msg		: `Retrieving leaderboard failed [${res}]`
+				}
+			})
+		}
+		else {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.get.leaderboard',
+				userIds : [payload.userId],
+				data : {
+					success : 	true,
+					msg			: `Retrieving leaderboard succeeded : [${res}]`,
+					leaderboard : res,
+				}
+			})
+		}
 	}
 
 	/**
@@ -412,16 +460,26 @@ export class AppController {
 		const res = await this.queries.getUserGameHistory(payload.userId);
 
 		this.logger.debug(`Retrieved the matchistory for user ${payload.userId}, res val : ${res}.`)
-		if (res === undefined)
-			return ({event : 'game.user.get.history', data : {
-				success : 	false,
-				msg		: `Retrieving user match history failed [${res}]`
-			}});
-		else
-			return ({event : 'game.user.get.history', data : {
-				success : true,
-				msg		: `Retrieving user match history succeeded : [${res}]`,
-				history : res,
-			}});
+		if (res === undefined) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.user.get.history',
+				userIds : [payload.userId],
+				data : {
+					success : 	false,
+					msg		: `Retrieving user match history failed [${res}]`
+				}
+			})
+		}
+		else {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.user.get.history',
+				userIds : [payload.userId],
+				data : {
+					success : true,
+					msg		: `Retrieving user match history succeeded : [${res}]`,
+					history : res,
+				}
+			})
+		}
 	}
 }

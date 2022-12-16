@@ -50,16 +50,32 @@ export class Sockets {
         }
     }
 
+	public removeAllSocketsUser(userId : number) {
+		this.socketMap.delete(userId);
+	}
+
     public sendData(users: number[], pattern: string, payload: object) {
+		if (users.length < 1 || users[0] === null) {
+			this.logger.error(`USERS ARRAY EMPTY`);
+			return ;
+		}
         for (const user of users) {
             const sockets: Socket[] | undefined = this.getSocket(user);
             if (sockets !== undefined) {
+<<<<<<< HEAD
                 if (sockets!.length > 0) {
                     sockets.forEach((e: Socket) => {
                         this.logger.debug(`Emitting to socket for userId: [${user}] socketId: ${e.id} socket length : ${sockets.length}`);
                         e?.emit(pattern, payload);
                     })
                 }
+=======
+				if (sockets!.length > 0) {
+					sockets.forEach((e : Socket) => {
+					this.logger.debug(`Emitting to socket for userId: [${user}] eventPattern: ${pattern} socketId: ${e.id} socket length : ${sockets.length}`);
+					e?.emit(pattern, payload);})
+				}
+>>>>>>> main
             } else {
                 this.logger.debug(`No socket for userId: [${user}] found when emitting to front end`);
             }

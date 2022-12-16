@@ -25,6 +25,11 @@ export interface FrontEndDTO {
     data: any;
 }
 
+interface Online {
+	userId: number;
+	checkIds: number[];
+}
+
 @WebSocketGateway(8084, {
     cors: {
         origin: '*',
@@ -40,15 +45,8 @@ export class ApiGateway
 
     async onApplicationBootstrap() {
         this.logger.log(`Starting bootstrap gateway...`);
-        // this.gameClient.connect();
         this.gameClient.emit('testMsg', 'msg from frontend');
         this.chatClient.emit('testMsg', 'msg from frontend');
-		this.gameClient.emit('game.create', {
-			player1UID 	: "123",
-			player2UID 	: "234",
-			gameMode	: 'default'
-		});
-		
     }
 
     //private clientList: { userID: number };
@@ -119,6 +117,25 @@ export class ApiGateway
     //     await this.auth.auth(client, payload);
     //   }
 
+	@UseGuards(AuthGuard)
+	@SubscribeMessage('check_online')
+	async handleCheckOnline(client: Socket, payload: Online) {
+		const online: number[] = []
+		const offline: number[] = []
+		for (let i = 0; i < payload.checkIds.length; i++) {
+			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.checkIds[i]);
+			if (socketList != undefined && socketList.length != 0) {
+				online.push(payload.checkIds[i])
+			} else {
+				offline.push(payload.checkIds[i])
+			}
+		}
+		client.emit('check_online', {
+			onlineUsers: online,
+			offlineUsers: offline
+		});
+	}
+
     @SubscribeMessage('auth')
     async handleAuthResp(client: Socket, payload: FrontEndDTO): Promise<boolean | any> {
 		this.sockets.storeSocket(payload.userId!, client);
@@ -131,8 +148,8 @@ export class ApiGateway
                 event: 'login',
                 data: { 
 					DTO : loginDTO,
-					success : loginDTO === undefined || loginDTO.auth_cookie === undefined  ? false : true,
-					msg : loginDTO === undefined || loginDTO.auth_cookie === undefined ? `Login went wrong` : `Login went well`,
+					success : loginDTO === undefined ? false : true,
+					msg : loginDTO === undefined ? `Login went wrong` : `Login went well`,
 				},
             };
         } else if (payload.eventPattern === 'validate')
@@ -344,42 +361,12 @@ export class ApiGateway
 		}
 		});
 	}
-    /**
-     * auth routes
-     * route 1 : Login.
-     * {
-     * 	userId? : number,
-     * 	token? : string,
-     * 	eventPattern : login
-     * 	payload: { token : accessToken },
-     * }
-     * return (app accessToken);
-     * route 2 : validating token w/ userId.
-     *  {
-     * 	userId? : number,
-     * 	token? : string,
-     * 	eventPattern : Validate
-     * 	payload: {},
-     * }
-     * return (boolean);
-     *
-     * route 3 : Create account.
-     *  {
-     * 	userId? : number,
-     * 	token? : string,
-     * 	eventPattern : Validate
-     * 	payload: {
-     * 		token : accessToken,
-     * 		userName : string,
-     * },
-     * }
-     * return (accessToken);
-     */
 
-    // export interface FrontEndDTO {
-    // 	userId?: number;
-    // 	token?: string;
-    // 	eventPattern: string;
-    // 	payload: {};
-    //   }
+	@UseGuards(AuthGuard)
+	@SubscribeMessage('logout')
+	async logoutUser(client : Socket, payload : FrontEndDTO) {
+		this.sockets.sendData([payload.userId!], 'logout', {sucess: true});
+		await this.queries.removeAllSessions(payload.userId!);
+		this.sockets.removeAllSocketsUser(payload.userId!);
+	}
 }

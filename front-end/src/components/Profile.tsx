@@ -2,50 +2,33 @@ import React, { useEffect, useState, useContext } from 'react'
 import { useCookies } from 'react-cookie';
 import { useSearchParams } from 'react-router-dom';
 import { IUser } from '../interfaces';
+import ProfileUser from './ProfileUser';
 import { SocketContext } from './Socket';
 
-/*
-    check what profile it should display with the searchParams
-    send the userId/Name with the navigate through params
-    only valid userid/name should be allowed
-    query strings
-*/
 
 const Profile: React.FC = () => {
     const socket = useContext(SocketContext);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [state, setState] = useState<boolean>(false);
-    const [qrcode, setQrcode] = useState<string>("");
     const [cookies] = useCookies(['userID', 'user']);
     const [user, setUser] = useState<IUser>();
 
-    // EVENT LISTENERS
+    // event listeners
     useEffect(() => {
         socket.on("get_user", response => {
-            if (response.success) {
-                console.log("get_user success");
-                setState(state => !state);
+            // console.log("search params " + searchParams.get("id"));
+            if (response.success && response.user.userId == Number(searchParams.get("id"))) {
+                console.log("get_user success profile");
                 setUser(user => response.user);
             }
         })
 
-        socket.on("enable_2fa", response => {
-            if (response.success) {
-                console.log(`socket.on ${response.msg} ${response.qrCode}`);
-                setQrcode(response.qrCode);
-            }
-            else
-                console.log(`socket.on ${response.msg}`);
-        })
-
         return () => {
             socket.off("get_user");
-            socket.off("enable_2fa");
         }
-    }, [])
+    }, [searchParams])
 
     useEffect(() => {
-        if (searchParams.get("id") && !state) {
+        if (searchParams.get("id")) {
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -57,40 +40,22 @@ const Profile: React.FC = () => {
             });
             console.log(`emiting get_user ${searchParams.get("id")}`);
         }
-    }, []) 
+    }, [searchParams]) 
 
-    const handle2FA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        socket.emit("enable_2fa", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-        });
-        console.log(`emiting enable_2fa`);
+    if (!user) {
+        return (
+            <div className='profile'>
+                    <p>User doest exist</p>
+            </div>
+        )
     }
-
-	/*
-		TO DO:
-		- Friend Request Button
-		- Avatar
-		- Stats/Match History
-		- Finish 2fa
-	*/
-
-    return (
-        <div>
-            {
-                state ?
-                <p>{user?.name}'s Profile</p> :
-                <p>User doest exist</p>
-            }
-            {/* <button className='defaultButtonA' onClick={(e) => handle2FA(e)}>ENABLE 2FA</button>
-            <br/><br/>
-            {
-                qrcode && 
-                <img src={qrcode}/>
-            } */}
-        </div>
-    )
+    else {
+        return (
+            <div className='profile'>
+                    <ProfileUser user={user} queryId={Number(searchParams.get("id"))}/> 
+            </div>
+        )
+    }
 }
 
 export default Profile

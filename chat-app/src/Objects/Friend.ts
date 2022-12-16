@@ -1,14 +1,21 @@
-import {IUser, User} from './User';
+import {IUser, SmallUser, User} from './User';
 
 export interface IFriend {
     IUser: IUser;
     confirmed: boolean;
 }
 
+<<<<<<< HEAD
 export class Friend extends User {
+=======
+export class Friend {
+    private _confirmed: boolean;
+    private readonly _user: User;
+
+>>>>>>> main
     constructor(user: User, confirmed: boolean) {
-        super(user.userId, user.name, user.avatar);
         this._confirmed = confirmed;
+        this._user = user;
     }
 
     private _confirmed: boolean;
@@ -21,10 +28,18 @@ export class Friend extends User {
         this._confirmed = value;
     }
 
+    get user(): User {
+        return this._user;
+    }
+
     public getIFriend(): IFriend {
         return {
-            IUser: this.getIUser(),
+            IUser: this._user.getIUser(),
             confirmed: this._confirmed
         }
+    }
+
+    public getSmallFriend(): SmallUser {
+        return {userId: this._user.userId, name: this._user.name, state: this._confirmed}
     }
 }

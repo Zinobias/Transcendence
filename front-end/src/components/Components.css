@@ -1,6 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Silkscreen&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Didact+Gothic&display=swap');
 
+
+/*
+  COLOR VARIABLES
+*/
+
+:root {
+    --defautGrey: #646464;
+    --lightGrey: #adadad;
+    --neonOrange: #CE5937;
+    --neonGreen: #5dce64;
+}
+  
+
 /*
     LOGIN FORM
 */
@@ -53,7 +66,7 @@
 }
 
 /*
-    CHAT
+    CHATROOM
 */
 
 
@@ -143,31 +156,116 @@ p.chatp {
     LIST CHATROOMS
 */
 
+.chats {
+    max-height: 300px;
+    margin-bottom: 40px;
+    overflow-y: auto; 
+    /* scrollbar-gutter: stable; */
+    /* border: 2px solid black; */
+}
+
 .listChat {
-    display: flex;
+    /* display: flex; */
     font-family: 'Didact Gothic';
+    list-style-type: none;
     margin: 5px;
 }
 
 .listChat__text {
-    flex: 1;
-    padding: 5px;
+    /* padding: 5px; */
     font-size: 20px;
 }
 
 .listChat__icon {
     margin-right: 10px;
-    font-size: 25px;
+    font-size: 20px;
+    float: right;
 }
 
 .listChatUser__text {
-    /* flex: 1; */
-    /* padding: 5px; */
     width: 100%;
-    /* line-height: 1; */
     font-size: 20px;
     cursor: pointer;
-    /* border: 2px solid; */
+}
+
+.listChat__button {
+    float: right;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: right;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.listChat__button:hover {
+    transform: scale(1.02);
+}
+
+/*
+    CHAT PW JOIN FORM
+*/
+
+.newChannel {
+    display: flex;
+}
+
+.newPwChannel {
+    display: none;
+}
+
+.pwChannelShow {
+    display: flex;
+}
+
+.channelShow {
+    display: none;
+}
+
+.chatPw {
+    display: none;
+    position: relative;
+    width: 100%;
+}
+
+.chatPwShow {
+    display: flex;
+}
+
+.pwform__label {
+    font-family: 'Silkscreen', cursive;
+    font-size: 15px;
+}
+
+.pwform__input {
+    font-size: 20px;
+    background: transparent;
+    border: 2px solid black;
+    display: inline-block;
+}
+
+.pwform__input::placeholder {
+    color: transparent;
+}
+
+.pwform__input:focus {
+    outline: none;
+}
+
+.pwform__button {
+    border: 2px solid;
+    color: black;
+    font-size: 18px;
+    margin-left: 5px;
+    background-color: transparent;
+    font-family: 'Silkscreen', cursive;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.pwform__button:hover {
+    transform: scale(1.02);
 }
 
 /*
@@ -187,11 +285,44 @@ p.chatp {
     cursor: pointer;
 }
 
-.leaveChannel {
+.settingsPassword {
+    display: none;
+}
+
+.settingsPasswordToggle {
+    display: inline;
+}
+
+.settingsPasswordShow {
+    display: inline;
+}
+
+.settingsPasswordHide {
+    display: none;
+}
+
+.settingsInput {
+    width:100%;
+    height: 28px;
+    background: transparent;
+    border: 2px solid black;
+    border-bottom: none;
+    box-sizing: border-box;
+}
+
+.settingsInput::placeholder {
+    color: transparent;
+}
+
+.settingsInput:focus {
+    outline: none;
+}
+
+.settingsButton {
     margin-bottom: 5px;
+    width: 100%;
     font-size: large;
-    border: 2px solid;
-    color: black;
+    border: 2px solid black;
     font-weight: bold;
     cursor: pointer;
     font-family: 'Silkscreen', cursive;
@@ -200,7 +331,23 @@ p.chatp {
 
 .settingsDropdown {
 	display: none;
-	background-color: #8a8a8a;
+    flex-direction: column;
+    /* align-items: center; */
+    border: 2px solid black;
+    border-bottom: none;
+	/* background-color: #8a8a8a; */
+}
+
+.memberButton {
+    /* margin-bottom: 5px; */
+    width: 100%;
+    font-size: large;
+    border: none;
+    border-bottom: 2px solid black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
 }
 
 .settingsShow {
@@ -208,56 +355,269 @@ p.chatp {
 }
 
 /*
-    PROFILE NAV
+    PASSWORD POPUP
+*/
+
+.passwordPrompt {
+    width: 200px;
+    height: 100px;
+    border: 2px solid black;
+    background-color: var(--defautGrey);
+}
+
+.passwordCenter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-area: 2 / 1 / 6 / 6;
+    z-index: 9999;
+}
+
+/*
+    PROFILE
 */
 
 .profile {
+    display: flex;
+    width: 55%;
+    max-width:100%;
+    /* border: solid 2px black; */
+}
+
+.profileLeft {
+    flex: 0.7;
+    /* border-right: solid 2px black; */
+}
+
+.profileRight {
+    flex: 2;
+    margin-left: 30px;
+}
+
+.profileAvatar {
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+    position: relative;
+    border: solid 2px black;
+}
+
+.profileQR {
+    width: 100%;
+}
+
+.profileAvatar_image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit:cover;
+}
+
+
+.profileButton {
+    width: 100%;
+    font-size: 100%;
+    margin-bottom: 5px;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+
+.twoFA {
+    display: none;
+}
+
+.twoFA_show {
+    display: inline;
+}
+
+.twoFA_input {
+    width: 100%;
+    font-size: 100%;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    background: transparent;
+    border: 2px solid black;
+}
+
+.twoFA_input::placeholder {
+    color: transparent;
+}
+
+.twoFA_input:focus {
+    outline: none;
+}
+
+.profileButton:active {
+    transform: scale(0.95);
+}
+
+.uploadAvatar {
+    width: 98%;
+    font-size: 100%;
+    margin-bottom: 5px;
+    text-align: center;
+    border: 2px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    display: inline-block;
+    line-height: 1.5;
+}
+
+.uploadAvatar_input {
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+@media (max-width: 1000px) {
+    .profile {
+        width: 100%;
+    }
+}
+
+/*
+    PROFILE NAV
+*/
+
+.profileNav {
     position: fixed;
     top: 2%;
     right: 3%;
     text-align: right;
     margin: 0;
+
+    word-break: break-word;
 }
 
-.profile__dropdown {
+.profileNav__dropdown {
     display: none;
-    height: 200px;
-    width: 150px;
+    /* height: 200px; */
+    width: 200px;
     /* margin: auto; */
     line-height: 1;
-    padding: 2%;
+    /* padding: 2%; */
+    text-align:center;
     background-color: #646464;
     border: 2px solid black;
 }
 
-.profile__avatar {
+.profileNav__avatar {
     width: 60px;
     height: 60px;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    cursor: pointer;
     /* object-fit: cover; */
     display: inline-block;
 }
 
-.profile__close {
+.profileNav__close {
     font-size: 20px;
     text-align: right;
 }
 
-.profile__close:hover {
+.profileNav__close:hover {
     cursor: pointer;
 }
 
-.profile__avatar:hover, .profile__avatar:focus {
+/* .profileNav__avatar:hover, .profileNav__avatar:focus {
     cursor: pointer;
     transform: scale(1.05);
-}
+} */
 
 .show {
     display: block;
+
+}
+/*
+    FRIENDSLIST
+*/
+
+.friendslist {
+    text-align: left;
+    list-style-type: none;
+    font-family: 'Didact Gothic';
 }
 
+.friendInvite {
+    margin: 6px;
+    border: 2px solid black;
+}
+
+.friendslistButton {
+    width: 50%;
+    font-size:100%;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.friendslistButton:active {
+    transform: scale(0.95);
+}
+
+/*
+    LOGIN
+*/
+
+.loginTwoFA_input {
+    width: 30%;
+    height: 40px;
+    font-size: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    background: transparent;
+    border: 2px solid black;
+}
+
+.loginTwoFA_input::placeholder {
+    color: transparent;
+}
+
+.loginTwoFA_input:focus {
+    outline: none;
+}
+
+.loginButtonDIV {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.loginButton {
+    font-size: 30px;
+    width:30%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    cursor: pointer;
+    box-shadow: 1px 1px 0px 0px #CE5937, 
+    2px 2px 0px 0px #CE5937, 
+    3px 3px 0px 0px #5dce64,  
+    4px 4px 0px 0px #5dce64;
+}
+
+.loginButton:hover {
+    transform: scale(1.05);
+}
 
 /*
     BUTTONS
@@ -371,6 +731,7 @@ p.chatp {
 
 .footerChat__body {
     display: none;
+    word-break: break-word;
     border: 2px solid #000000;
     border-bottom: none;
     height: 500px;
@@ -395,6 +756,8 @@ p.chatp {
     display: none;
     flex: 0.5;
 	width: 100%;
+    padding: 3px;
+    text-align: left;
     border-left: 2px solid black;
 }
 
@@ -402,17 +765,183 @@ p.chatp {
     display: flex;
 }
 
-
-/*
-    FRIENDSLIST
-*/
-
-.friendslist {
-    text-align: left;
-    list-style-type: none;
-    font-family: 'Didact Gothic';
-}
-
 /*
     GAME
 */
+
+.gameQueue {
+    width: 80%;
+    display: flex;  
+    flex-direction: row;
+    
+    /* position: relative; */
+    /* flex-direction: row; */
+}
+
+.gameSearch {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10%;
+    /* margin: auto auto; */
+    /* margin-bottom: none; */
+}
+
+.test {
+    width: 50%;
+    padding: 5%;
+}
+
+.gamePicture {
+    /* position: absolute; */
+    width: 100%;
+    /* height: 100%; */
+    object-fit:cover;
+}
+
+.gameLeft {
+    float:left;
+    font-weight: bold;
+}
+
+.gameRight {
+    float:right;
+    font-weight: bold;
+}
+
+.gameCanvas {
+    background-color: black; 
+}
+
+.newButton {
+    font-size: 30px;
+    width: 100%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.gameButton {
+    font-size: 30px;
+    /* width:30%; */
+    min-width: 30%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    /* word-break: break-word; */
+}
+
+.gameDiscoButton {
+    font-size: 30px;
+    width:100%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    cursor: pointer;
+    box-shadow: 1px 1px 0px 0px #CE5937, 
+                2px 2px 0px 0px #CE5937, 
+                3px 3px 0px 0px #5dce64,  
+                4px 4px 0px 0px #5dce64;
+}
+
+.gameButton:active, .gameDiscoButton:active {
+    transform: scale(0.95);
+}
+
+.dot-elastic {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: black;
+    color: black;
+    animation: dot-elastic 1s infinite linear;
+  }
+  .dot-elastic::before, .dot-elastic::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 0;
+  }
+  .dot-elastic::before {
+    left: -15px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: black;
+    color: black;
+    animation: dot-elastic-before 1s infinite linear;
+  }
+  .dot-elastic::after {
+    left: 15px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: black;
+    color: black;
+    animation: dot-elastic-after 1s infinite linear;
+  }
+  
+  @keyframes dot-elastic-before {
+    0% {
+      transform: scale(1, 1);
+    }
+    25% {
+      transform: scale(1, 1.5);
+    }
+    50% {
+      transform: scale(1, 0.67);
+    }
+    75% {
+      transform: scale(1, 1);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+  @keyframes dot-elastic {
+    0% {
+      transform: scale(1, 1);
+    }
+    25% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1, 1.5);
+    }
+    75% {
+      transform: scale(1, 1);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+  @keyframes dot-elastic-after {
+    0% {
+      transform: scale(1, 1);
+    }
+    25% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1, 0.67);
+    }
+    75% {
+      transform: scale(1, 1.5);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }

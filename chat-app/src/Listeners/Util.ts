@@ -13,6 +13,10 @@ export class Util {
 
     //EZ MESSAGE:
 
+    public emitFailedObject(userId: number, channel: string, msg: string) {
+        this.notify([userId], channel, {success: false, msg: msg})
+    }
+
     public notify(userIds: number[], channel: string, args: object) {
         const obj: microServiceDTO = {
             eventPattern: channel,
@@ -50,9 +54,9 @@ export class Util {
      * @param invert if this check should be inverted
      * @private
      */
-    public userInChannel(channel: Channel, userId: number, source: string, invert?: boolean): boolean {
+    public userInChannel(channel: Channel, userId: number, source: string, invert: boolean): boolean {
         if (invert) {
-            if (!channel.hasUser(userId)) {
+            if (channel.hasUser(userId)) {
                 this.logger.debug(`User [${userId}] should be in channel for ${source}`);
                 return false;
             }
@@ -60,9 +64,9 @@ export class Util {
         }
 
         if (channel.hasUser(userId)) {
-            this.logger.debug(`User [${userId}] should not be in channel for ${source}`);
             return true;
         }
+        this.logger.debug(`User [${userId}] should not be in channel for ${source}`);
         return false;
     }
 
@@ -76,6 +80,21 @@ export class Util {
     public notAdmin(channel: Channel, actorId: number, source: string): boolean {
         if (!channel.isAdmin(actorId)) {
             this.logger.debug(`Actor [${actorId}] is not an admin and can't issue the request ${source}`);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a user is an admin in a channel
+     * @param channel
+     * @param actorId
+     * @param source
+     * returns false if user *is* an admin
+     */
+    public isAdminButShouldNotBe(channel: Channel, actorId: number, source: string): boolean {
+        if (channel.isAdmin(actorId)) {
+            this.logger.debug(`Actor [${actorId}] is an admin and can't be affected by the request ${source}`);
             return true;
         }
         return false;

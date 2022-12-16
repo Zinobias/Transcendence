@@ -15,7 +15,7 @@ export interface UserEditName {
 
 export interface UserEditAvatar {
     user_id: number;
-    new_avatar: string;
+    new_avatar: any;
 }
 
 export interface UserBlockUser {
@@ -50,4 +50,15 @@ export interface GetSelfUserData {
 export interface GetOtherUserData {
     user_id: number;
     requested_user_id: number;
+}
+
+export interface InviteGameUser {
+    user_id: number;
+    request_user_id: number;
+    game_mode: string;
+}
+
+export interface AcceptGameRequest {
+    user_id: number;
+    request_user_id: number;
 }

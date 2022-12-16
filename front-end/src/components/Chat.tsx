@@ -5,7 +5,6 @@ import { IChannelInfo } from "../interfaces"
 import './Components.css';
 import {Md5} from "ts-md5";
 import ListPublicChatrooms from "./ListPublicChatrooms";
-import { stat } from "fs";
 
 const   Chat: React.FC = () => {
 	
@@ -16,6 +15,9 @@ const   Chat: React.FC = () => {
     const [visibleCheck, setVisibleCheck] = useState<boolean>(false);
     const [passwordCheck, setPasswordCheck] = useState<boolean>(false);
     const [channels, setChannels] = useState<IChannelInfo[]>([]);
+    const [pw, setPw] = useState<string>("");
+    const [pwName, setPwName] = useState<string>("");
+    const [pwId, setPwId] = useState<number>(-1);
 
     useEffect(() => {
         socket.emit("chat", {
@@ -30,32 +32,58 @@ const   Chat: React.FC = () => {
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("channel_create", response => {
-            if (response.success == true) {
+            if (response.success == true && response.hasPassword == false) {
                 console.log(`socket.on channel_create success ${response.channel_name}`);
                 socket.emit("chat", {
                     userId: cookies.userID,
                     authToken: cookies.user,
                     eventPattern: "get_channels_user",
                     data: {user_id: cookies.userID}
-                  })
+                })
                 console.log("emiting get_channels_user");
                 setState( state => !state);
+            }
+            else if (response.success == true && response.hasPassword == true) {
+                document.getElementById("pwChannel")?.classList.toggle("FormShow");
+                document.getElementById("noPwChannel")?.classList.toggle("FormHide");
+                setPwName( pwName => response.channel_name);
+                setPwId( pwId => response.channel_id);
             }
             else
                 alert(`[${response.msg}]`);
         })
 
         socket.on("channels_retrieve", response  => {
-            console.log(`socket.on channels_retrieve`);
+            console.log(`socket.on channels_retrieve success`);
             setChannels([]);
             response.channels.forEach((element : IChannelInfo) => {
                 setChannels( channels => [...channels, element])
             });
         })
 
+        socket.on("channel_update_password", response => {
+            if (response.success == true) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_channels_user",
+                    data: {user_id: cookies.userID}
+                })
+                console.log("emiting get_channels_user");
+                setState( state => !state);
+                setPwName("");
+                setPwId(-1);
+                document.getElementById("pwChannel")?.classList.toggle("FormHide");
+                document.getElementById("noPwChannel")?.classList.toggle("FormShow");
+            }
+            else
+                alert(`[${response.msg}]`);
+        })
+
         return () => {
             socket.off("channel_create");
             socket.off("channels_retrieve");
+            socket.off("channel_update_password");
         }
     },[])
 
@@ -79,13 +107,21 @@ const   Chat: React.FC = () => {
         return (true);
     }
 
+    function validatePassword (name: string) : boolean {
+        if (!name) {
+            alert("Password is required");
+            return (false);
+        }
+        if (name.length > 16 || name.length < 8) {
+            alert("Channel password needs to be between 8-16 characters");
+            return (false);
+        }
+        return (true);
+    }
+
     const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-
         if (validateChatroomName(chatroomName)) {
-            //TODO implement has for password, below is an example of how to hash something, just append the channel id to the end of the password
-            // console.log(Md5.hashStr(chatroomPassword + chatroomId))
-
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -103,21 +139,49 @@ const   Chat: React.FC = () => {
         setPasswordCheck(false);
     };
 
+    const handlePassword = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (validatePassword(pw)) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channel_update_password", 
+                data: { user_id: cookies.userID, 
+                        channel_id: pwId, 
+                        password: Md5.hashStr(pw + pwId) }
+            });
+            console.log(`emitting channel_update_password [${Md5.hashStr(pw + pwId)}]`);
+            setPw("");
+            document.getElementById("Channel")?.classList.toggle("channelShow");
+            document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");
+        }
+
+    };
+
     return (
         <>
         <div>
             <span className="heading__small">PUBLIC CHATROOMS</span>
             <ListPublicChatrooms chatroom={channels} />
         </div>
-        <form className="loginform" id="newChatroom">
-                <label className="loginform__label">Name</label>
-                <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
-                <label className="loginform__label">password</label>
-                <input type="checkbox" checked={passwordCheck} onChange={e => setPasswordCheck(!passwordCheck)}/>
-                <label className="loginform__label">public</label>
-                <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
-                <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
-        </form>
+        <div className="newPwChannel" id="pwChannel">
+            <form className="loginform">
+                <label className="loginform__label">Enter password for {pwName}</label>
+                <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
+                <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
+            </form> 
+        </div>
+        <div className="newChannel" id="Channel">
+            <form className="loginform">
+                    <label className="loginform__label">Name</label>
+                    <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
+                    <label className="loginform__label">password</label>
+                    <input type="checkbox" checked={passwordCheck} onChange={e => setPasswordCheck(!passwordCheck)}/>
+                    <label className="loginform__label">public</label>
+                    <input type="checkbox" checked={visibleCheck} onChange={e => setVisibleCheck(!visibleCheck)}/>
+                    <button className="loginform__button" onClick={(e) => handleSubmit(e)}>NEW CHATROOM</button>
+            </form>
+        </div>
         </>
     )
     

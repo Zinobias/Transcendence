@@ -137,6 +137,53 @@ export class Auth {
         return await this.retrieveUserId(json);
     }
 
+<<<<<<< HEAD
+=======
+    public async login(client: Socket, token: string, TFAToken? : string): Promise<any | undefined> {
+        const userId = await this.auth(token, false);
+
+        if (userId === undefined) {
+            this.logger.warn(`Received undefined userId from auth`)
+            return undefined;
+        }
+        if (!await this.queries.userExists(userId)) {
+            return undefined; //TODO fix this to return a proper error messages
+        }
+		this.sockets.storeSocket(userId, client);
+        /**
+         * TODO: Check if user in dataBase
+         */
+		const uuid = randomUUID();
+        const has2FA = await this.TFA.hasTwoFA(userId);
+		if (has2FA === Has2FA.HAS_TFA) {
+			if (TFAToken && await this.TFA.verify(userId, TFAToken) === true) {
+                if (await this.storeSession(userId, uuid) === false) {
+                    this.logger.error(`Unable to store session for user id [${userId}]`);
+                    return undefined;
+                }
+				return ({
+					user_id : userId,
+					auth_cookie : uuid,
+				});
+			}
+			else {
+				return ({
+					user_id : userId,
+					auth_cookie : undefined,
+				});
+			}
+		} else if (has2FA == Has2FA.ERROR) {
+            return undefined;
+        }
+        if ((await this.storeSession(userId, uuid)))
+            return {user_id: userId, auth_cookie: uuid};
+        else {
+            this.logger.error(`Unable to store session for user id [${userId}]`);
+            return undefined;
+        }
+    };
+
+>>>>>>> main
     private async retrieveUserId(authToken: AuthToken): Promise<number> {
         this.logger.log(authToken.access_token);
         const response = await fetch('https://api.intra.42.fr/v2/me', {

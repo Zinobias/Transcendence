@@ -56,3 +56,21 @@ export interface IGameGetLeaderboard extends basicResponse {
 export interface IGameUserGetHistory extends basicResponse {
 	history : any,
 };
+
+export interface IVec2 {
+	x : number,
+	y : number,
+}
+
+export interface IEntity {
+	pos				: IVec2,
+	velocityVector? : IVec2,
+	height 			: number,
+	width 			: number,
+	type			: string,
+};
+
+export interface IGameScore {
+	player1Score : number,
+	player2Score : number,
+}

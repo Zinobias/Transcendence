@@ -5,13 +5,28 @@ import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 
 export const   LogoutButton: React.FC = () => {
+    const socket = useContext(SocketContext);
     const [cookies, setCookie, removeCookie] = useCookies(['user', 'userID']);
+
+    // eventn listener to remove cookies and log user out
+    useEffect(() => {
+        socket.on("logout", response => {
+            removeCookie('user');
+            removeCookie('userID');
+        })
+
+        return () => {
+            socket.off("logout");
+        }
+    }, [])
 
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        removeCookie('user');
-        removeCookie('userID')
         console.log("click logout");
+        socket.emit("logout", {
+            userId: cookies.userID,
+            authToken: cookies.user
+        });
     };
 
     return (
@@ -29,6 +44,7 @@ export const    SignupButton: React.FC = () => {
     const [signup, setSignup] = useState<string>("");
     const socket = useContext(SocketContext);
 
+    // EVENT LISTENERS
     useEffect(() => {
         socket.on("create_account", response => {
             if (response.success == false) {
@@ -45,15 +61,18 @@ export const    SignupButton: React.FC = () => {
                 navigate('/');
             }
         })
+
         socket.on('retrieve_redirect', response => {
-            setSignup(response.signup);
+            setSignup(signip => response.signup);
         })
+
         return () => {
             socket.off('retrieve_redirect');
             socket.off("create_account");
         }
     }, [])
 
+    // ON MOUNT
     useEffect(() => {
         if (searchParams.get("code")) {
             console.log("emitting create_account " + sessionStorage.getItem("userName"));
@@ -66,9 +85,7 @@ export const    SignupButton: React.FC = () => {
             });
             sessionStorage.clear();
         }
-    }, [])
 
-    useEffect(() => {
         socket.emit('retrieve_redirect', {});
     }, [])
 
@@ -102,25 +119,41 @@ export const    LoginButton: React.FC = () => {
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const socket = useContext(SocketContext);
     const [login, setLogin] = useState<string>("");
+    const [token, setToken] = useState<string>("");
+    const [showTwoFA, setShowTwoFA] = useState<boolean>(false);
 
+    // EVENT LISTENERS
     useEffect(() => {
         socket.on("login", response => {
             if (response.success == false) {
                 console.log("Login went wrong");
                 searchParams.delete("code");
-                setSearchParams(searchParams);
+                setSearchParams(searchParams => searchParams);
                 alert(response.msg);
             }
-            else {
+            else if (response.success == true && !response.DTO.auth_cookie) {
+                console.log("socket.on login success setting up 2fa");
+                if (sessionStorage.getItem("2fa")) {
+                    alert("The Token you entered was invalid");
+                    searchParams.delete("code");
+                    setSearchParams(searchParams => searchParams);
+                }
+                else {                    
+                    sessionStorage.setItem("2fa", "2fa");
+                    window.dispatchEvent(new Event("storage"));
+                }
+            }
+            else if (response.success == true && response.DTO.auth_cookie) {
                 console.log("socket.on login " + response.DTO.auth_cookie);
                 console.log("socket.on login " + response.DTO.user_id);
+                sessionStorage.clear();
                 setCookie('user', response.DTO.auth_cookie, {path: '/'});
                 setCookie('userID', response.DTO.user_id, {path: '/'});
                 navigate('/');
             }
         })
         socket.on('retrieve_redirect', response => {
-            setLogin(response.login);
+            setLogin(login => response.login);
         })
         return () => {
             socket.off('retrieve_redirect');
@@ -128,77 +161,73 @@ export const    LoginButton: React.FC = () => {
         }
     }, [])
 
+    // ON MOUNT
     useEffect(() => {
-        if (searchParams.get("code")) {
+        if (searchParams.get("code") && sessionStorage.getItem("token")) {
+            console.log("emitting login 2fa" + searchParams.get("code"));
+            socket.emit("auth", {
+                eventPattern: "login", 
+                data: {token: searchParams.get("code"), TFAToken: sessionStorage.getItem("token")}
+            });
+        }
+        else if (searchParams.get("code") && !sessionStorage.getItem("token")) {
             console.log("emitting login " + searchParams.get("code"));
             socket.emit("auth", {
                 eventPattern: "login", 
                 data: {token: searchParams.get("code")}
             });
         }
-    }, [])
 
-    useEffect(() => {
+        if (sessionStorage.getItem("2fa")) {
+            setShowTwoFA(showTwoFA => true)
+            console.log("setting state boolean");
+        }
+
         socket.emit('retrieve_redirect', {});
     }, [])
 
+    // Session Storage Listener
+    useEffect(() => {
+        function checkUserData() {
+            if (sessionStorage.getItem("2fa")) {
+                setShowTwoFA(showTwoFA => true)
+                console.log("setting state boolean");
+            }
+        }
+        window.addEventListener('storage', checkUserData)
+        return () => {
+            window.removeEventListener('storage', checkUserData)
+        }
+      }, [])
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        console.log("REDIRECTING LOGIN");
+        console.log("redirecting login");
         window.location.href = login;
+        // sessionStorage.clear();
     };
+    
+    const handleTwoFA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        sessionStorage.setItem("token", token);
+        console.log("redirecting 2fa login");
+        setToken("");
+        window.location.href = login;
+        // sessionStorage.clear();
+    }
+
+    if (showTwoFA) {
+        return (
+            <div className="loginButtonDIV">
+                <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="loginTwoFA_input"/>
+                <button className="loginButton" onClick={(e) => handleTwoFA(e)}>submit 2fa token</button>
+            </div>
+        )
+    }
 
     return (
-        <>
-            <button className="defaultButton" onClick={(e) => handleClick(e)}>LOGIN</button>
-        </>
+        <div className="loginButtonDIV">
+            <button className="loginButton" id="loginButton" onClick={(e) => handleClick(e)}>LOGIN</button>
+        </div>
     )
 };
-
-export const DefaultMatchmaking: React.FC = () => {
-
-    const [state, setState] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (state)
-            console.log("emitting default");
-        //socke.emit
-    }, [state])
-
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
-        setState(true);
-        console.log("click default");
-    };
-
-    return (
-        <>
-            <button className="boringButton" onClick={(e) => handleClick(e)}>DEFAULT</button>
-        </>
-    )
-
-};
-
-export const DiscoMatchmaking: React.FC = () => {
-
-    const [state, setState] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (state)
-            console.log("emitting disco");
-        //socket.emit
-    }, [state])
-
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
-        setState(true);
-        console.log("click disco");
-    };
-
-    return (
-        <>
-            <button className="defaultButton" onClick={(e) => handleClick(e)}>DISCO</button>
-        </>
-    )
-};
-

@@ -10,6 +10,7 @@ export class DBGameResult {
 		this.player1Score = playerScore1;
 		this.player2Score = playerScore2;
 		this.winnerId = playerScore1 > playerScore2 ? uid1 : uid2;
+		this.createAt = new Date().getTime()
 	}
 
 	@PrimaryColumn()
@@ -30,7 +31,7 @@ export class DBGameResult {
 	@Column()
 	player2Score : number;
 
-	@Column({ default: new Date().getTime(), type: 'bigint'})
+	@Column({type: 'bigint'})
 	createAt: number;
 
 	@OneToMany(() => UserTable, (user) => user.userId)

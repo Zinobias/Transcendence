@@ -78,6 +78,8 @@
 */
 
 .grid-container {
+  width: 100vw;
+  height: 100vh;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 0.1fr 1fr;
@@ -87,8 +89,6 @@
   font-family: 'Silkscreen', cursive;
   box-sizing: border-box;
   padding: 10px;
-  width: 100vw;
-  height: 100vh;
 }
 
 .grid__header {
@@ -125,6 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* font-size: 2vw; */
   /* border: 2px solid black; */
   padding: 20px;
   grid-area: 2 / 1 / 6 / 6;

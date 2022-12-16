@@ -1,13 +1,11 @@
 import React, { useEffect, useContext } from "react";
-import { StringLiteral } from "typescript";
+import { useCookies } from "react-cookie";
+import { IUser } from "../interfaces";
 import { SocketContext } from "./Socket";
 
-interface i_Friendslist {
-    name: string;
-    userID: number;
-    // online: boolean;
+interface Props {
+    user: IUser;
 }
-
 
 /*
 	TO DO:
@@ -15,19 +13,67 @@ interface i_Friendslist {
 	- Show ingame or now
 */
 
-const Friendslist: React.FC = () => {
+const Friendslist: React.FC<Props> = ({user}) => {
     const socket = useContext(SocketContext);
-    var friends: i_Friendslist[] = [
-        {name: "zino", userID: 1},
-        {name: "stijn", userID: 2},
-        {name: "abba", userID: 3},
-    ];
+    const [cookies, setCookie] = useCookies(['user', 'userID']);
+
+    const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "accept_friend_request", 
+            data: {user_id: cookies.userID, friend_id: friendId}
+        })
+        console.log(`emiting accept_friend_request for users ` + friendId + ` ` + cookies.userID);
+    }
+
+    const handleDecline = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
+        e.preventDefault();
+        console.log("click decline");
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "decline_friend_request", 
+            data: {user_id: cookies.userID, friend_id: friendId}
+        })
+        console.log(`emiting decline_friend_request`);
+    }
+
+    /*
+        FRIEND REQUEST DIV
+
+    <div className="friendInvite">
+        <p><b>name</b> send you a friend request</p>
+        <button className="friendslistButton">Accept</button>
+        <button className="friendslistButton">Decline</button>
+    </div>
+
+    */
 
     return (
-        <>
-            <p style={{textAlign: "left"}}>Friendslist Placeholder</p>
-            {friends.map((e) => (
-                <li key={e.userID} className="friendslist">{e.name}</li>
+        <>  
+            {user.friends.map((element, index) => (
+                <div key={index} className="friendInvite">
+                {
+                    element.state == false &&
+                    <>
+                        <p><b>{element.name} {element.userId}</b> send you a friend request</p>
+                        <button className="friendslistButton" onClick={(event) => handleAccept(event, element.userId)}>Accept</button>
+                        <button className="friendslistButton" onClick={(event) => handleDecline(event, element.userId)}>Decline</button>
+                    </>
+                }
+                </div>
+            ))}
+            <p><b>Friendslist:</b></p>
+            {user.friends.map((e, index) => (
+                <div key={index} className="friendslist">
+                    {/* <p>{e.name} {e.state}</p> */}
+                    {
+                        e.state &&
+                        <li key={e.userId} className="friendslist">{e.name}</li>
+                    }
+                </div>
             ))}
         </>
     );

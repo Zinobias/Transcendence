@@ -18,7 +18,39 @@ export interface IChannel {
 
 export class Channel {
     private static _channels: Channel[] = [];
+<<<<<<< HEAD
     private readonly _owner: number;
+=======
+
+    private static addChannel(channel: Channel): void {
+        this._channels.push(channel);
+    }
+
+    public static getChannel(channelId: number): Channel | undefined {
+        // const channels = this._channels.filter((a) => a._channelId == channelId);
+        const channels = this._channels.find((e) => {
+            return (e._channelId == channelId);
+        });
+        if (channels !== undefined)
+            return channels;
+        return undefined;
+    }
+
+    public static getUserChannels(userId: number): Channel[] {
+        return this._channels.filter((channel) => {
+            return channel.users.filter((user) => {
+                return user.userId == userId
+            }).length == 1
+        });
+    }
+
+    public static removeChannel(channelId: number) {
+        this._channels = this._channels.filter((a) => a._channelId != channelId);
+    }
+
+    private _channelId: number;
+    private _owner: number;
+>>>>>>> main
     private readonly _otherOwner: number;
     private readonly _messages: Message[];
 
@@ -47,7 +79,17 @@ export class Channel {
         this._channelId = value;
     }
 
+<<<<<<< HEAD
     private _channelName: string;
+=======
+    set owner(value: number) {
+        this._owner = value;
+    }
+
+    public get otherOwner(): number {
+        return this._otherOwner;
+    }
+>>>>>>> main
 
     public get channelName(): string {
         return this._channelName;
@@ -79,7 +121,27 @@ export class Channel {
         this._closed = value;
     }
 
+<<<<<<< HEAD
     private _visible: boolean;
+=======
+    public get settings(): Setting[] {
+        return this._settings;
+    }
+
+    public hasSetting(affectedId: number, settingType: SettingType) {
+        return this._settings.find((setting: Setting) => setting.affectedId == affectedId && setting.setting == settingType) != undefined;
+    }
+
+    public addSetting(setting: Setting) {
+        this._settings.push(setting);
+    }
+
+    public removeSetting(userId: number, settingType: SettingType) {
+        this._settings = this._settings.filter(
+            (a) => !(a.affectedId == userId && a.setting === settingType),
+        );
+    }
+>>>>>>> main
 
     get visible(): boolean {
         return this._visible;

@@ -39,6 +39,13 @@ export interface ChannelDemote {
     affected_id: number;
 }
 
+export interface ChannelMuteUser {
+    user_id: number;
+    channel_id: number;
+    affected_id: number;
+    until: number;
+}
+
 export interface ChannelKick {
     user_id: number;
     channel_id: number;

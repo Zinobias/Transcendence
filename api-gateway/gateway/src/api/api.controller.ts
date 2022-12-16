@@ -22,9 +22,9 @@ export class ApiController {
     }
 
     @EventPattern('game')
-    gameForwarding(@Payload() payload: microServiceDTO) {
+    gameForwarding(@Payload() payload: any) {
         this.logger.log(`Msg from game to gateway received`);
-		this.sockets.sendData(payload.userIDs, payload.eventPattern, payload.data);
+		this.sockets.sendData(payload.userIds, payload.eventPattern, payload.data);
 		// for (const userid of payload.userIDs) {
 		// 	// this.sockets.sendData()
 		// 	this.sockets
@@ -61,7 +61,7 @@ export class ApiController {
 
     @EventPattern('game_to_chat')
     gameToChat(@Payload() payload: microServiceDTO) {
-        this.game_client.emit(payload.eventPattern, payload.data);
+        this.game_client.emit('internal.game.create', payload.data);
     }
 
 }

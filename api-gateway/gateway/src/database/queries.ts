@@ -1,5 +1,5 @@
 import {Sessions} from './entities/sessions';
-import {InsertResult} from 'typeorm';
+import {InsertResult, Repository} from 'typeorm';
 import {Inject, Injectable, Logger} from '@nestjs/common';
 import {Database} from './data-source';
 import {UserTable} from './entities/user-table';
@@ -25,6 +25,7 @@ export class Queries {
                 {
                     userId: id,
                     sessionCode: auth,
+                    time: new Date().getTime()
                 },
             ],
             ['userId', 'sessionCode'],
@@ -34,7 +35,7 @@ export class Queries {
 
     async loadSession(id: number): Promise<string[] | undefined> {
         const myDataSource = await this.database.getDataSource();
-        const repo = myDataSource.getRepository(Sessions);
+        const repo: Repository<Sessions> = myDataSource.getRepository(Sessions);
         let session = await repo.findBy({
             userId: id
         }).catch((e) => {
@@ -46,18 +47,23 @@ export class Queries {
             return undefined;
         let sessionCodes: string[] = []
         for (let output of session) {
-            if (output.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
-                this.logger.warn(`Need to remove this session ${output.sessionCode} for ${output.userId}`);
+            if (output.time + Queries.expireTime < new Date().getTime()) {
+                this.removeSessionWithRepo(repo, output).finally();
                 break;
             }
             sessionCodes.push(output.sessionCode);
         }
-        // if (session === null || session.time + Queries.expireTime < new Date().getUTCMilliseconds()) {
-        //     this.logger.debug(`Session expired for user ${id}`)
-        //     return undefined;
-        // }
-        // else
         return sessionCodes;
+    }
+
+    async removeSessionWithRepo(repo: Repository<Sessions>, session: Sessions) {
+        await repo.remove(session)
+    }
+
+    async removeAllSessions(userId: number) {
+        const myDataSource = await this.database.getDataSource();
+        const repo: Repository<Sessions> = myDataSource.getRepository(Sessions);
+        await repo.delete({userId: userId});
     }
 
     public async userNameExists(userName: string): Promise<boolean | string> {
@@ -99,12 +105,17 @@ export class Queries {
         if (await this.userExists(userId))
             return `You already have an active account.`;
 
+<<<<<<< HEAD
         try {
             //Store the user in the database
             await userTableRepo.insert({
                 userId: userId,
                 userName: userName,
             });
+=======
+        try { //Store the user in the database
+            await userTableRepo.insert(new UserTable(userId, userName, null));
+>>>>>>> main
         } catch (e) {
             Logger.warn(`Unable to run create user query for [${userId}] see error: ${e}`);
             return `Unknown error while saving the user in the database`;
@@ -116,6 +127,7 @@ export class Queries {
         try {
             const myDataSource = await this.database.getDataSource();
             const tfaTableRepo = myDataSource.getRepository(Tfa);
+<<<<<<< HEAD
             const insert = await tfaTableRepo.upsert(
                 [
                     {
@@ -126,6 +138,14 @@ export class Queries {
                 ['user_id', 'tfa_code'],
             );
             return insert.identifiers[0] !== undefined;
+=======
+            const findResult = await tfaTableRepo.findOneBy({user_id: userId});
+            if (findResult != null) {
+                await tfaTableRepo.delete(findResult);
+            }
+            const saveResult = await tfaTableRepo.save(new Tfa(userId, tfaCode));
+            return saveResult != null;
+>>>>>>> main
         } catch (e) {
             this.logger.warn(e);
         }

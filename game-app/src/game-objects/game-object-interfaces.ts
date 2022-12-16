@@ -1,6 +1,7 @@
 import { Vec2 } from "../vectorLib/vector-lib";
 import {GameConfig, Direction} from "../enums" ;
 import { getRandomInt } from "../utils";
+import { IVec2 } from "src/dto/frontend.DTOs";
 
 // Colors in R G B
 export class Color {
@@ -31,7 +32,8 @@ export class Color {
  * Simple abstract class to form the base of any type of entity.
  */
 export abstract class Entity {
-	public		onHit?(ball : Ball) : void; 
+	public		onHit?(ball : Ball) : void;
+	public		toDelete			: boolean;
 	protected 	_pos 				: Vec2;
 	protected	_velocityVector? 	: Vec2;
 	private		_type 				: string;
@@ -51,6 +53,7 @@ export abstract class Entity {
 		if (width && height)
 			[this._width, this._height] = [width, height];
 		this._pos = new Vec2();
+		this.toDelete = false;
 	}
 
 	// ------------------------------------------------------------------------------------------------
@@ -70,10 +73,8 @@ export abstract class Entity {
 	// Setters
 	set velocityVector(newVelocityVector : Vec2 | undefined) { this._velocityVector = newVelocityVector instanceof Vec2 ? new Vec2(newVelocityVector.x, newVelocityVector.y) : undefined; }
 	set pos(newPos : Vec2) { this._pos = newPos; }
-	set height(height : number) { this._height = this.height; }
-	set width(width : number) { this._width = this.width; }
-
-
+	set height(height : number) { this._height = height; }
+	set width(width : number) { this._width = width; }
 }
 
 /**
@@ -83,26 +84,16 @@ export abstract class Entity {
  */
 export class Ball extends Entity {
 	private _color : Color;
-	//private _radius	: number;
-	private _speed : number;
 
 	constructor () {
-		super("ball", GameConfig.DEFAULT_BALL_RADIUS,GameConfig.DEFAULT_BALL_RADIUS);
+		super("ball", GameConfig.DEFAULT_BALL_RADIUS, GameConfig.DEFAULT_BALL_RADIUS);
 		this._color = new Color(211, 211, 211);
 		this.velocityVector = new Vec2(1, 0);
 		[this.pos.x, this.pos.y] = [0, 0];
-		//this.speed = GameConfig.DEFAULT_BALL_SPEED;
 	}
 
 	get color() {return this._color;};
-	//get radius() {return this._radius;};
-	get speed() {return this._speed;};
-
-
 	set color(color : Color) {this._color = color;};
-	//set radius(radius : number) {this._radius = radius;};
-	set speed(speed : number) {this.speed = speed;};
-
 }
 
 /**
@@ -114,15 +105,30 @@ export class PlayerPaddle extends Entity {
 
 	constructor(_playerNumber : number) {
 		super('player_paddle', GameConfig.PADDLE_HEIGHT, GameConfig.PADDLE_WIDTH);
-		//[this.pos.x, this.pos.y] = [-GameConfig.PADDLE_HEIGHT / 2, _playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2];
-		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  -GameConfig.BOARD_WIDTH / 2 : GameConfig.BOARD_WIDTH / 2, -GameConfig.PADDLE_WIDTH / 2];
-		// [this.width, this.height] = [ GameConfig.PADDLE_WIDTH, GameConfig.PADDLE_HEIGHT];
+		[this.pos.x, this.pos.y] = [_playerNumber == 1 ?  (-GameConfig.BOARD_WIDTH / 2) + (GameConfig.PADDLE_WIDTH / 2) + 14 : (GameConfig.BOARD_WIDTH / 2) - 14 - (GameConfig.PADDLE_WIDTH / 2), 0];
 		[this._keyPressDown, this._keyPressUp ]= [false, false];
 		this.onHit = (ball : Ball ) => {
 			if (ball.velocityVector) {
-				ball.velocityVector.x *= -1.3;
-				ball.velocityVector.y = getRandomInt(-GameConfig.BOARD_HEIGHT / 2, GameConfig.BOARD_HEIGHT / 2);
+				if (ball.velocityVector.x < ball.width / 2)
+					ball.velocityVector.x *= -1.003; // 1.003
+				else
+					ball.velocityVector.x *= -1;
+				if (ball.velocityVector.y == 0) // in case both players are not inputtin any actions and hit the paddle exactly on the middle.
+					ball.velocityVector.y =  getRandomInt(0, 12) % 2 === 0 ? -1 : 1;
+				// --------------------------------------------
+				// Paddle segments.
+				if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 1) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1.5 : 1.5;
+				else if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 2) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1.25 : 1.25;
+				else if (ball.pos.y <= this._pos.y - (this.height / 8) || ball.pos.y >= this._pos.y + (this.height / 3) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -1 : 1;
+				else if (ball.pos.y <= this._pos.y - (this.height / 4) || ball.pos.y >= this._pos.y + (this.height / 4) )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -.75 : .75;
+				else if (ball.pos.y <= this.pos.y || ball.pos.y >= this.pos.y )
+					ball.velocityVector.y =  ball.velocityVector.y < 0 ? -0.5 : 0.5;
 			}
+			ball.pos.x = this.pos.x < 0 ? this.pos.x + (this.width / 2) + (ball.width / 2) : this.pos.x - (this.width / 2) - (ball.width / 2);
 		}
 	}
 
@@ -138,6 +144,7 @@ export class PlayerPaddle extends Entity {
 
 	// TODO: Maybe add a set height if we want to create some fun powerup that reduces the paddle height.
 }
+
 
 /**
  * UserID & the player's current score.
@@ -172,4 +179,54 @@ export enum MoveStatePaddle {
 	keyReleaseUp 	= 1,
 	keyPressDown 	= 2,
 	keyReleaseDown 	= 3,
+}
+
+/**
+ * MushroomPowerUp
+ * Increases the ball size.
+ */
+ export class powerUpMushroom extends Entity {
+
+	constructor(v2 : IVec2) {
+		super('mushroom', GameConfig.DEFAULT_MUSHROOM_HEIGHT, GameConfig.DEFAULT_MUSHROOM_WIDTH);
+		this.onHit = (ball : Ball ) => {
+			if (ball.height < 32) {
+				ball.height += 32;
+				ball.width +=  32;
+			}
+			else {
+				ball.height +=  6;
+				ball.width += 6;
+			}
+			console.log(`MUSHROOM ONHIT FNC WIDTH ${ball.width} height ${ball.height}`);
+		}
+		this._pos.x = v2.x;
+		this._pos.y = v2.y;
+		this.toDelete = true;
+	}
+}
+
+/**
+ * Pepper powerUp 
+ * Increases the ball velocity.
+ */
+ export class powerUpPepper extends Entity {
+
+	constructor(v2 : IVec2) {
+		super('pepper', GameConfig.DEFAULT_PEPPER_HEIGHT, GameConfig.DEFAULT_PEPPER_WIDTH);
+		this.onHit = (ball : Ball ) => {
+			if (ball.velocityVector!.x + 0.5 <= GameConfig.DEFAULT_BALL_RADIUS)
+				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.5 : 0.5;
+
+		}
+		this._pos.x = v2.x;
+		this._pos.y = v2.y;
+		this.toDelete = true;
+	}
+}
+
+export interface IRectangle {
+	pos : IVec2,
+	width : number,
+	height : number,
 }

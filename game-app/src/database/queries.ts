@@ -23,23 +23,20 @@ export class Queries {
 	public async getLeaderboard() {
 		const dataSource = await this.database.getDataSource();
 		const gameRepository = dataSource.getRepository(DBGameResult);
-
-		let res = await gameRepository.createQueryBuilder()
-		.select('game_result.winnerId, COUNT(game_result.winnerId)')
-		.from(DBGameResult, 'game_result')
-		.addGroupBy('game_result.winnerId')
-		.execute()
-		.catch((e) => this.logger.warn(`Inserting gameResult into DB went wrong. error msg : ${e}`));
-
+		const res = await gameRepository.query(`SELECT game_result."winnerId", COUNT(game_result."winnerId") FROM game_result GROUP BY game_result."winnerId"`);
 		this.logger.warn(`RESULT is ${res}`);
+		return (res);
 	}
+
+	// {winnerId: userId, count : 72}
+	// {winnerId: userId, count : 9}
 
 	public async getUserGameHistory(uid : number) {
 		const dataSource = await this.database.getDataSource();
 		const gameRepository = dataSource.getRepository(DBGameResult);
 
-		gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
-		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.'));
+		return (await gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
+		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.')));
 	}
 
 	public async getGameId() {
@@ -59,11 +56,11 @@ export class Queries {
 			this.logger.warn(`Grabbing gameId went wrong : ${e}`);
 			return (-1);
 		}
-		this.logger.debug(`Grabbing gameId   : ${res.gameId}`);
-		if (res.gameId === undefined)
+		this.logger.debug(`Grabbing gameId   : ${res}`);
+		if (res[0] === undefined)
 			return (0);
 		else
-			return (res.gameId);
+			return (res[0].game_result_gameId + 1);
 	}
 
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Sessions } from './sessions';
 
@@ -13,6 +14,20 @@ export class UserTable {
     onDelete: 'CASCADE',
   })
   session: Sessions[];
+=======
+import {Entity, Column, PrimaryColumn, OneToMany} from 'typeorm';
+import {Sessions} from "./sessions";
+import {Tfa} from "./tfa";
+
+@Entity('users')
+export class UserTable {
+	constructor(userId: number, userName: string, avatar: any) {
+		this.userId = userId;
+		this.userName = userName;
+		this.avatar = avatar;
+		this.createAt = new Date().getTime()
+	}
+>>>>>>> main
 
   constructor(userId: number, userName: string) {
     this.userId = userId;
@@ -23,6 +38,23 @@ export class UserTable {
   // @OneToMany(() => Sessions, (sessions: Sessions) => sessions.userId)
   // public sessions: Sessions[];
 
+<<<<<<< HEAD
   // @Column({ type: 'longblob' })
   // avatar: Buffer;
+=======
+	@Column()
+	userName: string;
+
+	@Column({type: 'bigint'})
+	createAt: number;
+
+	@Column({nullable: true, type: 'text'})
+	avatar: string;
+
+	@OneToMany(() => Sessions, (session) => session.user, {onDelete: 'CASCADE'})
+	session: Sessions[];
+
+	@OneToMany(() => Tfa, (tfa) => tfa.user, {onDelete: 'CASCADE'})
+	tfa: Tfa[];
+>>>>>>> main
 }

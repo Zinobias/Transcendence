@@ -6,7 +6,7 @@ import { CreateGameDTO, GameInfo, outDTO } from './dto/dto';
 import { IGameInfo } from './dto/frontend.DTOs';
 import { GameEndedData, gameMatchmakingEntity } from './event-objects/events.objects';
 import { Game } from './game-class';
-import { gameModes } from './game-object-interfaces';
+// import { gameModes } from './game-object-interfaces';
 import { GameResult } from './game-objects/game-object-interfaces';
 import { mapGetter } from './map.tools';
 const logger = new Logger("AppService");
@@ -140,7 +140,7 @@ export class MatchMakingService {
 				return (g === uuid);
 			});
 			if (index !== -1)
-				this.gameList.splice(index, 1);
+				gameMode[1].splice(index, 1);
 				return true;
 		}
 		return false;
@@ -153,7 +153,7 @@ export class MatchMakingService {
 	 * calling createGame().
 	 */
 	public findMatch() {
-		for (let gameMode of gameModes) {
+		for (let gameMode of this.gameModes) {
 			if (this.matchMakingQueue.get(gameMode)?.length as number >= 2) {
 				let gameDTO : CreateGameDTO = {
 					player1UID 	: this.matchMakingQueue.get(gameMode)?.pop() as number,
@@ -164,7 +164,9 @@ export class MatchMakingService {
 				this.client.emit<string, outDTO>("game", {
 					userIds 		: [gameDTO.player1UID, gameDTO.player2UID],
 					eventPattern 	: 'game.found',
-					data 			: undefined
+					data 			: {
+						playerIds : [gameDTO.player1UID, gameDTO.player2UID],
+					}
 				});
 				logger.log("Game found event emitted to client");
 			}
@@ -323,7 +325,7 @@ export class MatchMakingService {
 	}
 
 	async addGameResultToDatabase(res : GameResult) {
-		this.logger.debug(`ADDING GAME TO DB, METADATA : uid1 : ${res.player1.uid} uid2 : ${res.player1.uid} gameId : ${res.gameId}, player1score ${res.playerScores.player1FinalScore} player2score ${res.playerScores.player2FinalScore}`);
+		// this.logger.debug(`ADDING GAME TO DB, METADATA : uid1 : ${res.player1.uid} uid2 : ${res.player1.uid} gameId : ${res.gameId}, player1score ${res.playerScores.player1FinalScore} player2score ${res.playerScores.player2FinalScore}`);
 		this.queries.storeGameResult([res.player1.uid, res.player2.uid], res.gameId, [res.playerScores.player1FinalScore, res.playerScores.player2FinalScore]);
 		}
 }
