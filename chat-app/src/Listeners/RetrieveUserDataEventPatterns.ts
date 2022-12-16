@@ -351,15 +351,21 @@ export class RetrieveUserDataEventPatterns {
         }
 
         const user: User = await this.util.getUser(data.user_id, 'update_avatar');
-        if (user == undefined)
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'update_avatar', `This user doesn't exist`);
             return;
+        }
 
         // this.logger.debug(`File string: ${data.new_avatar}`);
         // const json: string = JSON.stringify(data.new_avatar);
         // this.logger.debug(`File info, stringify: ${json}`)
         user.avatar = data.new_avatar;
         await Queries.getInstance().setUserAvatar(user.userId, JSON.stringify(data.new_avatar));
-        //TODO add checks and report result back
+        this.util.notify([data.user_id], 'update_avatar', {
+            success: true,
+            msg: undefined
+        });
+        //TODO add checks for if the file is valid??
     }
 
     private inviteMap: Map<number, GameUser> = new Map();
