@@ -95,7 +95,6 @@ export class Queries {
 	async setUserAvatar(userId: number, image: any) {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
-		this.logger.debug(`setting avatar for user ${userId} to ${image}`);
 		await userRepository.update(userId, {avatar: image});
 	}
 

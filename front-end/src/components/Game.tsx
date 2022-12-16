@@ -77,13 +77,17 @@ const   Game: React.FC = () => {
         })
 
         socket.on("game.join.queue", response => {
-            if (response.success) 
+            if (response.success) {
+                console.log("joining queue success");
                 setQueue(queue => true);
+            }
         })
 
         socket.on("game.leave.queue", response => {
-            if (response.success) 
+            if (response.success) {
+                console.log("leaving queue success");
                 setQueue(queue => false);
+            }
         })
 
         return () => {

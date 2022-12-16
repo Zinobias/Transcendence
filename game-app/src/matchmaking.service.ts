@@ -139,9 +139,11 @@ export class MatchMakingService {
 			let index = gameMode[1].findIndex((g) => {
 				return (g === uuid);
 			});
-			if (index !== -1)
+			if (index !== -1) {
+				this.logger.debug("Leaving queue : {" + gameMode[0]+ "}");				
 				gameMode[1].splice(index, 1);
 				return true;
+			}
 		}
 		return false;
 	}
