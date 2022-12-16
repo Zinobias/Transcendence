@@ -9,14 +9,8 @@ export const DefaultMatchmaking: React.FC = () => {
     // event listeners
     useEffect(() => {
         socket.on("game.join.queue", response => {
-            if (response.success === true) {
-                // console.log("socket.on game.join.queue success");
+            if (response.success) 
                 console.log(`socket.on game.join.queue success ${response?.msg}`);
-            }
-            else {
-                console.log("socket.on game.join.queue fail");
-                alert(response.msg);
-            }
         })
 
         return () => {
@@ -24,21 +18,21 @@ export const DefaultMatchmaking: React.FC = () => {
         }
     }, [])
 
-    // emit to join queue
+    // emit to join default queue
     const handleJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         socket.emit("game", {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.join.queue", 
-            data: { userId: cookies.userID, gameMode: "DISCOPONG" }
+            data: { userId: cookies.userID, gameMode: "DEFAULT" }
         });
         console.log(`socket.emit game.join.queue default`);
     };
 
     return (
         <>
-            <button className="gameButton" onClick={(e) => handleJoin(e)}>DEFAULT</button>
+            <button className="gameButton" onClick={(e) => handleJoin(e)}>default queue</button>
         </>
     )
 
@@ -51,14 +45,8 @@ export const LeavetMatchmaking: React.FC = () => {
     // event listeners
     useEffect(() => {
         socket.on("game.leave.queue", response => {
-            if (response.success === true) {
-                console.log("socket.on game.leave.queue success");
-                console.log(response?.msg);
-            }
-            else {
-                console.log("socket.on game.leave.queue fail");
-                alert(response.msg);
-            }
+            if (response.success) 
+                console.log(`socket.on ${response?.msg}`);
         })
 
         return () => {
@@ -89,22 +77,34 @@ export const LeavetMatchmaking: React.FC = () => {
 export const DiscoMatchmaking: React.FC = () => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
-    const [state, setState] = useState<boolean>(false);
 
     // event listeners
     useEffect(() => {
+        socket.on("game.join.queue", response => {
+            if (response.success) 
+                console.log(`socket.on game.join.queue success ${response?.msg}`);
+        })
 
+        return () => {
+            socket.off("game.join.queue");
+        }
     }, [])
 
-    // emit to join queue
+    // emit to join default queue
     const handleJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        console.log("click disco");
+        socket.emit("game", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "game.join.queue", 
+            data: { userId: cookies.userID, gameMode: "DISCOPONG" }
+        });
+        console.log(`socket.emit game.join.queue default`);
     };
 
     return (
         <>
-            <button className="defaultButton" onClick={(e) => handleJoin(e)}>DISCO</button>
+            <button className="gameDiscoButton" onClick={(e) => handleJoin(e)}>disco queue</button>
         </>
     )
 };

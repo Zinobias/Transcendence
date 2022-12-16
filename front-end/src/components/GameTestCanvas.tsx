@@ -37,13 +37,13 @@ const GameTestCanvas : React.FC = () => {
     return (
         <>
             <div style={{width: `${canvasWidth}px`}}>
+                <br/>
+                <span className='gameLeft' style={{fontSize: "35px", lineHeight: "0"}}>8</span>
+                <span className='gameRight' style={{fontSize: "35px",lineHeight: "0"}}>9</span><br/>
                 <span className='gameLeft'>Player 1</span>
-                <span className='gameRight'>Player 2</span><br/>
-                <span className='gameLeft' style={{fontSize: "30px"}}>8</span>
-                <span className='gameRight' style={{fontSize: "30px"}}>9</span>
+                <span className='gameRight'>Player 2</span>
             </div>
             <canvas className="gameCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
-
         </>
     )
 }

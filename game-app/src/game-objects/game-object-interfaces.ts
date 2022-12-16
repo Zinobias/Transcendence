@@ -215,10 +215,12 @@ export enum MoveStatePaddle {
 	constructor(v2 : IVec2) {
 		super('pepper', GameConfig.DEFAULT_PEPPER_HEIGHT, GameConfig.DEFAULT_PEPPER_WIDTH);
 		this.onHit = (ball : Ball ) => {
-			if (ball.velocityVector!.x + 0.4 <= GameConfig.DEFAULT_BALL_RADIUS)
-				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.4 : 0.4;
+			if (ball.velocityVector!.x + 0.5 <= GameConfig.DEFAULT_BALL_RADIUS)
+				ball.velocityVector!.x += ball.velocityVector!.x < 0 ? -0.5 : 0.5;
 
 		}
+		this._pos.x = v2.x;
+		this._pos.y = v2.y;
 		this.toDelete = true;
 	}
 }

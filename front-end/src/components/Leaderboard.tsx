@@ -28,15 +28,15 @@ const   Leaderboard: React.FC = () => {
         socket.on("game.get.leaderboard", response => {
             if (response.success) {
                 console.log("socket.on game.get.leaderboard success");
-                // need to translate all the id's to names to display it
+                // sort the leaderboard
+                response.leaderboard.sort((a : leaderboardArray, b: leaderboardArray) => (a.count < b.count) ? 1 : -1);
                 response.leaderboard.forEach((e : any) => {
+                    // set array and emit to get names
                     setLeaderboard(leaderboard => [...leaderboard, {id: e.winnerId, count: e.count}]);
-                    // console.log(e);
-                    
                     socket.emit("chat", {
                         userId: cookies.userID,
                         authToken: cookies.user,
-                        eventPattern: "get_user", 
+                        eventPattern: "get_name", 
                         data: { user_id: cookies.userID, requested_user_id: e.winnerId }
                     });
 
@@ -53,13 +53,13 @@ const   Leaderboard: React.FC = () => {
 
     // listener to update the name in the leaderboard array
     useEffect(() => {
-        socket.on("get_user", response => {
+        socket.on("get_name", response => {
             if (response.success) 
-                setLeaderboard(leaderboard.map((entry) => (entry.id == response.user.userId ? {...entry, name: response.user.name} : entry)));
+                setLeaderboard(leaderboard.map((entry) => (entry.id == response.requested_id ? {...entry, name: response.requested_name} : entry)));
         })
 
         return () => {
-            socket.off("get_user");
+            socket.off("get_name");
         }
 
     }, [leaderboard])
@@ -70,6 +70,7 @@ const   Leaderboard: React.FC = () => {
             <br/>
             <br/>
             <div className="chats">
+
             {leaderboard.map((element, index) => (
                 <div key={index} className="listChat__text">
                    user: <b>{element.name}</b> games won: <b>{element.count}</b>

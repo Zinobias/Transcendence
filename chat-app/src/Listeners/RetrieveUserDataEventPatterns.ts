@@ -62,6 +62,26 @@ export class RetrieveUserDataEventPatterns {
         });
     }
 
+    @EventPattern('get_name')
+    async getName(data: GetOtherUserData) {
+        const user = await User.getUser(data.requested_user_id);
+        if (user == undefined) {
+            this.util.notify([data.user_id], 'get_name', {
+                success: false,
+                msg: 'This user does not exist',
+                message: undefined
+            });
+            return
+        }
+        this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
+        this.util.notify([data.user_id], 'get_name', {
+            success: true,
+            msg: undefined,
+            requested_name: user.name,
+            requested_id: user.userId,
+        });
+    }
+
     //TODO move this data to user class?
     @EventPattern('get_friend_requests')
     async getFriendsRequestUser(data: GetSelfUserData) {

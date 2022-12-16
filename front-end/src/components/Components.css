@@ -782,8 +782,8 @@ p.chatp {
 .gameCanvas {
     /* height: 100px;
     width: 200px; */
-    border: 3px solid #000000;
-    /* background-color: black;  */
+    /* border: 3px solid #000000; */
+    background-color: black; 
 }
 
 .gameButton {
@@ -798,6 +798,22 @@ p.chatp {
     background-color: transparent;
 }
 
-.gameButton:active {
+.gameDiscoButton {
+    font-size: 30px;
+    width:30%;
+    margin-top:20px;
+    border: 3px solid;
+    color: black;
+    font-weight: bold;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+    cursor: pointer;
+    box-shadow: 1px 1px 0px 0px #CE5937, 
+                2px 2px 0px 0px #CE5937, 
+                3px 3px 0px 0px #5dce64,  
+                4px 4px 0px 0px #5dce64;
+}
+
+.gameButton:active, .gameDiscoButton:active {
     transform: scale(0.95);
 }

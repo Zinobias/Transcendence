@@ -4,6 +4,7 @@ import { SocketContext } from "./Socket";
 import { DefaultMatchmaking, DiscoMatchmaking, LeavetMatchmaking } from "./GameUtils";
 import GameCanvas from "./GameCanvas";
 import GameTestCanvas from "./GameTestCanvas";
+import { IGameInfo } from "../DTOs/frontend.DTOs.game.matchmaking";
 
 
 /*
@@ -16,18 +17,21 @@ import GameTestCanvas from "./GameTestCanvas";
 const   Game: React.FC = () => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
-    const [gameFound, setGameFound] = useState<boolean>(false);
-    const [vs, setVs] = useState<string>("");
-    const [activeGameId, setActiveGameId] = useState<number>();
+    const [gameInfo, setGameinfo] = useState<IGameInfo>();
 
     // game event listeners
     useEffect(() => {
-        socket.on("game.found", response => {
-            // emit game.get.activeGameId
-            // if we have our game id we can get our gameInfo Object
-            setGameFound(gameFound => true);
-            setVs(vs => (cookies.userID === response.playerIds[0] ? response.playerIds[1] : response.playerIds[0]));
 
+        // on mount emit to see if user is in a game
+        socket.emit("game", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "game.isInGame", 
+            data: { userId: cookies.userID }
+        });
+
+        // we found a game so we ask for the activeGameId
+        socket.on("game.found", response => {
             socket.emit("game", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -37,20 +41,36 @@ const   Game: React.FC = () => {
             console.log(`socket.emit game.get.activeGameId`);
         })
 
+        // user is in a game so we ask for activeGameId
         socket.on("game.isInGame", response => {
-            // onMount if user is inGame display game again and ask for game Object
-            console.log(`socket.on game.isInGame ${response.success} ${response.msg}`);
+            if (response.success) {
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.get.activeGameId", 
+                    data: { userId: cookies.userID }
+                });
+                console.log(`socket.emit game.get.activeGameId`);
+            }
         })
 
+        // returns the ID for the game the user is currently in
         socket.on("game.get.activeGameId", response => {
-            // returns the ID for the game the user is currently in
             console.log(`socket.on game.get.activeGameId ${response.success} ${response.msg}`);
-            if (response.success)
-                setActiveGameId(activeGameId => response.gameId);
+            if (response.success) {
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.get.gameInfo", 
+                    data: { userId: cookies.userID, gameId: response.gameId }
+                });
+            }
+            // setActiveGameId(activeGameId => response.gameId);
         })
 
         socket.on("game.get.gameInfo", response => {
-            console.log(`socket.on game.get.gameInfo`);
+            if (response.gameInfo) 
+                setGameinfo(gameInfo => response.gameInfo);
         })
 
         return () => {
@@ -60,65 +80,29 @@ const   Game: React.FC = () => {
             socket.off("game.get.gameInfo");
 
             // emit to leave queue when we leave the page
+            // console.log(`socket.emit game.leave.queue default`);
             socket.emit("game", {
                 userId: cookies.userID,
                 authToken: cookies.user,
                 eventPattern: "game.leave.queue", 
                 data: { userId: cookies.userID }
             });
-            console.log(`socket.emit game.leave.queue default`);
         }
     }, [])
-
-    const isInGame = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
-        socket.emit("game", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-            eventPattern: "game.isInGame", 
-            data: { userId: cookies.userID }
-        });
-        console.log(`socket.emit game.isInGame`);
-    };
-
-    const getGameId = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault()
-        socket.emit("game", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-            eventPattern: "game.get.activeGameId", 
-            data: { userId: cookies.userID }
-        });
-        console.log(`socket.emit game.get.activeGameId`);
-    };
 
     return (
         <>
             {/* <GameTestCanvas /> */}
-            {/* <canvas className="gameCanvas" id="gameCanvas" width={512*2} height={256*2} />
-            <button className="gameButton" onClick={(e) => draw(e)}>draw</button> */}
 
             {
-                activeGameId !== undefined &&
-                <GameCanvas gameId={activeGameId}/>
-            }
-
-            {/* {
-                gameFound &&
-                <>
-                    <p>Game Found!</p>
-                    <p>{cookies.userID} vs {vs}</p>
+                gameInfo !== undefined ?
+                <GameCanvas gameInfo={gameInfo} setGameinfo={setGameinfo}/> :
+                <>                
+                    <DefaultMatchmaking />
+                    <DiscoMatchmaking />
+                    <LeavetMatchmaking />
                 </>
-            } */}
-
-
-            <DefaultMatchmaking />
-            <LeavetMatchmaking />
-
-            {/* <button className="gameButton" onClick={(e) => isInGame(e)}>is in game</button>
-            <button className="gameButton" onClick={(e) => getGameId(e)}>game id</button> */}
-
-            {/* <DiscoMatchmaking /> */}
+            }
         </>
     )
 };
