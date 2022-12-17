@@ -404,6 +404,7 @@ export class RetrieveUserDataEventPatterns {
             msg: undefined,
             user: user.userId,
             request_user_id: invitedUser.userId,
+            from_user_name: user.name,
             game_mode: data.game_mode
         });
     }
@@ -421,7 +422,7 @@ export class RetrieveUserDataEventPatterns {
             return;
         }
         if (!this.inviteMap.has(invitingUser.userId)) {
-            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request for you from this user`);
+            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request from this user`);
             return;
         }
 
@@ -430,7 +431,6 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request for you from this user`);
             return;
         }
-
         this.util.notify([data.user_id, data.request_user_id], 'accept_invite_game_user', {
             success: true,
             msg: undefined,
@@ -439,19 +439,20 @@ export class RetrieveUserDataEventPatterns {
             game_mode: gameUser.game_mode
         });
         const obj: GameRequest = {
-            userId1: data.request_user_id,
-            userId2: data.user_id,
+            player1UID: data.request_user_id,
+            player2UID: data.user_id,
             gameMode: gameUser.game_mode
         };
-        this.inviteMap.delete(user.userId)
-        this.gateway.emit('game_to_chat', obj);
+        this.inviteMap.delete(user.userId);
+        this.logger.debug("emitting to chat_to_game " + obj.player1UID);
+        this.gateway.emit('chat_to_game', obj);
     }
 }
 
 interface GameRequest {
-    userId1: number;
-    userId2: number;
-    gameMode: string;
+	player1UID	: number;
+	player2UID	: number;
+	gameMode	: string;
 }
 
 interface GameUser {

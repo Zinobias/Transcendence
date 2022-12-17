@@ -191,7 +191,7 @@ export class MatchMakingService {
 
 		logger.log("New game instance has been created");
 		await this.addGameToList(createGameDTO, newGameInstance);
-		return (this.gameId);
+		return (this.gameId++);
 		
 	}
 
@@ -210,7 +210,6 @@ export class MatchMakingService {
 			gameMode		: gameDto.gameMode,
 		});
 		// TODO : Increment gameIds in DB.
-		this.gameId++;
 	}
 
 

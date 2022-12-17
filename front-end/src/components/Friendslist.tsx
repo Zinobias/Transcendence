@@ -54,14 +54,14 @@ const Friendslist: React.FC<Props> = ({user}) => {
     return (
         <>  
             {user.friends.map((element, index) => (
-                <div key={index} className="friendInvite">
+                <div key={index}>
                 {
                     element.state == false &&
-                    <>
-                        <p><b>{element.name} {element.userId}</b> send you a friend request</p>
+                    <div className="friendInvite">
+                        <p><b>{element.name}</b> send you a friend request</p>
                         <button className="friendslistButton" onClick={(event) => handleAccept(event, element.userId)}>Accept</button>
                         <button className="friendslistButton" onClick={(event) => handleDecline(event, element.userId)}>Decline</button>
-                    </>
+                    </div>
                 }
                 </div>
             ))}

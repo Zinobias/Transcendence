@@ -66,6 +66,8 @@ const   Leaderboard: React.FC = () => {
 
     }, [leaderboard])
 
+    //document.getElementById("myDropdown")?.classList.toggle("show");
+
     return (
         <div className="leaderboard">
             {leaderboard.map((element, index) => (

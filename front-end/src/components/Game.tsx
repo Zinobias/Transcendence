@@ -66,10 +66,10 @@ const   Game: React.FC = () => {
                     data: { userId: cookies.userID, gameId: response.gameId }
                 });
             }
-            // setActiveGameId(activeGameId => response.gameId);
         })
 
         socket.on("game.get.gameInfo", response => {
+            console.log(response.msg);
             if (response.gameInfo) {
                 setQueue(queue => false);
                 setGameinfo(gameInfo => response.gameInfo);
@@ -97,7 +97,7 @@ const   Game: React.FC = () => {
             socket.off("game.get.gameInfo");
             socket.off("game.join.queue");
             socket.off("game.leave.queue");
-
+           
             // emit to leave queue when we leave the page
             // console.log(`socket.emit game.leave.queue default`);
             socket.emit("game", {
@@ -108,6 +108,40 @@ const   Game: React.FC = () => {
             });
         }
     }, [])
+
+    useEffect(() => {
+        socket.on("game.create", response => {
+            if (response.success) {
+                if (queue) {
+                    // if we accepted an gameInvite and we are in a queue we leave the queue first
+                    socket.emit("game", {
+                        userId: cookies.userID,
+                        authToken: cookies.user,
+                        eventPattern: "game.leave.queue", 
+                        data: { userId: cookies.userID }
+                    });
+                }
+                // console.log(`game.create success emitting game.get.activeGameId`);
+                // socket.emit("game", {
+                //     userId: cookies.userID,
+                //     authToken: cookies.user,
+                //     eventPattern: "game.get.activeGameId", 
+                //     data: { userId: cookies.userID }
+                // });
+                console.log("game.create success emitting game.get.gameInfo")
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.get.gameInfo", 
+                    data: { userId: cookies.userID, gameId: response.gameId }
+                });
+            }
+        })
+
+        return () => {
+            socket.off("game.create");
+        }
+    }, [queue])
 
     return (
         <>

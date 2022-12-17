@@ -399,24 +399,33 @@ export class AppController {
 	 */
 	@EventPattern('internal.game.create')
 	async createGame(@Payload() payload : CreateGameDTO) {
-		this.logger.log("a game has been created for users : {" + payload.player1UID + "} and + {" + payload.player2UID +"}");
+		this.logger.log("a game is beeing created for users : {" + payload.player1UID + "} and + {" + payload.player2UID +"}");
 
 		this.logger.debug("Game create payload:" + payload.gameMode);
 		this.logger.debug("Game create payload:" + payload.player1UID);
 		this.logger.debug("Game create payload:" + payload.player2UID);
-		if (this.matchMakingService.isValidGamemode(payload.gameMode))
-			return ({event : 'game.create', data : {
-				success : false,
-				msg		: `gameMode in payload is invalid : [${payload.gameMode}]`
-			}});
+		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false) {
+			this.logger.debug(`gameMode in payload is invalid : [${payload.gameMode}]`);
+			return ;
+		}
 
 		let gameId : number = await this.matchMakingService.createGame(payload);
 		this.logger.debug(`Game created with id : [${gameId}]`);
 
-		return ({event : 'game.create', data : {
-			success : true,
-			msg		: `Successfully ccreated a game with gameId : [${gameId}]`
-		}});
+		this.gatewayClient.emit<string, outDTO>('game', {
+			eventPattern : 'game.create',
+			userIds : [payload.player1UID, payload.player2UID],
+			data : {
+				success : 	true,
+				msg		: `Creating game for ${payload.player1UID} and ${payload.player2UID} succesfull`,
+				gameId	: gameId
+			}
+		})
+
+		// return ({event : 'game.create', data : {
+		// 	success : true,
+		// 	msg		: `Successfully ccreated a game with gameId : [${gameId}]`
+		// }});
 	}
 
 	/**

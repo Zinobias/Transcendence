@@ -20,11 +20,11 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
         return(newDate.getTime());
     }
 
-    const handleProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>,  userId: number) => {
+    const handleProfile = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         navigate({
             pathname: '/profile',
-            search: 'id=' + userId,
+            search: 'id=' + memberUserID,
         })
     }
 
@@ -72,6 +72,17 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
         console.log(`emitting channel_ban`);
     }
 
+    const handleInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "invite_game_user",
+            data: {user_id: cookies.userID, request_user_id: memberUserID, game_mode: "DEFAULT"}
+        })
+        console.log(`emitting invite_game_user`);
+    }
+
     function isAdmin (userId : number) : boolean {
         if (userId == channel.owner)
             return (true);
@@ -89,7 +100,7 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
     if (cookies.userID == memberUserID) {
         return (
             <>
-                <button className="memberButton" onClick={(e) => handleProfile(e, memberUserID)}>profile</button>
+                <button className="memberButton" onClick={(e) => handleProfile(e)}>profile</button>
             </>
         )
     }
@@ -97,8 +108,8 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
     else if (channel.otherOwner != undefined || isAdmin(cookies.userID) == false) {
         return (
             <>
-                <button className="memberButton" onClick={(e) => handleProfile(e, memberUserID)}>profile</button>
-                <button className="memberButton">invite to pong</button>
+                <button className="memberButton" onClick={(e) => handleProfile(e)}>profile</button>
+                <button className="memberButton" onClick={(e) => handleInvite(e)}>invite to pong</button>
                 <button className="memberButton">block</button>
             </>
         )
@@ -106,8 +117,8 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
 
     return (
         <>
-            <button className="memberButton" onClick={(e) => handleProfile(e, memberUserID)}>profile</button>
-            <button className="memberButton">invite to pong</button>
+            <button className="memberButton" onClick={(e) => handleProfile(e)}>profile</button>
+            <button className="memberButton" onClick={(e) => handleInvite(e)}>invite to pong</button>
             <button className="memberButton">block</button>
             {
                 memberUserID != channel.owner &&

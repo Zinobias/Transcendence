@@ -115,7 +115,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
    
     // event listener for game events & get_name
     useEffect(() => {
-        // console.log("Canvas component did mount with gameId " + gameId);
+        console.log("Canvas component did mount with gameId " + gameInfo.gameId);
 
         // request player names on mount
         socket.emit("chat", {

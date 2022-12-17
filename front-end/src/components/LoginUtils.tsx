@@ -37,12 +37,12 @@ export const   LogoutButton: React.FC = () => {
 };
 
 export const    SignupButton: React.FC = () => {
-    const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [userName, setUserName] = useState<string>("");
     const [signup, setSignup] = useState<string>("");
-    const socket = useContext(SocketContext);
 
     // EVENT LISTENERS
     useEffect(() => {
