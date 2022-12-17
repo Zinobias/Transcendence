@@ -42,46 +42,50 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
             });
         });
 
-        socket.on("channel_join", response => {
-            // if current user joined a channel update side channels
-            if (response.success && response.user_id == cookies.userID) {
-                console.log("socket.on channel join success");
-                setState(state => !state);
-            }
-            else if (response.success === false)
-                alert(response.msg);
-        })
-
-        socket.on("channel_leave", response  => {
-            // if current user left the channel update sidechannels
-            if (response.success && cookies.userID == response.user_id)
-                setState(state => !state);
-            // if current user left and was looking at the channel set channel to undefined
-            if (response.success && channelId == response.channel_id && cookies.userID == response.user_id)
-                setChannel(channel => undefined);
-        });
-
-        socket.on("channel_ban", response  => {
-            // if current user got banned update sidechannels
-            if (response.success && cookies.userID == response.affected_id)
-                setState(state => !state);
-            // if current user got banned and was looking at the channel set channel to undefined
-            if (response.success && channelId == response.channel_id && cookies.userID == response.affected_id)
-                setChannel(channel => undefined);
-        });
+        socket.on("channel_join", channelJoinInSidebar)
+        socket.on("channel_leave", channelLeaveInSidebar);
+        socket.on("channel_ban", channelBanInSidebar);
 
         return () => {
             socket.off("get_channels_user");
-            socket.off("channel_join");
-            socket.off("channel_leave");
-            socket.off("channel_ban");
+            socket.off("channel_join", channelJoinInSidebar);
+            socket.off("channel_leave", channelLeaveInSidebar);
+            socket.off("channel_ban", channelBanInSidebar);
         }
     }, [channelId])
-  
-  /*
+
+    function channelJoinInSidebar (response : any) {
+        // if current user joined a channel update side channels
+        if (response.success && response.user_id == cookies.userID) {
+            console.log("socket.on channel join success");
+            setState(state => !state);
+        }
+        else if (response.success === false)
+            alert(response.msg);
+    }
+
+    function channelLeaveInSidebar (response : any) {
+        // if current user left the channel update sidechannels
+        if (response.success && cookies.userID == response.user_id)
+            setState(state => !state);
+        // if current user left and was looking at the channel set channel to undefined
+        if (response.success && channelId == response.channel_id && cookies.userID == response.user_id)
+            setChannel(channel => undefined);   
+    }
+
+    function channelBanInSidebar (response : any) {
+        // if current user got banned update sidechannels
+        if (response.success && cookies.userID == response.affected_id)
+            setState(state => !state);
+        // if current user got banned and was looking at the channel set channel to undefined
+        if (response.success && channelId == response.channel_id && cookies.userID == response.affected_id)
+            setChannel(channel => undefined);
+    }
+
+    /*
     TODO:
     only show channels that are visible
-  */
+    */
 
     return (
     <div>

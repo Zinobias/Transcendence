@@ -5,6 +5,7 @@ import ChatInput from "./ChatInput";
 import { SocketContext } from "./Socket";
 import { AiOutlineMenu } from "react-icons/ai";
 import { convertToObject } from "typescript";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
     channel: IChannel;
@@ -21,6 +22,7 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
 	
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
+    const navigate = useNavigate();
     const inputRef = useRef<HTMLInputElement>(null);
     const [chat, setChat] = useState<IMessage[]>([]);
     const [me, setMe] = useState<IUser>();
@@ -30,12 +32,15 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
         setChat(chat => []);
     }, [channel]);
 
+    // get_user event listener function
+    function getUserInChatWindow (response : any) {
+        if (response.success && response.user.userId == cookies.userID) 
+            setMe(me => response.user);
+    }
+
     // on mount/change get my own profile to check for blocked users
     useEffect(() => {
-        socket.on("get_user", response => {
-            if (response.success && response.user.userId == cookies.userID) 
-                setMe(me => response.user);
-        })
+        socket.on("get_user", getUserInChatWindow)
 
         socket.emit("chat", {
             userId: cookies.userID,
@@ -45,7 +50,7 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
         });
 
         return () => {
-            socket.off("get_user");
+            socket.off("get_user", getUserInChatWindow);
         }
 
     }, [channel])
@@ -60,78 +65,83 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
                 console.log(`socket.on channel_message success ${response.channel_id} current_id ${channel.channelId}`);
             else 
                 alert(response.msg);
-        })
-
-        socket.on("channel_leave", response  => {
-            // if we are looking at the channel where a user leaves and we are NOT the user that left we want to update the channel
-            if (response.success && response.channel_id == channel.channelId && response.user_id != cookies.userID) 
-                setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success)
-                console.log(`socket.on channel_leave success current_id ${channel.channelId} affected_id ${response.channel_id}`);
-            else 
-                console.log(`socket.on channel_leave fail ${response.msg}`);
         });
-
-        socket.on("channel_join", response => {
-            // if we are looking at the channel where a new user joins we want to update the channel
-            if (response.success && response.channel_id == channel.channelId)
-                setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success)
-                console.log(`socket.on channel_join success current_id ${channel.channelId} affected_id ${response.channel_id}`);
-            else 
-                console.log(`socket.on channel_join fail ${response.msg}`);
-        })
 
         socket.on("channel_promote", response => {
             // if we are looking at the channel where a user got promoted we want to update the channel
             if (response.success && channel.channelId == response.channel_id)
-                setUpdateChannel(updateChannel => !updateChannel);
+            setUpdateChannel(updateChannel => !updateChannel);
             if (response.success )
-                console.log(`socket.on channel_promote success channel_id ${response.channel_id}`);
+            console.log(`socket.on channel_promote success channel_id ${response.channel_id}`);
             else
-                console.log(`socket.on channel_promote fail ${response.msg}`);
-        })
-
+            console.log(`socket.on channel_promote fail ${response.msg}`);
+        });
+        
         socket.on("channel_demote", response => {
             // if we are looking at the channel where a user got demoted we want to update the channel
             if (response.success && channel.channelId == response.channel_id)
-                setUpdateChannel(updateChannel => !updateChannel);
+            setUpdateChannel(updateChannel => !updateChannel);
             if (response.success)
-                console.log(`socket.on channel_demote success channel_id ${response.channel_id}`);
+            console.log(`socket.on channel_demote success channel_id ${response.channel_id}`);
             else 
-                console.log(`socket.on channel_demote fail ${response.msg}`);
-        })
-
-        socket.on("channel_ban", response => {
-            // if we are looking at the channel where a user got banned and we are NOT the banned user we want to update the channel
-            if (response.success  && channel.channelId == response.channel_id && response.affected_id != cookies.userID)
-                setUpdateChannel(updateChannel => !updateChannel);
-            if (response.success)
-                console.log(`socket.on channel_ban success channel_id ${response.channel_id} banned_id ${response.affected_id}`);
-            else 
-                console.log(`socket.on channel_ban fail ${response.msg}`);
-        })
-
+            console.log(`socket.on channel_demote fail ${response.msg}`);
+        });
+        
         socket.on("channel_mute_user", response => {
             // if we are looking at the channel where a user got banned and we are the muted user, we want to update the channel
             if (response.success && channel.channelId == response.channel_id)
-                setUpdateChannel(updateChannel => !updateChannel);
+            setUpdateChannel(updateChannel => !updateChannel);
             if (response.success)
-                console.log(`socket.on channel_mute_user success channel_id ${response.channel_id}`);
+            console.log(`socket.on channel_mute_user success channel_id ${response.channel_id}`);
             else  
-                console.log(`socket.on channel_mute_user fail ${response.msg}`);
-        })
+            console.log(`socket.on channel_mute_user fail ${response.msg}`);
+        });
+
+        socket.on("channel_leave", channelJoinInChatWindow);
+        socket.on("channel_join", channelJoinInChatWindow);
+        socket.on("channel_ban", channelBanInChatWindow);
 
         return () => {
             socket.off("channel_message");
-            socket.off("channel_leave");
-            socket.off("channel_join");
             socket.off("channel_promote");
             socket.off("channel_demote");
-            socket.off("channel_ban");
             socket.off("channel_mute_user");
+            socket.off("channel_leave", channelLeaveInChatWindow);
+            socket.off("channel_join", channelJoinInChatWindow);
+            socket.off("channel_ban", channelBanInChatWindow);
         }
     }, [channel])
+
+    // event listener functions
+    function channelJoinInChatWindow (response : any) {
+        // if we are looking at the channel where a new user joins we want to update the channel
+        if (response.success && response.channel_id == channel.channelId)
+            setUpdateChannel(updateChannel => !updateChannel);
+        if (response.success)
+            console.log(`socket.on channel_join success current_id ${channel.channelId} affected_id ${response.channel_id}`);
+        else 
+            console.log(`socket.on channel_join fail ${response.msg}`);    
+    }
+
+    function channelLeaveInChatWindow (response : any) {
+        // if we are looking at the channel where a user leaves and we are NOT the user that left we want to update the channel
+        if (response.success && response.channel_id == channel.channelId && response.user_id != cookies.userID) 
+            setUpdateChannel(updateChannel => !updateChannel);
+        if (response.success)
+            console.log(`socket.on channel_leave success current_id ${channel.channelId} affected_id ${response.channel_id}`);
+        else 
+            console.log(`socket.on channel_leave fail ${response.msg}`);
+    }
+
+    function channelBanInChatWindow (response : any) {
+        // if we are looking at the channel where a user got banned and we are NOT the banned user we want to update the channel
+        if (response.success  && channel.channelId == response.channel_id && response.affected_id != cookies.userID)
+            setUpdateChannel(updateChannel => !updateChannel);
+        if (response.success)
+            console.log(`socket.on channel_ban success channel_id ${response.channel_id} banned_id ${response.affected_id}`);
+        else 
+            console.log(`socket.on channel_ban fail ${response.msg}`);   
+    }
 
     // set input ref
     useEffect(() => {
@@ -170,6 +180,14 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
         console.log(channel.channelId);
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
     };
+
+    const goToProfile = (e: React.MouseEvent<HTMLElement, MouseEvent>, friendId : number) => {
+        e.preventDefault();
+        navigate({
+            pathname: '/profile',
+            search: 'id=' + friendId,
+        })
+    }
     
     return (
         <>
@@ -184,7 +202,7 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
                         <div key={index} className="chatroom__text--bubble">
                             {
                                 isBlocked(element.sender) == false ?
-                                <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p> :
+                                <p className="chatp"><b style={{cursor: "pointer"}} onClick={(e) => goToProfile(e, element.sender)}>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p> :
                                 <p className="chatp"><i>blocked message</i></p>
                             }
                         </div>
@@ -195,7 +213,7 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
                         <div key={index} className="chatroom__text--bubble">
                             {
                                 isBlocked(element.sender) == false ?
-                                <p className="chatp"><b>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p> :
+                                <p className="chatp"><b style={{cursor: "pointer"}} onClick={(e) => goToProfile(e, element.sender)}>{returnName(element.sender)} {returnDate(element.timestamp)}</b><br/>{element.message}</p> :
                                 <p className="chatp"><i>blocked message</i></p>
                             }
                         </div>

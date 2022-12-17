@@ -23,6 +23,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     const [cookies] = useCookies(['userID', 'user']);
     const socket = useContext(SocketContext);
     const [gamesWon, setGameswon] = useState<number>(0);
+    const [gamesLost, setGameslost] = useState<number>(0);
     const [gamehistory, setGamehistory] = useState<history[]>([]);
     const [online, setOnline] = useState<boolean>(false);
     const [inGame, setIngame] = useState<boolean>(false);
@@ -32,7 +33,8 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
         
         socket.on("game.user.get.history", response => {
             if (response.success) {
-                let count = 0
+                let lost : number = 0;
+                let won : number = 0;
                 setGamehistory(gamehistory => []);
                 console.log("get game history success");
                 // console.log(response.history);
@@ -50,22 +52,19 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                         data: { user_id: cookies.userID, requested_user_id: e.userId1 == user.userId ? e.userId2 : e.userId1 }
                     });
                     // count how many times user won
-                    if (e.winnerId == user.userId)
-                        count = count + 1;
+                    e.winnerId == user.userId ? won++ : lost++;
                 })
-                setGameswon(gamesWon => count);
+                setGameswon(gamesWon => won);
+                setGameslost(gamesLost => lost);
             }
         })
 
         socket.on("check_online", response => {
             if (response.onlineUsers[0] == user.userId)
                 setOnline(online => true);
-        }) 
-
-        socket.on("game.isInGame", response => {
-            if (response.success)
-                setIngame(inGame => true);
         })
+
+        socket.on("game.isInGame", gameIsInGameInProfile);
 
         socket.emit("check_online", {
             userId: cookies.userID,
@@ -91,21 +90,29 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
         return () => {
             socket.off("game.user.get.history");
             socket.off("check_online");
-            socket.off("game.isInGame");
+            socket.off("game.isInGame", gameIsInGameInProfile);
         }
     }, [user])
 
     useEffect(() => {
-        socket.on("get_name", response => {
-            if (response.success) 
-                setGamehistory(gamehistory.map((entry) => (entry.vsId == response.requested_id ? {...entry, vsName: response.requested_name} : entry)));
-        })
+        socket.on("get_name", getNameInProfile)
 
         return () => {
-            socket.off("get_name");
+            socket.off("get_name", getNameInProfile);
         }
 
     }, [gamehistory])
+
+    // event listener functions
+    function gameIsInGameInProfile (response : any) {
+        if (response.success)
+            setIngame(inGame => true);
+    }
+
+    function getNameInProfile (response : any) {
+        if (response.success) 
+            setGamehistory(gamehistory.map((entry) => (entry.vsId == response.requested_id ? {...entry, vsName: response.requested_name} : entry)));
+    }
 
     function returnDate (timestamp : string) : string {
         const date = new Date(Number(timestamp));
@@ -147,11 +154,12 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
         </div>
         <div className='profileRight'>
             <div className='rightTop'>
-                <p style={{fontSize: "1.5vw", lineHeight: "0", fontWeight: "bold"}}>stats</p>
-                <p>games won: {gamesWon}</p><br/>
+                <p style={{fontSize: "100%", lineHeight: "0", fontWeight: "bold"}}>stats</p>
+                <p>games won: {gamesWon}</p>
+                <p style={{lineHeight: "0"}}>games lost: {gamesLost}</p><br/>
             </div>
             <div className='rightBottom'>            
-                <p style={{fontSize: "1.5vw", lineHeight: "0", fontWeight: "bold"}}>match history</p>
+                <p style={{fontSize: "100%", lineHeight: "0", fontWeight: "bold"}}>match history</p>
                 <div className='listHistory'>
                     {gamehistory.map((element, index) => (
                         <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} >

@@ -19,6 +19,7 @@ const   Chat: React.FC = () => {
     const [pwName, setPwName] = useState<string>("");
     const [pwId, setPwId] = useState<number>(-1);
 
+    // update channels on state change
     useEffect(() => {
         socket.emit("chat", {
             userId: cookies.userID,
@@ -29,7 +30,27 @@ const   Chat: React.FC = () => {
         console.log("emiting channels_retrieve");
     }, [state])
 
-    // EVENT LISTENERS
+    // event listener functions
+    function updatePasswordInChat (response : any) {
+        if (response.success == true) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+            console.log("emiting get_channels_user");
+            setState( state => !state);
+            setPwName("");
+            setPwId(-1);
+            document.getElementById("pwChannel")?.classList.toggle("FormHide");
+            document.getElementById("noPwChannel")?.classList.toggle("FormShow");
+        }
+        else
+            alert(`[${response.msg}]`);
+    }
+
+    // event listeners
     useEffect(() => {
         socket.on("channel_create", response => {
             if (response.success == true && response.hasPassword == false) {
@@ -61,29 +82,12 @@ const   Chat: React.FC = () => {
             });
         })
 
-        socket.on("channel_update_password", response => {
-            if (response.success == true) {
-                socket.emit("chat", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "get_channels_user",
-                    data: {user_id: cookies.userID}
-                })
-                console.log("emiting get_channels_user");
-                setState( state => !state);
-                setPwName("");
-                setPwId(-1);
-                document.getElementById("pwChannel")?.classList.toggle("FormHide");
-                document.getElementById("noPwChannel")?.classList.toggle("FormShow");
-            }
-            else
-                alert(`[${response.msg}]`);
-        })
+        socket.on("channel_update_password", updatePasswordInChat)
 
         return () => {
             socket.off("channel_create");
             socket.off("channels_retrieve");
-            socket.off("channel_update_password");
+            socket.off("channel_update_password", updatePasswordInChat);
         }
     },[])
 

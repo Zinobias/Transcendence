@@ -12,20 +12,23 @@ const Profile: React.FC = () => {
     const [cookies] = useCookies(['userID', 'user']);
     const [user, setUser] = useState<IUser>();
 
+
     // event listeners
     useEffect(() => {
-        socket.on("get_user", response => {
-            // console.log("search params " + searchParams.get("id"));
-            if (response.success && response.user.userId == Number(searchParams.get("id"))) {
-                console.log("get_user success profile");
-                setUser(user => response.user);
-            }
-        })
+        socket.on("get_user", getUserInChat)
 
         return () => {
-            socket.off("get_user");
+            socket.off("get_user", getUserInChat);
         }
     }, [searchParams])
+
+    // event listener function
+    function getUserInChat (response : any) {
+        if (response.success && response.user.userId == Number(searchParams.get("id"))) {
+            console.log("get_user success profile");
+            setUser(user => response.user);
+        }
+    }
 
     useEffect(() => {
         if (searchParams.get("id")) {

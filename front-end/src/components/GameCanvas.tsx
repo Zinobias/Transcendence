@@ -43,7 +43,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const [count, setCount] = useState<number>(0);
     const [ret, setRet] = useState<number>(0);
 
-
     const canvasWidth : number = 512*2;
     const canvasHeight : number = 256*2;
     const ogCanvWidth : number = 512;
@@ -144,17 +143,12 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
             setP2score(p2Score => response.player2Score);
         })
 
-        socket.on("get_name", response => {
-            if (response.requested_id == gameInfo.players.player1)
-                setP1(p1 => response.requested_name);
-            if (response.requested_id == gameInfo.players.player2)
-                setP2(p2 => response.requested_name);
-        })
+        socket.on("get_name", getNameInCanvas)
 
         return () => {
             socket.off(`game.frame.update.` + gameInfo.gameId);
             socket.off(`game.score.` + gameInfo.gameId);
-            socket.off("get_name");
+            socket.off("get_name", getNameInCanvas);
         }
     }, [])
 
@@ -169,6 +163,14 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
             socket.off(`game.ended.` + gameInfo.gameId);
         }
     }, [p1, p2])
+
+    //get_name helper function
+    function getNameInCanvas (response : any) {
+        if (response.requested_id == gameInfo.players.player1)
+            setP1(p1 => response.requested_name);
+        if (response.requested_id == gameInfo.players.player2)
+            setP2(p2 => response.requested_name); 
+    }
 
     function returnColor () : string {
         const colors = ['#9400D3', '#0000FF', '#00FF00', '#FFF000', '#FF7F00', '#FF000'];

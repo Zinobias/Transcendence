@@ -53,15 +53,18 @@ const   Leaderboard: React.FC = () => {
         }
     }, [])
 
+    // get_name event listener function
+    function getNameInLeaderboard (response : any) {
+        if (response.success) 
+            setLeaderboard(leaderboard.map((entry) => (entry.id == response.requested_id ? {...entry, name: response.requested_name} : entry)));
+    }
+
     // listener to update the name in the leaderboard array
     useEffect(() => {
-        socket.on("get_name", response => {
-            if (response.success) 
-                setLeaderboard(leaderboard.map((entry) => (entry.id == response.requested_id ? {...entry, name: response.requested_name} : entry)));
-        })
+        socket.on("get_name", getNameInLeaderboard)
 
         return () => {
-            socket.off("get_name");
+            socket.off("get_name", getNameInLeaderboard);
         }
 
     }, [leaderboard])

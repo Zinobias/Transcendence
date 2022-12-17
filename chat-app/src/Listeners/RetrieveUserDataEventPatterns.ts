@@ -146,7 +146,7 @@ export class RetrieveUserDataEventPatterns {
             return;
         }
         await Queries.getInstance().addFriend(data.friend_id, data.user_id, false);
-        friend.friend(new Friend(user, false))
+        friend.friend(new Friend(user, false));
         this.util.notify([data.user_id, data.friend_id], 'friend_request', {
             success: true,
             msg: undefined,
@@ -443,8 +443,7 @@ export class RetrieveUserDataEventPatterns {
             player2UID: data.user_id,
             gameMode: gameUser.game_mode
         };
-        this.inviteMap.delete(user.userId);
-        this.logger.debug("emitting to chat_to_game " + obj.player1UID);
+        this.inviteMap.delete(data.request_user_id);
         this.gateway.emit('chat_to_game', obj);
     }
 }

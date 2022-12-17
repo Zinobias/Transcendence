@@ -90,15 +90,16 @@ const ProfileNav: React.FC = () => {
 
         socket.on("game.create", response => {
             if (response.success) {
-                if (window.location.pathname != "/game") {
+                console.log("socket.on game.create success " + window.location.pathname);
+                if (window.location.pathname != "/game" && window.location.pathname != "/") {
                     console.log("socket.on game.create success " + response.msg);
-                    // navigate('/game');
+                    navigate('/game');
                 }
             }
         })
 
         socket.on("accept_invite_game_user", response => {
-            console.log(response.msg);
+            console.log("socket.on accept game invite " + response.success + " " + response.msg);
         })
 
         return () => {
@@ -123,7 +124,7 @@ const ProfileNav: React.FC = () => {
                 if (document.getElementById("myDropdown")?.classList.contains("show") == false)
                     document.getElementById("myDropdown")?.classList.toggle("show");
             }
-            console.log("socket.on invite_game_user from " + response.user + " to " + response.request_user_id + response.msg);
+            console.log("socket.on invite_game_user from " + response.user + " to " + response.request_user_id + " " + response.msg);
         })
 
         return () => {
@@ -152,6 +153,7 @@ const ProfileNav: React.FC = () => {
         })
         console.log(`emiting accept_invite_game_user`);
         setGameInvites(gameInvites => gameInvites.filter((_, i) => i !== index));
+        document.getElementById("myDropdown")?.classList.toggle("show");
     }
 
     const handleDecline = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, index : number) => {
@@ -168,10 +170,8 @@ const ProfileNav: React.FC = () => {
                 onClick={(e) => toggleProfile(e)}
             />
             <div id="myDropdown" className="profileNav__dropdown">
-                {/* <span className="profile__close" onClick={(e) => handleClose(e)}>
-                    <AiFillCloseSquare />
-                </span> */}
-                <p><Link to={path}>My Profile</Link></p>
+
+                <p style={{fontWeight: "bold"}}><Link to={path} style={{ textDecoration: "none", color: "black" }}>My Profile</Link></p>
                 {gameInvites.map((element, index) => (
                     <div key={index} className="friendInvite">
                         {

@@ -388,7 +388,6 @@ p.chatp {
 
 .profileLeft {
     flex: 0.7;
-    /* border-right: solid 2px black; */
 }
 
 .profileRight {
@@ -437,7 +436,7 @@ p.chatp {
     height: 0;
     padding-bottom: 100%;
     position: relative;
-    border: solid 2px black;
+    /* border: solid 2px black; */
 }
 
 .profileQR {
@@ -569,6 +568,7 @@ p.chatp {
     cursor: pointer;
 }
 
+
 /* .profileNav__avatar:hover, .profileNav__avatar:focus {
     cursor: pointer;
     transform: scale(1.05);
@@ -578,14 +578,17 @@ p.chatp {
     display: block;
 
 }
+
+
 /*
     FRIENDSLIST
 */
 
 .friendslist {
-    text-align: left;
+    padding: 5%;
     list-style-type: none;
     font-family: 'Didact Gothic';
+    font-weight: bold;
 }
 
 .friendInvite {

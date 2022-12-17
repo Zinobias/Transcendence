@@ -9,7 +9,7 @@ interface Props {
     memberUserID: number;
 }
 
-const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
+const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
     const [cookies] = useCookies(['userID', 'user']);
     const socket = useContext(SocketContext);
     const navigate = useNavigate();
@@ -140,4 +140,4 @@ const ChannelUtils: React.FC<Props> = ({channel, memberUserID}) => {
     )
 }
 
-export default ChannelUtils;
+export default ChannelSettingsUtils;

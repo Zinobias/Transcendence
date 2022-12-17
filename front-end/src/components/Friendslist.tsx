@@ -1,6 +1,7 @@
 import React, { useEffect, useContext } from "react";
 import { useCookies } from "react-cookie";
-import { IUser } from "../interfaces";
+import { useNavigate } from "react-router-dom";
+import { IUser, SmallUser } from "../interfaces";
 import { SocketContext } from "./Socket";
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
 const Friendslist: React.FC<Props> = ({user}) => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
+    const navigate = useNavigate();
 
     const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
         e.preventDefault();
@@ -40,6 +42,14 @@ const Friendslist: React.FC<Props> = ({user}) => {
         console.log(`emiting decline_friend_request`);
     }
 
+    const goToProfile = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, friendId : number) => {
+        e.preventDefault();
+        navigate({
+            pathname: '/profile',
+            search: 'id=' + friendId,
+        })
+    }
+
     /*
         FRIEND REQUEST DIV
 
@@ -50,9 +60,17 @@ const Friendslist: React.FC<Props> = ({user}) => {
     </div>
 
     */
+    // const mapfriends = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    //     e.preventDefault();
+    //     console.log("click map");
+    //     user.friends.forEach((element : SmallUser) => {
+    //         console.log(element);
+    //     });
+    // }
 
     return (
         <>  
+            {/* <button className="friendslistButton" onClick={(e) => mapfriends(e)}>map</button> */}
             {user.friends.map((element, index) => (
                 <div key={index}>
                 {
@@ -65,13 +83,12 @@ const Friendslist: React.FC<Props> = ({user}) => {
                 }
                 </div>
             ))}
-            <p><b>Friendslist:</b></p>
+            <b>Friendslist</b>
             {user.friends.map((e, index) => (
                 <div key={index} className="friendslist">
-                    {/* <p>{e.name} {e.state}</p> */}
                     {
                         e.state &&
-                        <li key={e.userId} className="friendslist">{e.name}</li>
+                        <div style={{cursor: "pointer"}} onClick={(event) => goToProfile(event, e.userId)}>{e.name}</div>
                     }
                 </div>
             ))}

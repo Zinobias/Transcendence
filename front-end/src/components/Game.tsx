@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { useCookies } from 'react-cookie';
+import { Cookies, useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 import { DefaultMatchmaking, DiscoMatchmaking, LeavetMatchmaking } from "./GameUtils";
 import GameCanvas from "./GameCanvas";
@@ -20,6 +20,21 @@ const   Game: React.FC = () => {
     const [gameInfo, setGameinfo] = useState<IGameInfo>();
     const [queue, setQueue] = useState<boolean>(false);
 
+    // game event listener helper function
+    function gameIsInGameInGame (response : any) {
+        if (response.success) {
+            socket.emit("game", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "game.get.activeGameId", 
+                data: { userId: cookies.userID, requestedId: cookies.userID }
+            });
+            // console.log(`socket.emit game.get.activeGameId`);
+        }
+        console.log(response.msg);
+    }
+
+
     // game event listeners
     useEffect(() => {
 
@@ -30,6 +45,7 @@ const   Game: React.FC = () => {
             eventPattern: "game.isInGame", 
             data: { userId: cookies.userID, requestedId: cookies.userID }
         });
+        console.log("emitting game.isInGame");
 
         // we found a game so we ask for the activeGameId
         socket.on("game.found", response => {
@@ -43,17 +59,7 @@ const   Game: React.FC = () => {
         })
 
         // user is in a game so we ask for activeGameId
-        socket.on("game.isInGame", response => {
-            if (response.success) {
-                socket.emit("game", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "game.get.activeGameId", 
-                    data: { userId: cookies.userID }
-                });
-                console.log(`socket.emit game.get.activeGameId`);
-            }
-        })
+        socket.on("game.isInGame", gameIsInGameInGame)
 
         // returns the ID for the game the user is currently in
         socket.on("game.get.activeGameId", response => {
@@ -92,7 +98,7 @@ const   Game: React.FC = () => {
 
         return () => {
             socket.off("game.found");
-            socket.off("game.isInGame");
+            socket.off("game.isInGame", gameIsInGameInGame);
             socket.off("game.get.activeGameId");
             socket.off("game.get.gameInfo");
             socket.off("game.join.queue");
@@ -109,9 +115,10 @@ const   Game: React.FC = () => {
         }
     }, [])
 
+    // we always want to listen to this
     useEffect(() => {
-        socket.on("game.create", response => {
-            if (response.success) {
+        socket.on("game.create", gameResponse => {
+            if (gameResponse.success && window.location.pathname == "/game") {
                 if (queue) {
                     // if we accepted an gameInvite and we are in a queue we leave the queue first
                     socket.emit("game", {
@@ -121,26 +128,16 @@ const   Game: React.FC = () => {
                         data: { userId: cookies.userID }
                     });
                 }
-                // console.log(`game.create success emitting game.get.activeGameId`);
-                // socket.emit("game", {
-                //     userId: cookies.userID,
-                //     authToken: cookies.user,
-                //     eventPattern: "game.get.activeGameId", 
-                //     data: { userId: cookies.userID }
-                // });
                 console.log("game.create success emitting game.get.gameInfo")
                 socket.emit("game", {
                     userId: cookies.userID,
                     authToken: cookies.user,
                     eventPattern: "game.get.gameInfo", 
-                    data: { userId: cookies.userID, gameId: response.gameId }
+                    data: { userId: cookies.userID, gameId: gameResponse.gameId }
                 });
             }
         })
 
-        return () => {
-            socket.off("game.create");
-        }
     }, [queue])
 
     return (

@@ -4,7 +4,7 @@ import { IChannel, SettingType } from '../interfaces';
 import { SocketContext } from './Socket';
 import { TbCrown, TbSword } from "react-icons/tb";
 import {Md5} from "ts-md5";
-import ChannelUtils from './ChannelUtils';
+import ChannelSettingsUtils from './ChannelSettingsUtils';
 
 interface Props {
     channel: IChannel;
@@ -15,23 +15,27 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
     const [pw, setPw] = useState<string>("");
     const socket = useContext(SocketContext);
 
-    // EVENT LISTENER
+
+    // event listener functions
+    function updatePasswordInSettings (response : any) {
+        if (response.success === true && response.channel_id === channel.channelId ) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "channel_retrieve_by_id", 
+                data: { user_id: cookies.userID, 
+                        channel_id: channel.channelId }
+            });
+            console.log("emiting channel_retrieve_by_id");
+        }
+    }
+
+    // event listener functions
     useEffect(() => {
-        socket.on("channel_update_password", response => {
-            if (response.success === true && response.channel_id === channel.channelId ) {
-                socket.emit("chat", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "channel_retrieve_by_id", 
-                    data: { user_id: cookies.userID, 
-                            channel_id: channel.channelId }
-                });
-                console.log("emiting channel_retrieve_by_id");
-            }
-        })
+        socket.on("channel_update_password", updatePasswordInSettings)
 
         return () => {
-            socket.off("channel_update_password");
+            socket.off("channel_update_password", updatePasswordInSettings);
         }
     }, [channel])
 
@@ -143,7 +147,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                     }
 					</span>
 					<div id={element.userId.toString()} className="settingsDropdown">
-                        <ChannelUtils channel={channel} memberUserID={element.userId}/>
+                        <ChannelSettingsUtils channel={channel} memberUserID={element.userId}/>
 					</div>
                 </li>
             ))}

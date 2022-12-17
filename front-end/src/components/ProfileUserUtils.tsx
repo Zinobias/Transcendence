@@ -165,20 +165,21 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 
 export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const [cookies] = useCookies(['userID', 'user']);
-    const [me, setMe] = useState<IUser>();
     const [isFriend, setIsFriend] = useState<boolean>(false);
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
     const socket = useContext(SocketContext);
 
+    // get_user listener function
+    function getUserInProfileUtils (response : any) {
+        if (response.success && response.user.userId == cookies.userID) {
+            setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
+            setIsFriend(isFriend => !response.user.friends.find((e : SmallUser) => user.userId == e.userId && e.state == true));
+        }
+    }
+
     // event listeners and emits on mount
     useEffect(() => {
-        socket.on("get_user", response => {
-            if (response.success && response.user.userId == cookies.userID) {
-                setMe(me => response.user);
-                setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
-                setIsFriend(isFriend => !response.user.friends.find((e : SmallUser) => user.userId == e.userId && e.state == true));
-            }
-        })
+        socket.on("get_user", getUserInProfileUtils);
 
         socket.emit("chat", {
             userId: cookies.userID,
@@ -215,7 +216,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         })
 
         return () => {
-            socket.off("get_user");
+            socket.off("get_user", getUserInProfileUtils);
             socket.off('block_user');
             socket.off('unblock_user');
         }
@@ -266,9 +267,22 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         console.log(`emitting unblock_user`);
     }
 
+    const gameInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, gameMode : string) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "invite_game_user",
+            data: {user_id: cookies.userID, request_user_id: user.userId, game_mode: gameMode}
+        })
+        console.log(`emitting invite_game_user`);
+    }
+
     return (
         <>  
-            <button className='profileButton'>Invite to Pong</button> 
+            <span style={{display: "flex", alignItems: "center", flexDirection: "column", fontWeight: "bold", fontSize: "100%"}}>invite to game</span>
+            <button style={{width: "50%", borderRight: "none"}} className='profileButton' onClick={(e) => gameInvite(e, "DEFAULT")}>Default</button>
+            <button style={{width: "50%"}} className='profileButton' onClick={(e) => gameInvite(e, "DISCOPONG")}>Disco</button>  
             {
                 isFriend ?
                 <button className='profileButton' onClick={(e) => addFriend(e)}>Add Friend</button> :
