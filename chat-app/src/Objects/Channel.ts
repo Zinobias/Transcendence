@@ -2,6 +2,7 @@ import {IUser, User} from './User';
 import {IMessage, Message} from './Message';
 import {ISetting, Setting} from './Setting';
 import {SettingType} from '../Enums/SettingType';
+import {Queries} from "../Database/Queries";
 
 export interface IChannel {
     channelId: number;
@@ -132,7 +133,16 @@ export class Channel {
     }
 
     public hasSetting(affectedId: number, settingType: SettingType) {
-        return this._settings.find((setting: Setting) => setting.affectedId == affectedId && setting.setting == settingType) != undefined;
+        const foundSetting = this._settings.find((setting: Setting) => setting.affectedId == affectedId && setting.setting == settingType);
+        if (foundSetting == undefined)
+            return false;
+        if (foundSetting.until == -1)
+            return true;
+        if (foundSetting.until > new Date().getTime())
+            return false;
+        Queries.getInstance().removeSetting(foundSetting.channelId, foundSetting.affectedId, foundSetting.setting);
+        this._settings = this._settings.filter(setting => setting != foundSetting)
+        return false;
     }
 
     public addSetting(setting: Setting) {
