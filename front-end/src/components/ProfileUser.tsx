@@ -70,11 +70,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             }
         })
 
-        socket.on("check_online", response => {
-            if (response.onlineUsers[0] == user.userId)
-                setOnline(online => true);
-        })
-
+        socket.on("check_online", checkOnlineProfile);
         socket.on("game.isInGame", gameIsInGameInProfile);
         socket.on("get_name", getNameInProfile);
 
@@ -119,6 +115,11 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             console.log("get_name success " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
+    }
+
+    function checkOnlineProfile (response : any) {
+        if (response.onlineUsers[0] == user.userId)
+            setOnline(online => true);
     }
 
     // helper functions

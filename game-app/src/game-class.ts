@@ -305,7 +305,7 @@ export class Game {
 		let loopState : Boolean = true;
 		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 		let powerUptimer : number = 0; // time since last powerup
-		let powerUpInterval : number = 5000; // every 5 seconds
+		let powerUpInterval : number = 5000 * this._fps; // every 5 seconds
 		logger.debug(`GameMode for new gameInstance is : ${this.gameMode}`);
 
 		while (loopState === true) {

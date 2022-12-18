@@ -69,20 +69,6 @@ const Friendslist: React.FC<Props> = ({user}) => {
     //     });
     // }
 
-    /*
-        friends status notes:
-
-        check if they are online or in game in an interval
-
-
-        ● ■
-        online color #06d60d 
-        offline color #d60606
-
-        <span style={{color: `{variable}`}}>●</span>
-        <span style={{fontWeight: "lighter"}}>in game</span>
-                        
-    */
 
     return (
         <>  

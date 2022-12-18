@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { SmallUser } from "../interfaces";
@@ -12,6 +12,8 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const navigate = useNavigate();
+    const [online, setOnline] = useState<boolean>(false);
+    const [inGame, setIngame] = useState<boolean>(false);
 
     // get statusues on mount
     useEffect(() => {
@@ -28,7 +30,28 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
             eventPattern: "game.isInGame", 
             data: { userId: cookies.userID, requestedId: friend.userId }
         });
+
+        socket.on("check_online", checkOnlineFriendslist);
+        socket.on("game.isInGame", checkInGameFriendslist);
+
+        return () => {
+            socket.off("check_online", checkOnlineFriendslist);
+            socket.off("game.isInGame", checkInGameFriendslist);
+        }
+        
     }, [])
+
+    // event listener functions
+    function checkOnlineFriendslist (response : any) {
+        if (response.onlineUsers[0] == friend.userId)
+            setOnline(online => true);
+
+    }
+
+    function checkInGameFriendslist (response : any) {
+        if (response.success)
+            setIngame(inGame => true);
+    }
 
     const goToProfile = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
@@ -37,10 +60,35 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
             search: 'id=' + friend.userId,
         })
     }
+    
+    /*
+        friends status notes:
+
+        check if they are online or in game in an interval
+
+
+        ● ■
+        online color #06d60d 
+        offline color #d60606
+
+        <span style={{color: `{variable}`}}>●</span>
+        <span style={{fontWeight: "lighter"}}>in game</span>
+
+        <span style={online ? {color: "#06d60d"} : {color: "#d60606"}}>●</span>
+        {
+            inGame &&
+            <span style={{fontWeight: "lighter"}}>in game</span>
+        }
+                        
+    */
 
     return (
         <>
-        <div style={{cursor: "pointer"}} onClick={(e) => goToProfile(e)}>{friend.name}</div>
+        <div style={{cursor: "pointer"}} onClick={(e) => goToProfile(e)}>{friend.name}<span style={online ? {color: "#06d60d"} : {color: "#d60606"}}> ●</span></div>
+        {
+            inGame &&
+            <span style={{fontWeight: "lighter"}}>in game</span>
+        }
         </>
     )
 }
