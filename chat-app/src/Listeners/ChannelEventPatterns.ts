@@ -14,7 +14,7 @@ import {
     ChannelPromote,
     ChannelRetrieve,
     ChannelsRetrieve,
-    ChannelUpdatePassword, DmChannel,
+    ChannelUpdatePassword, DmChannel, GetActiveInvites,
 } from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
@@ -551,6 +551,16 @@ export class ChannelEventPatterns {
     }
 
     channel_invites: invites[] = []
+
+    @EventPattern('get_active_invites')
+    async getActiveInvites(data: GetActiveInvites) {
+        this.util.notify([data.user_id], 'get_active_invites', {
+            success: true,
+            msg: undefined,
+            invites: this.channel_invites.filter(abc => abc.invited_id == data.user_id)
+        });
+    }
+
     @EventPattern('channel_invite')
     async handleChannelInvite(data: ChannelInvite) {
         if (data.channel_id == undefined || data.invited_id == undefined) {

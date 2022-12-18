@@ -79,6 +79,10 @@ export interface ChannelRetrieve {
     channel_id: number
 }
 
+export interface GetActiveInvites {
+    user_id: number
+}
+
 export interface ChannelInvite {
     user_id: number
     invited_id: number
