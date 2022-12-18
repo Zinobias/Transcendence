@@ -59,6 +59,10 @@ export class ChannelEventPatterns {
                 this.util.emitFailedObject(data.user_id, 'channel_create', 'Unable to find second dm user');
                 return;
             }
+            if (user.hasBlocked(user2) || user2.hasBlocked(user)) {
+                this.util.emitFailedObject(data.user_id, 'channel_create', `You can't create a channel with this user`);
+                return;
+            }
             usersArr.push(user2);
         }
 
