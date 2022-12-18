@@ -47,6 +47,7 @@ export interface IChannel {
 export interface IChannelInfo {
     channelId: number;
     channelName: string;
+    otherOwnderId: number;
     visible: boolean;
     hasPassword: boolean;
 }

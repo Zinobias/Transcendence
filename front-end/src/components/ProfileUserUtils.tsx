@@ -223,11 +223,30 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             });
         });
 
+        socket.on("get_dm_channel", response => {
+            if (response.channel) 
+                console.log("already in a dm with that user");
+            else {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "channel_create", 
+                    data: { user_id: cookies.userID, 
+                            channel_name: `${cookies.userID}_${user.userId}`, 
+                            creator2_id: user.userId, 
+                            visible: false, 
+                            should_get_password: false }
+                });
+                console.log("not in a dm with that user");
+            }
+        });
+
         return () => {
             socket.off("get_user", getUserInProfileUtils);
             socket.off('block_user');
             socket.off('unblock_user');
             socket.off("get_chatrooms_user");
+            socket.off("get_dm_channel");
         }
 
     }, [])
@@ -290,7 +309,13 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const directMessage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         // emit to create dm, if we already are in a dm just toggle the chat window       
         e.preventDefault();
-        console.log(`click direct message`);
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "get_dm_channel",
+            data: {user_id: cookies.userID, other_user_id: user.userId}
+        })
+        console.log(`emitting get_dm_channel`)
     }
 
     const channelRequest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -334,7 +359,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 <button className='profileButton' onClick={(e) => blockUser(e)}>block</button> :
                 <button className='profileButton' onClick={(e) => unblockUser(e)}>unblock</button> 
             }
-            <button className='profileButton'>send message</button>
+            <button className='profileButton' onClick={(e) => directMessage(e)}>send message</button>
             <button className='profileButton' onClick={(e) => channelRequest(e)}>Invite to Channel</button>
             {
                 channels.length != 0 &&

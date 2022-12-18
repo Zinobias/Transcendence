@@ -36,6 +36,7 @@ export class RetrieveUserDataEventPatterns {
                 return {
                     channelId: channel.channelId,
                     channelName: channel.channelName,
+                    otherOwnderId: channel.otherOwner === undefined ? -1 : (data.user_id == channel.owner ? channel.otherOwner : channel.owner),
                     visible: channel.visible,
                     hasPassword: (channel.password != undefined && channel.password.length == 64)
                 }
@@ -73,6 +74,9 @@ export class RetrieveUserDataEventPatterns {
             });
             return
         }
+        const usertest = user.getIUser();
+        // this.logger.warn("user " + user.friends[0].user.userId);
+        // this.logger.warn("iuser " + usertest.friends[0].userId);
         this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
         this.util.notify([data.user_id], 'get_user', {
             success: true,

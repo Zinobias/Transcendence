@@ -138,7 +138,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                     <span onClick={(e) => toggleSettings(e, element.userId)}>
 					{element.name}
                     {
-                        element.userId == channel.owner &&
+                        (element.userId == channel.owner && !channel.otherOwner) &&
                         <TbCrown />
                     }
                     {

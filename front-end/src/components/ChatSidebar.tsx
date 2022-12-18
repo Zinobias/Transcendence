@@ -10,12 +10,18 @@ interface Props {
     setChannel: React.Dispatch<React.SetStateAction<IChannel | undefined>>;
 }
 
+interface INames {
+    userId  : number;
+    name    : string;
+}
+
 const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChannel}) => {
 
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
     const [state, setState] = useState<boolean>(false);
     const [channels, setChannels] = useState<IChannelInfo[]>([]);
+    const [names, setNames] = useState<INames[]>([]);
 
     // when the state changes we want to update the channels in the sidebar
     useEffect(() => {
@@ -35,7 +41,15 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
             console.log(`socket.on get_channels_user success`);
             setChannels([]);
             response.channels.forEach((element : IChannelInfo) => {
-                setChannels(channels => [...channels, element])
+                setChannels(channels => [...channels, element]);
+                if (element.otherOwnderId != -1 && !names.find((e) => e.userId == element.otherOwnderId)) {
+                    socket.emit("chat", {
+                        userId: cookies.userID,
+                        authToken: cookies.user,
+                        eventPattern: "get_name", 
+                        data: { user_id: cookies.userID, requested_user_id: element.otherOwnderId }
+                    });
+                }
                 console.log(`${element.channelName} ${element.channelId}`);
             });
         });
@@ -50,7 +64,15 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
             socket.off("channel_leave", channelLeaveInSidebar);
             socket.off("channel_ban", channelBanInSidebar);
         }
-    }, [channelId])
+    }, [channelId, names])
+
+    useEffect(() => {
+        socket.on("get_name", getNameInSidebar);
+
+        return () => {
+            socket.off("get_name", getNameInSidebar);
+        }
+    }, [])
 
     function channelJoinInSidebar (response : any) {
         // if current user joined a channel update side channels
@@ -80,6 +102,19 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
             setChannel(channel => undefined);
     }
 
+    function getNameInSidebar (response : any) {
+        if (response.success) {
+            console.log("get_name success " + response.requested_name);
+            setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
+        }
+    }
+
+    // helper functions
+    function returnName (id : number) : string {
+        const ret = names.find((e) => e.userId == id)?.name;
+        return (ret === undefined ? "Unknown User": ret);
+    }
+
     /*
     TODO:
     only show channels that are visible
@@ -90,7 +125,7 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
         <p style={{textAlign: "center", lineHeight: "0"}}>MY CHATS:</p>
         {channels.map((element) => (
         <li key={element.channelId} className="listChat">
-            <span className="listChatUser__text" onClick={() => setChannelId(channelId => element.channelId)}>{element.channelName}</span> 
+            <span className="listChatUser__text" onClick={() => setChannelId(channelId => element.channelId)}>{element.otherOwnderId == -1 ? element.channelName : returnName(element.otherOwnderId)}</span> 
         </li>
         ))}
     </div>

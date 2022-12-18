@@ -46,6 +46,7 @@ const ProfileNav: React.FC = () => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
                 console.log("get_user success profileNav");
+                console.log(response.user);
                 setUser(user => response.user);
             }
         })

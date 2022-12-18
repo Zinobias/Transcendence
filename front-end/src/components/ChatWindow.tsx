@@ -192,7 +192,7 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
     return (
         <>
         <div className="chatroom">
-            {channel.channelName}
+            {channel.otherOwner ? (channel.otherOwner == cookies.userID ? returnName(channel.owner) : returnName(channel.otherOwner)) : channel.channelName}
             <span className="chatroom__settingsicon" onClick={(e) => toggleSettings(e)}>
                 <AiOutlineMenu />
             </span>
