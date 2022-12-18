@@ -14,7 +14,7 @@ export interface IChannel {
     settings: ISetting[];
     closed: boolean;
     visible: boolean;
-    password: string;
+    password: boolean;
 }
 
 export class Channel {
@@ -193,19 +193,33 @@ export class Channel {
         );
     }
 
-    public getIChannel(): IChannel {
-        return {
-            channelId: this._channelId,
-            owner: this._owner,
-            otherOwner: this._otherOwner,
-            channelName: this._channelName,
-            users: this._users.map(user => {return user.getIUser()}),
-            messages: this._messages.map(message => {return message.getIMessage()}),
-            settings: this._settings.map(setting => {return setting.getISetting()}),
-            closed: this._closed,
-            visible: this._visible,
-            password: this._password,
-        }
+    public getIChannel(all: boolean): IChannel {
+        if (all)
+            return {
+                channelId: this._channelId,
+                owner: this._owner,
+                otherOwner: this._otherOwner,
+                channelName: this._channelName,
+                users: this._users.map(user => {return user.getIUser()}),
+                messages: this._messages.map(message => {return message.getIMessage()}),
+                settings: this._settings.map(setting => {return setting.getISetting()}),
+                closed: this._closed,
+                visible: this._visible,
+                password: this._password == undefined,
+            }
+        else
+            return {
+                channelId: this._channelId,
+                owner: -1,
+                otherOwner: -1,
+                channelName: this._channelName,
+                users: [],
+                messages: [],
+                settings: [],
+                closed: this._closed,
+                visible: this._visible,
+                password: this._password == undefined,
+            }
     }
 
     addMessage(message: Message) {
