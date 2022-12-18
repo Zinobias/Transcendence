@@ -20,6 +20,7 @@ export class Game {
 	private _player1Serves		: Boolean;
 	private	_toServe			: Boolean;
 	private _set				: IRectangle[];
+	private _deltaTime			: number;
 
 	constructor(
 			private eventEmitter		: EventEmitter2,
@@ -322,7 +323,6 @@ export class Game {
 			4. Transmit frameData to frontend to render.
 			5. loop.
 			*/
-			// TODO: At end of loop, send current state object to frontEnd. For rendering purposes. JSON format for DTO
 			this.eventEmitter.emit('game.frame.update',
 			new GameFrameUpdateEvent({
 				gameId:	 this.gameId,
@@ -352,14 +352,9 @@ export class Game {
 	 * Creates a ball based on gameMode passed to the constructor.
 	 */
 	private ballFactory() : void {
-		// const ballFactoryMap = new Map<string, () => void >([
-		// 	["DEFAULT", this.createDefaultBall]
-		// ]);
-		// ballFactoryMap.get(this.gameMode)?.();
-
-		// TODO : Fix ballfactoryMap. for extra gameMode balls.
 		this.createDefaultBall();
 	}
+
 	private createDefaultBall() : void {
 		this.ball = new Ball(); // probably do not need to create a new one here?
 		this.entities.push(this.ball);

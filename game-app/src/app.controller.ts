@@ -99,7 +99,6 @@ export class AppController {
 				player2ScoreFinal : payload.payload.playerScores.player2FinalScore,
 			}
 		}); // Forwarding entities of the game. to render in frontend.
-		// TODO : not hardcode.
 		this.matchMakingService.removeGameFromList(payload.gameId);
 	}
 

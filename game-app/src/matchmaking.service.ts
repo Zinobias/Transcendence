@@ -124,8 +124,6 @@ export class MatchMakingService {
 				return ;
 			}
 			this.logger.log(`Adding userId : [${payload.userId}] to queue for gamemode : [${payload.gameMode}] went wrong`);
-
-			// this.matchMakingQueue.get(payload.gameMode)?.push(payload.userId);
 		}
 	}
 
@@ -173,7 +171,6 @@ export class MatchMakingService {
 				logger.log("Game found event emitted to client");
 			}
 		}
-		// TODO: Do we have to add this to the database?
 	}
 	
 	/**
@@ -210,7 +207,6 @@ export class MatchMakingService {
 			frameSubscribers:[gameDto.player1UID,  gameDto.player2UID],
 			gameMode		: gameDto.gameMode,
 		});
-		// TODO : Increment gameIds in DB.
 	}
 
 
@@ -324,10 +320,6 @@ export class MatchMakingService {
 			}
 		}
 		return false;
-	}
-
-	async addNewGameToDatabase(newGame : CreateGameDTO) {
-		// TODO : add new game to db
 	}
 
 	async addGameResultToDatabase(res : GameResult) {

@@ -46,5 +46,3 @@ export enum GameConfig {
 */
 
 // max speeds -7 pixel to +7 pixels
-
-// TODO: maybe add a scalar to config.

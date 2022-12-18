@@ -142,7 +142,6 @@ export class PlayerPaddle extends Entity {
 	set keyPressUp(state : boolean) { this._keyPressUp = state;}
 	set keyPressDown(state : boolean) { this._keyPressDown = state;}
 
-	// TODO: Maybe add a set height if we want to create some fun powerup that reduces the paddle height.
 }
 
 
