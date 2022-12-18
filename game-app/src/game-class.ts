@@ -20,7 +20,7 @@ export class Game {
 	private _player1Serves		: Boolean;
 	private	_toServe			: Boolean;
 	private _set				: IRectangle[];
-	private _deltaTime			: number;
+	private _fps				: number; // set to 1 equals 300 fps
 
 	constructor(
 			private eventEmitter		: EventEmitter2,
@@ -43,6 +43,7 @@ export class Game {
 		this.playerPaddles.push( {uid : this.player1.uid, playerPaddle : new PlayerPaddle(1)});
 		this.playerPaddles.push( {uid : this.player2.uid, playerPaddle : new PlayerPaddle(2)});
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
+		this._fps = 1;
 		this.ballFactory();
 		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this));
 	};
@@ -89,13 +90,13 @@ export class Game {
 	 */	
 	private movePlayer() : void {
 		if (this.playerPaddles[0].playerPaddle.keyPressUp === true)
-			this.playerPaddles[0].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (this.playerPaddles[0].playerPaddle.height * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[0].playerPaddle.pos.y += (GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (this.playerPaddles[0].playerPaddle.height * 0.5)) * this._fps > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 		if (this.playerPaddles[0].playerPaddle.keyPressDown === true)
-			this.playerPaddles[0].playerPaddle.pos.y -= this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[0].playerPaddle.height * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[0].playerPaddle.pos.y -= (this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[0].playerPaddle.height * 0.5)) * this._fps < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 		if (this.playerPaddles[1].playerPaddle.keyPressUp === true)
-			this.playerPaddles[1].playerPaddle.pos.y += GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (this.playerPaddles[1].playerPaddle.height * 0.5) > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1].playerPaddle.pos.y += (GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (this.playerPaddles[1].playerPaddle.height * 0.5)) * this._fps > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 		if (this.playerPaddles[1].playerPaddle.keyPressDown === true)
-			this.playerPaddles[1].playerPaddle.pos.y -= this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[1].playerPaddle.height * 0.5) < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE;
+			this.playerPaddles[1].playerPaddle.pos.y -=( this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[1].playerPaddle.height * 0.5)) * this._fps < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 	}
 
 	/**
@@ -103,8 +104,8 @@ export class Game {
 	 */
 	private moveBall() : void {
 		if (this.ball.velocityVector) {
-			this.ball.pos.x += this.ball.velocityVector?.x;
-			this.ball.pos.y += this.ball.velocityVector?.y;
+			this.ball.pos.x += this.ball.velocityVector?.x * this._fps;
+			this.ball.pos.y += this.ball.velocityVector?.y * this._fps;
 		}
 	}
 	// Entrypoint for the game class.
@@ -310,7 +311,7 @@ export class Game {
 			this.moveBall(); // move ball
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
-			if (this.gameMode === 'DISCOPONG' && powerUptimer >= 5000) {
+			if (this.gameMode === 'DISCOPONG' && powerUptimer >= powerUpInterval) {
 				logger.debug(`Generating a powerUp`);
 				this.generatePowerUps();
 				powerUptimer = 0;
@@ -329,8 +330,8 @@ export class Game {
 				payload: this.entities,
 			}),
 			);
-			await sleep(3.33);
-			powerUptimer += 3.33;
+			await sleep(3.33 * this._fps);
+			powerUptimer += 3.33 * this._fps;
 			if (this.player1.score === 11 || this.player2.score === 11)
 				loopState = false;
 		}
