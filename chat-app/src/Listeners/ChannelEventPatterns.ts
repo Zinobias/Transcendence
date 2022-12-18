@@ -79,7 +79,7 @@ export class ChannelEventPatterns {
                 this.util.emitFailedObject(data.user_id, 'channel_create', `You can't create a channel with this user`);
                 return;
             }
-            if (Channel.getUserChannels(user.userId).filter(abc => abc.otherOwner == user2.userId) != undefined || Channel.getUserChannels(user2.userId).filter(abc => abc.otherOwner == user.userId) != undefined) {
+            if (this.getDmChannel(data.user_id, data.creator2_id) != undefined) {
                 this.util.emitFailedObject(data.user_id, 'channel_create', `You already have a dm with this user`);
                 return;
             }
