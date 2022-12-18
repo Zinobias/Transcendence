@@ -108,7 +108,7 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
         const colors = ['#9400D3', '#0000FF', '#00FF00', '#FFF000', '#FF7F00', '#FF000'];
         if (count === 0)
             setRet(ret => Math.floor(Math.random() * (5 - 0 + 1)) + 0);
-        setCount(count => (count === 40 ? 0 : count + 1));
+        setCount(count => (count === 8 ? 0 : count + 1));
         return (colors[ret]);
     }
 

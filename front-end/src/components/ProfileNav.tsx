@@ -138,11 +138,6 @@ const ProfileNav: React.FC = () => {
         document.getElementById("myDropdown")?.classList.toggle("show");
     };
 
-    /*
-    export interface AcceptGameRequest 
-    user_id: number;
-    request_user_id: number;
-    */
     const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, index : number, inviteId : number) => {
         e.preventDefault();
         socket.emit("chat", {

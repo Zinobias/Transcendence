@@ -43,7 +43,7 @@ export class Game {
 		this.playerPaddles.push( {uid : this.player1.uid, playerPaddle : new PlayerPaddle(1)});
 		this.playerPaddles.push( {uid : this.player2.uid, playerPaddle : new PlayerPaddle(2)});
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
-		this._fps = 5;
+		this._fps = 2.5;
 		this.ballFactory();
 		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this));
 	};
@@ -282,7 +282,7 @@ export class Game {
 		return (entityPosition!);
 	}
 
-	private generatePowerUps() {
+	private async generatePowerUps() {
 		const powerUpPicker  : number = getRandomInt(0, 2);
 		let newEntityPos : IVec2;
 		let newEntity : Entity;
@@ -305,7 +305,7 @@ export class Game {
 		let loopState : Boolean = true;
 		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 		let powerUptimer : number = 0; // time since last powerup
-		let powerUpInterval : number = 5000 * this._fps; // every 5 seconds
+		let powerUpInterval : number = 5000; // every 5 seconds
 		logger.debug(`GameMode for new gameInstance is : ${this.gameMode}`);
 
 		while (loopState === true) {
