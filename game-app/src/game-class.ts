@@ -212,6 +212,10 @@ export class Game {
 						this.removeEntity(entity);
 						logger.debug(`Deleted object`);
 					}
+					if (this.ball.velocityVector!.x > this.ball.width)
+						this.ball.velocityVector!.x = this.ball.width;
+					if (this.ball.velocityVector!.y > this.ball.height)
+						this.ball.velocityVector!.y = this.ball.height;
 				}
 		}
 	}
