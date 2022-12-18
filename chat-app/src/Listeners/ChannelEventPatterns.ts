@@ -155,7 +155,6 @@ export class ChannelEventPatterns {
     //TODO check if user is invited?
     @EventPattern('channel_join')
     async handleJoin(data: ChannelJoin) {
-        let had_invite = false;
         if (data.channel_id == undefined) {
             this.util.emitFailedObject(data.user_id, 'channel_join', 'Incorrect data object');
             return;
@@ -169,12 +168,9 @@ export class ChannelEventPatterns {
             return;
         }
 
-        if (channel.visible == false) {
-            if (this.channel_invites.find(abc => abc.channel_id == channel.channelId && abc.invited_id == data.user_id) == null) {
-                this.util.emitFailedObject(data.user_id, 'channel_join', `You don't have an invite for this channel`);
-                return
-            }
-            had_invite = true;
+        if (channel.visible == false && this.channel_invites.find(abc => abc.channel_id == channel.channelId && abc.invited_id == data.user_id) == null) {
+            this.util.emitFailedObject(data.user_id, 'channel_join', `You don't have an invite for this channel`);
+            return
         }
 
         const user: User = await this.util.getUser(data.user_id, 'channel_join');
@@ -208,9 +204,7 @@ export class ChannelEventPatterns {
         channel.addUser(user);
         await Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
 
-        if (had_invite) {
-            this.channel_invites = this.channel_invites.filter(abc => abc.channel_id != data.channel_id && abc.invited_id != data.user_id);
-        }
+        this.channel_invites = this.channel_invites.filter(abc => abc.channel_id != data.channel_id && abc.invited_id != data.user_id);
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_join', {
