@@ -72,7 +72,7 @@ export class MatchMakingService {
 	 */
 	public isInGame(uid : number) : boolean{
 		if (this.getGameList().find((e) => {
-			return ((e.player1 === uid || e.player2 === uid));
+			return ((e.player1 == uid || e.player2 == uid));
 		})!== undefined)
 			return true;
 		return false;
@@ -191,7 +191,7 @@ export class MatchMakingService {
 
 		logger.log("New game instance has been created");
 		await this.addGameToList(createGameDTO, newGameInstance);
-		return (this.gameId++);
+		return (this.gameId);
 		
 	}
 

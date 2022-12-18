@@ -89,7 +89,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.isInGame", 
-            data: { userId: cookies.userID, requestedId: user.userId }
+            data: { userId: cookies.userID, requestedId: Number(user.userId) }
         });
 
         socket.emit("game", {
@@ -111,6 +111,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     function gameIsInGameInProfile (response : any) {
         if (response.success)
             setIngame(inGame => true);
+        console.log(response.msg);
     }
 
     function getNameInProfile (response : any) {

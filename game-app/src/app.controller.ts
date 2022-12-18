@@ -259,7 +259,7 @@ export class AppController {
 	@EventPattern('game.isInGame')
 	isInGame(@Payload() payload : any) {
 		let success : boolean = this.matchMakingService.isInGame(payload.requestedId);
-		this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}]`);
+		this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}] typeOf userId : ${typeof(payload.requestedId)}`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
