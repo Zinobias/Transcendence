@@ -35,7 +35,7 @@ const ProfileNav: React.FC = () => {
             eventPattern: "get_user", 
             data: {user_id: cookies.userID, requested_user_id: cookies.userID}
         })
-        console.log(`emiting get_user ${cookies.userID}`);
+        // console.log(`emiting get_user ${cookies.userID}`);
     }, [state])
 
     // user event listeners
@@ -43,6 +43,7 @@ const ProfileNav: React.FC = () => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
                 console.log("get_user success profileNav");
+                console.log(response.user);
                 setUser(user => response.user);
             }
         })

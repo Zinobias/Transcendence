@@ -29,6 +29,7 @@ export const   LogoutButton: React.FC = () => {
         });
         removeCookie('user');
         removeCookie('userID');
+        // window.location.reload();
     };
 
     return (

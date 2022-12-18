@@ -15,21 +15,32 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
     const [online, setOnline] = useState<boolean>(false);
     const [inGame, setIngame] = useState<boolean>(false);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // console.log('This will run every second!');
+            if (document.getElementById("myDropdown")?.classList.contains("show")) {
+                // console.log('This will run every second!');
+                socket.emit("check_online", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "check_online", 
+                    data: {userId: cookies.userID, checkIds: [friend.userId]}
+                });
+        
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.isInGame", 
+                    data: { userId: cookies.userID, requestedId: friend.userId }
+                });
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     // get statusues on mount
     useEffect(() => {
-        socket.emit("check_online", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-            eventPattern: "check_online", 
-            data: {userId: cookies.userID, checkIds: [friend.userId]}
-        });
-
-        socket.emit("game", {
-            userId: cookies.userID,
-            authToken: cookies.user,
-            eventPattern: "game.isInGame", 
-            data: { userId: cookies.userID, requestedId: friend.userId }
-        });
 
         socket.on("check_online", checkOnlineFriendslist);
         socket.on("game.isInGame", checkInGameFriendslist);
@@ -39,18 +50,21 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
             socket.off("game.isInGame", checkInGameFriendslist);
         }
         
-    }, [])
+    }, [friend])
 
     // event listener functions
     function checkOnlineFriendslist (response : any) {
         if (response.onlineUsers[0] == friend.userId)
             setOnline(online => true);
-
+        else
+            setOnline(online => false);
     }
 
     function checkInGameFriendslist (response : any) {
         if (response.success)
             setIngame(inGame => true);
+        else
+            setIngame(inGame => false);
     }
 
     const goToProfile = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

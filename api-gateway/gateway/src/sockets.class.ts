@@ -52,7 +52,7 @@ export class Sockets {
 	public removeSocket(socket : Socket) {
 		for (let socketMap of this.socketMap.entries()) {
 			let index = socketMap[1].findIndex((s) => {
-				this.logger.warn(`REMOVE SOCKET SUCCESS : ${s?.id == socket.id}`);
+				this.logger.warn(`SOCKET WILL GET REMOVED : ${s?.id == socket.id}`);
 				return (s?.id == socket.id);
 			});
 			if (index !== -1)
@@ -62,7 +62,12 @@ export class Sockets {
 	}
 
 	public removeAllSocketsUser(userId : number) {
-		this.socketMap.delete(userId);
+		// this.socketMap.delete(userId);
+		let sockets : Socket[] | undefined = mapGetter(userId, this.socketMap);
+		if (sockets != undefined) {
+			sockets.forEach(a => this.removeSocket(a));
+			this.logger.warn(sockets.length);
+		}
 	}
 
     public sendData(users: number[], pattern: string, payload: object) {

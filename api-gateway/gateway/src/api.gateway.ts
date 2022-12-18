@@ -125,6 +125,7 @@ export class ApiGateway
 		this.logger.debug("event check_online " + payload.data.checkIds);
 		for (let i = 0; i < payload.data.checkIds.length; i++) {
 			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.data.checkIds[i]);
+			this.logger.debug("socketlen " + socketList?.length);
 			if (socketList != undefined && socketList.length != 0) {
 				online.push(payload.data.checkIds[i])
 			} else {
@@ -373,7 +374,8 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('logout')
 	async logoutUser(client : Socket, payload : FrontEndDTO) {
-		this.sockets.sendData([payload.userId!], 'logout', {sucess: true});
+		// this.sockets.sendData([payload.userId!], 'logout', {sucess: true});
+		client.emit('logout', {sucess: true})
 		await this.queries.removeAllSessions(payload.userId!);
 		this.sockets.removeAllSocketsUser(payload.userId!);
 	}
