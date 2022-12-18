@@ -117,14 +117,17 @@ export class Queries {
 		const myDataSource = await getDataSource();
 		const userRepository = myDataSource.getRepository(user_table);
 		const findUser = await userRepository.findOneBy({ userId: userId });
-		if (findUser == undefined)
+		
+		if (findUser == null)
 			return undefined;
-		let newVar;
+		let avatar : any | undefined;
 		if (findUser.avatar == null)
-			newVar = undefined;
+			avatar = undefined;
 		else
-			newVar = await JSON.parse(findUser.avatar);
-		return new User(findUser.userId, findUser.userName, newVar); //TODO add avatar
+			avatar = await JSON.parse(findUser.avatar);
+		let newUser : User = new User(findUser.userId, findUser.userName, avatar);
+		await newUser.init();
+		return newUser;
 	}
 
 	//Blocked users table

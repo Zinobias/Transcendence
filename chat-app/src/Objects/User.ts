@@ -24,6 +24,7 @@ export class User {
 
     public static async getUser(userId: number): Promise<User | undefined> {
         const users = this._users.filter((a) => a._userId == userId);
+		
         if (users.length == 1)
             return users[0];
         const user: User = await Queries.getInstance().getUser(userId);
@@ -49,11 +50,17 @@ export class User {
         this._avatar = avatar;
         this._blocked = [];
         this._friends = [];
-        User.addUser(this);
-        this.updateBlocked();
-        this.updateFriends();
+        // User.addUser(this);
+        // this.updateBlocked();
+        // this.updateFriends();
     }
 
+	public async init() {
+		await this.updateBlocked();
+        await this.updateFriends();
+        User.addUser(this);
+	}
+	
     get userId(): number {
         return this._userId;
     }
