@@ -14,7 +14,7 @@ import {
     ChannelPromote,
     ChannelRetrieve,
     ChannelsRetrieve,
-    ChannelUpdatePassword,
+    ChannelUpdatePassword, DmChannel,
 } from '../DTOs/ChannelDTOs';
 import {User} from '../Objects/User';
 import {Channel} from '../Objects/Channel';
@@ -32,6 +32,22 @@ export class ChannelEventPatterns {
                 @Inject('gateway') private readonly gateway: ClientProxy,
                 @Inject(Util) private readonly util: Util,
                 /*@Inject(Queries) private readonly queries: Queries*/) {}
+
+    private getDmChannel(user1Id: number, user2Id: number): Channel | undefined {
+        let channel: Channel = Channel.getUserChannels(user1Id).find(abc => abc.otherOwner == user2Id);
+        if (channel != undefined)
+            return channel;
+        return Channel.getUserChannels(user2Id).find(abc => abc.otherOwner == user1Id);
+    }
+
+    @EventPattern('get_dm_channel')
+    getDmChannelEvent(data: DmChannel) {
+        const dmChannel = this.getDmChannel(data.user_id, data.other_user_id);
+        this.util.notify([data.user_id], 'get_dm_channel', {
+            success: true,
+            channel: dmChannel
+        });
+    }
 
     @EventPattern('channel_create')
     async channelCreate(data: ChannelCreate) {
@@ -63,6 +79,10 @@ export class ChannelEventPatterns {
                 this.util.emitFailedObject(data.user_id, 'channel_create', `You can't create a channel with this user`);
                 return;
             }
+            if (Channel.getUserChannels(user.userId).filter(abc => abc.otherOwner == user2.userId) != undefined || Channel.getUserChannels(user2.userId).filter(abc => abc.otherOwner == user.userId) != undefined) {
+                this.util.emitFailedObject(data.user_id, 'channel_create', `You already have a dm with this user`);
+                return;
+            }
             usersArr.push(user2);
         }
 
@@ -75,7 +95,7 @@ export class ChannelEventPatterns {
             [],
             data.should_get_password != undefined && data.should_get_password == true,
             user2 == undefined ? undefined : user2.userId,
-            data.visible,
+            user2 == undefined ? data.visible : false,
             undefined
         );
         const channelId = await Queries.getInstance().createChannel(channel);
@@ -169,6 +189,11 @@ export class ChannelEventPatterns {
         );
         if (channel == null) {
             this.util.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
+            return;
+        }
+
+        if (channel.otherOwner != undefined) {
+            this.util.emitFailedObject(data.user_id, 'channel_join', `You can't join dm channels`);
             return;
         }
 
@@ -535,6 +560,17 @@ export class ChannelEventPatterns {
         if (!(await this.parseInviteData(data.channel_id, data.user_id, data.invited_id, data.user_id, 'channel_invite'))) {
             return;
         }
+
+        const channel: Channel = this.util.getChannel(
+            data.channel_id,
+            'channel_invite',
+        );
+
+        if (channel.otherOwner != undefined) {
+            this.util.emitFailedObject(data.user_id, 'channel_invite', `You can't invite users to a dm channel`);
+            return;
+        }
+
         this.channel_invites.push({inviter_id: data.user_id, invited_id: data.invited_id, channel_id: data.channel_id})
         this.util.notify([data.invited_id], 'channel_invite', {
             success: true,

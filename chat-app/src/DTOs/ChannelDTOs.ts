@@ -96,3 +96,8 @@ export interface ChannelInviteDeny {
     inviter_id: number
     channel_id: number
 }
+
+export interface DmChannel {
+    user_id: number
+    other_user_id: number
+}
