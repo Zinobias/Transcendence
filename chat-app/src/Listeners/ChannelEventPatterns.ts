@@ -5,7 +5,7 @@ import {
     ChannelBan,
     ChannelCreate,
     ChannelDemote,
-    ChannelDisband,
+    ChannelDisband, ChannelInvite, ChannelInviteAccept, ChannelInviteDeny,
     ChannelJoin,
     ChannelKick,
     ChannelLeave,
@@ -155,6 +155,7 @@ export class ChannelEventPatterns {
     //TODO check if user is invited?
     @EventPattern('channel_join')
     async handleJoin(data: ChannelJoin) {
+        let had_invite = false;
         if (data.channel_id == undefined) {
             this.util.emitFailedObject(data.user_id, 'channel_join', 'Incorrect data object');
             return;
@@ -166,6 +167,14 @@ export class ChannelEventPatterns {
         if (channel == null) {
             this.util.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
             return;
+        }
+
+        if (channel.visible == false) {
+            if (this.channel_invites.find(abc => abc.channel_id == channel.channelId && abc.invited_id == data.user_id) == null) {
+                this.util.emitFailedObject(data.user_id, 'channel_join', `You don't have an invite for this channel`);
+                return
+            }
+            had_invite = true;
         }
 
         const user: User = await this.util.getUser(data.user_id, 'channel_join');
@@ -198,6 +207,10 @@ export class ChannelEventPatterns {
 
         channel.addUser(user);
         await Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
+
+        if (had_invite) {
+            this.channel_invites = this.channel_invites.filter(abc => abc.channel_id != data.channel_id && abc.invited_id != data.user_id);
+        }
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_join', {
@@ -482,6 +495,101 @@ export class ChannelEventPatterns {
         });
     }
 
+    private async parseInviteData(channel_id: number, inviter_id: number, invited_id: number, source_id: number, pattern: string): Promise<Boolean> {
+        const channel: Channel = this.util.getChannel(
+            channel_id,
+            pattern,
+        );
+        if (channel == null)
+            return;
+
+        if (!channel.hasUser(inviter_id)) {
+            this.util.notify([source_id], pattern, {
+                success: false,
+                msg: 'Inviter is not a member of this channel',
+                message: undefined
+            });
+            return;
+        }
+
+        const inviter: User = await this.util.getUser(inviter_id, pattern);
+        if (inviter == undefined) {
+            this.util.emitFailedObject(source_id, pattern, 'Unable to retrieve other user');
+            return;
+        }
+
+        const invited: User = await this.util.getUser(invited_id, pattern);
+        if (invited == undefined) {
+            this.util.emitFailedObject(source_id, pattern, 'Unable to retrieve other user');
+            return;
+        }
+
+        return true
+    }
+
+    channel_invites: invites[] = []
+    @EventPattern('channel_invite')
+    async handleChannelInvite(data: ChannelInvite) {
+        if (data.channel_id == undefined || data.invited_id == undefined) {
+            this.util.emitFailedObject(data.user_id, 'channel_invite', 'Incorrect data object');
+            return;
+        }
+        if (!(await this.parseInviteData(data.channel_id, data.user_id, data.invited_id, data.user_id, 'channel_invite'))) {
+            return;
+        }
+        this.channel_invites.push({inviter_id: data.user_id, invited_id: data.invited_id, channel_id: data.channel_id})
+        this.util.notify([data.invited_id], 'channel_invite', {
+            success: true,
+            msg: undefined,
+            inviter_id: data.user_id,
+            channel_id: data.channel_id,
+        });
+    }
+
+    @EventPattern('channel_invite_accept')
+    async handleChannelInviteAccept(data: ChannelInviteAccept) {
+        if (data.channel_id == undefined || data.inviter_id == undefined) {
+            this.util.emitFailedObject(data.user_id, 'channel_invite_accept', 'Incorrect data object');
+            return;
+        }
+        if (!(await this.parseInviteData(data.channel_id, data.inviter_id, data.user_id, data.user_id, 'channel_invite_accept'))) {
+            return;
+        }
+        const tmp: invites = {inviter_id: data.inviter_id, invited_id: data.user_id, channel_id: data.channel_id};
+        if (this.channel_invites.find(abc => abc == tmp) == null) {
+            this.util.emitFailedObject(data.user_id, 'channel_invite_accept', `You don't have this invite`);
+            return;
+        }
+        this.util.notify([data.user_id], 'channel_invite_accept', {
+            success: true,
+            msg: undefined,
+            channel_id: data.channel_id
+        });
+    }
+
+    @EventPattern('channel_invite_deny')
+    async handleChannelInviteDeny(data: ChannelInviteDeny) {
+        if (data.channel_id == undefined || data.inviter_id == undefined) {
+            this.util.emitFailedObject(data.user_id, 'channel_invite_deny', 'Incorrect data object');
+            return;
+        }
+        if (!(await this.parseInviteData(data.channel_id, data.inviter_id, data.user_id, data.user_id, 'channel_invite_deny'))) {
+            return;
+        }
+        const tmp: invites = {inviter_id: data.inviter_id, invited_id: data.user_id, channel_id: data.channel_id};
+        if (this.channel_invites.find(abc => abc == tmp) == null) {
+            this.util.emitFailedObject(data.user_id, 'channel_invite_deny', `You don't have this invite`);
+            return;
+        }
+        this.channel_invites = this.channel_invites.filter(abc => abc != tmp);
+        this.util.notify([data.user_id], 'channel_invite_deny', {
+            success: true,
+            msg: undefined,
+            channel_id: data.channel_id
+        });
+    }
+
+
     @EventPattern('channel_message')
     handleMessage(data: ChannelMessage) {
         if (data.channel_id == undefined || data.message == undefined) {
@@ -574,4 +682,10 @@ export class ChannelEventPatterns {
             channel: channel.getIChannel()
         });
     }
+}
+
+interface invites {
+    inviter_id: number
+    invited_id: number
+    channel_id: number
 }

@@ -78,3 +78,21 @@ export interface ChannelRetrieve {
     user_id: number
     channel_id: number
 }
+
+export interface ChannelInvite {
+    user_id: number
+    invited_id: number
+    channel_id: number
+}
+
+export interface ChannelInviteAccept {
+    user_id: number
+    inviter_id: number
+    channel_id: number
+}
+
+export interface ChannelInviteDeny {
+    user_id: number
+    inviter_id: number
+    channel_id: number
+}
