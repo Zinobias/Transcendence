@@ -50,17 +50,11 @@ export class User {
         this._avatar = avatar;
         this._blocked = [];
         this._friends = [];
-        // User.addUser(this);
-        // this.updateBlocked();
-        // this.updateFriends();
+        User.addUser(this);
+        this.updateBlocked();
+        this.updateFriends();
     }
 
-	public async init() {
-		await this.updateBlocked();
-        await this.updateFriends();
-        User.addUser(this);
-	}
-	
     get userId(): number {
         return this._userId;
     }

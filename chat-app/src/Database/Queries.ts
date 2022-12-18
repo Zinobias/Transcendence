@@ -125,9 +125,7 @@ export class Queries {
 			avatar = undefined;
 		else
 			avatar = await JSON.parse(findUser.avatar);
-		let newUser : User = new User(findUser.userId, findUser.userName, avatar);
-		await newUser.init();
-		return newUser;
+		return new User(findUser.userId, findUser.userName, avatar); //TODO add avatar
 	}
 
 	//Blocked users table
