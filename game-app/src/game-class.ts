@@ -43,7 +43,7 @@ export class Game {
 		this.playerPaddles.push( {uid : this.player1.uid, playerPaddle : new PlayerPaddle(1)});
 		this.playerPaddles.push( {uid : this.player2.uid, playerPaddle : new PlayerPaddle(2)});
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
-		this._fps = 1;
+		this._fps = 5;
 		this.ballFactory();
 		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this));
 	};
@@ -90,13 +90,13 @@ export class Game {
 	 */	
 	private movePlayer() : void {
 		if (this.playerPaddles[0].playerPaddle.keyPressUp === true)
-			this.playerPaddles[0].playerPaddle.pos.y += (GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (this.playerPaddles[0].playerPaddle.height * 0.5)) * this._fps > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
+			this.playerPaddles[0].playerPaddle.pos.y += (GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[0].playerPaddle.pos.y + (this.playerPaddles[0].playerPaddle.height * 0.5)) * this._fps > (GameConfig.BOARD_HEIGHT * 0.5) * this._fps ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 		if (this.playerPaddles[0].playerPaddle.keyPressDown === true)
-			this.playerPaddles[0].playerPaddle.pos.y -= (this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[0].playerPaddle.height * 0.5)) * this._fps < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
+			this.playerPaddles[0].playerPaddle.pos.y -= (this.playerPaddles[0].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[0].playerPaddle.height * 0.5)) * this._fps < -(GameConfig.BOARD_HEIGHT * 0.5) * this._fps ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 		if (this.playerPaddles[1].playerPaddle.keyPressUp === true)
-			this.playerPaddles[1].playerPaddle.pos.y += (GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (this.playerPaddles[1].playerPaddle.height * 0.5)) * this._fps > GameConfig.BOARD_HEIGHT * 0.5 ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
+			this.playerPaddles[1].playerPaddle.pos.y += (GameConfig.PADDLE_STEP_SIZE + this.playerPaddles[1].playerPaddle.pos.y + (this.playerPaddles[1].playerPaddle.height * 0.5)) * this._fps > (GameConfig.BOARD_HEIGHT * 0.5) * this._fps ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 		if (this.playerPaddles[1].playerPaddle.keyPressDown === true)
-			this.playerPaddles[1].playerPaddle.pos.y -=( this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[1].playerPaddle.height * 0.5)) * this._fps < -(GameConfig.BOARD_HEIGHT * 0.5) ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
+			this.playerPaddles[1].playerPaddle.pos.y -=( this.playerPaddles[1].playerPaddle.pos.y - GameConfig.PADDLE_STEP_SIZE - (this.playerPaddles[1].playerPaddle.height * 0.5)) * this._fps < -(GameConfig.BOARD_HEIGHT * 0.5) * this._fps ? 0 : GameConfig.PADDLE_STEP_SIZE * this._fps;
 	}
 
 	/**

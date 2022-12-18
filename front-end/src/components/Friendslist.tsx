@@ -2,6 +2,7 @@ import React, { useEffect, useContext } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { IUser, SmallUser } from "../interfaces";
+import FriendslistUtils from "./FriendslistUtils";
 import { SocketContext } from "./Socket";
 
 interface Props {
@@ -68,6 +69,21 @@ const Friendslist: React.FC<Props> = ({user}) => {
     //     });
     // }
 
+    /*
+        friends status notes:
+
+        check if they are online or in game in an interval
+
+
+        ● ■
+        online color #06d60d 
+        offline color #d60606
+
+        <span style={{color: `{variable}`}}>●</span>
+        <span style={{fontWeight: "lighter"}}>in game</span>
+                        
+    */
+
     return (
         <>  
             {/* <button className="friendslistButton" onClick={(e) => mapfriends(e)}>map</button> */}
@@ -88,7 +104,10 @@ const Friendslist: React.FC<Props> = ({user}) => {
                 <div key={index} className="friendslist">
                     {
                         e.state &&
-                        <div style={{cursor: "pointer"}} onClick={(event) => goToProfile(event, e.userId)}>{e.name}</div>
+                        <>
+                        <FriendslistUtils friend={e}/>
+                        {/* <div style={{cursor: "pointer"}} onClick={(event) => goToProfile(event, e.userId)}>{e.name}</div> */}
+                        </>
                     }
                 </div>
             ))}

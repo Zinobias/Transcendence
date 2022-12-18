@@ -278,6 +278,12 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         console.log(`emitting invite_game_user`);
     }
 
+    const directMessage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        // emit to create dm, if we already are in a dm just toggle the chat window       
+        e.preventDefault();
+        console.log(`click direct message`);
+    }
+
     return (
         <>  
             <span style={{display: "flex", alignItems: "center", flexDirection: "column", fontWeight: "bold", fontSize: "100%"}}>invite to game</span>
@@ -293,6 +299,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 <button className='profileButton' onClick={(e) => blockUser(e)}>block</button> :
                 <button className='profileButton' onClick={(e) => unblockUser(e)}>unblock</button> 
             }
+            <button className='profileButton'>send message</button>
         </>
     )
 }

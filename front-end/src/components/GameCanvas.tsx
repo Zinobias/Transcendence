@@ -34,8 +34,8 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const [entities, setEntities] = useState<IEntity[]>([]);
     const [up, setUp] = useState<boolean>(false);
     const [down, setDown] = useState<boolean>(false); 
-    const [p1Score, setP1score] = useState<number>(0);
-    const [p2Score, setP2score] = useState<number>(0);
+    const [p1Score, setP1score] = useState<number>(gameInfo.playerScores.player1Score);
+    const [p2Score, setP2score] = useState<number>(gameInfo.playerScores.player2Score);
     const [p1, setP1] = useState<string>("");
     const [p2, setP2] = useState<string>("");
     const [winner, setWinner] = useState<string>("");

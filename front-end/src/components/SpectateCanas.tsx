@@ -18,8 +18,8 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [entities, setEntities] = useState<IEntity[]>([]);
-    const [p1Score, setP1score] = useState<number>(0);
-    const [p2Score, setP2score] = useState<number>(0);
+    const [p1Score, setP1score] = useState<number>(gameInfo.playerScores.player1Score);
+    const [p2Score, setP2score] = useState<number>(gameInfo.playerScores.player2Score);
     const [p1, setP1] = useState<string>("");
     const [p2, setP2] = useState<string>("");
     const [winner, setWinner] = useState<string>("");
@@ -156,10 +156,10 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
         socket.emit("game", {
             userId: cookies.userID,
             authToken: cookies.user,
-            eventPattern: "game.spectate.start", 
+            eventPattern: "game.spectate.stop", 
             data: { userId: cookies.userID, targetGameId: gameInfo.gameId }
         });
-        console.log("emitting game.spectate.start for game " + gameInfo.gameId);
+        console.log("emitting game.spectate.sttop for game " + gameInfo.gameId);
     }
     
     return (

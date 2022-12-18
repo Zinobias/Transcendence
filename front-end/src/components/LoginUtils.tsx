@@ -27,6 +27,8 @@ export const   LogoutButton: React.FC = () => {
             userId: cookies.userID,
             authToken: cookies.user
         });
+        removeCookie('user');
+        removeCookie('userID');
     };
 
     return (
