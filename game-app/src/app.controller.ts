@@ -32,18 +32,18 @@ export class AppController {
 			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
 			return ;
 		}
-		let uids : number[];
-		// if (gameInfo?.spectatorList !== undefined) {
-		// 	uids = gameInfo?.spectatorList;
-		// 	uids.push(gameInfo.player1, gameInfo.player2);
-		// }
-		// else
-		uids = [gameInfo.player1, gameInfo.player2];
+		// let uids : number[];
+		// // if (gameInfo?.spectatorList !== undefined) {
+		// // 	uids = gameInfo?.spectatorList;
+		// // 	uids.push(gameInfo.player1, gameInfo.player2);
+		// // }
+		// // else
+		// uids = [gameInfo.player1, gameInfo.player2];
 		const IEntityList = Game.EntityArrayToIEntityArray(payload.payload);
 		// this.logger.debug("GAME FRAME UPDATE RECEIVED");
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.frame.update.' + gameInfo.gameId,
-			userIds : uids,
+			userIds : gameInfo.frameSubscribers,
 			data 	: IEntityList}); // Forwarding entities of the game. to render in frontend.
 	}
 
@@ -71,17 +71,17 @@ export class AppController {
 			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
 			return ;
 		}
-		let uids : number[];
-		// if (gameInfo?.spectatorList !== undefined) {
-		// 	uids = gameInfo?.spectatorList;
-		// 	uids.push(gameInfo.player1, gameInfo.player2);
-		// }
-		// else
-		uids = [gameInfo.player1, gameInfo.player2];
+		// let uids : number[];
+		// // if (gameInfo?.spectatorList !== undefined) {
+		// // 	uids = gameInfo?.spectatorList;
+		// // 	uids.push(gameInfo.player1, gameInfo.player2);
+		// // }
+		// // else
+		// uids = [gameInfo.player1, gameInfo.player2];
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.score.' + payload.gameId,
-			userIds : uids,
+			userIds : gameInfo.frameSubscribers,
 			data : {
 				player1Score : gameInfo.gameInstance.player1.score,
 				player2Score : gameInfo.gameInstance.player2.score,
@@ -104,17 +104,17 @@ export class AppController {
 			return ;
 		}
 		await this.matchMakingService.addGameResultToDatabase(payload.payload);
-		let uids : number[];
-		if (gameInfo?.spectatorList !== undefined) {
-			uids = gameInfo?.spectatorList;
-			uids.push(gameInfo.player1, gameInfo.player2);
-		}
-		else
-			uids = [gameInfo.player1, gameInfo.player2];
+		// let uids : number[];
+		// if (gameInfo?.spectatorList !== undefined) {
+		// 	uids = gameInfo?.spectatorList;
+		// 	uids.push(gameInfo.player1, gameInfo.player2);
+		// }
+		// else
+		// 	uids = [gameInfo.player1, gameInfo.player2];
 		this.logger.debug(`Player1UID : ${gameInfo.player1} player2UID ${gameInfo.player2}`);
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.ended.' + gameInfo.gameId,
-			userIds : uids,
+			userIds : gameInfo.frameSubscribers,
 			data 	: {
 				winner : payload.payload.winnerUID,
 				player1ScoreFinal : payload.payload.playerScores.player1FinalScore,

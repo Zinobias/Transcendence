@@ -44,7 +44,6 @@ export class Game {
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
 		this.ballFactory();
 		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this));
-		this.start(); // prob put this in the calling function.
 	};
 
 	private gameFinishedHandler() {
@@ -108,7 +107,7 @@ export class Game {
 		}
 	}
 	// Entrypoint for the game class.
-	private async start() {
+	public async start() {
 		await this.loop();
 		this.gameFinishedHandler();
 	}

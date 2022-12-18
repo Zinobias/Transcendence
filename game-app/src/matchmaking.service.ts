@@ -188,10 +188,10 @@ export class MatchMakingService {
 	@OnEvent("game.create")
 	public async createGame(createGameDTO : CreateGameDTO) : Promise<number> {
 		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, this.gameId);
-
 		logger.log("New game instance has been created");
 		await this.addGameToList(createGameDTO, newGameInstance);
-		return (this.gameId);
+		newGameInstance.start();
+		return (this.gameId++);
 		
 	}
 
@@ -207,7 +207,7 @@ export class MatchMakingService {
 			player2 		: gameDto.player2UID,
 			gameId 			: this.gameId,
 			gameInstance 	: gameInstance,
-			spectatorList	:[],
+			frameSubscribers:[gameDto.player1UID,  gameDto.player2UID],
 			gameMode		: gameDto.gameMode,
 		});
 		// TODO : Increment gameIds in DB.
@@ -277,7 +277,7 @@ export class MatchMakingService {
 				player1 : gameInfo.player1,
 				player2 : gameInfo.player2,
 			},
-			spectatorList : gameInfo.spectatorList,
+			frameSubscribers : gameInfo.frameSubscribers,
 			gameId : gameInfo.gameId,
 			playerScores : {
 				player1Score : gameInfo.gameInstance.player1.score,
@@ -295,9 +295,10 @@ export class MatchMakingService {
 	public async addSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId == targetGameId) {
-				this.logger.debug("add spectator " + targetGameId)
-				if (game.spectatorList?.includes(userId) === false) {
-					game.spectatorList?.push(userId);
+				if (game.frameSubscribers.includes(userId) === false) {
+					if (userId == game.player1 || userId == game.player2)
+						return false;
+					game.frameSubscribers?.push(userId);
 					return true;
 				}
 			}
@@ -314,8 +315,10 @@ export class MatchMakingService {
 	public async removeSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId === targetGameId) {
-				if (game.spectatorList?.includes(userId) === true) {
-					game.spectatorList.splice(game.spectatorList.indexOf(userId), 1);
+				if (game.frameSubscribers?.includes(userId) === true) {
+					if (userId == game.player1 || userId == game.player2)
+						return false;
+					game.frameSubscribers.splice(game.frameSubscribers.indexOf(userId), 1);
 					return true;
 				}
 			}

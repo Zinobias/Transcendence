@@ -28,7 +28,7 @@ export interface IGameInfo {
 		readonly player1 	:  	number ,
 		readonly player2	: 	number ,
 	},
-	spectatorList? 			:	number[];
+	frameSubscribers 		:	number[],
 	readonly gameId			: 	number,
 	readonly playerScores 	: {
 		readonly player1Score	: 	number,
