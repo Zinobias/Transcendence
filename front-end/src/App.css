@@ -145,7 +145,8 @@
   grid-area: 1 / 1 / 2 / 6;
   font-weight: bold;
   border: 2px solid black;
-  font-size: 30px;
+  /* border-bottom: 2px solid black; */
+  font-size: 2.2vw;
   text-shadow:  1px 1px 0px #CE5937,
                 2px 2px 0px #CE5937,
                 3px 3px 0px #5dce64,
@@ -154,17 +155,20 @@
 
 #nav ul {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  /* display: flex; */
+  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   justify-content: center;
   justify-items: center;
   list-style-type: none;
+
 }
 
 #nav ul li {
+  /* flex: 1; */
   align-items: center;
   padding-left: 5%;
   padding-right: 5%;
+  /* border: 2px solid black; */
 }
 
 #nav ul li:hover a {
@@ -190,7 +194,7 @@
 /* @media rule to include a block of CSS properties only if a certain condition is true. */
 
 
-@media (max-width: 880px) {
+@media (max-width: 900px) {
   .heading {
     margin: 15px 0;
     font-size: 35px;

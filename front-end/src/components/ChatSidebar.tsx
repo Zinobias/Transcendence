@@ -2,8 +2,6 @@ import React, {  useContext, useState,  useEffect } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import { IChannel, IChannelInfo } from "../interfaces";
-import { AiFillCloseSquare } from "react-icons/ai";
-import ListUserChatrooms from "./ListUserChatrooms";
 
 interface Props {
     channelId: number | undefined;

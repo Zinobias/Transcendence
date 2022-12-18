@@ -33,12 +33,12 @@ export class AppController {
 			return ;
 		}
 		let uids : number[];
-		if (gameInfo?.spectatorList !== undefined) {
-			uids = gameInfo?.spectatorList;
-			uids.push(gameInfo.player1, gameInfo.player2);
-		}
-		else
-			uids = [gameInfo.player1, gameInfo.player2];
+		// if (gameInfo?.spectatorList !== undefined) {
+		// 	uids = gameInfo?.spectatorList;
+		// 	uids.push(gameInfo.player1, gameInfo.player2);
+		// }
+		// else
+		uids = [gameInfo.player1, gameInfo.player2];
 		const IEntityList = Game.EntityArrayToIEntityArray(payload.payload);
 		// this.logger.debug("GAME FRAME UPDATE RECEIVED");
 		this.gatewayClient.emit('game', {
@@ -72,12 +72,12 @@ export class AppController {
 			return ;
 		}
 		let uids : number[];
-		if (gameInfo?.spectatorList !== undefined) {
-			uids = gameInfo?.spectatorList;
-			uids.push(gameInfo.player1, gameInfo.player2);
-		}
-		else
-			uids = [gameInfo.player1, gameInfo.player2];
+		// if (gameInfo?.spectatorList !== undefined) {
+		// 	uids = gameInfo?.spectatorList;
+		// 	uids.push(gameInfo.player1, gameInfo.player2);
+		// }
+		// else
+		uids = [gameInfo.player1, gameInfo.player2];
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.score.' + payload.gameId,
@@ -225,6 +225,7 @@ export class AppController {
 			data : { 
 				success : success,
 				msg : success === true ? "Success" : "gameId invalid",
+				spectateId: payload.targetGameId,
 			}
 		});
 	}
@@ -248,6 +249,7 @@ export class AppController {
 			data : { 
 				success : success,
 				msg : success === true ? "Success" : "gameId invalid",
+				spectateId: payload.targetGameId,
 			}
 		});
 	}

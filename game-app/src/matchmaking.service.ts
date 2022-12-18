@@ -207,6 +207,7 @@ export class MatchMakingService {
 			player2 		: gameDto.player2UID,
 			gameId 			: this.gameId,
 			gameInstance 	: gameInstance,
+			spectatorList	:[],
 			gameMode		: gameDto.gameMode,
 		});
 		// TODO : Increment gameIds in DB.
@@ -237,12 +238,12 @@ export class MatchMakingService {
 	 * 
 	 * @returns game list object.
 	 */
-	public getIGameInfoList() : GameInfo[] {
+	public getIGameInfoList() : IGameInfo[] {
 		let iGameInfoList : IGameInfo[] = [];
 
 		for (let gameInfo of this.gameList) 
 			iGameInfoList.push(this.createIGameInfo(gameInfo));
-		return (this.gameList);
+		return (iGameInfoList);
 	}
 
 	/**
@@ -293,7 +294,8 @@ export class MatchMakingService {
 	 */
 	public async addSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
-			if (game.gameId === targetGameId) {
+			if (game.gameId == targetGameId) {
+				this.logger.debug("add spectator " + targetGameId)
 				if (game.spectatorList?.includes(userId) === false) {
 					game.spectatorList?.push(userId);
 					return true;

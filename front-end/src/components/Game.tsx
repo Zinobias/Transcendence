@@ -19,22 +19,7 @@ const   Game: React.FC = () => {
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [gameInfo, setGameinfo] = useState<IGameInfo>();
     const [queue, setQueue] = useState<boolean>(false);
-
-    // game event listener helper function
-    function gameIsInGameInGame (response : any) {
-        if (response.success) {
-            socket.emit("game", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "game.get.activeGameId", 
-                data: { userId: cookies.userID, requestedId: cookies.userID }
-            });
-            // console.log(`socket.emit game.get.activeGameId`);
-        }
-        console.log(response.msg);
-    }
-
-
+    
     // game event listeners
     useEffect(() => {
 
@@ -46,7 +31,7 @@ const   Game: React.FC = () => {
             data: { userId: cookies.userID, requestedId: cookies.userID }
         });
         console.log("emitting game.isInGame");
-
+        
         // we found a game so we ask for the activeGameId
         socket.on("game.found", response => {
             socket.emit("game", {
@@ -57,10 +42,10 @@ const   Game: React.FC = () => {
             });
             console.log(`socket.emit game.get.activeGameId`);
         })
-
+        
         // user is in a game so we ask for activeGameId
-        socket.on("game.isInGame", gameIsInGameInGame)
-
+        socket.on("game.isInGame", isInGameInGame)
+        
         // returns the ID for the game the user is currently in
         socket.on("game.get.activeGameId", response => {
             console.log(`socket.on game.get.activeGameId ${response.success} ${response.msg}`);
@@ -73,37 +58,31 @@ const   Game: React.FC = () => {
                 });
             }
         })
-
-        socket.on("game.get.gameInfo", response => {
-            console.log(response.msg);
-            if (response.gameInfo) {
-                setQueue(queue => false);
-                setGameinfo(gameInfo => response.gameInfo);
-            }
-        })
-
+        
+        socket.on("game.get.gameInfo", getGameInfoInGame);
+        
         socket.on("game.join.queue", response => {
             if (response.success) {
                 console.log("joining queue success");
                 setQueue(queue => true);
             }
         })
-
+        
         socket.on("game.leave.queue", response => {
             if (response.success) {
                 console.log("leaving queue success");
                 setQueue(queue => false);
             }
         })
-
+        
         return () => {
             socket.off("game.found");
-            socket.off("game.isInGame", gameIsInGameInGame);
+            socket.off("game.isInGame", isInGameInGame);
             socket.off("game.get.activeGameId");
-            socket.off("game.get.gameInfo");
+            socket.off("game.get.gameInfo", getGameInfoInGame);
             socket.off("game.join.queue");
             socket.off("game.leave.queue");
-           
+            
             // emit to leave queue when we leave the page
             // console.log(`socket.emit game.leave.queue default`);
             socket.emit("game", {
@@ -114,6 +93,28 @@ const   Game: React.FC = () => {
             });
         }
     }, [])
+
+    // game event listener helper function
+    function isInGameInGame (response : any) {
+        if (response.success) {
+            socket.emit("game", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "game.get.activeGameId", 
+                data: { userId: cookies.userID, requestedId: cookies.userID }
+            });
+            // console.log(`socket.emit game.get.activeGameId`);
+        }
+        console.log(response.msg);
+    }
+
+    function getGameInfoInGame (response : any) {
+        console.log(response.msg);
+        if (response.gameInfo) {
+            setQueue(queue => false);
+            setGameinfo(gameInfo => response.gameInfo);
+        }
+    }
 
     // we always want to listen to this
     useEffect(() => {

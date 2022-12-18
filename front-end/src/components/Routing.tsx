@@ -11,6 +11,7 @@ import SignUp from './SignUp';
 import Guard  from './Guard';
 import Profile from './Profile';
 import { socket } from './Socket';
+import Spectate from './Spectate';
 
 const Routing: React.FC  = () => {
     const [cookies, setCookie, removeCookie] = useCookies(['user', 'userID']);
@@ -24,6 +25,7 @@ const Routing: React.FC  = () => {
                 <Route index element={<Game />} />
                 <Route path='leaderboard' element={<Leaderboard />} />
                 <Route path='game' element={<Game />} />
+                <Route path='spectate' element={<Spectate />} />
                 <Route path='chat' element={<Chat />} />
                 <Route path='profile' element={<Profile/>}/>
             </Route>

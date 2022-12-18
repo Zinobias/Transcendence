@@ -14,26 +14,10 @@ interface Props {
     setGameinfo: React.Dispatch<React.SetStateAction<IGameInfo | undefined>> ;
 };
 
-/* 
-    CANVA NOTES
-
-        width/x = 1024
-        height/y = 512
-
-        i get pos x/y ->    x = w/2 + x*2 
-                            y = h/2 + y*2
-
-        clear all rects ->
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-*/
-
-const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
+const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const [entities, setEntities] = useState<IEntity[]>([]);
-    const [up, setUp] = useState<boolean>(false);
-    const [down, setDown] = useState<boolean>(false); 
     const [p1Score, setP1score] = useState<number>(0);
     const [p2Score, setP2score] = useState<number>(0);
     const [p1, setP1] = useState<string>("");
@@ -54,64 +38,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const pepper = new Image();
     pepper.src = "https://i.imgur.com/LPLy2U4.png";
 
-    // emit key input
-    useEffect(() => {
-        const keyPress = (event: KeyboardEvent) => {
-            if (event.key === "ArrowUp" && up === false) {
-                setUp(up => true);
-                socket.emit("game", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "game.player.move", 
-                    data: { userId: cookies.userID, keyEvent: Move.keyPressUp }
-                });
-                // console.log(`socket.emit ${event.key} is being pressed`);
-            }
-            if (event.key === "ArrowDown" && down === false) {
-                setDown(down => true);
-                socket.emit("game", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "game.player.move", 
-                    data: { userId: cookies.userID, keyEvent: Move.keyPressDown }
-                });
-                // console.log(`socket.emit ${event.key} is being pressed`);
-            }
-        };
-
-        const keyRelease = (event: KeyboardEvent) => {
-            if (event.key === "ArrowUp") {
-                setUp(up => false);   
-                socket.emit("game", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "game.player.move", 
-                    data: { userId: cookies.userID, keyEvent: Move.keyReleaseUp }
-                });             
-                // console.log(`socket.emit ${event.key} is being released`)
-            }
-            if (event.key === "ArrowDown") {
-                setDown(down => false);
-                socket.emit("game", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "game.player.move", 
-                    data: { userId: cookies.userID, keyEvent: Move.keyReleaseDown }
-                });
-                // console.log(`socket.emit ${event.key} is being released`)
-            }
-        };
-
-        window.addEventListener('keydown', keyPress);
-        window.addEventListener('keyup', keyRelease);
-        
-        return () => {
-            window.removeEventListener('keydown', keyPress);
-            window.removeEventListener('keyup', keyRelease);
-        };
-    }, [up, down]);
-
-   
+      
     // event listener for game events & get_name
     useEffect(() => {
         console.log("Canvas component did mount with gameId " + gameInfo.gameId);
@@ -131,45 +58,45 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
             data: { user_id: cookies.userID, requested_user_id: gameInfo.players.player2 }
         });
 
-        socket.on(`game.frame.update.` + gameInfo.gameId, gameFrameUpdtate);
-        socket.on(`game.score.` + gameInfo.gameId, gameScore);
-        socket.on("get_name", getNameInCanvas);
+        socket.on(`game.frame.update.` + gameInfo.gameId, gameFrameUpdtateSpectate);
+        socket.on(`game.score.` + gameInfo.gameId, gameScoreSpectate);
+        socket.on("get_name", getNameInSpectateCanvas);
 
         return () => {
-            socket.off(`game.frame.update.` + gameInfo.gameId, gameFrameUpdtate);
-            socket.off(`game.score.` + gameInfo.gameId, gameScore);
-            socket.off("get_name", getNameInCanvas);
+            socket.off(`game.frame.update.` + gameInfo.gameId, gameFrameUpdtateSpectate);
+            socket.off(`game.score.` + gameInfo.gameId, gameScoreSpectate);
+            socket.off("get_name", getNameInSpectateCanvas);
         }
     }, [])
 
     // rerun this effect to get the correct names
     useEffect(() => {
-        socket.on(`game.ended.` + gameInfo.gameId, gameEnded);
+        socket.on(`game.ended.` + gameInfo.gameId, gameEndedSpectate);
 
         return () => {
-            socket.off(`game.ended.` + gameInfo.gameId, gameEnded);
+            socket.off(`game.ended.` + gameInfo.gameId, gameEndedSpectate);
         }
     }, [p1, p2])
 
-    // event listener functions
-    function getNameInCanvas (response : any) {
+    //event listener functions
+    function getNameInSpectateCanvas (response : any) {
         if (response.requested_id == gameInfo.players.player1)
             setP1(p1 => response.requested_name);
         if (response.requested_id == gameInfo.players.player2)
             setP2(p2 => response.requested_name); 
     }
 
-    function gameEnded (response : any) {
+    function gameEndedSpectate (response : any) {
         console.log("socket.on game.ended winner " + response.winner);
         setWinner(winner => (response.winner == gameInfo.players.player1 ? p1 : p2));
     }
 
-    function gameScore (response : any) {
+    function gameScoreSpectate (response : any) {
         setP1score(p1Score => response.player1Score);
         setP2score(p2Score => response.player2Score);
     }
 
-    function gameFrameUpdtate (response : any) {
+    function gameFrameUpdtateSpectate (response : any) {
         setEntities([]);
         response.forEach((element : IEntity) => {
             setEntities(entities => [...entities, element]);
@@ -179,7 +106,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     // helper functions
     function returnColor () : string {
         const colors = ['#9400D3', '#0000FF', '#00FF00', '#FFF000', '#FF7F00', '#FF000'];
-
         if (count === 0)
             setRet(ret => Math.floor(Math.random() * (5 - 0 + 1)) + 0);
         setCount(count => (count === 40 ? 0 : count + 1));
@@ -210,7 +136,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                         ctx.fillStyle = '#ffffff';
                     ctx.fillRect(getX(e.pos.x, e.width), getY(e.pos.y, e.height), (e.width*2), (e.height*2));
                 }
-                //ctx.fillRect(getX(e.pos.x, e.width), getY(e.pos.y, e.height), (e.width*2), (e.height*2));
             });
             ctx.stroke();
         }
@@ -225,6 +150,17 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     function getY (y : number, height : number) : number {
         return (((ogCanvHeight/2) - y - (height/2)) * 2);
     }
+
+    const spectateStop = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        socket.emit("game", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "game.spectate.start", 
+            data: { userId: cookies.userID, targetGameId: gameInfo.gameId }
+        });
+        console.log("emitting game.spectate.start for game " + gameInfo.gameId);
+    }
     
     return (
         <>
@@ -237,14 +173,17 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
             </div>
             <canvas className="gameCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
             {
-                winner &&
+                winner ?
                 <>
-                <p style={{fontSize: "30px", lineHeight: "0"}}>{winner} WON THE GAME!</p>
-                <button style={{marginTop: "0px"}}className="gameButton" onClick = {() => setGameinfo(gameInfo => undefined)}>QUEUE AGAIN</button>
+                    <p style={{fontSize: "30px", lineHeight: "0"}}>{winner} WON THE GAME!</p>
+                    <button style={{marginTop: "0px"}}className="gameButton" onClick = {() => setGameinfo(gameInfo => undefined)}>go back</button>
+                </> : 
+                <>
+                    <button style={{marginTop: "0px"}}className="gameButton" onClick = {(e) => spectateStop(e)}>go back</button>
                 </>
             }
         </>
     )
 }
 
-export default GameCanvas;
+export default SpectateCanvas;

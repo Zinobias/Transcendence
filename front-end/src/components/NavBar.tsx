@@ -9,6 +9,7 @@ import '../App.css'
     An <Outlet> should be used in parent route elements to render their child route elements. 
     This allows nested UI to show up when child routes are rendered. If the parent route matched exactly
 */
+// style={{ textDecoration: "none", color: "black", listStyleType: "none"}}
 
 const NavBar: React.FC = () => {
     return (
@@ -19,6 +20,7 @@ const NavBar: React.FC = () => {
                 <div id="nav">
                     <ul>
                         <li><Link to='/game'>Game</Link></li>
+                        <li><Link to='/spectate'>Spectate</Link></li>
                         <li><Link to='/leaderboard'>Leaderboard</Link></li>
                         <li><Link to='/chat'>Chat</Link></li>
                     </ul>

@@ -89,7 +89,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "game.isInGame", 
-            data: { userId: cookies.userID, requestedId: Number(user.userId) }
+            data: { userId: cookies.userID, requestedId: user.userId }
         });
 
         socket.emit("game", {
