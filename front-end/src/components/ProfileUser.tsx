@@ -18,6 +18,11 @@ interface history {
     winnerId : number;
 }
 
+interface INames {
+    userId  : number;
+    name    : string;
+}
+
 const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     const defaultAvatar = "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png";
     const [cookies] = useCookies(['userID', 'user']);
@@ -25,33 +30,39 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     const [gamesWon, setGameswon] = useState<number>(0);
     const [gamesLost, setGameslost] = useState<number>(0);
     const [gamehistory, setGamehistory] = useState<history[]>([]);
+    const [names, setNames] = useState<INames[]>([]);
     const [online, setOnline] = useState<boolean>(false);
     const [inGame, setIngame] = useState<boolean>(false);
 
     // get user stats and update on user change
     useEffect(() => {
         
+        setGamehistory([]);
+        setNames([]);
+
         socket.on("game.user.get.history", response => {
             if (response.success) {
                 let lost : number = 0;
                 let won : number = 0;
-                setGamehistory(gamehistory => []);
+                let ids : number[] = [];
                 console.log("get game history success");
-                // console.log(response.history);
                 response.history.forEach((e : any) => {
                     setGamehistory(gamehistory => [...gamehistory, {
                         createAt: e.createAt, 
                         vsId: e.userId1 == user.userId ? e.userId2 : e.userId1, 
                         winnerId: e.winnerId
                     }]);
-                    // emit to get name of other player
-                    socket.emit("chat", {
-                        userId: cookies.userID,
-                        authToken: cookies.user,
-                        eventPattern: "get_name", 
-                        data: { user_id: cookies.userID, requested_user_id: e.userId1 == user.userId ? e.userId2 : e.userId1 }
-                    });
-                    // count how many times user won
+                    let ret = ids.find((element) => element == (e.userId1 == user.userId ? e.userId2 : e.userId1));
+                    if (ret === undefined) {
+                        ids.push(e.userId1 == user.userId ? e.userId2 : e.userId1);
+                        socket.emit("chat", {
+                            userId: cookies.userID,
+                            authToken: cookies.user,
+                            eventPattern: "get_name", 
+                            data: { user_id: cookies.userID, requested_user_id: e.userId1 == user.userId ? e.userId2 : e.userId1 }
+                        });
+                        console.log("emit to get_name " + (e.userId1 == user.userId ? e.userId2 : e.userId1));
+                    }
                     e.winnerId == user.userId ? won++ : lost++;
                 })
                 setGameswon(gamesWon => won);
@@ -65,6 +76,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
         })
 
         socket.on("game.isInGame", gameIsInGameInProfile);
+        socket.on("get_name", getNameInProfile);
 
         socket.emit("check_online", {
             userId: cookies.userID,
@@ -91,17 +103,9 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             socket.off("game.user.get.history");
             socket.off("check_online");
             socket.off("game.isInGame", gameIsInGameInProfile);
-        }
-    }, [user])
-
-    useEffect(() => {
-        socket.on("get_name", getNameInProfile)
-
-        return () => {
             socket.off("get_name", getNameInProfile);
         }
-
-    }, [gamehistory])
+    }, [user])
 
     // event listener functions
     function gameIsInGameInProfile (response : any) {
@@ -110,13 +114,21 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     }
 
     function getNameInProfile (response : any) {
-        if (response.success) 
-            setGamehistory(gamehistory.map((entry) => (entry.vsId == response.requested_id ? {...entry, vsName: response.requested_name} : entry)));
+        if (response.success) {
+            console.log("get_name success " + response.requested_name);
+            setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
+        }
     }
 
+    // helper functions
     function returnDate (timestamp : string) : string {
         const date = new Date(Number(timestamp));
         return(`${date.getDay()}.${date.getMonth()}.${date.getFullYear()}`);
+    }
+
+    function returnName (id : number) : string {
+        const ret = names.find((e) => e.userId == id)?.name;
+        return (ret === undefined ? "Unknown User": ret);
     }
 
     function toBlob() : Blob {
@@ -164,7 +176,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                     {gamehistory.map((element, index) => (
                         <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} >
                             <span className='floatLeft'>{returnDate(element.createAt)}</span>
-                            <span className='floatRight'> {element.winnerId == user.userId ? "WIN" : "LOSS"} <b>vs</b> {element.vsName}</span><br/>
+                            <span className='floatRight'> {element.winnerId == user.userId ? "WIN" : "LOSS"} <b>vs</b> {returnName(element.vsId)}</span><br/>
                         </div>
                     ))}
                 </div>

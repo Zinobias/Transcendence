@@ -72,13 +72,13 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
         console.log(`emitting channel_ban`);
     }
 
-    const handleInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const gameInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, gameMode : string) => {
         e.preventDefault();
         socket.emit("chat", {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "invite_game_user",
-            data: {user_id: cookies.userID, request_user_id: memberUserID, game_mode: "DEFAULT"}
+            data: {user_id: cookies.userID, request_user_id: memberUserID, game_mode: gameMode}
         })
         console.log(`emitting invite_game_user`);
     }
@@ -109,8 +109,9 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
         return (
             <>
                 <button className="memberButton" onClick={(e) => handleProfile(e)}>profile</button>
-                <button className="memberButton" onClick={(e) => handleInvite(e)}>invite to pong</button>
-                <button className="memberButton">block</button>
+                <span style={{display: "inline", textAlign: "center", fontWeight: "bold", fontSize: "90%"}}>INVITE TO PONG</span>
+                <button style={{border: "none"}} className="memberButton" onClick={(e) => gameInvite(e, "DEFAULT")}>default</button>
+                <button className="memberButton" onClick={(e) => gameInvite(e, "DISCOPONG")}>disco</button>
             </>
         )
     }
@@ -118,8 +119,9 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
     return (
         <>
             <button className="memberButton" onClick={(e) => handleProfile(e)}>profile</button>
-            <button className="memberButton" onClick={(e) => handleInvite(e)}>invite to pong</button>
-            <button className="memberButton">block</button>
+            <span style={{display: "inline", textAlign: "center", fontWeight: "bold", fontSize: "90%"}}>INVITE TO PONG</span>
+            <button style={{border: "none"}} className="memberButton" onClick={(e) => gameInvite(e, "DEFAULT")}>default</button>
+            <button className="memberButton" onClick={(e) => gameInvite(e, "DISCOPONG")}>disco</button>
             {
                 memberUserID != channel.owner &&
                 <>

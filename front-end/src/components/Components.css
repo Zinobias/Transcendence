@@ -342,7 +342,8 @@ p.chatp {
 .memberButton {
     /* margin-bottom: 5px; */
     width: 100%;
-    font-size: large;
+    font-size: 90%;
+    /* font-size: large; */
     border: none;
     border-bottom: 2px solid black;
     font-weight: bold;

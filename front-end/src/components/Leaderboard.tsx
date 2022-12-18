@@ -8,10 +8,16 @@ interface leaderboardArray {
     count: number;
 }
 
+interface INames {
+    userId  : number;
+    name    : string;
+}
+
 const   Leaderboard: React.FC = () => {
     const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
     const [leaderboard, setLeaderboard] = useState<leaderboardArray[]>([]);
+    const [names, setNames] = useState<INames[]>([]);
 
 
     // emit to get leaderboard on component mount
@@ -28,7 +34,7 @@ const   Leaderboard: React.FC = () => {
         socket.on("game.get.leaderboard", response => {
             if (response.success) {
                 // empty leaderboard just to be sure
-                setLeaderboard(leaderboard => []);
+                setLeaderboard([]);
                 console.log("socket.on game.get.leaderboard success");
                 // sort the leaderboard
                 response.leaderboard.sort((a : leaderboardArray, b: leaderboardArray) => (a.count < b.count) ? 1 : -1);
@@ -48,36 +54,34 @@ const   Leaderboard: React.FC = () => {
                 console.log(response.msg);
         })
 
+        socket.on("get_name", getNameInLeaderboard);
+
         return () => {
             socket.off("game.get.leaderboard");
-        }
-    }, [])
-
-    // get_name event listener function
-    function getNameInLeaderboard (response : any) {
-        if (response.success) 
-            setLeaderboard(leaderboard.map((entry) => (entry.id == response.requested_id ? {...entry, name: response.requested_name} : entry)));
-    }
-
-    // listener to update the name in the leaderboard array
-    useEffect(() => {
-        socket.on("get_name", getNameInLeaderboard)
-
-        return () => {
             socket.off("get_name", getNameInLeaderboard);
         }
+    }, [])
+    
+    // get_name event listener function
+    function getNameInLeaderboard (response : any) {
+        if (response.success) {
+            console.log("get_name success " + response.requested_name);
+            setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
+        }
+    }
 
-    }, [leaderboard])
-
-    //document.getElementById("myDropdown")?.classList.toggle("show");
+    // helper functions
+    function returnName (id : number) : string {
+        const ret = names.find((e) => e.userId == id)?.name;
+        return (ret === undefined ? "Unknown User": ret);
+    }
 
     return (
         <div className="leaderboard">
             {leaderboard.map((element, index) => (
                 <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} className="listLeaderboard">
-                    <span style={{float: "left"}}>{index+1}. <b>{element.name}</b></span>
+                    <span style={{float: "left"}}>{index+1}. <b> {returnName(element.id)}</b></span>
                     <span style={{float: "right"}}>games won: <b>{element.count}</b></span><br/>
-                    {/* {index+1}. <b>{element.name}</b> games won: <b>{element.count}</b> */}
                 </div>
             ))}
         </div>

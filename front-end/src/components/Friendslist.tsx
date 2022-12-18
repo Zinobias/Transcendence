@@ -92,6 +92,7 @@ const Friendslist: React.FC<Props> = ({user}) => {
                     }
                 </div>
             ))}
+            <br/>
         </>
     );
 };
