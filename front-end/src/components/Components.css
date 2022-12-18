@@ -560,6 +560,13 @@ p.chatp {
     display: inline-block;
 }
 
+.profileNav__pw {
+    width:100%;
+    background: transparent;
+    border: 2px solid black;
+
+}
+
 .profileNav__close {
     font-size: 20px;
     text-align: right;

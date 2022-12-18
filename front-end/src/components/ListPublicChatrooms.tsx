@@ -46,24 +46,30 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
         <>
             <div className="chats">
             {chatroom.map((element, index) => (
-                <li key={index} className="listChat">
-                    <span className="listChat__text">{element.channelName}</span> 
-                    <button className="listChat__button" onClick={(e) => handleJoin(e, element.channelId, element.hasPassword)}>JOIN</button>
+                <div key={index}>
                     {
-                        element.hasPassword && 
-                        <span className="listChat__icon">
-                            <SlLock />
-                        </span>
+                        element.visible &&
+                        <li className="listChat">
+                            <span className="listChat__text">{element.channelName}</span> 
+                            <button className="listChat__button" onClick={(e) => handleJoin(e, element.channelId, element.hasPassword)}>JOIN</button>
+                            {
+                                element.hasPassword && 
+                                <span className="listChat__icon">
+                                    <SlLock />
+                                </span>
+                            }
+                            <div id={element.channelId.toString()} className="chatPw">
+                                <form>
+                                    <label className="pwform__label">password</label>
+                                    <br/>
+                                    <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="pwform__input"/>
+                                    <button className="pwform__button" onClick={(e) => handlePwJoin(e, element.channelId)}>enter</button>
+                                </form>
+                            </div>
+
+                        </li>
                     }
-                    <div id={element.channelId.toString()} className="chatPw">
-                        <form>
-                            <label className="pwform__label">password</label>
-                            <br/>
-                            <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="pwform__input"/>
-                            <button className="pwform__button" onClick={(e) => handlePwJoin(e, element.channelId)}>enter</button>
-                        </form>
-                    </div>
-                </li>
+                </div>
             ))}
             </div>
         </>

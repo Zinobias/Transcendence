@@ -717,8 +717,8 @@ export class ChannelEventPatterns {
 
     @EventPattern('channel_info_retrieve_by_id')
     async handleRetrieveChannelInfo(data: ChannelRetrieve) {
-        const channel = this.util.getChannel(data.channel_id, 'channel_retrieve_by_id');
-        this.util.notify([data.user_id], 'channel_retrieve_by_id', {
+        const channel = this.util.getChannel(data.channel_id, 'channel_info_retrieve_by_id');
+        this.util.notify([data.user_id], 'channel_info_retrieve_by_id', {
             success: true,
             msg: undefined,
             channel: channel.getIChannel(false)

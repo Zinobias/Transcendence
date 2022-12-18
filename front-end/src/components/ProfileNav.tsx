@@ -4,8 +4,9 @@ import { AiFillCloseSquare } from "react-icons/ai";
 import Friendslist from "./Friendslist";
 import { useCookies } from 'react-cookie';
 import '../App.css'
-import { IUser } from "../interfaces";
+import { IChannel, IUser } from "../interfaces";
 import { SocketContext } from "./Socket";
+import {Md5} from "ts-md5";
 
 /*
     An <Outlet> should be used in parent route elements to render their child route elements. 
@@ -24,7 +25,9 @@ const ProfileNav: React.FC = () => {
     const [user, setUser] = useState<IUser>();
     const [state, setState] = useState<boolean>(false);
     const [gameInvites, setGameInvites] = useState<IGameInvites[]>([]);
+    const [channelInvites, setChannelInvites] = useState<IChannel[]>([]);
     const navigate = useNavigate();
+    const [pw, setPw] = useState<string>();
     var path:string = "/profile?id=" + cookies.userID; 
 
     // emit to get user on mount and state change to update it
@@ -43,7 +46,6 @@ const ProfileNav: React.FC = () => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
                 console.log("get_user success profileNav");
-                console.log(response.user);
                 setUser(user => response.user);
             }
         })
@@ -101,7 +103,27 @@ const ProfileNav: React.FC = () => {
 
         socket.on("accept_invite_game_user", response => {
             console.log("socket.on accept game invite " + response.success + " " + response.msg);
-        })
+        });
+
+        socket.on("channel_invite", response => {
+            if (response.success) {
+                // emit to channel_info_retrieve_by_id
+                console.log("channel invite success emitting to get channel info")
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "channel_info_retrieve_by_id", 
+                    data: {user_id: cookies.userID, channel_id: response.channel_id}
+                })
+            }
+            else
+                console.log(response.msg);
+        });
+
+        socket.on("channel_info_retrieve_by_id", response => {
+            if (response.success)
+                setChannelInvites(channelInvites => [...channelInvites, response.channel]);
+        });
 
         return () => {
             socket.off("get_user");
@@ -110,6 +132,8 @@ const ProfileNav: React.FC = () => {
             socket.off("un_friend");
             socket.off("game.create");
             socket.off("accept_invite_game_user");
+            socket.off("channel_invite")
+            socket.off("channel_info_retrieve_by_id");
         }
     }, [])
 
@@ -139,7 +163,7 @@ const ProfileNav: React.FC = () => {
         document.getElementById("myDropdown")?.classList.toggle("show");
     };
 
-    const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, index : number, inviteId : number) => {
+    const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, inviteId : number) => {
         e.preventDefault();
         socket.emit("chat", {
             userId: cookies.userID,
@@ -148,14 +172,34 @@ const ProfileNav: React.FC = () => {
             data: {user_id: cookies.userID, request_user_id: inviteId}
         })
         console.log(`emiting accept_invite_game_user`);
-        setGameInvites(gameInvites => gameInvites.filter((_, i) => i !== index));
+        setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != inviteId));
         document.getElementById("myDropdown")?.classList.toggle("show");
     }
 
-    const handleDecline = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, index : number) => {
+    const handleDecline = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, inviteId : number) => {
         e.preventDefault();
-        setGameInvites(gameInvites => gameInvites.filter((_, i) => i !== index));
+        setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != inviteId));
     }
+
+    const handleJoin = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, channelId : number) => {
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channel_join",
+            data: {user_id: cookies.userID, channel_id: channelId, password: (pw ? Md5.hashStr(pw + channelId) : undefined)}
+        })
+        setPw(pw => undefined); 
+        setChannelInvites(channelInvites => channelInvites.filter((element) => element.channelId != channelId));
+    }
+    /*
+        channel invite notes:
+
+        if user gets an invite -> channel_info_retrieve_by_id to see if the channel has a pw or not
+        if pw prompt to enter it
+        
+        call channel join with invite id and pw if needed 
+    */
 
     return (
         <div className="profileNav">
@@ -173,7 +217,24 @@ const ProfileNav: React.FC = () => {
                         {
                             <>
                                 <p><b>{element.fromUserName}</b> invited you to <b>{element.game_mode}</b></p>
-                                <button className="friendslistButton" onClick={(e) => handleAccept(e, index, element.fromUserId)}>Accept</button>
+                                <button className="friendslistButton" onClick={(e) => handleAccept(e, element.fromUserId)}>Accept</button>
+                                {/* <button className="friendslistButton" onClick={(e) => handleDecline(e, index)}>Decline</button> */}
+                            </>
+                        }
+                    </div>
+                ))}
+                {channelInvites.map((element, index) => (
+                    <div key={index} className="friendInvite">
+                        {
+                            <>
+                                <p>you got invited to chatroom <b>{element.channelName}</b></p>
+                                {
+                                    element.password &&
+                                    <>
+                                    <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} style={{borderBottom: "solid 1px black"}} className="settingsInput"/>
+                                    </>
+                                }
+                                <button className="friendslistButton" onClick={(e) => handleJoin(e, element.channelId)}>{element.password ? "enter pw" : "join"}</button>
                                 {/* <button className="friendslistButton" onClick={(e) => handleDecline(e, index)}>Decline</button> */}
                             </>
                         }

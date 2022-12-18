@@ -43,6 +43,25 @@ export class RetrieveUserDataEventPatterns {
         });
     }
 
+    @EventPattern('get_chatrooms_user')
+    getChatroomsUser(data: GetSelfUserData) {
+        const channels = Channel.getUserChannels(data.user_id);
+        this.util.notify([data.user_id], 'get_chatrooms_user', {
+            success: true,
+            msg: undefined,
+            channels: channels
+            ?.filter((channel) => channel.otherOwner == undefined)
+            .map(channel => {
+                return {
+                    channelId: channel.channelId,
+                    channelName: channel.channelName,
+                    visible: channel.visible,
+                    hasPassword: (channel.password != undefined && channel.password.length == 64)
+                }
+            })
+        });
+    }
+
     @EventPattern('get_user')
     async getUser(data: GetOtherUserData) {
         const user = await User.getUser(data.requested_user_id);

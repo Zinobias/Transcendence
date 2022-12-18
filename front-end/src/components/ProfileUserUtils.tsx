@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useCookies } from 'react-cookie';
-import { IUser, SmallUser } from '../interfaces';
+import { IChannelInfo, IUser, SmallUser } from '../interfaces';
 import { SocketContext } from './Socket';
 
 interface Props {
@@ -164,10 +164,11 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 }
 
 export const UserFriendSettings : React.FC<Props> = ({user}) => {
+    const socket = useContext(SocketContext);
     const [cookies] = useCookies(['userID', 'user']);
+    const [channels, setChannels] = useState<IChannelInfo[]>([]);
     const [isFriend, setIsFriend] = useState<boolean>(false);
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
-    const socket = useContext(SocketContext);
 
     // get_user listener function
     function getUserInProfileUtils (response : any) {
@@ -213,12 +214,20 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             else 
                 console.log(response.msg);
 
-        })
+        });
+
+        socket.on("get_chatrooms_user", response => {
+            setChannels([]);
+            response.channels.forEach((element : IChannelInfo) => {
+                setChannels(channels => [...channels, element])
+            });
+        });
 
         return () => {
             socket.off("get_user", getUserInProfileUtils);
             socket.off('block_user');
             socket.off('unblock_user');
+            socket.off("get_chatrooms_user");
         }
 
     }, [])
@@ -284,6 +293,32 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         console.log(`click direct message`);
     }
 
+    const channelRequest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        // emit to create dm, if we already are in a dm just toggle the chat window       
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "get_chatrooms_user",
+            data: {user_id: cookies.userID}
+        })
+        console.log(`emitting to get_chatrooms_user`);
+    }
+
+    const channelInvite = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, channelId : number) => {
+        // emit to create dm, if we already are in a dm just toggle the chat window       
+        e.preventDefault();
+        socket.emit("chat", {
+            userId: cookies.userID,
+            authToken: cookies.user,
+            eventPattern: "channel_invite",
+            data: {user_id: cookies.userID, invited_id: user.userId, channel_id: channelId}
+        })
+        setChannels(channels => []);
+        // console.log(`emitting to channel_invite`);
+    }
+
+
     return (
         <>  
             <span style={{display: "flex", alignItems: "center", flexDirection: "column", fontWeight: "bold", fontSize: "100%"}}>invite to game</span>
@@ -300,6 +335,18 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 <button className='profileButton' onClick={(e) => unblockUser(e)}>unblock</button> 
             }
             <button className='profileButton'>send message</button>
+            <button className='profileButton' onClick={(e) => channelRequest(e)}>Invite to Channel</button>
+            {
+                channels.length != 0 &&
+                <>
+                select a channel
+                {channels.map((element, index) => (
+                    <li key={index} className="listChat">
+                        <span className="listChatUser__text" onClick={(e) => channelInvite(e, element.channelId)}>{element.channelName}</span> 
+                    </li>
+                ))}
+                </>
+            }
         </>
     )
 }

@@ -89,7 +89,7 @@ const Friendslist: React.FC<Props> = ({user}) => {
             {user.friends.map((e, index) => (
                 <div key={index} className="friendslist">
                     {
-                        // e.state &&
+                        e.state &&
                         <>
                         <FriendslistUtils friend={e}/>
                         {/* <div style={{cursor: "pointer"}} onClick={(event) => goToProfile(event, e.userId)}>{e.name}</div> */}

@@ -205,7 +205,7 @@ export class Channel {
                 settings: this._settings.map(setting => {return setting.getISetting()}),
                 closed: this._closed,
                 visible: this._visible,
-                password: this._password == undefined,
+                password: this._password != undefined,
             }
         else
             return {
@@ -218,7 +218,7 @@ export class Channel {
                 settings: [],
                 closed: this._closed,
                 visible: this._visible,
-                password: this._password == undefined,
+                password: this._password != undefined,
             }
     }
 
