@@ -295,9 +295,9 @@ export class MatchMakingService {
 	public async addSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
 			if (game.gameId == targetGameId) {
-				if (game.frameSubscribers.includes(userId) === false) {
+				if (game.frameSubscribers.includes(userId) === false || (userId == game.player1 || userId == game.player2)) {
 					if (userId == game.player1 || userId == game.player2)
-						return false;
+						return true;
 					game.frameSubscribers?.push(userId);
 					return true;
 				}
@@ -317,7 +317,7 @@ export class MatchMakingService {
 			if (game.gameId === targetGameId) {
 				if (game.frameSubscribers?.includes(userId) === true) {
 					if (userId == game.player1 || userId == game.player2)
-						return false;
+						return true;
 					game.frameSubscribers.splice(game.frameSubscribers.indexOf(userId), 1);
 					return true;
 				}
