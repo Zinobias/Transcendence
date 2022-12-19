@@ -143,12 +143,24 @@ const ProfileNav: React.FC = () => {
     // check for game invites, update listener when user updates
     useEffect(() => {
         socket.on("invite_game_user", response => {
-            if (response.success && response.request_user_id == cookies.userID && !gameInvites.find((entry) => response.user == entry.fromUserId)) {
-                setGameInvites(gameInvites => [...gameInvites, {
-                    fromUserId: response.user, 
-                    fromUserName: response.from_user_name,
-                    game_mode: response.game_mode
-                }])
+            if (response.success && response.request_user_id == cookies.userID) {
+                let index = gameInvites.findIndex((e) => e.fromUserId == response.user);
+                if (index != -1) {
+                    let newArr = [...gameInvites]; 
+                    newArr[index] = {
+                        fromUserId: response.user, 
+                        fromUserName: response.from_user_name,
+                        game_mode: response.game_mode
+                    }; 
+                    setGameInvites(newArr);
+                }
+                else {
+                    setGameInvites(gameInvites => [...gameInvites, {
+                        fromUserId: response.user, 
+                        fromUserName: response.from_user_name,
+                        game_mode: response.game_mode
+                    }])
+                }
                 if (document.getElementById("myDropdown")?.classList.contains("show") == false)
                     document.getElementById("myDropdown")?.classList.toggle("show");
             }
