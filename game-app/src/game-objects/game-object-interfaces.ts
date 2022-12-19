@@ -197,7 +197,7 @@ export enum MoveStatePaddle {
 				ball.height +=  6;
 				ball.width += 6;
 			}
-			console.log(`MUSHROOM ONHIT FNC WIDTH ${ball.width} height ${ball.height}`);
+			// console.log(`MUSHROOM ONHIT FNC WIDTH ${ball.width} height ${ball.height}`);
 		}
 		this._pos.x = v2.x;
 		this._pos.y = v2.y;

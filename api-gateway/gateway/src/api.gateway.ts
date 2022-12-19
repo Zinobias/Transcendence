@@ -91,7 +91,7 @@ export class ApiGateway
             this.logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
             return;
         }
-        this.logger.debug(`Received event from frontend on ${payload.eventPattern}`)
+        // this.logger.debug(`Received event from frontend on ${payload.eventPattern}`)
         this.chatClient.emit(payload.eventPattern, payload.data);
     }
 
@@ -103,7 +103,7 @@ export class ApiGateway
         //TODO verify auth
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
-        this.logger.debug(`auth works ${payload}`);
+        // this.logger.debug(`auth works ${payload}`);
         if (payload.eventPattern == 'game.player.move') {
             if (payload.userId === undefined || payload.userId != payload.data.userId)
                 return;
@@ -122,10 +122,9 @@ export class ApiGateway
 	async handleCheckOnline(client: Socket, payload: any) {
 		const online: number[] = []
 		const offline: number[] = []
-		this.logger.debug("event check_online " + payload.data.checkIds);
+		// this.logger.debug("event check_online " + payload.data.checkIds);
 		for (let i = 0; i < payload.data.checkIds.length; i++) {
 			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.data.checkIds[i]);
-			this.logger.debug("socketlen " + socketList?.length);
 			if (socketList != undefined && socketList.length != 0) {
 				online.push(payload.data.checkIds[i])
 			} else {

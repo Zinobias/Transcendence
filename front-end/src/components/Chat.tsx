@@ -41,28 +41,7 @@ const   Chat: React.FC = () => {
     
     // event listeners
     useEffect(() => {
-        socket.on("channel_create", response => {
-            if (response.success == true && response.hasPassword == false) {
-                console.log(`socket.on channel_create success ${response.channel_name}`);
-                socket.emit("chat", {
-                    userId: cookies.userID,
-                    authToken: cookies.user,
-                    eventPattern: "get_channels_user",
-                    data: {user_id: cookies.userID}
-                })
-                console.log("emiting get_channels_user");
-                setState( state => !state);
-            }
-            else if (response.success == true && response.hasPassword == true) {
-                console.log(`socket.on channel_create success ${response.channel_name} pw ${response.hasPassword}`);
-                document.getElementById("Channel")?.classList.toggle("channelShow");
-                document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");
-                setPwName( pwName => response.channel_name);
-                setPwId( pwId => response.channel_id);
-            }
-            else
-            alert(`[${response.msg}]`);
-        })
+        socket.on("channel_create", channelCreateInChat);
         
         socket.on("channels_retrieve", response  => {
             // console.log(`socket.on channels_retrieve success`);
@@ -75,7 +54,7 @@ const   Chat: React.FC = () => {
         socket.on("channel_update_password", updatePasswordInChat)
         
         return () => {
-            socket.off("channel_create");
+            socket.off("channel_create", channelCreateInChat);
             socket.off("channels_retrieve");
             socket.off("channel_update_password", updatePasswordInChat);
         }
@@ -97,6 +76,30 @@ const   Chat: React.FC = () => {
             alert(`[${response.msg}]`);
     }
 
+    function channelCreateInChat (response : any) {
+        if (response.success == true && response.hasPassword == false) {
+            console.log(`socket.on channel_create success ${response.channel_name}`);
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+            console.log("emiting get_channels_user");
+            setState( state => !state);
+        }
+        else if (response.success == true && response.hasPassword == true) {
+            console.log(`socket.on channel_create success ${response.channel_name} pw ${response.hasPassword}`);
+            document.getElementById("Channel")?.classList.toggle("channelShow");
+            document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");
+            setPwName( pwName => response.channel_name);
+            setPwId( pwId => response.channel_id);
+        }
+        else
+        alert(`[${response.msg}]`);
+    }
+
+    // helper functions
     function validateChatroomName (name: string) : boolean {
         const regExp = new RegExp(`[^a-zA-Z0-9_]`, 'g');
         const match = name.matchAll(regExp);

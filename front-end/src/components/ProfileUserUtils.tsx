@@ -170,25 +170,18 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
     const [isFriend, setIsFriend] = useState<boolean>(false);
     const [isBlocked, setIsBlocked] = useState<boolean>(false);
 
-    // get_user listener function
-    function getUserInProfileUtils (response : any) {
-        if (response.success && response.user.userId == cookies.userID) {
-            setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
-            setIsFriend(isFriend => !response.user.friends.find((e : SmallUser) => user.userId == e.userId && e.state == true));
-        }
-    }
-
+    
     // event listeners and emits on mount
     useEffect(() => {
         socket.on("get_user", getUserInProfileUtils);
-
+        
         socket.emit("chat", {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "get_user", 
             data: { user_id: cookies.userID, requested_user_id: cookies.userID }
         });
-
+        
         socket.on("block_user", response => {
             if (response.success) {
                 socket.emit("chat", {
@@ -199,7 +192,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 });
             }
             else 
-                console.log(response.msg);
+            console.log(response.msg);
         })
 
         socket.on('unblock_user', response => {
@@ -212,8 +205,8 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 });
             }
             else 
-                console.log(response.msg);
-
+            console.log(response.msg);
+            
         });
 
         socket.on("get_chatrooms_user", response => {
@@ -222,12 +215,12 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 setChannels(channels => [...channels, element])
             });
         });
-
+        
         socket.on("get_dm_channel", response => {
             if (response.channel != undefined) {
                 if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
-                    document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
-                // console.log("already in a dm with that user");
+                document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
+                console.log("already in a dm with that user");
             }
             else {
                 socket.emit("chat", {
@@ -239,20 +232,42 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                             creator2_id: user.userId, 
                             visible: false, 
                             should_get_password: false }
-                });
-                console.log("not in a dm with that user");
-            }
+                        });
+                        console.log("not in a dm with that user");
+                    }
         });
 
+        socket.on("channel_create", createChannelInProfile);
+        
         return () => {
             socket.off("get_user", getUserInProfileUtils);
             socket.off('block_user');
             socket.off('unblock_user');
             socket.off("get_chatrooms_user");
-            // socket.off("get_dm_channel");
+            socket.off("get_dm_channel");
+            socket.off("channel_create", createChannelInProfile);
         }
-
+        
     }, [])
+    
+    // get_user listener function
+    function getUserInProfileUtils (response : any) {
+        if (response.success && response.user.userId == cookies.userID) {
+            setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
+            setIsFriend(isFriend => !response.user.friends.find((e : SmallUser) => user.userId == e.userId && e.state == true));
+        }
+    }
+
+    function createChannelInProfile (response : any) {
+        if (response.success == true) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+        }
+    }
 
     const addFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

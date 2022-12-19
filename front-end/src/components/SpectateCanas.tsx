@@ -114,7 +114,7 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
 
     // redraw canvas on state change
     useEffect(() => {
-        const canvas : HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
+        const canvas : HTMLCanvasElement = document.getElementById('spectateCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext("2d");
         if (ctx && entities) {
             ctx.beginPath();
@@ -171,7 +171,11 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                 <span className='gameLeft'>{p1}</span>
                 <span className='gameRight'>{p2}</span>
             </div>
-            <canvas className="gameCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
+            <div className="aspect-ratio">
+                <div className="aspect-ratio__inner-wrapper">
+                    <canvas className="gameCanvas" id="spectateCanvas" width={canvasWidth} height={canvasHeight} />
+                </div>
+            </div>
             {
                 winner ?
                 <>

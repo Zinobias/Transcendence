@@ -19,7 +19,7 @@ export class Sockets {
 			return false;
 		if (socketMap.find(e => e?.id == socket?.id) === undefined)
 			return false;
-		this.logger.debug(`uid : ${userId} SOCKET ALREADY STORED`)
+		// this.logger.debug(`uid : ${userId} SOCKET ALREADY STORED`)
 		return true;
 	}
 
@@ -52,7 +52,7 @@ export class Sockets {
 	public removeSocket(socket : Socket) {
 		for (let socketMap of this.socketMap.entries()) {
 			let index = socketMap[1].findIndex((s) => {
-				this.logger.warn(`SOCKET WILL GET REMOVED : ${s?.id == socket.id}`);
+				// this.logger.warn(`SOCKET WILL GET REMOVED : ${s?.id == socket.id}`);
 				return (s?.id == socket.id);
 			});
 			if (index !== -1)
@@ -80,7 +80,7 @@ export class Sockets {
             if (sockets !== undefined) {
 				if (sockets!.length > 0) {
 					sockets.forEach((e : Socket) => {
-					this.logger.debug(`Emitting to socket for userId: [${user}] eventPattern: ${pattern} socketId: ${e.id} socket length : ${sockets.length}`);
+					// this.logger.debug(`Emitting to socket for userId: [${user}] eventPattern: ${pattern} socketId: ${e.id} socket length : ${sockets.length}`);
 					e?.emit(pattern, payload);})
 				}
             } else {

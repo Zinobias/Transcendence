@@ -77,7 +77,7 @@ export class RetrieveUserDataEventPatterns {
         const usertest = user.getIUser();
         // this.logger.warn("user " + user.friends[0].user.userId);
         // this.logger.warn("iuser " + usertest.friends[0].userId);
-        this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
+        // this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
         this.util.notify([data.user_id], 'get_user', {
             success: true,
             msg: undefined,
@@ -96,7 +96,7 @@ export class RetrieveUserDataEventPatterns {
             });
             return
         }
-        this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
+        // this.logger.debug(`chat_app user ${user.userId} ${user.name}`);
         this.util.notify([data.user_id], 'get_name', {
             success: true,
             msg: undefined,

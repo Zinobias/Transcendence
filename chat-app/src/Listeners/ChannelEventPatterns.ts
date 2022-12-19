@@ -45,7 +45,7 @@ export class ChannelEventPatterns {
         const dmChannel = this.getDmChannel(data.user_id, data.other_user_id);
         this.util.notify([data.user_id], 'get_dm_channel', {
             success: true,
-            channel: dmChannel.getIChannel(true),
+            channel: dmChannel == undefined ? undefined : dmChannel.getIChannel(true),
         });
     }
 

@@ -28,12 +28,12 @@ export class ApiController {
 
     @EventPattern('testMsg')
     testingFnc(@Payload() payload: any) {
-        this.logger.log(`Msg from game to gateway received : [${payload}]`);
+        // this.logger.log(`Msg from game to gateway received : [${payload}]`);
     }
 
     @EventPattern('chat')
     chatForwarding(@Payload() payload: microServiceDTO) {
-        this.logger.log(`Msg from chat to gateway received`);
+        // this.logger.log(`Msg from chat to gateway received`);
 		this.sockets.sendData(payload.userIDs, payload.eventPattern, payload.data);
 
 		// for (const userid of payload.userIDs) {

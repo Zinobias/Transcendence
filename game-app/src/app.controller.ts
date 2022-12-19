@@ -46,7 +46,7 @@ export class AppController {
 	@EventPattern("game.player.move")
 	async userMoveEvent(@Payload() payload : userKeyInputDTO) {
 		// this.logger.log("player : {" + payload.userId + "} has moved.");
-		this.logger.log("player : {" + payload.userId + "} has moved with key event {" + payload.keyEvent + "}");
+		// this.logger.log("player : {" + payload.userId + "} has moved with key event {" + payload.keyEvent + "}");
 		let res = this.matchMakingService.getUserActiveGameId(payload.userId);
 		if (res === undefined)
 			return ;
@@ -238,7 +238,7 @@ export class AppController {
 	@EventPattern('game.isInGame')
 	isInGame(@Payload() payload : any) {
 		let success : boolean = this.matchMakingService.isInGame(payload.requestedId);
-		this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}] typeOf userId : ${typeof(payload.requestedId)}`);
+		// this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}] typeOf userId : ${typeof(payload.requestedId)}`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
@@ -258,7 +258,7 @@ export class AppController {
 	@EventPattern('game.get.activeGameId')
 	getActiveGameId(@Payload() payload : any) {
 		let ret = this.matchMakingService.getUserActiveGameId(payload.userId);
-		this.logger.log(`getActivegameId called, user ${payload.userId} is in game ${ret}`);
+		// this.logger.log(`getActivegameId called, user ${payload.userId} is in game ${ret}`);
 
 		if (ret === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
@@ -344,7 +344,7 @@ export class AppController {
 	 */
 	@EventPattern('game.get.gameInfo')
 	getGameInfo(@Payload() payload : any) {
-		this.logger.log("getGameInfo called");
+		// this.logger.log("getGameInfo called");
 
 		let gameInfoRet = this.matchMakingService.getIGameInfo(payload.gameId);
 
@@ -383,6 +383,16 @@ export class AppController {
 		this.logger.debug("Game create payload:" + payload.gameMode);
 		this.logger.debug("Game create payload:" + payload.player1UID);
 		this.logger.debug("Game create payload:" + payload.player2UID);
+		if (this.matchMakingService.isInGame(payload.player1UID) || this.matchMakingService.isInGame(payload.player2UID)) {
+			this.gatewayClient.emit<string, outDTO>('game', {
+				eventPattern : 'game.create',
+				userIds : [payload.player1UID, payload.player2UID],
+				data : {
+					success : 	false,
+					msg		: `One of the users is already currently playing a game`,
+				}
+			})
+		}
 		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false) {
 			this.logger.debug(`gameMode in payload is invalid : [${payload.gameMode}]`);
 			return ;

@@ -43,7 +43,8 @@ export class Game {
 		this.playerPaddles.push( {uid : this.player1.uid, playerPaddle : new PlayerPaddle(1)});
 		this.playerPaddles.push( {uid : this.player2.uid, playerPaddle : new PlayerPaddle(2)});
 		this.entities.push(this.playerPaddles[0].playerPaddle, this.playerPaddles[1].playerPaddle);
-		this._fps = 2.5;
+		// this._fps = 2.5;
+		this._fps = 1;
 		this.ballFactory();
 		this.eventEmitter.on("game.player.move." + this.gameId, this.setPlayerMovementState.bind(this));
 	};
@@ -151,7 +152,7 @@ export class Game {
 
 
 	private		serveBall() {
-		logger.log("serving ball");
+		// logger.log("serving ball");
 		this._toServe = false;
 		[this.ball.pos.x, this.ball.pos.y] = [0, 0];
 		[this.ball.height, this.ball.width] = [GameConfig.DEFAULT_BALL_RADIUS, GameConfig.DEFAULT_BALL_RADIUS];
@@ -181,14 +182,14 @@ export class Game {
 		});
 		if (setIndex !== -1)
 			this._set.splice(setIndex, 1);
-		logger.debug('RemovingEntity from the set');
+		// logger.debug('RemovingEntity from the set');
 
 		const entityArrayIndex = this.entities.findIndex((e) => {
 			return ((e.pos.x == ent.pos.x && e.pos.y == ent.pos.y) && e.type != 'ball');
 		});
 		if (entityArrayIndex !== -1)
 			this.entities.splice(entityArrayIndex, 1);
-		logger.debug(`RemovingEntity from the entities array, successfull : [${(setIndex !== -1 && entityArrayIndex !== -1) ? true : false}]`);
+		// logger.debug(`RemovingEntity from the entities array, successfull : [${(setIndex !== -1 && entityArrayIndex !== -1) ? true : false}]`);
 		return ;
 	}
 	/**
@@ -202,15 +203,15 @@ export class Game {
 
 			if (this.checkBallHit(entity) === true)
 				if (entity.onHit) {
-					logger.log(`intersection with ${entity.type}`);
-					logger.debug(`ball width before  ${this.ball.width} height ${this.ball.height}`);
+					// logger.log(`intersection with ${entity.type}`);
+					// logger.debug(`ball width before  ${this.ball.width} height ${this.ball.height}`);
 
 					entity.onHit(this.ball);
-					logger.debug(`ball width after  ${this.ball.width} height ${this.ball.height}`);
+					// logger.debug(`ball width after  ${this.ball.width} height ${this.ball.height}`);
 					if (entity.toDelete === true) {
-						logger.debug(`ToDelete is true for object ${entity.type}`);
+						// logger.debug(`ToDelete is true for object ${entity.type}`);
 						this.removeEntity(entity);
-						logger.debug(`Deleted object`);
+						// logger.debug(`Deleted object`);
 					}
 					if (this.ball.velocityVector!.x > this.ball.width)
 						this.ball.velocityVector!.x = this.ball.width;
@@ -277,7 +278,7 @@ export class Game {
 					pos : entityPosition,
 				}));
 			}) === undefined;
-			logger.warn(`IN THE getAvailableEntityPosition LOOP`);
+			// logger.warn(`IN THE getAvailableEntityPosition LOOP`);
 		}
 		return (entityPosition!);
 	}
@@ -296,7 +297,7 @@ export class Game {
 		}
 		this._set.push(Game.EntityToIRectangle(newEntity));
 		this.entities.push(newEntity);
-		logger.debug(`Generated powerUp of type ${newEntity.type}`);
+		// logger.debug(`Generated powerUp of type ${newEntity.type}`);
 	}
 	/**
 	 * Basic gameloop.
@@ -316,7 +317,7 @@ export class Game {
 			this.checkIntersections(); // checks for intersections.
 			this.checkBallPosition(); // check ball position relative to the board. Checks for points / top bottom
 			if (this.gameMode === 'DISCOPONG' && powerUptimer >= powerUpInterval) {
-				logger.debug(`Generating a powerUp`);
+				// logger.debug(`Generating a powerUp`);
 				this.generatePowerUps();
 				powerUptimer = 0;
 			}

@@ -19,7 +19,7 @@ export class AuthGuard implements CanActivate {
     private logger = new Logger('AuthGuard');
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToWs().getData();
-        this.logger.debug(`Auth request data: [${request.userId}], [${request.authToken}]`);
+        // this.logger.debug(`Auth request data: [${request.userId}], [${request.authToken}]`);
 		
         return this.validateRequest(request);
     }
@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
         if (request.userId === undefined || request.authToken === undefined)
             return false;
         let validateResult = this.auth.validate(request.userId, request.authToken);
-        this.logger.debug(`Validate result is: [${validateResult}]`);
+        // this.logger.debug(`Validate result is: [${validateResult}]`);
 		// TODO : implement this TFA stuff.
 		// if (this.TFA.hasTwoFA === true) {
 		// 	this.TFA.verify(request.userId, request.TFAToken);

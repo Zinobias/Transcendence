@@ -143,7 +143,7 @@ const ProfileNav: React.FC = () => {
     // check for game invites, update listener when user updates
     useEffect(() => {
         socket.on("invite_game_user", response => {
-            if (response.success && response.request_user_id == cookies.userID) {
+            if (response.success && response.request_user_id == cookies.userID && !gameInvites.find((entry) => response.user == entry.fromUserId)) {
                 setGameInvites(gameInvites => [...gameInvites, {
                     fromUserId: response.user, 
                     fromUserName: response.from_user_name,
@@ -159,7 +159,7 @@ const ProfileNav: React.FC = () => {
             socket.off("invite_game_user");
         }
 
-    }, [user])
+    }, [user, gameInvites])
 
     const toggleProfile = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
         e.preventDefault();
