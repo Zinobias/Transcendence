@@ -19,4 +19,4 @@ RUN npm install react-scripts@3.4.1 -g
 
 # Installed all dependencies, now we copy over the sourcecode
 COPY . .
-CMD ["npm", "start", "--watch"]
+CMD ["npm", "start"]
