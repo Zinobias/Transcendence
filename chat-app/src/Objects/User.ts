@@ -51,8 +51,12 @@ export class User {
         this._blocked = [];
         this._friends = [];
         User.addUser(this);
-        this.updateBlocked();
-        this.updateFriends();
+    }
+
+    public async init() {
+        await this.updateBlocked();
+        await this.updateFriends();
+        return ;
     }
 
     get userId(): number {

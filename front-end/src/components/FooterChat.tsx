@@ -43,7 +43,6 @@ const FooterChat: React.FC = () => {
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
-        console.log("footer click");
         document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
     };
 

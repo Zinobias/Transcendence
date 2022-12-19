@@ -65,7 +65,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressUp }
                 });
-                // console.log(`socket.emit ${event.key} is being pressed`);
+                console.log(`socket.emit ${event.key} is being pressed for user ${cookies.userID}`);
             }
             if (event.key === "ArrowDown" && down === false) {
                 setDown(down => true);
@@ -75,7 +75,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressDown }
                 });
-                // console.log(`socket.emit ${event.key} is being pressed`);
+                console.log(`socket.emit ${event.key} is being pressed for user ${cookies.userID}`);
             }
         };
 
@@ -88,7 +88,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseUp }
                 });             
-                // console.log(`socket.emit ${event.key} is being released`)
+                console.log(`socket.emit ${event.key} is being released for user ${cookies.userID}`)
             }
             if (event.key === "ArrowDown") {
                 setDown(down => false);
@@ -98,7 +98,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseDown }
                 });
-                // console.log(`socket.emit ${event.key} is being released`)
+                console.log(`socket.emit ${event.key} is being released for user ${cookies.userID}`)
             }
         };
 

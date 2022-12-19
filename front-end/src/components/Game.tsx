@@ -110,34 +110,40 @@ const   Game: React.FC = () => {
 
     function getGameInfoInGame (response : any) {
         console.log(response.msg);
-        if (response.gameInfo) {
+        if (response.gameInfo != undefined) {
             setQueue(queue => false);
             setGameinfo(gameInfo => response.gameInfo);
         }
     }
 
-    // we always want to listen to this
-    useEffect(() => {
-        socket.on("game.create", gameResponse => {
-            if (gameResponse.success && window.location.pathname == "/game") {
-                if (queue) {
-                    // if we accepted an gameInvite and we are in a queue we leave the queue first
-                    socket.emit("game", {
-                        userId: cookies.userID,
-                        authToken: cookies.user,
-                        eventPattern: "game.leave.queue", 
-                        data: { userId: cookies.userID }
-                    });
-                }
-                console.log("game.create success emitting game.get.gameInfo")
+    function gameCreateInGame (gameResponse : any) {
+        if (gameResponse.success && (window.location.pathname == "/game" || window.location.pathname == "/")) {
+            if (queue) {
+                // if we accepted an gameInvite and we are in a queue we leave the queue first
                 socket.emit("game", {
                     userId: cookies.userID,
                     authToken: cookies.user,
-                    eventPattern: "game.get.gameInfo", 
-                    data: { userId: cookies.userID, gameId: gameResponse.gameId }
+                    eventPattern: "game.leave.queue", 
+                    data: { userId: cookies.userID }
                 });
             }
-        })
+            console.log("game.create success emitting game.get.gameInfo")
+            socket.emit("game", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "game.get.gameInfo", 
+                data: { userId: cookies.userID, gameId: gameResponse.gameId }
+            });
+        }
+    }
+
+    // we always want to listen to this
+    useEffect(() => {
+        socket.on("game.create", gameCreateInGame)
+
+        return () => {
+            socket.off("game.create", gameCreateInGame);
+        }
 
     }, [queue])
 

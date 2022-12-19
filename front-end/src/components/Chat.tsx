@@ -61,6 +61,8 @@ const   Chat: React.FC = () => {
                     eventPattern: "get_channels_user",
                     data: {user_id: cookies.userID}
                 })
+                if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
+                    document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
                 console.log("emiting get_channels_user");
                 setState( state => !state);
             }

@@ -78,6 +78,8 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
         // if current user joined a channel update side channels
         if (response.success && response.user_id == cookies.userID) {
             console.log("socket.on channel join success");
+            if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
+                document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
             setState(state => !state);
         }
         else if (response.success === false)
@@ -90,7 +92,10 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
             setState(state => !state);
         // if current user left and was looking at the channel set channel to undefined
         if (response.success && channelId == response.channel_id && cookies.userID == response.user_id)
+        {
+            setChannelId(channelId => undefined);
             setChannel(channel => undefined);   
+        }
     }
 
     function channelBanInSidebar (response : any) {
@@ -120,12 +125,18 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
     only show channels that are visible
     */
 
+    const setIdTemp = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, id : number) => {
+        e.preventDefault();
+        console.log(id);
+        setChannelId(channelId => id);
+    }
+
     return (
     <div>
         <p style={{textAlign: "center", lineHeight: "0"}}>MY CHATS:</p>
         {channels.map((element) => (
         <li key={element.channelId} className="listChat">
-            <span className="listChatUser__text" onClick={() => setChannelId(channelId => element.channelId)}>{element.otherOwnderId == -1 ? element.channelName : returnName(element.otherOwnderId)}</span> 
+            <span className="listChatUser__text" onClick={(e) => setIdTemp(e, element.channelId)}>{element.otherOwnderId == -1 ? element.channelName : returnName(element.otherOwnderId)}</span> 
         </li>
         ))}
     </div>

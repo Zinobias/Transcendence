@@ -15,29 +15,29 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
     const [online, setOnline] = useState<boolean>(false);
     const [inGame, setIngame] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         // console.log('This will run every second!');
-    //         if (document.getElementById("myDropdown")?.classList.contains("show")) {
-    //             // console.log('This will run every second!');
-    //             socket.emit("check_online", {
-    //                 userId: cookies.userID,
-    //                 authToken: cookies.user,
-    //                 eventPattern: "check_online", 
-    //                 data: {userId: cookies.userID, checkIds: [friend.userId]}
-    //             });
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // console.log('This will run every second!');
+            if (document.getElementById("myDropdown")?.classList.contains("show")) {
+                // console.log('This will run every second!');
+                socket.emit("check_online", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "check_online", 
+                    data: {userId: cookies.userID, checkIds: [friend.userId]}
+                });
         
-    //             socket.emit("game", {
-    //                 userId: cookies.userID,
-    //                 authToken: cookies.user,
-    //                 eventPattern: "game.isInGame", 
-    //                 data: { userId: cookies.userID, requestedId: friend.userId }
-    //             });
-    //         }
-    //     }, 1000);
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.isInGame", 
+                    data: { userId: cookies.userID, requestedId: friend.userId }
+                });
+            }
+        }, 1000);
 
-    //     return () => clearInterval(interval);
-    // }, []);
+        return () => clearInterval(interval);
+    }, []);
 
     // get statusues on mount
     useEffect(() => {

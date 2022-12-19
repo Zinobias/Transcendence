@@ -224,8 +224,11 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         });
 
         socket.on("get_dm_channel", response => {
-            if (response.channel) 
-                console.log("already in a dm with that user");
+            if (response.channel != undefined) {
+                if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
+                    document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
+                // console.log("already in a dm with that user");
+            }
             else {
                 socket.emit("chat", {
                     userId: cookies.userID,
@@ -246,7 +249,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             socket.off('block_user');
             socket.off('unblock_user');
             socket.off("get_chatrooms_user");
-            socket.off("get_dm_channel");
+            // socket.off("get_dm_channel");
         }
 
     }, [])

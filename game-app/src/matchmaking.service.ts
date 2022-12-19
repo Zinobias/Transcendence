@@ -85,7 +85,7 @@ export class MatchMakingService {
 	 */
 	public getUserActiveGameId(uid : number) : number | undefined{
 		let e = this.getGameList().find((e) => {
-			return ((e.player1 === uid || e.player2 === uid));
+			return ((e.player1 == uid || e.player2 == uid));
 		});
 		if (e !== undefined)
 			return (e?.gameId)

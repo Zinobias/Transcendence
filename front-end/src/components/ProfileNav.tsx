@@ -46,7 +46,7 @@ const ProfileNav: React.FC = () => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
                 console.log("get_user success profileNav");
-                console.log(response.user);
+                // console.log(response.user);
                 setUser(user => response.user);
             }
         })
@@ -96,6 +96,8 @@ const ProfileNav: React.FC = () => {
             if (response.success) {
                 console.log("socket.on game.create success " + window.location.pathname);
                 if (window.location.pathname != "/game" && window.location.pathname != "/") {
+                    if (document.getElementById("myDropdown")?.classList.contains("show"))
+                        document.getElementById("myDropdown")?.classList.toggle("show");
                     console.log("socket.on game.create success " + response.msg);
                     navigate('/game');
                 }

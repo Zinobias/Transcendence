@@ -125,7 +125,9 @@ export class Queries {
 			avatar = undefined;
 		else
 			avatar = await JSON.parse(findUser.avatar);
-		return new User(findUser.userId, findUser.userName, avatar); //TODO add avatar
+		const newUser : User = new User(findUser.userId, findUser.userName, avatar);
+		await newUser.init();
+		return newUser; //TODO add avatar
 	}
 
 	//Blocked users table
