@@ -413,10 +413,6 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'invite_game_user', 'This user has you blocked');
             return;
         }
-        if (this.inviteMap.has(user.userId) && this.inviteMap.get(user.userId).user_id == invitedUser.userId) {
-            this.util.emitFailedObject(data.user_id, 'invite_game_user', `You already an active game request for this user`);
-            return;
-        }
         const obj: GameUser = {
             user_id: invitedUser.userId,
             game_mode: data.game_mode
