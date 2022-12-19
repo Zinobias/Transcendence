@@ -61,7 +61,7 @@ export class Game {
 	 * @param payload event with data for moving.
 	 * @returns void
 	 */
-	private setPlayerMovementState(payload: MoveStateEvent) {
+	private async setPlayerMovementState(payload: MoveStateEvent) {
 
 		const		playerPaddle : PlayerPaddle = payload.userId == this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 
@@ -119,7 +119,7 @@ export class Game {
 	/**
 	 * Emits the score to all players and spectators in the game, in case of goal.
 	 */
-	private emitPlayerScore() : void {
+	private async emitPlayerScore() : Promise<void> {
 		this.eventEmitter.emit('game.emit.score', {
 			gameId : this.gameId
 		});
