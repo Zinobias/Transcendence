@@ -138,8 +138,8 @@ export class Channel {
             return false;
         if (foundSetting.until == -1)
             return true;
-        if (foundSetting.until > new Date().getTime())
-            return false;
+        if (foundSetting.until < new Date().getTime())
+            return true;
         Queries.getInstance().removeSetting(foundSetting.channelId, foundSetting.affectedId, foundSetting.setting);
         this._settings = this._settings.filter(setting => setting != foundSetting)
         return false;
