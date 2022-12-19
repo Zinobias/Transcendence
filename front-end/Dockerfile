@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM node:latest
-ENV NODE_ENV=development
+ENV NODE_ENV=PRODUCTION
 # SET ENV TO PRODUCTION WHEN DONE
 WORKDIR /usr/src/app
 
@@ -19,4 +19,4 @@ RUN npm install react-scripts@3.4.1 -g
 
 # Installed all dependencies, now we copy over the sourcecode
 COPY . .
-CMD ["npm", "start", "--watch"]
+CMD ["npm", "start"]
