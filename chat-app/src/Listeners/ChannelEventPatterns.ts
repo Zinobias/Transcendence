@@ -233,7 +233,7 @@ export class ChannelEventPatterns {
         channel.addUser(user);
         await Queries.getInstance().addChannelMember(data.channel_id, data.user_id);
 
-        this.channel_invites = this.channel_invites.filter(abc => abc.channel_id != data.channel_id || abc.invited_id != data.user_id);
+        this.channel_invites = this.channel_invites.filter(abc => abc.channel_id != data.channel_id && abc.invited_id != data.user_id);
 
         const userIds = channel.users.map((a) => a.userId);
         this.util.notify(userIds, 'channel_join', {
