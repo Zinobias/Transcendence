@@ -32,7 +32,7 @@ const   Leaderboard: React.FC = () => {
         console.log("emiting game.get.leaderboard");
 
         socket.on("game.get.leaderboard", response => {
-            if (response.success) {
+            if (response.success && response.leaderboard.length > 0) {
                 // empty leaderboard just to be sure
                 setLeaderboard([]);
                 console.log("socket.on game.get.leaderboard success");
@@ -77,14 +77,23 @@ const   Leaderboard: React.FC = () => {
     }
 
     return (
-        <div className="leaderboard">
-            {leaderboard.map((element, index) => (
-                <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} className="listLeaderboard">
-                    <span style={{float: "left"}}>{index+1}. <b> {returnName(element.id)}</b></span>
-                    <span style={{float: "right"}}>games won: <b>{element.count}</b></span><br/>
-                </div>
-            ))}
-        </div>
+        <>
+            {
+                leaderboard.length == 0 ?
+                    <div>
+                        Leaderboard currently empty.
+                    </div>
+                    :
+                    <div className="leaderboard">
+                        {leaderboard.map((element, index) => (
+                            <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} className="listLeaderboard">
+                                <span style={{float: "left"}}>{index+1}. <b> {returnName(element.id)}</b></span>
+                                <span style={{float: "right"}}>games won: <b>{element.count}</b></span><br/>
+                            </div>
+                        ))}
+                    </div>
+            }
+        </>
     )
 };
 
