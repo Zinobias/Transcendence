@@ -24,13 +24,11 @@ export class ApiController {
     @EventPattern('game')
     gameForwarding(@Payload() payload: any) {
         // this.logger.log(`Msg from game to gateway received`);
+		if (payload.eventPattern == `game.player.move`) {
+			if (payload.userId != payload.data.userId)
+				this.logger.warn(`Someone is sending an invalid userId for game player move`);
+		}
 		this.sockets.sendData(payload.userIds, payload.eventPattern, payload.data);
-		// for (const userid of payload.userIDs) {
-		// 	// this.sockets.sendData()
-		// 	this.sockets
-		// 		.getSocket(userid)
-		// 		?.emit(payload.eventPattern, payload.data);
-		// }
     }
 
     @EventPattern('testMsg')
