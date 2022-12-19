@@ -795,6 +795,9 @@ p.chatp {
     flex: 0.5;
     text-align: left;
     border-right: 2px solid black;
+    height: 100%;
+    overflow-y: auto; 
+    scrollbar-gutter: stable;
 }
 
 .footerChat__chat {
@@ -808,6 +811,9 @@ p.chatp {
     padding: 3px;
     text-align: left;
     border-left: 2px solid black;
+    height: 100%;
+    overflow-y: auto; 
+    scrollbar-gutter: stable;
 }
 
 .footerChat__show {
