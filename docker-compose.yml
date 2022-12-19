@@ -5,10 +5,10 @@ services:
     build: front-end
     ports:
       - "3000:3000"
-    # volumes:
-    #   - type: bind
-    #     source: ./front-end/
-    #     target: /usr/src/app/
+    volumes:
+       - type: bind
+         source: ./front-end/
+         target: /usr/src/app/
 
   chat_app:
     container_name: chat-app
@@ -20,10 +20,10 @@ services:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_HOST: "${POSTGRES_HOST}"
 
-    # volumes:
-    #   - type: bind
-    #     source: ./chat-app/
-    #     target: /usr/src/app/
+    volumes:
+       - type: bind
+         source: ./chat-app/
+         target: /usr/src/app/
 
   game_app:
     container_name: game-app
@@ -35,10 +35,10 @@ services:
       POSTGRES_DB: "${POSTGRES_DB}"
       POSTGRES_HOST: "${POSTGRES_HOST}"
 
-    # volumes:
-    #   - type: bind
-    #     source: ./game-app/
-    #     target: /usr/src/app/
+    volumes:
+       - type: bind
+         source: ./game-app/
+         target: /usr/src/app/
 
   gateway:
     container_name: gateway
@@ -57,10 +57,10 @@ services:
       WEB_HOST: "${WEB_HOST}"
       WEB_PORT: "${WEB_PORT}"
 
-    # volumes:
-    #   - type: bind
-    #     source: ./api-gateway/gateway
-    #     target: /usr/src/app/
+    volumes:
+       - type: bind
+         source: ./api-gateway/gateway
+         target: /usr/src/app/
 
   db:
     container_name: db
