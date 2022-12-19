@@ -187,7 +187,7 @@ export class ChannelEventPatterns {
             data.channel_id,
             'channel_join',
         );
-        if (channel == null) {
+        if (channel == null || channel.closed) {
             this.util.emitFailedObject(data.user_id, 'channel_join', `Unable to find the channel you're trying to join`);
             return;
         }
