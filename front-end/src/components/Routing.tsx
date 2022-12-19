@@ -12,15 +12,17 @@ import Guard  from './Guard';
 import Profile from './Profile';
 import { socket } from './Socket';
 import Spectate from './Spectate';
+import Invalidpage from './Invalidpage';
 
 const Routing: React.FC  = () => {
     const [cookies, setCookie, removeCookie] = useCookies(['user', 'userID']);
 
     return (
         <Routes>
-            {/* <Route path='/Login' element={cookies.user ? <NavBar /> : <Login />}/> */}
-            <Route path='/login' element={<Login />}/>
-            <Route path='/signup' element={<SignUp />}/>
+            <Route path='/login' element={cookies.user ? <Game /> : <Login />}/>
+            <Route path='/signup' element={cookies.user ? <Game /> : <Login />}/>
+            {/* <Route path='/login' element={<Login />}/> */}
+            {/* <Route path='/signup' element={<SignUp />}/> */}
             <Route path='/' element={<Guard outlet={<NavBar />} />}>
                 <Route index element={<Game />} />
                 <Route path='leaderboard' element={<Leaderboard />} />
@@ -28,6 +30,7 @@ const Routing: React.FC  = () => {
                 <Route path='spectate' element={<Spectate />} />
                 <Route path='chat' element={<Chat />} />
                 <Route path='profile' element={<Profile/>}/>
+                <Route path="*" element={<Invalidpage />} /> 
             </Route>
         </Routes>
     )

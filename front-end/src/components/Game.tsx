@@ -149,6 +149,12 @@ const   Game: React.FC = () => {
 
     return (
         <>
+
+            {/* <div className="aspect-ratio">
+                <div className="aspect-ratio__inner-wrapper">
+                </div>
+            </div> */}
+
             {/* <GameTestCanvas /> */}
 
             {

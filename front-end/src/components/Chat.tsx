@@ -50,14 +50,13 @@ const   Chat: React.FC = () => {
                     eventPattern: "get_channels_user",
                     data: {user_id: cookies.userID}
                 })
-                // if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
-                //     document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
                 console.log("emiting get_channels_user");
                 setState( state => !state);
             }
             else if (response.success == true && response.hasPassword == true) {
-                document.getElementById("pwChannel")?.classList.toggle("FormShow");
-                document.getElementById("noPwChannel")?.classList.toggle("FormHide");
+                console.log(`socket.on channel_create success ${response.channel_name} pw ${response.hasPassword}`);
+                document.getElementById("Channel")?.classList.toggle("channelShow");
+                document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");
                 setPwName( pwName => response.channel_name);
                 setPwId( pwId => response.channel_id);
             }
@@ -93,10 +92,6 @@ const   Chat: React.FC = () => {
             })
             console.log("emiting get_channels_user");
             setState( state => !state);
-            setPwName("");
-            setPwId(-1);
-            document.getElementById("pwChannel")?.classList.toggle("FormHide");
-            document.getElementById("noPwChannel")?.classList.toggle("FormShow");
         }
         else
             alert(`[${response.msg}]`);
@@ -182,7 +177,7 @@ const   Chat: React.FC = () => {
         <div className="newPwChannel" id="pwChannel">
             <form className="loginform">
                 <label className="loginform__label">Enter password for {pwName}</label>
-                <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
+                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
                 <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
             </form> 
         </div>

@@ -62,7 +62,7 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
                                 <form>
                                     <label className="pwform__label">password</label>
                                     <br/>
-                                    <input type="input" value={pw} onChange={(e)=>setPw(e.target.value)} className="pwform__input"/>
+                                    <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} className="pwform__input"/>
                                     <button className="pwform__button" onClick={(e) => handlePwJoin(e, element.channelId)}>enter</button>
                                 </form>
                             </div>

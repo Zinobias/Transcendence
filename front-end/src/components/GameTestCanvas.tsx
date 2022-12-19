@@ -14,6 +14,7 @@ const GameTestCanvas : React.FC = () => {
     useEffect(() => {
         const canvas : HTMLCanvasElement = document.getElementById('gameCanvas') as HTMLCanvasElement;
         const ctx = canvas.getContext("2d");
+        console.log(canvas.width + " " + canvas.height);
         if (ctx) {
             ctx.beginPath();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -36,14 +37,20 @@ const GameTestCanvas : React.FC = () => {
     
     return (
         <>
-            <div style={{width: `${canvasWidth}px`}}>
+            <div style={{width: "65%"}}>
                 <br/>
                 <span className='gameLeft' style={{fontSize: "35px", lineHeight: "0"}}>8</span>
                 <span className='gameRight' style={{fontSize: "35px",lineHeight: "0"}}>9</span><br/>
                 <span className='gameLeft'>Player 1</span>
                 <span className='gameRight'>Player 2</span>
             </div>
-            <canvas className="gameCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
+
+            <div className="aspect-ratio">
+                <div className="aspect-ratio__inner-wrapper">
+                    <canvas className="testCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
+                </div>
+            </div>
+
         </>
     )
 }

@@ -229,14 +229,18 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     
     return (
         <>
-            <div style={{width: `${canvasWidth}px`}}>
+            <div style={{width: "65%"}}>
                 <br/>
                 <span className='gameLeft' style={{fontSize: "35px", lineHeight: "0"}}>{p1Score}</span>
                 <span className='gameRight' style={{fontSize: "35px",lineHeight: "0"}}>{p2Score}</span><br/>
                 <span className='gameLeft'>{p1}</span>
                 <span className='gameRight'>{p2}</span>
             </div>
-            <canvas className="gameCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
+            <div className="aspect-ratio">
+                <div className="aspect-ratio__inner-wrapper">
+                    <canvas className="gameCanvas" id="gameCanvas" width={canvasWidth} height={canvasHeight} />
+                </div>
+            </div>
             {
                 winner &&
                 <>
