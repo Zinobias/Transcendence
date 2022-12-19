@@ -11,7 +11,7 @@ import { getRandomInt } from "./utils";
 const logger = new Logger('random game instance');
 
 export class Game {
-	public readonly player1	: PlayerData;
+	public readonly player1		: PlayerData;
 	public readonly player2 	: PlayerData;
 	private entities 			: Entity[];
 	private	playerPaddles		: PaddleGameData[];

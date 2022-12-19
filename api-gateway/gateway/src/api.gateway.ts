@@ -104,8 +104,8 @@ export class ApiGateway
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
             return;
         this.logger.debug(`auth works ${payload}`);
-        if (payload.eventPattern === 'game.player.move') {
-            if (payload.userId === undefined || payload.userId !== payload.data.userId)
+        if (payload.eventPattern == 'game.player.move') {
+            if (payload.userId === undefined || payload.userId != payload.data.userId)
                 return;
         }
         this.gameClient.emit(payload.eventPattern, payload.data);

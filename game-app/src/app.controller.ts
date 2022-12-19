@@ -397,7 +397,6 @@ export class AppController {
 		}
 		this.matchMakingService
 		.emitEvent('game.create', gameDTO);
-		// this.logger.debug(`Game created with id : [${gameId}]`);
 		this.logger.debug(`Game created for users ${gameDTO.player1UID} and ${gameDTO.player2UID}]`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
@@ -406,14 +405,8 @@ export class AppController {
 			data : {
 				success : 	true,
 				msg		: `Creating game for ${payload.player1UID} and ${payload.player2UID} succesfull`,
-				// gameId	: gameId
 			}
 		})
-
-		// return ({event : 'game.create', data : {
-		// 	success : true,
-		// 	msg		: `Successfully ccreated a game with gameId : [${gameId}]`
-		// }});
 	}
 
 	/**
