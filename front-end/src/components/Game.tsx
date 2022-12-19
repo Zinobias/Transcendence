@@ -127,12 +127,12 @@ const   Game: React.FC = () => {
                     data: { userId: cookies.userID }
                 });
             }
-            console.log("game.create success emitting game.get.gameInfo")
+            console.log("game.create success emitting game.get.activeGameId")
             socket.emit("game", {
                 userId: cookies.userID,
                 authToken: cookies.user,
-                eventPattern: "game.get.gameInfo", 
-                data: { userId: cookies.userID, gameId: gameResponse.gameId }
+                eventPattern: "game.get.activeGameId", 
+                data: { userId: cookies.userID }
             });
         }
     }
@@ -152,7 +152,7 @@ const   Game: React.FC = () => {
             {/* <GameTestCanvas /> */}
 
             {
-                gameInfo !== undefined ?
+                gameInfo != undefined ?
                 <GameCanvas gameInfo={gameInfo} setGameinfo={setGameinfo}/> :
                 <>  
                     {

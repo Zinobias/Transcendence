@@ -62,7 +62,7 @@ export class Game {
 	 */
 	private setPlayerMovementState(payload: MoveStateEvent) {
 
-		const		playerPaddle : PlayerPaddle = payload.userId === this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
+		const		playerPaddle : PlayerPaddle = payload.userId == this.player1.uid ? this.playerPaddles[0].playerPaddle : this.playerPaddles[1].playerPaddle;
 
 		switch (payload.keyEvent) {
 			case MoveStatePaddle.keyPressDown: {
