@@ -118,7 +118,7 @@ export class ChannelEventPatterns {
             hasPassword: data.should_get_password,
             channel_name: channel.channelName,
             channel_id: channel.channelId,
-            channel_users: channel.users,
+            channel_users: channel.users.map(user => user.getIUser()),
         });
     }
 

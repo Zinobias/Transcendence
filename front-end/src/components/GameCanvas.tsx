@@ -241,7 +241,7 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                 winner &&
                 <>
                 <p style={{fontSize: "30px", lineHeight: "0"}}>{winner} WON THE GAME!</p>
-                <button style={{marginTop: "0px"}}className="gameButton" onClick = {() => setGameinfo(gameInfo => undefined)}>QUEUE AGAIN</button>
+                <button style={{marginTop: "0px"}}className="gameButton" onClick = {() => setGameinfo(gameInfo => undefined)}>PLAY MORE</button>
                 </>
             }
         </>
