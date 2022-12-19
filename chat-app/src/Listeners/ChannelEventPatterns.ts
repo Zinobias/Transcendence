@@ -268,7 +268,7 @@ export class ChannelEventPatterns {
 
         if (channel.users.length == 0) {
             channel.closed = true;
-            await Queries.getInstance().setChannelVisibility(data.channel_id, false);
+            await Queries.getInstance().setClosed(data.channel_id, true);
             return;
         }
 
