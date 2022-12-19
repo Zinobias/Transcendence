@@ -245,6 +245,7 @@ export class AppController {
 			eventPattern : 'game.isInGame',
 			data : {
 				success : success,
+				requestedId : payload.requestedId,
 				msg : success === true ? "userId in game" : "userId not in game",
 			}
 		});

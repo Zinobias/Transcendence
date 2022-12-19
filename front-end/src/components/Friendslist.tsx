@@ -20,6 +20,34 @@ const Friendslist: React.FC<Props> = ({user}) => {
     const [cookies, setCookie] = useCookies(['user', 'userID']);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // console.log('This will run every second!');
+            if (document.getElementById("myDropdown")?.classList.contains("show")) {
+                let ids : number[] = user.friends.map(friend => friend.userId);
+
+                // console.log('This will run every second!');
+                socket.emit("check_online", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "check_online", 
+                    data: {userId: cookies.userID, checkIds: ids}
+                });
+        
+                user.friends.forEach((e : SmallUser) => {
+                    socket.emit("game", {
+                        userId: cookies.userID,
+                        authToken: cookies.user,
+                        eventPattern: "game.isInGame", 
+                        data: { userId: cookies.userID, requestedId: e.userId }
+                    });
+                })
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
         e.preventDefault();
         socket.emit("chat", {
