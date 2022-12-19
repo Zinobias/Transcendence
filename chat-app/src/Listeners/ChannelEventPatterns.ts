@@ -269,6 +269,12 @@ export class ChannelEventPatterns {
         if (channel.users.length == 0) {
             channel.closed = true;
             await Queries.getInstance().setClosed(data.channel_id, true);
+			this.util.notify([data.user_id], 'channel_leave', {
+				success: true,
+				msg: undefined,
+				channel_id: channel.channelId,
+				user_id: data.user_id,
+			});
             return;
         }
 
