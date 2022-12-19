@@ -20,7 +20,7 @@ const Routing: React.FC  = () => {
     return (
         <Routes>
             <Route path='/login' element={cookies.user ? <Game /> : <Login />}/>
-            <Route path='/signup' element={cookies.user ? <Game /> : <Login />}/>
+            <Route path='/signup' element={cookies.user ? <Game /> : <SignUp />}/>
             {/* <Route path='/login' element={<Login />}/> */}
             {/* <Route path='/signup' element={<SignUp />}/> */}
             <Route path='/' element={<Guard outlet={<NavBar />} />}>
