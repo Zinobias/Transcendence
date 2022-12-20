@@ -1,14 +1,8 @@
-import React, { useRef, useEffect, useContext, useState }  from 'react'
+import React, { useEffect, useContext, useState }  from 'react'
 import { useCookies } from 'react-cookie';
 import { IEntity, IGameInfo } from '../DTOs/frontend.DTOs.game.matchmaking';
 import { SocketContext } from './Socket';
 
-enum Move {
-	keyPressUp = 0,
-	keyReleaseUp = 1,
-	keyPressDown = 2,
-	keyReleaseDown = 3,
-}
 interface Props {
     gameInfo : IGameInfo;
     setGameinfo: React.Dispatch<React.SetStateAction<IGameInfo | undefined>> ;
@@ -33,10 +27,10 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const ogCanvHeight : number = 256;
 
     const mushroom = new Image();
-    mushroom.src = "https://i.imgur.com/G39eWqq.png";
+    mushroom.src = "./SourceImages/mushroom";
 
     const pepper = new Image();
-    pepper.src = "https://i.imgur.com/LPLy2U4.png";
+    pepper.src = "./SourceImages/pepper";
 
       
     // event listener for game events & get_name
@@ -164,7 +158,7 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     
     return (
         <>
-            <div style={{width: `${canvasWidth}px`}}>
+            <div style={{width: "65%"}}>
                 <br/>
                 <span className='gameLeft' style={{fontSize: "35px", lineHeight: "0"}}>{p1Score}</span>
                 <span className='gameRight' style={{fontSize: "35px",lineHeight: "0"}}>{p2Score}</span><br/>

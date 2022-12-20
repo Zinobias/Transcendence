@@ -582,6 +582,9 @@ export class ChannelEventPatterns {
             'channel_invite',
         );
 
+        if (channel == undefined)
+            this.util.emitFailedObject(data.user_id, 'channel_invite', `Invalid channelId`);
+
         if (channel.otherOwner != undefined) {
             this.util.emitFailedObject(data.user_id, 'channel_invite', `You can't invite users to a dm channel`);
             return;
@@ -593,6 +596,8 @@ export class ChannelEventPatterns {
             msg: undefined,
             inviter_id: data.user_id,
             channel_id: data.channel_id,
+            channel_name: channel.channelName,
+            has_password: channel.password == undefined ? false : true
         });
     }
 

@@ -9,11 +9,6 @@ interface Props {
     user: IUser;
 }
 
-/*
-	TO DO:
-	- Show online/offline
-	- Show ingame or now
-*/
 
 const Friendslist: React.FC<Props> = ({user}) => {
     const socket = useContext(SocketContext);
@@ -22,11 +17,9 @@ const Friendslist: React.FC<Props> = ({user}) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            // console.log('This will run every second!');
             if (document.getElementById("myDropdown")?.classList.contains("show")) {
                 let ids : number[] = user.friends.map(friend => friend.userId);
 
-                // console.log('This will run every second!');
                 socket.emit("check_online", {
                     userId: cookies.userID,
                     authToken: cookies.user,
@@ -79,28 +72,8 @@ const Friendslist: React.FC<Props> = ({user}) => {
         })
     }
 
-    /*
-        FRIEND REQUEST DIV
-
-    <div className="friendInvite">
-        <p><b>name</b> send you a friend request</p>
-        <button className="friendslistButton">Accept</button>
-        <button className="friendslistButton">Decline</button>
-    </div>
-
-    */
-    // const mapfriends = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    //     e.preventDefault();
-    //     console.log("click map");
-    //     user.friends.forEach((element : SmallUser) => {
-    //         console.log(element);
-    //     });
-    // }
-
-
     return (
         <>  
-            {/* <button className="friendslistButton" onClick={(e) => mapfriends(e)}>map</button> */}
             {user.friends.map((element, index) => (
                 <div key={index}>
                 {
@@ -118,10 +91,7 @@ const Friendslist: React.FC<Props> = ({user}) => {
                 <div key={index} className="friendslist">
                     {
                         e.state &&
-                        <>
                         <FriendslistUtils friend={e}/>
-                        {/* <div style={{cursor: "pointer"}} onClick={(event) => goToProfile(event, e.userId)}>{e.name}</div> */}
-                        </>
                     }
                 </div>
             ))}

@@ -15,32 +15,7 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
     const [online, setOnline] = useState<boolean>(false);
     const [inGame, setIngame] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         // console.log('This will run every second!');
-    //         if (document.getElementById("myDropdown")?.classList.contains("show")) {
-    //             // console.log('This will run every second!');
-
-    //             socket.emit("check_online", {
-    //                 userId: cookies.userID,
-    //                 authToken: cookies.user,
-    //                 eventPattern: "check_online", 
-    //                 data: {userId: cookies.userID, checkIds: [friend.userId]}
-    //             });
-        
-    //             socket.emit("game", {
-    //                 userId: cookies.userID,
-    //                 authToken: cookies.user,
-    //                 eventPattern: "game.isInGame", 
-    //                 data: { userId: cookies.userID, requestedId: friend.userId }
-    //             });
-    //         }
-    //     }, 1000);
-
-    //     return () => clearInterval(interval);
-    // }, []);
-
-    // get statusues on mount
+    // event listeners to get friend status
     useEffect(() => {
 
         socket.on("check_online", checkOnlineFriendslist);
@@ -76,27 +51,6 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
         })
     }
     
-    /*
-        friends status notes:
-
-        check if they are online or in game in an interval
-
-
-        ● ■
-        online color #06d60d 
-        offline color #d60606
-
-        <span style={{color: `{variable}`}}>●</span>
-        <span style={{fontWeight: "lighter"}}>in game</span>
-
-        <span style={online ? {color: "#06d60d"} : {color: "#d60606"}}>●</span>
-        {
-            inGame &&
-            <span style={{fontWeight: "lighter"}}>in game</span>
-        }
-                        
-    */
-
     return (
         <>
         <div style={{cursor: "pointer"}} onClick={(e) => goToProfile(e)}>{friend.name}<span style={online ? {color: "#06d60d"} : {color: "#d60606"}}> ●</span></div>

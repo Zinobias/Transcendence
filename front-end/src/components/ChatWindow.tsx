@@ -13,11 +13,6 @@ interface Props {
     setUpdateChannel: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-/*
-    NOTIFY NOTES
-    setNotify(notify => ({message: "has joined the channel.", sender: response.user_id, timestamp: -1}));
-*/
-
 const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel}) => {
 	
     const socket = useContext(SocketContext);
@@ -155,7 +150,6 @@ const   ChatWindow: React.FC<Props> = ({channel, updateChannel, setUpdateChannel
           element.scroll({
             top: element.scrollHeight,
             left: 0,
-            // behavior: "smooth"
           })
         }
     }, [inputRef, chat, channel])

@@ -6,14 +6,6 @@ import GameCanvas from "./GameCanvas";
 import GameTestCanvas from "./GameTestCanvas";
 import { IGameInfo } from "../DTOs/frontend.DTOs.game.matchmaking";
 
-
-/*
-    GAME TODO
-
-    call isInGame on mount to see if a player is still in a game and reconnect the player.
-    eventPattern : 'game.frame.update.' + gameInfo.gameId 
-*/
-
 const   Game: React.FC = () => {
     const socket = useContext(SocketContext);
     const [cookies, setCookie] = useCookies(['user', 'userID']);
@@ -84,7 +76,6 @@ const   Game: React.FC = () => {
             socket.off("game.leave.queue");
             
             // emit to leave queue when we leave the page
-            // console.log(`socket.emit game.leave.queue default`);
             socket.emit("game", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -149,11 +140,6 @@ const   Game: React.FC = () => {
 
     return (
         <>
-
-            {/* <div className="aspect-ratio">
-                <div className="aspect-ratio__inner-wrapper">
-                </div>
-            </div> */}
 
             {/* <GameTestCanvas /> */}
 

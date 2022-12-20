@@ -127,7 +127,6 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
 
     const setIdTemp = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, id : number) => {
         e.preventDefault();
-        // console.log(id);
         setChannelId(channelId => id);
     }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useContext } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 
@@ -20,7 +20,7 @@ export const DefaultMatchmaking: React.FC = () => {
 
     return (
         <div className="test">
-            <img src="https://i.imgur.com/D5ZGbzC.png" className="gamePicture"/>
+            <img src="./SourceImages/default" className="gamePicture"/>
             <button className="newButton" onClick={(e) => handleJoin(e)}>default</button>
         </div>
     )
@@ -45,7 +45,7 @@ export const DiscoMatchmaking: React.FC = () => {
 
     return (
         <div className="test">
-            <img src="https://i.imgur.com/G2PfTy4.png" className="gamePicture"/>
+            <img src="./SourceImages/discopong" className="gamePicture"/>
             <button className="gameDiscoButton" onClick={(e) => handleJoin(e)}>disco</button>
         </div>
     )

@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { SlSocialVkontakte } from 'react-icons/sl';
-import { UrlWithStringQuery } from 'url';
 import { IUser } from '../interfaces'
 import { UserFriendSettings, UserSettings } from './ProfileUserUtils';
 import { SocketContext } from './Socket';
@@ -24,7 +22,7 @@ interface INames {
 }
 
 const ProfileUser : React.FC<Props> = ({user, queryId}) => {
-    const defaultAvatar = "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png";
+    const defaultAvatar = "./SourceImages/default_avatar";
     const [cookies] = useCookies(['userID', 'user']);
     const socket = useContext(SocketContext);
     const [gamesWon, setGameswon] = useState<number>(0);

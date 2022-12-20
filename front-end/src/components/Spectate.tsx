@@ -3,7 +3,6 @@ import { useCookies } from 'react-cookie';
 import { SocketContext } from './Socket';
 import './Components.css';
 import { IGameInfo } from "../DTOs/frontend.DTOs.game.matchmaking";
-import { SocketAddress } from "net";
 import SpectateCanvas from "./SpectateCanas";
 
 interface INames {

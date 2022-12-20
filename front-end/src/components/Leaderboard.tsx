@@ -35,8 +35,6 @@ const   Leaderboard: React.FC = () => {
                 // empty leaderboard just to be sure
                 let tmpId : number[] = [];
                 setLeaderboard([]);
-                // console.log("socket.on game.get.leaderboard success");
-                // sort the leaderboard
                 response.leaderboard.sort((a : leaderboardArray, b: leaderboardArray) => (a.count < b.count) ? 1 : -1);
                 setLeaderboard(response.leaderboard);
                 response.leaderboard.forEach((entry : leaderboardArray) => {
