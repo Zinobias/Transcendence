@@ -81,7 +81,7 @@ export class ApiGateway
 
         if (payload.eventPattern.toLocaleLowerCase().startsWith('internal'))
             return;
-        if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
+        if (payload.data.user_id !== undefined && payload.userId != payload.data.user_id) {
             this.logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
             return;
         }

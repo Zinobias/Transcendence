@@ -417,6 +417,16 @@ export class RetrieveUserDataEventPatterns {
             user_id: invitedUser.userId,
             game_mode: data.game_mode
         }
+
+        const invitee = this.inviteMap.get(data.user_id);
+		if (invitee != undefined) {
+			this.util.notify([invitee.user_id], 'remove_game_invite', {
+				success: true,
+				msg: `Invitation expired`,
+				inviter_id: data.user_id,
+			});
+		}
+
         this.inviteMap.set(user.userId, obj)
         this.util.notify([data.user_id, data.request_user_id], 'invite_game_user', {
             success: true,
@@ -440,13 +450,8 @@ export class RetrieveUserDataEventPatterns {
             this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', 'Unable to retrieve invited user');
             return;
         }
-        if (!this.inviteMap.has(invitingUser.userId)) {
-            this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request from this user`);
-            return;
-        }
-
         const gameUser = this.inviteMap.get(invitingUser.userId);
-        if (gameUser.user_id != user.userId) {
+        if (gameUser == undefined || gameUser.user_id != user.userId) {
             this.util.emitFailedObject(data.user_id, 'accept_invite_game_user', `There is no active request for you from this user`);
             return;
         }
@@ -465,7 +470,34 @@ export class RetrieveUserDataEventPatterns {
         this.inviteMap.delete(data.request_user_id);
         this.gateway.emit('chat_to_game', obj);
     }
+
+	@EventPattern('decline_invite_game_user')
+    async declineGameRequest(data: AcceptGameRequest) {
+        const user: User = await this.util.getUser(data.user_id, 'decline_invite_game_user');
+
+        if (user == undefined) {
+            this.util.emitFailedObject(data.user_id, 'decline_invite_game_user', 'Unable to retrieve user');
+            return;
+        }
+        const invitingUser: User = await this.util.getUser(data.request_user_id, 'decline_invite_game_user');
+        if (invitingUser == undefined) {
+            this.util.emitFailedObject(data.user_id, 'decline_invite_game_user', 'Unable to retrieve invited user');
+            return;
+        }
+        const invitee = this.inviteMap.get(invitingUser.userId);
+        if (invitee != undefined && invitee.user_id == user.userId)
+			this.inviteMap.delete(data.request_user_id);
+
+        this.util.notify([data.user_id, data.request_user_id], 'decline_invite_game_user', {
+            success: true,
+            msg: `invitation has been declined successfully`,
+            user: user.userId,
+            request_user_id: invitingUser.userId,
+        });
+    }
 }
+
+
 
 interface GameRequest {
 	player1UID	: number;
