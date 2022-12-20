@@ -13,7 +13,7 @@ COPY package-lock.json ./
 
 # npm install will download all dependencies defined in package.json
 # into node_modules
-RUN npm install --production
+RUN npm install
 # RUN npm install react-scripts@3.4.1 -g
 
 # Installed all dependencies, now we copy over the sourcecode

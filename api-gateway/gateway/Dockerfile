@@ -13,9 +13,12 @@ COPY ["./package.json", "./package-lock.json*", "./"]
 
 # # npm install will download all dependencies defined in package.json
 # # into node_modules
+RUN npm install -g @nestjs/cli
+
 RUN npm install
 
 # # Installed all dependencies, now we copy over the sourcecode
 COPY . .
 EXPOSE 8081 8082 8084
+RUN npm run build
 CMD ["npm", "run", "start:prod"]

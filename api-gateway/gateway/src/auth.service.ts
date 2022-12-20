@@ -87,12 +87,9 @@ export class Auth {
             return undefined;
         }
         if (!await this.queries.userExists(userId)) {
-            return undefined; //TODO fix this to return a proper error messages
+            return undefined;
         }
 		this.sockets.storeSocket(userId, client);
-        /**
-         * TODO: Check if user in dataBase
-         */
 		const uuid = randomUUID();
         const has2FA = await this.TFA.hasTwoFA(userId);
 		if (has2FA === Has2FA.HAS_TFA) {
