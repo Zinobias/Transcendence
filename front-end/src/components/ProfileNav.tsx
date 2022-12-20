@@ -207,14 +207,6 @@ const ProfileNav: React.FC = () => {
         setPw(pw => undefined); 
         setChannelInvites(channelInvites => channelInvites.filter((element) => element.channelId != channelId));
     }
-    /*
-        channel invite notes:
-
-        if user gets an invite -> channel_info_retrieve_by_id to see if the channel has a pw or not
-        if pw prompt to enter it
-        
-        call channel join with invite id and pw if needed 
-    */
 
     return (
         <div className="profileNav">
