@@ -17,8 +17,8 @@ const Friendslist: React.FC<Props> = ({user}) => {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (document.getElementById("myDropdown")?.classList.contains("show")) {
-                let ids : number[] = user.friends.map(friend => friend.userId);
+            if (document.getElementById("myDropdown")?.classList.contains("show") && user.friends.length > 0) {
+                let ids : number[]  = user.friends.map(friend => friend.userId);
 
                 socket.emit("check_online", {
                     userId: cookies.userID,
@@ -28,12 +28,14 @@ const Friendslist: React.FC<Props> = ({user}) => {
                 });
         
                 user.friends.forEach((e : SmallUser) => {
-                    socket.emit("game", {
-                        userId: cookies.userID,
-                        authToken: cookies.user,
-                        eventPattern: "game.isInGame", 
-                        data: { userId: cookies.userID, requestedId: e.userId }
-                    });
+                    if (e.state) {
+                        socket.emit("game", {
+                            userId: cookies.userID,
+                            authToken: cookies.user,
+                            eventPattern: "game.isInGame", 
+                            data: { userId: cookies.userID, requestedId: e.userId }
+                        });
+                    }
                 })
             }
         }, 1000);
