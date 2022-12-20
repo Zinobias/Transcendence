@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM node:latest
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 # SET ENV TO PRODUCTION WHEN DONE
 WORKDIR /usr/src/app
 
@@ -18,4 +18,4 @@ RUN npm install
 # # Installed all dependencies, now we copy over the sourcecode
 COPY . .
 EXPOSE 8081 8082 8084
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod"]

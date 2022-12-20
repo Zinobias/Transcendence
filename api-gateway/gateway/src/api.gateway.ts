@@ -123,7 +123,7 @@ export class ApiGateway
 		const online: number[] = []
 		const offline: number[] = []
 		// this.logger.debug("event check_online " + payload.data.checkIds);
-		for (let i = 0; i < payload.data.checkIds.length; i++) {
+		for (let i = 0; i < payload.data.checkIds?.length; i++) {
 			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.data.checkIds[i]);
 			if (socketList != undefined && socketList.length != 0) {
 				online.push(payload.data.checkIds[i])

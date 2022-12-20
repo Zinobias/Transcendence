@@ -1,7 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM node:latest
 ENV NODE_ENV=development
-# SET ENV TO PRODUCTION WHEN DONE
 WORKDIR /usr/src/app
 
 # Metadata for npm
@@ -15,7 +14,7 @@ COPY package-lock.json ./
 # npm install will download all dependencies defined in package.json
 # into node_modules
 RUN npm install --production
-RUN npm install react-scripts@3.4.1 -g
+# RUN npm install react-scripts@3.4.1 -g
 
 # Installed all dependencies, now we copy over the sourcecode
 COPY . .
