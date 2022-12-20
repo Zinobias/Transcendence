@@ -222,7 +222,7 @@ const ProfileNav: React.FC = () => {
     return (
         <div className="profileNav">
             <img
-                src="./SourceImages/profile_icon"
+                src="./SourceImages/profile_icon.png"
                 alt="defaultAvatar"
                 className="profileNav__avatar"
                 onClick={(e) => toggleProfile(e)}

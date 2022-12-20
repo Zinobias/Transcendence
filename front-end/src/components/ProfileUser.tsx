@@ -22,7 +22,7 @@ interface INames {
 }
 
 const ProfileUser : React.FC<Props> = ({user, queryId}) => {
-    const defaultAvatar = "./SourceImages/default_avatar";
+    const defaultAvatar = "./SourceImages/default_avatar.png";
     const [cookies] = useCookies(['userID', 'user']);
     const socket = useContext(SocketContext);
     const [gamesWon, setGameswon] = useState<number>(0);

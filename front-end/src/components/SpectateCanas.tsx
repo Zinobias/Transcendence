@@ -27,10 +27,10 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const ogCanvHeight : number = 256;
 
     const mushroom = new Image();
-    mushroom.src = "./SourceImages/mushroom";
+    mushroom.src = "./SourceImages/mushroom.png";
 
     const pepper = new Image();
-    pepper.src = "./SourceImages/pepper";
+    pepper.src = "./SourceImages/pepper.png";
 
       
     // event listener for game events & get_name

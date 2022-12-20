@@ -20,7 +20,7 @@ export const DefaultMatchmaking: React.FC = () => {
 
     return (
         <div className="test">
-            <img src="./SourceImages/default" className="gamePicture"/>
+            <img src="./SourceImages/default.png" className="gamePicture"/>
             <button className="newButton" onClick={(e) => handleJoin(e)}>default</button>
         </div>
     )
@@ -45,7 +45,7 @@ export const DiscoMatchmaking: React.FC = () => {
 
     return (
         <div className="test">
-            <img src="./SourceImages/discopong" className="gamePicture"/>
+            <img src="./SourceImages/discopong.png" className="gamePicture"/>
             <button className="gameDiscoButton" onClick={(e) => handleJoin(e)}>disco</button>
         </div>
     )
