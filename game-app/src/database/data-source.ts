@@ -20,7 +20,7 @@ export class Database {
     }
 
     async onApplicationBootstrap() {
-        this.dataSource
+        await this.dataSource
             .initialize()
             .then(async () => {
                 console.log('Connection initialized with database...');
