@@ -1,6 +1,6 @@
 
 import React, { useEffect, useContext, useState } from "react";
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 
@@ -29,7 +29,6 @@ export const   LogoutButton: React.FC = () => {
         });
         removeCookie('user');
         removeCookie('userID');
-        // window.location.reload();
     };
 
     return (
@@ -111,6 +110,7 @@ export const    SignupButton: React.FC = () => {
                 <input type="input" onChange={(e)=>setUserName(e.target.value)} placeholder="name" className="loginform__input"/>
                 <button className="loginform__button"  onClick={(e) => handleClick(e)}>CREATE ACCOUNT</button>
             </form>
+            <br/><span>Already have an account? Go to <Link to="/login" style={{ textDecoration: "none", color: "black" }}><b>Login!</b></Link></span>
         </>
     )
 };
@@ -231,6 +231,7 @@ export const    LoginButton: React.FC = () => {
     return (
         <div className="loginButtonDIV">
             <button className="loginButton" id="loginButton" onClick={(e) => handleClick(e)}>LOGIN</button>
+            <br/><span>Not signed up yet? Create an <Link to="/signup" style={{ textDecoration: "none", color: "black" }}><b>Account!</b></Link></span>
         </div>
     )
 };
