@@ -16,6 +16,7 @@ import {
 import {User} from '../Objects/User';
 import {Queries} from '../Database/Queries';
 import {Friend} from "../Objects/Friend";
+import {mapGetter} from "../map.tools";
 
 @Controller()
 export class RetrieveUserDataEventPatterns {
@@ -418,7 +419,8 @@ export class RetrieveUserDataEventPatterns {
             game_mode: data.game_mode
         }
 
-        const invitee = this.inviteMap.get(data.user_id);
+
+        const invitee = mapGetter(data.user_id, this.inviteMap);
 		if (invitee != undefined) {
 			this.util.notify([invitee.user_id], 'remove_game_invite', {
 				success: true,
