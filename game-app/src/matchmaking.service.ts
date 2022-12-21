@@ -103,7 +103,7 @@ export class MatchMakingService {
 	public isInQueue(uid : number) : boolean {
 		for (let gameMode of this.matchMakingQueue.entries()) {
 			for (let user of gameMode[1]) {
-				if (uid === user)
+				if (uid == user)
 					return (true);
 			}
 		}
@@ -135,7 +135,7 @@ export class MatchMakingService {
 	public removeFromQueue(uuid : number) {
 		for (let gameMode of this.matchMakingQueue.entries()) {
 			let index = gameMode[1].findIndex((g) => {
-				return (g === uuid);
+				return (g == uuid);
 			});
 			if (index !== -1) {
 				//this.logger.debug("Leaving queue : {" + gameMode[0]+ "}");				
@@ -216,7 +216,7 @@ export class MatchMakingService {
 	 */
 	public removeGameFromList(gameId : number) {
 			let index = this.gameList.findIndex((ref) => {
-				return (ref.gameId === gameId);
+				return (ref.gameId == gameId);
 			})
 			if (index !== -1)
 				this.gameList.splice(index, 1);
@@ -249,7 +249,7 @@ export class MatchMakingService {
 	 */
 	public getGameInfo(gameId : number) : GameInfo | undefined {
 		return (this.gameList.find((e) => {
-			return (e.gameId === gameId);
+			return (e.gameId == gameId);
 		}));
 	}
 
@@ -260,7 +260,7 @@ export class MatchMakingService {
 	 */
 	public getIGameInfo(gameId : number) : IGameInfo | undefined {
 		let gameInfo : GameInfo | undefined = this.gameList.find((e) => {
-			return (e.gameId === gameId);
+			return (e.gameId == gameId);
 		});
 		if (gameInfo !== undefined) 
 			return <IGameInfo>(this.createIGameInfo(gameInfo))
@@ -308,7 +308,7 @@ export class MatchMakingService {
 	 */
 	public async removeSpectator(userId : number, targetGameId : number) {
 		for (let game of this.gameList) {
-			if (game.gameId === targetGameId) {
+			if (game.gameId == targetGameId) {
 				if (game.frameSubscribers?.includes(userId) === true) {
 					if (userId == game.player1 || userId == game.player2)
 						return true;
