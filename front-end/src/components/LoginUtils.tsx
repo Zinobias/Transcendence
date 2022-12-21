@@ -208,8 +208,10 @@ export const    LoginButton: React.FC = () => {
     useEffect(() => {
         function checkUserData() {
             if (sessionStorage.getItem("2fa")) {
-                setShowTwoFA(showTwoFA => true)
+                setShowTwoFA(showTwoFA => true);
             }
+            else
+                setShowTwoFA(showTwoFA => false);
         }
         window.addEventListener('storage', checkUserData)
         return () => {
@@ -231,11 +233,19 @@ export const    LoginButton: React.FC = () => {
         // sessionStorage.clear();
     }
 
+    const backToLogin = (e : React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.preventDefault();
+        sessionStorage.clear();
+        setShowTwoFA(showTwoFA => false);
+        navigate('/login');
+    }
+
     if (showTwoFA) {
         return (
             <div className="loginButtonDIV">
                 <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="loginTwoFA_input"/>
                 <button className="loginButton" onClick={(e) => handleTwoFA(e)}>submit 2fa token</button>
+                <br/><span>Go back to <b style={{cursor: "pointer"}} onClick={(e) => backToLogin(e)}>Login!</b></span>
             </div>
         )
     }
