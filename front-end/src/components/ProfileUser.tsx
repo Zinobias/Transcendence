@@ -35,12 +35,13 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     // get user stats and update on user change
     useEffect(() => {
         
+        setGamehistory([]);
         socket.on("game.user.get.history", response => {
             if (response.success) {
                 let lost : number = 0;
                 let won : number = 0;
                 let ids : number[] = [];
-                console.log("get game history success");
+                // console.log("get game history success");
                 response.history.forEach((e : any) => {
                     setGamehistory(gamehistory => [...gamehistory, {
                         createAt: e.createAt, 

@@ -96,7 +96,7 @@ const   Game: React.FC = () => {
             // console.log(response.msg);
             // console.log(`socket.emit game.get.activeGameId`);
         }
-        console.log(response.msg);
+        // console.log(response.msg);
     }
 
     function getGameInfoInGame (response : any) {
