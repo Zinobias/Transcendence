@@ -20,18 +20,18 @@ export class AppGateway
   private logger: Logger = new Logger('AppGateway');
 
   afterInit(server: Server) {
-    this.logger.log('Init');
+    // this.logger.log('Init');
   }
 
   // private static clientMap = new Map();
   // private static socketMap = new Map();
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
+    // this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
+    // this.logger.log(`Client connected: ${client.id}`);
     // const newVar: number = AppGateway.clientMap.get(client.id);
     // if (newVar != undefined) {
     //   AppGateway.socketMap.delete(newVar);

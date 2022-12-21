@@ -48,8 +48,8 @@ export class Auth {
             this.logger.debug(`Storing session token for user: [${userId}] token: [${accessToken}]`)
             this.map.set(userId, accessToken);
         }
-        else
-            Logger.warn(`Received undefined accessToken when loading session for user id [${userId}]`)
+        // else
+            // Logger.warn(`Received undefined accessToken when loading session for user id [${userId}]`)
     }
 
     private async auth(token: string, signup: boolean): Promise<number | undefined> {

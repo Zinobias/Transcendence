@@ -31,7 +31,7 @@ export class Util {
     public getChannel(channelId: number, source: string): Channel {
         const channel: Channel = Channel.getChannel(channelId);
         if (channel == null) {
-            this.logger.warn(`Received invalid channel id [${channelId}] from [${source}]`);
+            // this.logger.warn(`Received invalid channel id [${channelId}] from [${source}]`);
             return undefined;
         }
         return channel;
@@ -40,7 +40,7 @@ export class Util {
     public async getUser(userId: number, source: string): Promise<User | undefined> {
         const user: User = await User.getUser(userId);
         if (user == null) {
-            this.logger.warn(`Received invalid user id [${userId}] from [${source}]`);
+            // this.logger.warn(`Received invalid user id [${userId}] from [${source}]`);
             return undefined;
         }
         return user;
@@ -57,7 +57,6 @@ export class Util {
     public userInChannel(channel: Channel, userId: number, source: string, invert: boolean): boolean {
         if (invert) {
             if (channel.hasUser(userId)) {
-                this.logger.debug(`User [${userId}] should be in channel for ${source}`);
                 return false;
             }
             return true;
@@ -79,7 +78,6 @@ export class Util {
      */
     public notAdmin(channel: Channel, actorId: number, source: string): boolean {
         if (!channel.isAdmin(actorId)) {
-            this.logger.debug(`Actor [${actorId}] is not an admin and can't issue the request ${source}`);
             return true;
         }
         return false;
@@ -109,7 +107,6 @@ export class Util {
      */
     public notOwner(channel: Channel, actorId: number, source: string): boolean {
         if (!channel.isOwner(actorId)) {
-            this.logger.debug(`Actor [${actorId}] is not an owner and can't issue the request ${source}`);
             return true;
         }
         return false;

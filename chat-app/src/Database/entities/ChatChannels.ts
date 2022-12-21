@@ -13,7 +13,6 @@ export class chat_channels {
     constructor(channel?: Channel) {
         if (channel == undefined)
             return;
-        this.logger.debug(`Initializing channel: ${channel}`);
         this.ownerId = channel.owner;
         this.owner2Id = channel.otherOwner;
         this.channelName = channel.channelName;

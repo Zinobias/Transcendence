@@ -18,7 +18,7 @@ export class AppController {
   @EventPattern('testMsg')
   receiveInit(@Payload() payload: any) {
     this.gateway.emit('testMsg', 'msg from chat-app');
-    this.logger.log('chat msg from gateway received');
+    // this.logger.log('chat msg from gateway received');
   }
 }
 

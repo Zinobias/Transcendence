@@ -96,7 +96,7 @@ export class Queries {
 			else
 				return true;
         } catch (e) {
-            Logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`)
+            // Logger.warn(`Unable to run userExists check query for [${userId}] see error: ${e}`)
         }
         return false;
     }
@@ -111,7 +111,7 @@ export class Queries {
         try { //Store the user in the database
             await userTableRepo.insert(new UserTable(userId, userName, null));
         } catch (e) {
-            Logger.warn(`Unable to run save user query for [${userId}] see error: ${e}`)
+            // Logger.warn(`Unable to run save user query for [${userId}] see error: ${e}`)
             return `Unknown error while saving the user in the database`;
         }
         return true;

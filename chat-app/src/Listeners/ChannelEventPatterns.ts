@@ -101,13 +101,12 @@ export class ChannelEventPatterns {
         const channelId = await Queries.getInstance().createChannel(channel);
         if (channelId == -1) {
             this.util.emitFailedObject(data.user_id, 'channel_create', 'Unable to create a new channel');
-            this.logger.warn(`Received invalid channel [${channelId}] from channel_create`);
+            // this.logger.warn(`Received invalid channel [${channelId}] from channel_create`);
             return;
         }
         channel.channelId = channelId;
         usersArr.forEach(a => {
             if (a != undefined) {
-                this.logger.debug(`Adding user: [${a.userId}] to new channel: [${channelId}]`);
                 Queries.getInstance().addChannelMember(channelId, a.userId);
             }
         });

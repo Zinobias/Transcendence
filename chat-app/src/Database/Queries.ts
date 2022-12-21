@@ -351,7 +351,7 @@ export class Queries {
 		for (const [, result] of find_channel.entries()) {
 			let resultChannel = Channel.getChannel(result.channelId);
 			if (resultChannel === undefined) {
-				Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
+				// Logger.warn(`Unable to retrieve public channel ${result.channelId} while retrieving all public channels.`)
 				continue;
 			}
 			channelList.push(resultChannel);
