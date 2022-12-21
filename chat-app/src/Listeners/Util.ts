@@ -65,7 +65,7 @@ export class Util {
         if (channel.hasUser(userId)) {
             return true;
         }
-        this.logger.debug(`User [${userId}] should not be in channel for ${source}`);
+        // this.logger.debug(`User [${userId}] should not be in channel for ${source}`);
         return false;
     }
 
@@ -92,7 +92,7 @@ export class Util {
      */
     public isAdminButShouldNotBe(channel: Channel, actorId: number, source: string): boolean {
         if (channel.isAdmin(actorId)) {
-            this.logger.debug(`Actor [${actorId}] is an admin and can't be affected by the request ${source}`);
+            // this.logger.debug(`Actor [${actorId}] is an admin and can't be affected by the request ${source}`);
             return true;
         }
         return false;
