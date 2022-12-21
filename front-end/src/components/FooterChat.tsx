@@ -18,7 +18,7 @@ const FooterChat: React.FC = () => {
     // event listener
     useEffect(() => {
         socket.on("channel_retrieve_by_id", response => {
-            console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName} ${response.channel.channelId}`)
+            // console.log(`socket.on channel_retrieve_by_id ${response.channel.channelName} ${response.channel.channelId}`)
             setChannel(channel => response.channel);
         })
 
@@ -37,7 +37,7 @@ const FooterChat: React.FC = () => {
                 data: { user_id: cookies.userID, 
                         channel_id: channelId }
             });
-            console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
+            // console.log(`socket.emit channel_retrieve_by_id ${channelId}`);
         }
     }, [channelId, updateChannel])
 

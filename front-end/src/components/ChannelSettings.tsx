@@ -26,7 +26,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                 data: { user_id: cookies.userID, 
                         channel_id: channel.channelId }
             });
-            console.log("emiting channel_retrieve_by_id");
+            // console.log("emiting channel_retrieve_by_id");
         }
     }
 
@@ -48,7 +48,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
           eventPattern: "channel_leave",
           data: {user_id: cookies.userID, channel_id: channel.channelId}
         })
-        console.log("emiting channel_leave");
+        // console.log("emiting channel_leave");
         document.getElementById("chatSettings")?.classList.toggle("footerChat__show");
     }
 	
@@ -72,7 +72,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                 eventPattern: "channel_update_password", 
                 data: {user_id: cookies.userID, channel_id: channel.channelId, password: Md5.hashStr(pw + channel.channelId)}
             });
-            console.log(`emitting channel_update_password`);
+            // console.log(`emitting channel_update_password`);
             setPw("");
             document.getElementById("settingsPasswordDropDown")?.classList.toggle("settingsPasswordShow");
             document.getElementById("passwordSetButton")?.classList.toggle("settingsPasswordHide");
@@ -86,7 +86,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
             eventPattern: "channel_update_password", 
             data: {user_id: cookies.userID, channel_id: channel.channelId, password: undefined}
         });
-        console.log(`emitting channel_update_password`);
+        // console.log(`emitting channel_update_password`);
     }
 
     function findAdmin (userId : number) : boolean {

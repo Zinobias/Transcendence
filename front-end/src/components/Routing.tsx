@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Routes, Route } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import Login from './Login';
@@ -10,7 +10,6 @@ import NavBar from './NavBar';
 import SignUp from './SignUp';
 import Guard  from './Guard';
 import Profile from './Profile';
-import { socket } from './Socket';
 import Spectate from './Spectate';
 import Invalidpage from './Invalidpage';
 

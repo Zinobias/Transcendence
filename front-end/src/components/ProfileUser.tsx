@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { SlSocialVkontakte } from 'react-icons/sl';
-import { UrlWithStringQuery } from 'url';
 import { IUser } from '../interfaces'
 import { UserFriendSettings, UserSettings } from './ProfileUserUtils';
 import { SocketContext } from './Socket';
@@ -24,7 +22,7 @@ interface INames {
 }
 
 const ProfileUser : React.FC<Props> = ({user, queryId}) => {
-    const defaultAvatar = "https://ynnovate.it/wp-content/uploads/2015/04/default-avatar.png";
+    const defaultAvatar = "./SourceImages/default_avatar.png";
     const [cookies] = useCookies(['userID', 'user']);
     const socket = useContext(SocketContext);
     const [gamesWon, setGameswon] = useState<number>(0);
@@ -45,7 +43,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                 let lost : number = 0;
                 let won : number = 0;
                 let ids : number[] = [];
-                console.log("get game history success");
+                // console.log("get game history success");
                 response.history.forEach((e : any) => {
                     setGamehistory(gamehistory => [...gamehistory, {
                         createAt: e.createAt, 
@@ -61,7 +59,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                             eventPattern: "get_name", 
                             data: { user_id: cookies.userID, requested_user_id: e.userId1 == user.userId ? e.userId2 : e.userId1 }
                         });
-                        console.log("emit to get_name " + (e.userId1 == user.userId ? e.userId2 : e.userId1));
+                        // console.log("emit to get_name " + (e.userId1 == user.userId ? e.userId2 : e.userId1));
                     }
                     e.winnerId == user.userId ? won++ : lost++;
                 })
@@ -107,12 +105,12 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     function gameIsInGameInProfile (response : any) {
         if (response.success)
             setIngame(inGame => true);
-        console.log(response.msg);
+        // console.log(response.msg);
     }
 
     function getNameInProfile (response : any) {
         if (response.success) {
-            console.log("get_name success " + response.requested_name);
+            // console.log("get_name success " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
     }

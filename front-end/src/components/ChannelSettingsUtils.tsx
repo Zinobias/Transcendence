@@ -36,7 +36,7 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
             eventPattern: "channel_demote",
             data: {user_id: cookies.userID, channel_id:channel.channelId, affected_id: memberUserID}
         })
-        console.log("emitting channel_demote");
+        // console.log("emitting channel_demote");
     }
 
     const handlePromote = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -47,7 +47,7 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
             eventPattern: "channel_promote",
             data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID}
         })
-        console.log(`emitting channel_promote ${channel.channelId} ${memberUserID}`);
+        // console.log(`emitting channel_promote ${channel.channelId} ${memberUserID}`);
     }
 
     const handleMute = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -58,7 +58,7 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
             eventPattern: "channel_mute_user",
             data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
         })
-        console.log(`emitting channel_mute_user`);
+        // console.log(`emitting channel_mute_user`);
     }
 
     const handleBan = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -69,7 +69,7 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
             eventPattern: "channel_ban",
             data: {user_id: cookies.userID, channel_id: channel.channelId, affected_id: memberUserID, until: returnDate()}
         })
-        console.log(`emitting channel_ban`);
+        // console.log(`emitting channel_ban`);
     }
 
     const gameInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, gameMode : string) => {
@@ -80,7 +80,7 @@ const ChannelSettingsUtils: React.FC<Props> = ({channel, memberUserID}) => {
             eventPattern: "invite_game_user",
             data: {user_id: cookies.userID, request_user_id: memberUserID, game_mode: gameMode}
         })
-        console.log(`emitting invite_game_user`);
+        // console.log(`emitting invite_game_user`);
     }
 
     function isAdmin (userId : number) : boolean {

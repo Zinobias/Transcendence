@@ -23,7 +23,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 
         socket.on("remove_2fa", response => {
             if (response.success) {
-                console.log("socket.on remove_2fa success");
+                // console.log("socket.on remove_2fa success");
                 setHasTwoFA(hasTwoFA => false);
             }
             else
@@ -32,7 +32,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 
         socket.on("enable_2fa", response => {
             if (response.success) {
-                console.log("socket.on enable_2fa success");
+                // console.log("socket.on enable_2fa success");
                 setQrcode(response.qrCode);
                 // toggle verify menu
                 document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
@@ -43,7 +43,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
 
         socket.on("verify_2fa", response => {
             if (response.success) {
-                console.log("socket.on varify_2fa success");
+                // console.log("socket.on varify_2fa success");
                 setHasTwoFA(hasTwoFA => true);
             }
             else
@@ -51,9 +51,14 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         })
 
         socket.on("update_avatar", response => {
-            // maybe update the user profile?
-            if (response.success)
-                console.log("update avatar succes");
+            if (response.success) {
+                socket.emit("chat", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "get_user", 
+                    data: { user_id: cookies.userID, requested_user_id: cookies.userID }
+                })
+            }
         }) 
 
         socket.emit("isEnabled_2fa", {
@@ -87,7 +92,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
                         new_avatar: selectedImage as Blob
                     }
                 });
-                console.log('emitting update_avatar');   
+                // console.log('emitting update_avatar');   
             }
         }
     }, [selectedImage])
@@ -101,7 +106,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
             eventPattern: "enable_2fa", 
             data: {user_id: cookies.userID}
         });
-        console.log(`emiting enable_2fa`);
+        // console.log(`emiting enable_2fa`);
     }
 
     // VERIFY THE 2FA TOKEN AFTER SCANNING
@@ -113,7 +118,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
             eventPattern: "verify_2fa", 
             data: {TFAToken: token}
         });
-        console.log(`emiting verify_2fa`);
+        // console.log(`emiting verify_2fa`);
         document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
         setToken("");
         setQrcode("");
@@ -128,7 +133,7 @@ export const UserSettings : React.FC<Props> = ({user}) => {
             eventPattern: "remove_2fa", 
             data: {TFAToken: token}
         });
-        console.log(`emitting remove_2fa`);
+        // console.log(`emitting remove_2fa`);
         document.getElementById("disable_TwoFA")?.classList.toggle("twoFA_show")
         setToken("");
     }
@@ -192,7 +197,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 });
             }
             else 
-            console.log(response.msg);
+            // console.log(response.msg);
         })
 
         socket.on('unblock_user', response => {
@@ -205,7 +210,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                 });
             }
             else 
-            console.log(response.msg);
+            // console.log(response.msg);
             
         });
 
@@ -220,7 +225,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             if (response.channel != undefined) {
                 if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
                 document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
-                console.log("already in a dm with that user");
+                // console.log("already in a dm with that user");
             }
             else {
                 socket.emit("chat", {
@@ -233,7 +238,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                             visible: false, 
                             should_get_password: false }
                         });
-                        console.log("not in a dm with that user");
+                        // console.log("not in a dm with that user");
                     }
         });
 
@@ -277,7 +282,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "friend_request",
             data: {user_id: cookies.userID, friend_id: user.userId}
         })
-        console.log(`emitting friend_request`);
+        // console.log(`emitting friend_request`);
     }
 
     const removeFriend = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -288,7 +293,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "un_friend",
             data: {user_id: cookies.userID, friend_id: user.userId}
         })
-        console.log(`emitting un_friend`);
+        // console.log(`emitting un_friend`);
     }
 
     const blockUser = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -299,7 +304,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "block_user",
             data: {user_id: cookies.userID, blocked_id: user.userId}
         })
-        console.log(`emitting block_user`);
+        // console.log(`emitting block_user`);
     }
 
     const unblockUser = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -310,7 +315,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "unblock_user",
             data: {user_id: cookies.userID, blocked_id: user.userId}
         })
-        console.log(`emitting unblock_user`);
+        // console.log(`emitting unblock_user`);
     }
 
     const gameInvite = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, gameMode : string) => {
@@ -321,7 +326,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "invite_game_user",
             data: {user_id: cookies.userID, request_user_id: user.userId, game_mode: gameMode}
         })
-        console.log(`emitting invite_game_user`);
+        // console.log(`emitting invite_game_user`);
     }
 
     const directMessage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -333,7 +338,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "get_dm_channel",
             data: {user_id: cookies.userID, other_user_id: user.userId}
         })
-        console.log(`emitting get_dm_channel`)
+        // console.log(`emitting get_dm_channel`)
     }
 
     const channelRequest = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -345,7 +350,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             eventPattern: "get_chatrooms_user",
             data: {user_id: cookies.userID}
         })
-        console.log(`emitting to get_chatrooms_user`);
+        // console.log(`emitting to get_chatrooms_user`);
     }
 
     const channelInvite = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, channelId : number) => {

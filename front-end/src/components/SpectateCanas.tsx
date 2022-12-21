@@ -1,14 +1,8 @@
-import React, { useRef, useEffect, useContext, useState }  from 'react'
+import React, { useEffect, useContext, useState }  from 'react'
 import { useCookies } from 'react-cookie';
 import { IEntity, IGameInfo } from '../DTOs/frontend.DTOs.game.matchmaking';
 import { SocketContext } from './Socket';
 
-enum Move {
-	keyPressUp = 0,
-	keyReleaseUp = 1,
-	keyPressDown = 2,
-	keyReleaseDown = 3,
-}
 interface Props {
     gameInfo : IGameInfo;
     setGameinfo: React.Dispatch<React.SetStateAction<IGameInfo | undefined>> ;
@@ -33,16 +27,14 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const ogCanvHeight : number = 256;
 
     const mushroom = new Image();
-    mushroom.src = "https://i.imgur.com/G39eWqq.png";
+    mushroom.src = "./SourceImages/mushroom.png";
 
     const pepper = new Image();
-    pepper.src = "https://i.imgur.com/LPLy2U4.png";
+    pepper.src = "./SourceImages/pepper.png";
 
       
     // event listener for game events & get_name
     useEffect(() => {
-        console.log("Canvas component did mount with gameId " + gameInfo.gameId);
-
         // request player names on mount
         socket.emit("chat", {
             userId: cookies.userID,
@@ -87,7 +79,6 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     }
 
     function gameEndedSpectate (response : any) {
-        console.log("socket.on game.ended winner " + response.winner);
         setWinner(winner => (response.winner == gameInfo.players.player1 ? p1 : p2));
     }
 
@@ -159,12 +150,11 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
             eventPattern: "game.spectate.stop", 
             data: { userId: cookies.userID, targetGameId: gameInfo.gameId }
         });
-        console.log("emitting game.spectate.sttop for game " + gameInfo.gameId);
     }
     
     return (
         <>
-            <div style={{width: `${canvasWidth}px`}}>
+            <div style={{width: "65%"}}>
                 <br/>
                 <span className='gameLeft' style={{fontSize: "35px", lineHeight: "0"}}>{p1Score}</span>
                 <span className='gameRight' style={{fontSize: "35px",lineHeight: "0"}}>{p2Score}</span><br/>

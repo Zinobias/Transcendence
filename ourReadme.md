@@ -6,5 +6,10 @@
 4. POSTGRES_HOST: "db" // postgres hostname
 5. SECRET: 		// Secret of 42intra application
 6. CLIENT:		// Client id of 42intra application
-7. WEB_HOST: "localhost" // hostname.
+7. WEB_HOST: "localhost" or "f1r3s14.codam.nl"// hostname.
 8. WEB_PORT: "3000" // Port for applications to connect to.
+
+# frontend react env
+
+REACT_APP_WEB_HOST=localhost
+REACT_APP_WEB_HOST=$HOST // this should work too

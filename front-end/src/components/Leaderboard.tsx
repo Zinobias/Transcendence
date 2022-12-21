@@ -3,8 +3,7 @@ import { useCookies } from "react-cookie";
 import { SocketContext } from "./Socket";
 
 interface leaderboardArray {
-    name?: string;
-    id: number;
+    winnerId: number;
     count: number;
 }
 
@@ -29,29 +28,31 @@ const   Leaderboard: React.FC = () => {
             eventPattern: "game.get.leaderboard", 
             data: {userId: cookies.userID}
         });
-        console.log("emiting game.get.leaderboard");
+        // console.log("emiting game.get.leaderboard");
 
         socket.on("game.get.leaderboard", response => {
             if (response.success && response.leaderboard.length > 0) {
                 // empty leaderboard just to be sure
+                let tmpId : number[] = [];
                 setLeaderboard([]);
-                console.log("socket.on game.get.leaderboard success");
-                // sort the leaderboard
                 response.leaderboard.sort((a : leaderboardArray, b: leaderboardArray) => (a.count < b.count) ? 1 : -1);
-                response.leaderboard.forEach((e : any) => {
-                    // set array and emit to get names
-                    setLeaderboard(leaderboard => [...leaderboard, {id: e.winnerId, count: e.count}]);
-                    socket.emit("chat", {
-                        userId: cookies.userID,
-                        authToken: cookies.user,
-                        eventPattern: "get_name", 
-                        data: { user_id: cookies.userID, requested_user_id: e.winnerId }
-                    });
+                setLeaderboard(response.leaderboard);
+                response.leaderboard.forEach((entry : leaderboardArray) => {
+                    if (!tmpId.find((id) => id == entry.winnerId)) {
+                        tmpId.push(entry.winnerId);
+                        socket.emit("chat", {
+                            userId: cookies.userID,
+                            authToken: cookies.user,
+                            eventPattern: "get_name", 
+                            data: { user_id: cookies.userID, requested_user_id: entry.winnerId }
+                        });
+                        // console.log("emitting get name");
+                    }
 
                 });
             }
-            else 
-                console.log(response.msg);
+            // else 
+            //     console.log(response.msg);
         })
 
         socket.on("get_name", getNameInLeaderboard);
@@ -65,7 +66,7 @@ const   Leaderboard: React.FC = () => {
     // get_name event listener function
     function getNameInLeaderboard (response : any) {
         if (response.success) {
-            console.log("get_name success " + response.requested_name);
+            // console.log("get_name success leaderboard " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
     }
@@ -87,7 +88,7 @@ const   Leaderboard: React.FC = () => {
                     <div className="leaderboard">
                         {leaderboard.map((element, index) => (
                             <div key={index} style={index%2 ? {backgroundColor: "#4b4b4b"} : {}} className="listLeaderboard">
-                                <span style={{float: "left"}}>{index+1}. <b> {returnName(element.id)}</b></span>
+                                <span style={{float: "left"}}>{index+1}. <b> {returnName(element.winnerId)}</b></span>
                                 <span style={{float: "right"}}>games won: <b>{element.count}</b></span><br/>
                             </div>
                         ))}

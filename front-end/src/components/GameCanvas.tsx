@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext, useState }  from 'react'
+import React, { useEffect, useContext, useState }  from 'react'
 import { useCookies } from 'react-cookie';
 import { IEntity, IGameInfo } from '../DTOs/frontend.DTOs.game.matchmaking';
 import { SocketContext } from './Socket';
@@ -13,20 +13,6 @@ interface Props {
     gameInfo : IGameInfo;
     setGameinfo: React.Dispatch<React.SetStateAction<IGameInfo | undefined>> ;
 };
-
-/* 
-    CANVA NOTES
-
-        width/x = 1024
-        height/y = 512
-
-        i get pos x/y ->    x = w/2 + x*2 
-                            y = h/2 + y*2
-
-        clear all rects ->
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-*/
 
 const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const socket = useContext(SocketContext);
@@ -49,10 +35,10 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     const ogCanvHeight : number = 256;
 
     const mushroom = new Image();
-    mushroom.src = "https://i.imgur.com/G39eWqq.png";
+    mushroom.src = "./SourceImages/mushroom.png";
 
     const pepper = new Image();
-    pepper.src = "https://i.imgur.com/LPLy2U4.png";
+    pepper.src = "./SourceImages/pepper.png";
 
     // emit key input
     useEffect(() => {
@@ -65,7 +51,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressUp }
                 });
-                // console.log(`socket.emit ${event.key} is being pressed for user ${cookies.userID}`);
             }
             if (event.key === "ArrowDown" && down === false) {
                 setDown(down => true);
@@ -75,7 +60,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressDown }
                 });
-                // console.log(`socket.emit ${event.key} is being pressed for user ${cookies.userID}`);
             }
         };
 
@@ -88,7 +72,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseUp }
                 });             
-                // console.log(`socket.emit ${event.key} is being released for user ${cookies.userID}`)
             }
             if (event.key === "ArrowDown") {
                 setDown(down => false);
@@ -98,7 +81,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseDown }
                 });
-                // console.log(`socket.emit ${event.key} is being released for user ${cookies.userID}`)
             }
         };
 
@@ -114,8 +96,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
    
     // event listener for game events & get_name
     useEffect(() => {
-        console.log("Canvas component did mount with gameId " + gameInfo.gameId);
-
         // request player names on mount
         socket.emit("chat", {
             userId: cookies.userID,
@@ -160,7 +140,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     }
 
     function gameEnded (response : any) {
-        console.log("socket.on game.ended winner " + response.winner);
         setWinner(winner => (response.winner == gameInfo.players.player1 ? p1 : p2));
     }
 
@@ -211,7 +190,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                         ctx.fillStyle = '#ffffff';
                     ctx.fillRect(getX(e.pos.x, e.width), getY(e.pos.y, e.height), (e.width*2), (e.height*2));
                 }
-                //ctx.fillRect(getX(e.pos.x, e.width), getY(e.pos.y, e.height), (e.width*2), (e.height*2));
             });
             ctx.stroke();
         }

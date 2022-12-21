@@ -1,6 +1,5 @@
-
 import React, { useEffect, useContext, useState } from "react";
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 
@@ -22,14 +21,13 @@ export const   LogoutButton: React.FC = () => {
 
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        console.log("click logout");
+        // console.log("click logout");
         socket.emit("logout", {
             userId: cookies.userID,
             authToken: cookies.user
         });
         removeCookie('user');
         removeCookie('userID');
-        // window.location.reload();
     };
 
     return (
@@ -51,14 +49,14 @@ export const    SignupButton: React.FC = () => {
     useEffect(() => {
         socket.on("create_account", response => {
             if (response.success == false) {
-                console.log("Create Account went wrong");
+                // console.log("Create Account went wrong");
                 searchParams.delete("code");
                 setSearchParams(searchParams);
                 alert(response.msg);
             }
             else {
-                console.log("socket.on create_acconut " + response.DTO.auth_cookie);
-                console.log("socket.on create_acocunt " + response.DTO.user_id);
+                // console.log("socket.on create_acconut " + response.DTO.auth_cookie);
+                // console.log("socket.on create_acocunt " + response.DTO.user_id);
                 setCookie('user', response.DTO.auth_cookie, {path: '/'});
                 setCookie('userID', response.DTO.user_id, {path: '/'});
                 navigate('/');
@@ -78,7 +76,7 @@ export const    SignupButton: React.FC = () => {
     // ON MOUNT
     useEffect(() => {
         if (searchParams.get("code")) {
-            console.log("emitting create_account " + sessionStorage.getItem("userName"));
+            // console.log("emitting create_account " + sessionStorage.getItem("userName"));
             socket.emit("auth", {
                 eventPattern: "create_account", 
                 data: {
@@ -95,7 +93,7 @@ export const    SignupButton: React.FC = () => {
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
         if (userName) {
-            console.log("Redirecting signup " + userName);
+            // console.log("Redirecting signup " + userName);
             sessionStorage.setItem("userName", userName);
             window.location.href = signup;
         }
@@ -111,6 +109,7 @@ export const    SignupButton: React.FC = () => {
                 <input type="input" onChange={(e)=>setUserName(e.target.value)} placeholder="name" className="loginform__input"/>
                 <button className="loginform__button"  onClick={(e) => handleClick(e)}>CREATE ACCOUNT</button>
             </form>
+            <br/><span>Already have an account? Go to <Link to="/login" style={{ textDecoration: "none", color: "black" }}><b>Login!</b></Link></span>
         </>
     )
 };
@@ -129,13 +128,13 @@ export const    LoginButton: React.FC = () => {
     useEffect(() => {
         socket.on("login", response => {
             if (response.success == false) {
-                console.log("Login went wrong");
+                // console.log("Login went wrong");
                 searchParams.delete("code");
                 setSearchParams(searchParams => searchParams);
                 alert(response.msg);
             }
             else if (response.success == true && !response.DTO.auth_cookie) {
-                console.log("socket.on login success setting up 2fa");
+                // console.log("socket.on login success setting up 2fa");
                 if (sessionStorage.getItem("2fa")) {
                     alert("The Token you entered was invalid");
                     searchParams.delete("code");
@@ -147,8 +146,8 @@ export const    LoginButton: React.FC = () => {
                 }
             }
             else if (response.success == true && response.DTO.auth_cookie) {
-                console.log("socket.on login " + response.DTO.auth_cookie);
-                console.log("socket.on login " + response.DTO.user_id);
+                // console.log("socket.on login " + response.DTO.auth_cookie);
+                // console.log("socket.on login " + response.DTO.user_id);
                 sessionStorage.clear();
                 setCookie('user', response.DTO.auth_cookie, {path: '/'});
                 setCookie('userID', response.DTO.user_id, {path: '/'});
@@ -167,14 +166,12 @@ export const    LoginButton: React.FC = () => {
     // ON MOUNT
     useEffect(() => {
         if (searchParams.get("code") && sessionStorage.getItem("token")) {
-            console.log("emitting login 2fa" + searchParams.get("code"));
             socket.emit("auth", {
                 eventPattern: "login", 
                 data: {token: searchParams.get("code"), TFAToken: sessionStorage.getItem("token")}
             });
         }
         else if (searchParams.get("code") && !sessionStorage.getItem("token")) {
-            console.log("emitting login " + searchParams.get("code"));
             socket.emit("auth", {
                 eventPattern: "login", 
                 data: {token: searchParams.get("code")}
@@ -183,7 +180,6 @@ export const    LoginButton: React.FC = () => {
 
         if (sessionStorage.getItem("2fa")) {
             setShowTwoFA(showTwoFA => true)
-            console.log("setting state boolean");
         }
 
         socket.emit('retrieve_redirect', {});
@@ -194,7 +190,6 @@ export const    LoginButton: React.FC = () => {
         function checkUserData() {
             if (sessionStorage.getItem("2fa")) {
                 setShowTwoFA(showTwoFA => true)
-                console.log("setting state boolean");
             }
         }
         window.addEventListener('storage', checkUserData)
@@ -205,7 +200,6 @@ export const    LoginButton: React.FC = () => {
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        console.log("redirecting login");
         window.location.href = login;
         // sessionStorage.clear();
     };
@@ -213,7 +207,6 @@ export const    LoginButton: React.FC = () => {
     const handleTwoFA = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         sessionStorage.setItem("token", token);
-        console.log("redirecting 2fa login");
         setToken("");
         window.location.href = login;
         // sessionStorage.clear();
@@ -231,6 +224,7 @@ export const    LoginButton: React.FC = () => {
     return (
         <div className="loginButtonDIV">
             <button className="loginButton" id="loginButton" onClick={(e) => handleClick(e)}>LOGIN</button>
+            <br/><span>Not signed up yet? Create an <Link to="/signup" style={{ textDecoration: "none", color: "black" }}><b>Account!</b></Link></span>
         </div>
     )
 };

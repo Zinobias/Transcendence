@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useContext } from "react";
 import { useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 
@@ -15,12 +15,12 @@ export const DefaultMatchmaking: React.FC = () => {
             eventPattern: "game.join.queue", 
             data: { userId: cookies.userID, gameMode: "DEFAULT" }
         });
-        console.log(`socket.emit game.join.queue default`);
+        // console.log(`socket.emit game.join.queue default`);
     };
 
     return (
         <div className="test">
-            <img src="https://i.imgur.com/D5ZGbzC.png" className="gamePicture"/>
+            <img src="./SourceImages/default.png" className="gamePicture"/>
             <button className="newButton" onClick={(e) => handleJoin(e)}>default</button>
         </div>
     )
@@ -40,12 +40,12 @@ export const DiscoMatchmaking: React.FC = () => {
             eventPattern: "game.join.queue", 
             data: { userId: cookies.userID, gameMode: "DISCOPONG" }
         });
-        console.log(`socket.emit game.join.queue default`);
+        // console.log(`socket.emit game.join.queue default`);
     };
 
     return (
         <div className="test">
-            <img src="https://i.imgur.com/G2PfTy4.png" className="gamePicture"/>
+            <img src="./SourceImages/discopong.png" className="gamePicture"/>
             <button className="gameDiscoButton" onClick={(e) => handleJoin(e)}>disco</button>
         </div>
     )
@@ -64,7 +64,7 @@ export const LeavetMatchmaking: React.FC = () => {
             eventPattern: "game.leave.queue", 
             data: { userId: cookies.userID }
         });
-        console.log(`socket.emit game.leave.queue`);
+        // console.log(`socket.emit game.leave.queue`);
     };
 
     return (

@@ -245,6 +245,7 @@ export class AppController {
 			eventPattern : 'game.isInGame',
 			data : {
 				success : success,
+				requestedId : payload.requestedId,
 				msg : success === true ? "userId in game" : "userId not in game",
 			}
 		});
@@ -256,7 +257,7 @@ export class AppController {
 	 * @param Payload { userId : string}
 	 */
 	@EventPattern('game.get.activeGameId')
-	getActiveGameId(@Payload() payload : any) {
+	async getActiveGameId(@Payload() payload : any) {
 		let ret = this.matchMakingService.getUserActiveGameId(payload.userId);
 		// this.logger.log(`getActivegameId called, user ${payload.userId} is in game ${ret}`);
 
@@ -287,7 +288,7 @@ export class AppController {
 	 * @param Payload { userId : string}
 	 */
 	@EventPattern('game.isInQueue')
-	isInQueue(@Payload() payload : any) {
+	async isInQueue(@Payload() payload : any) {
 		this.logger.log("isInQueue called");
 
 		let success : boolean = this.matchMakingService.isInQueue(payload.userId);
@@ -308,7 +309,7 @@ export class AppController {
 	 * @param payload 
 	 */
 	@EventPattern('game.get.gameList')
-	getGameList(@Payload() payload : any) {
+	async getGameList(@Payload() payload : any) {
 		this.logger.log("getGameList called");
 
 		let gameListRet = this.matchMakingService.getIGameInfoList();
@@ -343,7 +344,7 @@ export class AppController {
 	 * @returns 
 	 */
 	@EventPattern('game.get.gameInfo')
-	getGameInfo(@Payload() payload : any) {
+	async getGameInfo(@Payload() payload : any) {
 		// this.logger.log("getGameInfo called");
 
 		let gameInfoRet = this.matchMakingService.getIGameInfo(payload.gameId);

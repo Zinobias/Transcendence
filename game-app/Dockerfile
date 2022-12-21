@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM node:latest
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 # SET ENV TO PRODUCTION WHEN DONE
 WORKDIR /usr/src/app
 
@@ -13,9 +13,11 @@ COPY ["./package.json", "./package-lock.json*", "./"]
 
 # # npm install will download all dependencies defined in package.json
 # # into node_modules
-RUN npm install
+RUN npm install -g @nestjs/cli
+RUN npm install 
 
 # # Installed all dependencies, now we copy over the sourcecode
 COPY . .
+RUN npm run build
 EXPOSE 8080 9000 3001
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:prod"]

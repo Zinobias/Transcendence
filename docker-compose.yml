@@ -11,6 +11,8 @@ services:
     #     target: /usr/src/app/
 
   chat_app:
+    depends_on:
+      - "db"
     container_name: chat-app
     build: chat-app
 
@@ -26,6 +28,8 @@ services:
     #     target: /usr/src/app/
 
   game_app:
+    depends_on:
+      - "db"
     container_name: game-app
     build: game-app
 
@@ -41,6 +45,8 @@ services:
     #     target: /usr/src/app/
 
   gateway:
+    depends_on:
+      - "db"
     container_name: gateway
     build: api-gateway/gateway
     ports:

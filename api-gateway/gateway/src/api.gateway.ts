@@ -45,8 +45,6 @@ export class ApiGateway
 
     async onApplicationBootstrap() {
         this.logger.log(`Starting bootstrap gateway...`);
-        this.gameClient.emit('testMsg', 'msg from frontend');
-        this.chatClient.emit('testMsg', 'msg from frontend');
     }
 
     //private clientList: { userID: number };
@@ -69,10 +67,6 @@ export class ApiGateway
     // TODO: make sure it is storing the userID
     handleConnection(client: Socket, ...args: any[]) {
         this.logger.log(`Client connected: ${client.id} ${args[0]}`);
-        // this.sockets.storeSocket(args[0] as number, client); /*This shouldn't be needed as auth handles that*/
-        client.emit('wssTest', {message: 'Connected to the websocketServer'}); // relays back to frontend
-        this.gameClient.send('testMsg', {message: 'random message from gateway'}); // to game
-        this.gameClient.emit('testMsg', 'user connected to frontend');
     }
 
     handleDisconnect(client: Socket) {
@@ -85,13 +79,12 @@ export class ApiGateway
     handleChat(client: Socket, payload: FrontEndDTO) {
 		this.sockets.storeSocket(payload.userId!, client);
 
-        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
+        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal'))
             return;
-        if (payload.data.user_id !== undefined && payload.userId !== payload.data.user_id) {
+        if (payload.data.user_id !== undefined && payload.userId != payload.data.user_id) {
             this.logger.warn(`Received invalid payload from ${payload.userId}, the user id in the payload was set to ${payload.data.userId}!`)
             return;
         }
-        // this.logger.debug(`Received event from frontend on ${payload.eventPattern}`)
         this.chatClient.emit(payload.eventPattern, payload.data);
     }
 
@@ -99,11 +92,8 @@ export class ApiGateway
     @SubscribeMessage('game')
     handleGame(client: Socket, payload: FrontEndDTO) {
 		this.sockets.storeSocket(payload.userId!, client);
-
-        //TODO verify auth
-        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal')) //TODO Move to auth guard
+        if (payload.eventPattern.toLocaleLowerCase().startsWith('internal'))
             return;
-        // this.logger.debug(`auth works ${payload}`);
         if (payload.eventPattern == 'game.player.move') {
             if (payload.userId === undefined || payload.userId != payload.data.userId)
                 return;
@@ -111,30 +101,30 @@ export class ApiGateway
         this.gameClient.emit(payload.eventPattern, payload.data);
     }
 
-    //   @SubscribeMessage('auth')
-    //     async handleAuth(client: Socket, payload: any) {
-    //     this.logger.debug("auth event " + payload.code);
-    //     await this.auth.auth(client, payload);
-    //   }
-
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('check_online')
 	async handleCheckOnline(client: Socket, payload: any) {
 		const online: number[] = []
 		const offline: number[] = []
-		// this.logger.debug("event check_online " + payload.data.checkIds);
-		for (let i = 0; i < payload.data.checkIds.length; i++) {
-			const socketList: Socket[] | undefined = this.sockets.getSocket(payload.data.checkIds[i]);
-			if (socketList != undefined && socketList.length != 0) {
-				online.push(payload.data.checkIds[i])
-			} else {
-				offline.push(payload.data.checkIds[i])
+		
+			if (payload === undefined || payload.data.checkIds === undefined || payload.data.checkIds?.length === undefined) {
+				this.logger.warn(`CheckIds in payload from frontend is undefined.`);
+				return {
+					event: `check_online`,
+					data: {
+						onlineUsers: online,
+						offlineUsers: offline
+					}
+				};
 			}
-		}
-		// client.emit('check_online', {
-		// 	onlineUsers: online,
-		// 	offlineUsers: offline
-		// });
+			for (let i = 0; i < payload.data.checkIds?.length; i++) {
+				const socketList: Socket[] | undefined = this.sockets.getSocket(payload.data.checkIds[i]);
+				if (socketList != undefined && socketList?.length != 0) {
+					online.push(payload.data.checkIds[i])
+				} else {
+					offline.push(payload.data.checkIds[i])
+				}
+			}
 		return {
 			event: `check_online`,
 			data: {
@@ -230,15 +220,22 @@ export class ApiGateway
     @SubscribeMessage('enable_2fa') 
 	async enableTwoFactorAuthentication(client : Socket, payload : FrontEndDTO) {
 		this.sockets.storeSocket(payload.userId!, client);
-		if (!payload.userId) // might not be neccessary due to authguard
-		return ({
-			event : 'enable_2fa',
-			data : {
-				success : false,
-				msg 	: 'enabling 2fa failed, invalid userId : undefined'
-			}
-		});
-		// CHECK IF ALREADY IN DB, IF IN DB, RETURN FAILED.
+		if (!payload.userId)
+			return ({
+				event : 'enable_2fa',
+				data : {
+					success : false,
+					msg 	: 'enabling 2fa failed, invalid userId : undefined'
+				}
+			});
+		const hasTFA : Has2FA = await this.TFA.hasTwoFA(payload.userId);
+		if (hasTFA == Has2FA.HAS_TFA || hasTFA == Has2FA.ERROR) {
+			return ({event : 'enable_2fa', data : {
+				success : 	false,
+				msg		: 	'Already has 2FA protection, or the db failed.',
+				qrCode 	:	undefined,
+			}});
+		}
 		this.logger.log(`user [${payload.userId}] calling enable 2fa`);
 		let qrCode : string | undefined = await this.TFA.generateSecret(payload.userId);
 		let success : boolean = qrCode !== undefined;
@@ -373,7 +370,6 @@ export class ApiGateway
 	@UseGuards(AuthGuard)
 	@SubscribeMessage('logout')
 	async logoutUser(client : Socket, payload : FrontEndDTO) {
-		// this.sockets.sendData([payload.userId!], 'logout', {sucess: true});
 		client.emit('logout', {sucess: true})
 		await this.queries.removeAllSessions(payload.userId!);
 		this.sockets.removeAllSocketsUser(payload.userId!);

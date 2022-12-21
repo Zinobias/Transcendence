@@ -25,7 +25,7 @@ const Profile: React.FC = () => {
     // event listener function
     function getUserInChat (response : any) {
         if (response.success && response.user.userId == Number(searchParams.get("id"))) {
-            console.log("get_user success profile");
+            // console.log("get_user success profile"); 
             setUser(user => response.user);
         }
     }
@@ -41,7 +41,7 @@ const Profile: React.FC = () => {
                     requested_user_id: searchParams.get("id")
                 }
             });
-            console.log(`emiting get_user ${searchParams.get("id")}`);
+            // console.log(`emiting get_user ${searchParams.get("id")}`);
         }
     }, [searchParams]) 
 

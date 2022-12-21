@@ -93,12 +93,14 @@ export interface ChannelInviteAccept {
     user_id: number
     inviter_id: number
     channel_id: number
+    channel_name: string
 }
 
 export interface ChannelInviteDeny {
     user_id: number
     inviter_id: number
     channel_id: number
+    channel_name: string
 }
 
 export interface DmChannel {
