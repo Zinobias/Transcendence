@@ -41,7 +41,7 @@ const Friendslist: React.FC<Props> = ({user}) => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [user]);
 
     const handleAccept = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
         e.preventDefault();

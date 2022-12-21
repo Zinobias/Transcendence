@@ -265,7 +265,6 @@ export class ChannelEventPatterns {
 
         channel.removeUser(data.user_id);
         await Queries.getInstance().removeChannelMember(data.channel_id, data.user_id);
-
         if (channel.users.length == 0) {
             channel.closed = true;
             await Queries.getInstance().setClosed(data.channel_id, true);

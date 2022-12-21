@@ -78,14 +78,6 @@ const   Chat: React.FC = () => {
 
     function channelCreateInChat (response : any) {
         if (response.success == true && response.hasPassword == false) {
-            // console.log(`socket.on channel_create success ${response.channel_name}`);
-            socket.emit("chat", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "get_channels_user",
-                data: {user_id: cookies.userID}
-            })
-            // console.log("emiting get_channels_user");
             setState( state => !state);
         }
         else if (response.success == true && response.hasPassword == true) {
@@ -96,7 +88,7 @@ const   Chat: React.FC = () => {
             setPwId( pwId => response.channel_id);
         }
         else
-        alert(`[${response.msg}]`);
+            alert(`[${response.msg}]`);
     }
 
     // helper functions

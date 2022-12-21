@@ -68,13 +68,13 @@ const ProfileNav: React.FC = () => {
                 if (response.friend == cookies.userID) {
                     setState(state => !state);
                     if (document.getElementById("myDropdown")?.classList.contains("show") == false)
-                        document.getElementById("myDropdown")?.classList.toggle("show");
+                    document.getElementById("myDropdown")?.classList.toggle("show");
                 }
             }
             // else
             //     console.log(`socket.on friend_request fail ${response.msg}`);
         })
-
+        
         socket.on("decline_friend_request", response => {
             if (response.success && response.user == cookies.userID) {
                 // console.log(`socket.on decline_friend_request success`);
@@ -83,16 +83,16 @@ const ProfileNav: React.FC = () => {
             // else if (!response.success)
             //     console.log(`socket.on decline_friend_request fail ${response.msg}`)
         })
-
+        
         socket.on("accept_friend_request", response => {
             if (response.success) {
                 // console.log(`socket.on accept_friend_request success`);
                 setState(state => !state);
-            // }
+            }
             // else
             //     console.log(`socket.on accept_friend_request fail ${response.msg}`);
         })
-
+        
         socket.on("un_friend", response => {
             if (response.success) {
                 // console.log(`socket.on un_friend success`);
@@ -101,30 +101,26 @@ const ProfileNav: React.FC = () => {
             // else
             //     console.log(`socket.on un_friend fail ${response.msg}`);
         })
-
+        
         socket.on("game.create", response => {
             if (response.success) {
                 // console.log("socket.on game.create success " + window.location.pathname);
                 if (window.location.pathname != "/game" && window.location.pathname != "/") {
                     if (document.getElementById("myDropdown")?.classList.contains("show"))
-                        document.getElementById("myDropdown")?.classList.toggle("show");
+                    document.getElementById("myDropdown")?.classList.toggle("show");
                     // console.log("socket.on game.create success " + response.msg);
                     navigate('/game');
                 }
             }
         })
-
-        socket.on("remove_game_invite", response => {
-            setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != response.inviter_id));
-        });
-
+                
         socket.on("get_active_invites", response => {
             setChannelInvites([]);
             response.invites.forEach((element : any) => {
                 setChannelInvites(channelInvites => [...channelInvites, {fromUserId: element.inviter_id, channelId: response.channel_id, channelName: response.channel_name}]);
             });
         })
-
+        
         socket.on("channel_invite", response => {
             if (response.success) {
                 // we are setting our channel invites
@@ -135,22 +131,46 @@ const ProfileNav: React.FC = () => {
                 }])
             }
             else
-                console.log(response.msg);
+            console.log(response.msg);
         });
-
-
+        
+        socket.on("channel_create", createChannelInProfile);
+        
         return () => {
             socket.off("get_user");
             socket.off("friend_request");
             socket.off("accept_friend_request");
             socket.off("un_friend");
             socket.off("game.create");
-            socket.off("remove_game_invite");
             socket.off("get_active_invites");
             socket.off("channel_invite")
+            socket.off("channel_create", createChannelInProfile);
         }
     }, [])
 
+    useEffect(() => {
+        socket.on("remove_game_invite", response => {
+            console.log("remove_game_invite socket.on triggered")
+            setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != response.inviter_id));
+        });
+
+        return () => {
+            socket.off("remove_game_invite");
+        }
+    }, [gameInvites]);
+
+    //event listener function
+    function createChannelInProfile (response : any) {
+        if (response.success == true) {
+            socket.emit("chat", {
+                userId: cookies.userID,
+                authToken: cookies.user,
+                eventPattern: "get_channels_user",
+                data: {user_id: cookies.userID}
+            })
+        }
+    }
+    
     // check for game invites, update listener when user updates
     useEffect(() => {
         socket.on("invite_game_user", response => {
@@ -254,7 +274,7 @@ const ProfileNav: React.FC = () => {
                             <>
                                 <p><b>{element.fromUserName}</b> invited you to <b>{element.game_mode}</b></p>
                                 <button className="friendslistButton" onClick={(e) => gameAccept(e, element.fromUserId)}>Accept</button>
-                                <button className="friendslistButton" onClick={(e) => gameDecline(e, element.fromUserId)}>Accept</button>
+                                <button className="friendslistButton" onClick={(e) => gameDecline(e, element.fromUserId)}>Decline</button>
                             </>
                         }
                     </div>

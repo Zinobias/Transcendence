@@ -3,7 +3,6 @@ import { Cookies, useCookies } from 'react-cookie';
 import { SocketContext } from "./Socket";
 import { DefaultMatchmaking, DiscoMatchmaking, LeavetMatchmaking } from "./GameUtils";
 import GameCanvas from "./GameCanvas";
-import GameTestCanvas from "./GameTestCanvas";
 import { IGameInfo } from "../DTOs/frontend.DTOs.game.matchmaking";
 
 const   Game: React.FC = () => {

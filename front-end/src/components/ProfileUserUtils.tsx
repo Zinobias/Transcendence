@@ -196,7 +196,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                     data: { user_id: cookies.userID, requested_user_id: cookies.userID }
                 });
             }
-            else 
+            // else 
             // console.log(response.msg);
         })
 
@@ -209,7 +209,7 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                     data: { user_id: cookies.userID, requested_user_id: cookies.userID }
                 });
             }
-            else 
+            // else 
             // console.log(response.msg);
             
         });
@@ -241,8 +241,6 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
                         // console.log("not in a dm with that user");
                     }
         });
-
-        socket.on("channel_create", createChannelInProfile);
         
         return () => {
             socket.off("get_user", getUserInProfileUtils);
@@ -250,7 +248,6 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
             socket.off('unblock_user');
             socket.off("get_chatrooms_user");
             socket.off("get_dm_channel");
-            socket.off("channel_create", createChannelInProfile);
         }
         
     }, [])
@@ -260,17 +257,6 @@ export const UserFriendSettings : React.FC<Props> = ({user}) => {
         if (response.success && response.user.userId == cookies.userID) {
             setIsBlocked(isBlocked => !response.user.blocked.find((e : SmallUser) => user.userId == e.userId));
             setIsFriend(isFriend => !response.user.friends.find((e : SmallUser) => user.userId == e.userId && e.state == true));
-        }
-    }
-
-    function createChannelInProfile (response : any) {
-        if (response.success == true) {
-            socket.emit("chat", {
-                userId: cookies.userID,
-                authToken: cookies.user,
-                eventPattern: "get_channels_user",
-                data: {user_id: cookies.userID}
-            })
         }
     }
 
