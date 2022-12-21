@@ -150,7 +150,8 @@ export class Auth {
 		
         if (userId === undefined)
             return 'Failed to get userId from auth, are you an intra user?';
-        if (payload.userName.length() < 3 || payload.userName.length() > 12)
+        const tmp: string = payload.userName;
+        if (tmp.length < 3 || tmp.length > 12)
             return 'Your name has to be between 3 and 12 characters.';
         let createUserResult: string | boolean = await this.queries.createUser(userId, payload.userName);
         if (typeof createUserResult == 'string')
