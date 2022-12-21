@@ -21,4 +21,5 @@ RUN npm install
 COPY . .
 EXPOSE 8081 8082 8084
 RUN npm run build
-CMD ["npm", "run", "start:prod"]
+#CMD ["npm", "run", "start:prod"]
+CMD ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "start:prod"]

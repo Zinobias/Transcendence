@@ -9,4 +9,5 @@ RUN npm install -g @nestjs/cli
 RUN npm install
 COPY . .
 RUN npm run build
-CMD ["npm", "run", "start:prod"]
+#CMD ["npm", "run", "start:prod"]
+CMD ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "start:prod"]

@@ -12,4 +12,3 @@
 # frontend react env
 
 REACT_APP_WEB_HOST=localhost
-REACT_APP_WEB_HOST=$HOST // this works too
