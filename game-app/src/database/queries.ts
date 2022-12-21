@@ -17,14 +17,14 @@ export class Queries {
 		const gameRepository = dataSource.getRepository(DBGameResult);
 
 		gameRepository.insert(new DBGameResult(uids[0], uids[1], gameId, playerScores[0], playerScores[1]))
-		.catch((e) => this.logger.warn('Inserting gameResult into DB went wrong.'));
+		.catch((e : any) => this.logger.warn(`Inserting gameResult into DB went wrong ${e}.`));
 	}
 
 	public async getLeaderboard() {
 		const dataSource = await this.database.getDataSource();
 		const gameRepository = dataSource.getRepository(DBGameResult);
 		const res = await gameRepository.query(`SELECT game_result."winnerId", COUNT(game_result."winnerId") FROM game_result GROUP BY game_result."winnerId"`);
-		this.logger.warn(`RESULT is ${res}`);
+		//this.logger.warn(`RESULT is ${res}`);
 		return (res);
 	}
 
@@ -36,7 +36,7 @@ export class Queries {
 		const gameRepository = dataSource.getRepository(DBGameResult);
 
 		return (await gameRepository.findBy([{ userId1 : uid }, { userId2 : uid }])
-		.catch((e) => this.logger.warn('Retrieving user matchhistory went wrong.')));
+		.catch((e : any) => this.logger.warn(`Retrieving user matchhistory went wrong. ${e}`)));
 	}
 
 	public async getGameId() {
@@ -53,7 +53,7 @@ export class Queries {
 			.execute()
 		}
 		catch(e) {
-			this.logger.warn(`Grabbing gameId went wrong : ${e}`);
+			//this.logger.warn(`Grabbing gameId went wrong : ${e}`);
 			return (-1);
 		}
 		this.logger.debug(`Grabbing gameId   : ${res}`);

@@ -32,7 +32,7 @@ export class MatchMakingService {
 
 	async onApplicationBootstrap() {
 		this.gameId = await this.queries.getGameId();
-		this.logger.debug(`GAMEID IN MM IS : [${this.gameId}]`);
+		//this.logger.debug(`GAMEID IN MM IS : [${this.gameId}]`);
     }
 
 	/**
@@ -123,7 +123,7 @@ export class MatchMakingService {
 				this.logger.log(`Added userId : [${payload.userId}] to queue for gamemode : [${payload.gameMode}]`);
 				return ;
 			}
-			this.logger.log(`Adding userId : [${payload.userId}] to queue for gamemode : [${payload.gameMode}] went wrong`);
+			//this.logger.log(`Adding userId : [${payload.userId}] to queue for gamemode : [${payload.gameMode}] went wrong`);
 		}
 	}
 
@@ -138,7 +138,7 @@ export class MatchMakingService {
 				return (g === uuid);
 			});
 			if (index !== -1) {
-				this.logger.debug("Leaving queue : {" + gameMode[0]+ "}");				
+				//this.logger.debug("Leaving queue : {" + gameMode[0]+ "}");				
 				gameMode[1].splice(index, 1);
 				return true;
 			}
@@ -168,7 +168,7 @@ export class MatchMakingService {
 						playerIds : [gameDTO.player1UID, gameDTO.player2UID],
 					}
 				});
-				logger.log("Game found event emitted to client");
+				//logger.log("Game found event emitted to client");
 			}
 		}
 	}
@@ -185,7 +185,7 @@ export class MatchMakingService {
 	@OnEvent("game.create")
 	public async createGame(createGameDTO : CreateGameDTO) : Promise<number> {
 		let newGameInstance : Game = new Game(this.eventEmitter , this.client , [createGameDTO.player1UID, createGameDTO.player2UID], createGameDTO.gameMode, this.gameId);
-		logger.log("New game instance has been created");
+		//logger.log("New game instance has been created");
 		await this.addGameToList(createGameDTO, newGameInstance);
 		newGameInstance.start();
 		return (this.gameId++);

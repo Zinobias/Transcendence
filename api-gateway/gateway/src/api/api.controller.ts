@@ -26,11 +26,6 @@ export class ApiController {
 		this.sockets.sendData(payload.userIds, payload.eventPattern, payload.data);
     }
 
-    @EventPattern('testMsg')
-    testingFnc(@Payload() payload: any) {
-        // this.logger.log(`Msg from game to gateway received : [${payload}]`);
-    }
-
     @EventPattern('chat')
     chatForwarding(@Payload() payload: microServiceDTO) {
         // this.logger.log(`Msg from chat to gateway received`);
