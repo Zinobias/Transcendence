@@ -150,7 +150,6 @@ const ProfileNav: React.FC = () => {
 
     useEffect(() => {
         socket.on("remove_game_invite", response => {
-            console.log("remove_game_invite socket.on triggered")
             setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != response.inviter_id));
         });
 
@@ -294,7 +293,9 @@ const ProfileNav: React.FC = () => {
                 ))}
                 {
                     user &&
-                    <Friendslist user={user}/>
+                    <>
+                        <Friendslist user={user}/><br/>
+                    </>
                 }
             </div>
         </div>

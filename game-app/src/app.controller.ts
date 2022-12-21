@@ -445,7 +445,7 @@ export class AppController {
 	async getLeaderBoard(@Payload() payload : any) {
 		const res = await this.queries.getLeaderboard();
 
-		//this.logger.debug(`Retrieved the leaderboard ${res}.`)
+		this.logger.debug(`Retrieved the leaderboard ${res}.`)
 		if (res === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				eventPattern : 'game.get.leaderboard',
