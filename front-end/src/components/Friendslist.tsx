@@ -27,16 +27,12 @@ const Friendslist: React.FC<Props> = ({user}) => {
                     data: {userId: cookies.userID, checkIds: ids}
                 });
         
-                user.friends.forEach((e : SmallUser) => {
-                    if (e.state) {
-                        socket.emit("game", {
-                            userId: cookies.userID,
-                            authToken: cookies.user,
-                            eventPattern: "game.isInGame", 
-                            data: { userId: cookies.userID, requestedId: e.userId }
-                        });
-                    }
-                })
+                socket.emit("game", {
+                    userId: cookies.userID,
+                    authToken: cookies.user,
+                    eventPattern: "game.isInGameArray", 
+                    data: { userId: cookies.userID, uids: ids }
+                });
             }
         }, 1000);
 

@@ -90,16 +90,35 @@ export const    SignupButton: React.FC = () => {
         socket.emit('retrieve_redirect', {});
     }, [])
 
+    function validateUserName (name: string) : boolean {
+        const regExp = new RegExp(`[^a-zA-Z0-9_]`, 'g');
+        const match = name.matchAll(regExp);
+        const result = match.next().value;
+
+        if (!name) {
+            alert("Name Field is required");
+            return (false);
+        }
+        if (name.length > 12 || name.length < 3) {
+            alert("Username needs to be between 3-12 characters");
+            return (false);
+        }
+        if (result != undefined) {
+            alert(`[${result}] is an invalid character`);
+            return (false);
+        }
+        return (true);
+    }
+
     const handleClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault()
-        if (userName) {
+        if (validateUserName(userName)) {
             // console.log("Redirecting signup " + userName);
             sessionStorage.setItem("userName", userName);
             window.location.href = signup;
         }
-        else {
-            alert("Name Field is required");
-        }
+        else
+            setUserName("");
     };
 
     return (   

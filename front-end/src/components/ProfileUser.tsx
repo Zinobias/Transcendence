@@ -43,7 +43,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                 let lost : number = 0;
                 let won : number = 0;
                 let ids : number[] = [];
-                // console.log("get game history success");
+                console.log("get game history success");
                 response.history.forEach((e : any) => {
                     setGamehistory(gamehistory => [...gamehistory, {
                         createAt: e.createAt, 
@@ -92,10 +92,11 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             eventPattern: "game.user.get.history", 
             data: { userId: cookies.userID, requestedId: user.userId }
         });
+        console.log("emit get game history success");
 
         return () => {
             socket.off("game.user.get.history");
-            socket.off("check_online");
+            socket.off("check_online", checkOnlineProfile);
             socket.off("game.isInGame", gameIsInGameInProfile);
             socket.off("get_name", getNameInProfile);
         }
@@ -147,7 +148,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                 <img src={defaultAvatar} alt="defaultAvatar" className="profileAvatar_image"/> 
             }
             </div>
-            <b style={{fontSize: "1.8vw"}}>{user.name}</b><br/>
+            <b style={{fontSize: "1.6vw"}}>{user.name}</b><br/>
             {
                 online ?
                 <span style={{fontSize: "1vw"}}>online</span> :

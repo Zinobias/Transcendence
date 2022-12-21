@@ -37,7 +37,7 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
     }
 
     function checkInGameFriendslist (response : any) {
-        if (response.success && response.requestedId == friend.userId)
+        if (response.ingameUsers.find((e : number) => e == friend.userId) != undefined)
             setIngame(inGame => true);
         else
             setIngame(inGame => false);

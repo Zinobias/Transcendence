@@ -44,10 +44,15 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         socket.on("verify_2fa", response => {
             if (response.success) {
                 // console.log("socket.on varify_2fa success");
+                document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
+                setToken("");
+                setQrcode("");
                 setHasTwoFA(hasTwoFA => true);
             }
-            else
+            else {
+                setToken("");
                 alert(response.msg);
+            }
         })
 
         socket.on("update_avatar", response => {
@@ -82,6 +87,8 @@ export const UserSettings : React.FC<Props> = ({user}) => {
         if (selectedImage) {
             if (!selectedImage?.name.match(/\.(jpg|jpeg|png)$/)) 
                 alert("Please Select a valid image")
+            else if (selectedImage.size > 1e6)
+                alert("Please upload a file smaller than 1 MB");
             else  {
                 socket.emit("chat", {
                     userId: cookies.userID,
@@ -119,9 +126,9 @@ export const UserSettings : React.FC<Props> = ({user}) => {
             data: {TFAToken: token}
         });
         // console.log(`emiting verify_2fa`);
-        document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
+        // document.getElementById("verify_TwoFA")?.classList.toggle("twoFA_show");
         setToken("");
-        setQrcode("");
+        // setQrcode("");
     }
 
     // DISABLE -> USER NEEDS TO ADD HIS ONE TIME TOKEN

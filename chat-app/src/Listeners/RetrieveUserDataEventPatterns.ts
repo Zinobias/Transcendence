@@ -422,7 +422,6 @@ export class RetrieveUserDataEventPatterns {
 
         const invitee = mapGetter(data.user_id, this.inviteMap);
 		if (invitee != undefined) {
-            this.logger.debug("emitting to remove_game_invitegit p")
 			this.util.notify([invitee.user_id], 'remove_game_invite', {
 				success: true,
 				msg: `Invitation expired`,
