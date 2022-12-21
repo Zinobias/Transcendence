@@ -8,6 +8,7 @@ import { GameEndedData, GameFrameUpdateEvent, gameMatchmakingEntity } from './ev
 import { addSpectatorDTO, CreateGameDTO, GameFrameUpdateDTO, outDTO, userKeyInputDTO } from './dto/dto';
 import { Queries } from './database/queries';
 import { Game } from './game-class';
+import { filter } from 'rxjs';
 
 
 @Controller()
@@ -224,7 +225,7 @@ export class AppController {
 
 	/**
 	 * Returns a boolean & msg, true if  user is currently in a game.
-	 * @param Payload { userId : string}
+	 * @param Payload { userId : number}
 	 */
 	@EventPattern('game.isInGame')
 	isInGame(@Payload() payload : any) {
@@ -238,6 +239,31 @@ export class AppController {
 				success : success,
 				requestedId : payload.requestedId,
 				msg : success === true ? "userId in game" : "userId not in game",
+			}
+		});
+	}
+
+		/**
+	 * Returns an array of ingame users.
+	 * @param Payload { uids : number[]}
+	 */
+	@EventPattern('game.isInGameArray')
+	isInGameArray(@Payload() payload : any) {
+		let success : boolean = this.matchMakingService.isInGame(payload.requestedId);
+		// this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}] typeOf userId : ${typeof(payload.requestedId)}`);
+		let uids : number[] = []
+		if (payload.uids != undefined) {
+			uids = payload.uids;
+			uids = uids.filter((e) => this.matchMakingService.isInGame(e));
+		}
+		this.gatewayClient.emit<string, outDTO>('game', {
+			userIds : [payload.userId],
+			eventPattern : 'game.isInGame',
+			data : {
+				success : success,
+				requestedId : payload.requestedId,
+				msg : success === true ? "ingameUsers received" : "ingameUsers not received",
+				ingameUsers : uids,
 			}
 		});
 	}
