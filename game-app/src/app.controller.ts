@@ -258,7 +258,7 @@ export class AppController {
 		}
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
-			eventPattern : 'game.isInGame',
+			eventPattern : 'game.isInGameArray',
 			data : {
 				success : success,
 				requestedId : payload.requestedId,
