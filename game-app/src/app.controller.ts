@@ -228,7 +228,7 @@ export class AppController {
 	 * @param Payload { userId : number}
 	 */
 	@EventPattern('game.isInGame')
-	isInGame(@Payload() payload : any) {
+	async isInGame(@Payload() payload : any) {
 		let success : boolean = this.matchMakingService.isInGame(payload.requestedId);
 		// this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}] typeOf userId : ${typeof(payload.requestedId)}`);
 
@@ -248,8 +248,8 @@ export class AppController {
 	 * @param Payload { uids : number[]}
 	 */
 	@EventPattern('game.isInGameArray')
-	isInGameArray(@Payload() payload : any) {
-		let success : boolean = this.matchMakingService.isInGame(payload.requestedId);
+	async isInGameArray(@Payload() payload : any) {
+		let success : boolean = true;
 		// this.logger.log(`isInGame called for user [${payload.requestedId}] result : [${success}] typeOf userId : ${typeof(payload.requestedId)}`);
 		let uids : number[] = []
 		if (payload.uids != undefined) {
