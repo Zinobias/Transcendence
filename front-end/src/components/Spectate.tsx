@@ -27,7 +27,6 @@ const Spectate : React.FC = () => {
             eventPattern: "game.get.gameList",
             data: {userId: cookies.userID}
         })
-        console.log("emiting game.get.gameList");
 
         socket.on("game.get.gameList", response => {
             if (response.success) {
@@ -70,11 +69,9 @@ const Spectate : React.FC = () => {
                     eventPattern: "game.get.gameInfo", 
                     data: { userId: cookies.userID, gameId: response.spectateId }
                 });
-                // console.log(spectateId);
             }
             else if (!response.success)
                 setSpectateId(spectateId => -1);
-            console.log("socket.on game.spectate.start " + response.msg);
         });
 
         socket.on("game.spectate.stop", response => {
@@ -82,7 +79,6 @@ const Spectate : React.FC = () => {
                 setGameinfo(gameInfo => undefined);
                 setSpectateId(spectateId => -1);
             } 
-            console.log("socket.on game.spectate.stop " + response.msg);
         });
 
         return () => {
@@ -95,13 +91,11 @@ const Spectate : React.FC = () => {
     // event listener functions
     function getNameInSpectate (response : any) {
         if (response.success) {
-            console.log("get_name success " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
     }
 
     function getGameInfoSpectate (response : any) {
-        console.log(response.msg);
         if (response.gameInfo && response.gameInfo.gameId == spectateId)
             setGameinfo(gameInfo => response.gameInfo);
     }
@@ -121,7 +115,6 @@ const Spectate : React.FC = () => {
             data: { userId: cookies.userID, targetGameId: gameId }
         });
         setSpectateId(spectateId => gameId);
-        console.log("emitting game.spectate.start for game " + gameId);
     }
 
     return (

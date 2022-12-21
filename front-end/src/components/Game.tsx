@@ -22,7 +22,7 @@ const   Game: React.FC = () => {
             eventPattern: "game.isInGame", 
             data: { userId: cookies.userID, requestedId: cookies.userID }
         });
-        console.log("emitting game.isInGame");
+        // console.log("emitting game.isInGame");
         
         // we found a game so we ask for the activeGameId
         socket.on("game.found", response => {
@@ -32,7 +32,7 @@ const   Game: React.FC = () => {
                 eventPattern: "game.get.activeGameId", 
                 data: { userId: cookies.userID }
             });
-            console.log(`socket.emit game.get.activeGameId`);
+            // console.log(`socket.emit game.get.activeGameId`);
         })
         
         // user is in a game so we ask for activeGameId
@@ -40,7 +40,7 @@ const   Game: React.FC = () => {
         
         // returns the ID for the game the user is currently in
         socket.on("game.get.activeGameId", response => {
-            console.log(`socket.on game.get.activeGameId ${response.success} ${response.msg}`);
+            // console.log(`socket.on game.get.activeGameId ${response.success} ${response.msg}`);
             if (response.success) {
                 socket.emit("game", {
                     userId: cookies.userID,
@@ -55,14 +55,14 @@ const   Game: React.FC = () => {
         
         socket.on("game.join.queue", response => {
             if (response.success) {
-                console.log("joining queue success");
+                // console.log("joining queue success");
                 setQueue(queue => true);
             }
         })
         
         socket.on("game.leave.queue", response => {
             if (response.success) {
-                console.log("leaving queue success");
+                // console.log("leaving queue success");
                 setQueue(queue => false);
             }
         })
@@ -96,11 +96,11 @@ const   Game: React.FC = () => {
             });
             // console.log(`socket.emit game.get.activeGameId`);
         }
-        console.log(response.msg);
+        // console.log(response.msg);
     }
 
     function getGameInfoInGame (response : any) {
-        console.log(response.msg);
+        // console.log(response.msg);
         if (response.gameInfo != undefined) {
             setQueue(queue => false);
             setGameinfo(gameInfo => response.gameInfo);
@@ -118,7 +118,7 @@ const   Game: React.FC = () => {
                     data: { userId: cookies.userID }
                 });
             }
-            console.log("game.create success emitting game.get.activeGameId")
+            // console.log("game.create success emitting game.get.activeGameId")
             socket.emit("game", {
                 userId: cookies.userID,
                 authToken: cookies.user,
@@ -140,9 +140,6 @@ const   Game: React.FC = () => {
 
     return (
         <>
-
-            {/* <GameTestCanvas /> */}
-
             {
                 gameInfo != undefined ?
                 <GameCanvas gameInfo={gameInfo} setGameinfo={setGameinfo}/> :

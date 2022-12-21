@@ -69,7 +69,7 @@ const   Chat: React.FC = () => {
                 eventPattern: "get_channels_user",
                 data: {user_id: cookies.userID}
             })
-            console.log("emiting get_channels_user");
+            // console.log("emiting get_channels_user");
             setState( state => !state);
         }
         else
@@ -78,18 +78,18 @@ const   Chat: React.FC = () => {
 
     function channelCreateInChat (response : any) {
         if (response.success == true && response.hasPassword == false) {
-            console.log(`socket.on channel_create success ${response.channel_name}`);
+            // console.log(`socket.on channel_create success ${response.channel_name}`);
             socket.emit("chat", {
                 userId: cookies.userID,
                 authToken: cookies.user,
                 eventPattern: "get_channels_user",
                 data: {user_id: cookies.userID}
             })
-            console.log("emiting get_channels_user");
+            // console.log("emiting get_channels_user");
             setState( state => !state);
         }
         else if (response.success == true && response.hasPassword == true) {
-            console.log(`socket.on channel_create success ${response.channel_name} pw ${response.hasPassword}`);
+            // console.log(`socket.on channel_create success ${response.channel_name} pw ${response.hasPassword}`);
             document.getElementById("Channel")?.classList.toggle("channelShow");
             document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");
             setPwName( pwName => response.channel_name);
@@ -145,7 +145,7 @@ const   Chat: React.FC = () => {
                         visible: visibleCheck, 
                         should_get_password: passwordCheck }
             });
-            console.log(`emiting channel_create name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
+            // console.log(`emiting channel_create name:[${chatroomName}] visible:[${visibleCheck}] password:[${passwordCheck}]`);
         }
         setChatroomName("");
         setVisibleCheck(false);
@@ -163,7 +163,7 @@ const   Chat: React.FC = () => {
                         channel_id: pwId, 
                         password: Md5.hashStr(pw + pwId) }
             });
-            console.log(`emitting channel_update_password [${Md5.hashStr(pw + pwId)}]`);
+            // console.log(`emitting channel_update_password [${Md5.hashStr(pw + pwId)}]`);
             setPw("");
             document.getElementById("Channel")?.classList.toggle("channelShow");
             document.getElementById("pwChannel")?.classList.toggle("pwChannelShow");

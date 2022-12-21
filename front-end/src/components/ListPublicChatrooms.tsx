@@ -25,7 +25,7 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
                 eventPattern: "channel_join",
                 data: {user_id: cookies.userID, channel_id: channelId}
             })
-            console.log("emiting channel_join");
+            // console.log("emiting channel_join");
         }
     };
 
@@ -37,7 +37,7 @@ const ListPublicChatrooms: React.FC<Props> = ({chatroom}) => {
             eventPattern: "channel_join",
             data: {user_id: cookies.userID, channel_id: channelId, password: Md5.hashStr(pw + channelId)}
         })
-        console.log("emiting channel_join with pw");
+        // console.log("emiting channel_join with pw");
         setPw("");
         document.getElementById(channelId.toString())?.classList.toggle("chatPwShow");
     };

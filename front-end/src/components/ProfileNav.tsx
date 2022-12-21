@@ -55,7 +55,7 @@ const ProfileNav: React.FC = () => {
     useEffect(() => {
         socket.on("get_user", response => {
             if (response.success && response.user.userId == cookies.userID) {
-                console.log("get_user success profileNav");
+                // console.log("get_user success profileNav");
                 // console.log(response.user);
                 setUser(user => response.user);
             }
@@ -63,7 +63,7 @@ const ProfileNav: React.FC = () => {
 
         socket.on("friend_request", response => {
             if (response.success) {
-                console.log(`socket.on friend_request success from ${response.user} to ${response.friend}`);
+                // console.log(`socket.on friend_request success from ${response.user} to ${response.friend}`);
                 // setState(state => !state);
                 if (response.friend == cookies.userID) {
                     setState(state => !state);
@@ -71,44 +71,44 @@ const ProfileNav: React.FC = () => {
                         document.getElementById("myDropdown")?.classList.toggle("show");
                 }
             }
-            else
-                console.log(`socket.on friend_request fail ${response.msg}`);
+            // else
+            //     console.log(`socket.on friend_request fail ${response.msg}`);
         })
 
         socket.on("decline_friend_request", response => {
             if (response.success && response.user == cookies.userID) {
-                console.log(`socket.on decline_friend_request success`);
+                // console.log(`socket.on decline_friend_request success`);
                 setState(state => !state);
             }
-            else if (!response.success)
-                console.log(`socket.on decline_friend_request fail ${response.msg}`)
+            // else if (!response.success)
+            //     console.log(`socket.on decline_friend_request fail ${response.msg}`)
         })
 
         socket.on("accept_friend_request", response => {
             if (response.success) {
-                console.log(`socket.on accept_friend_request success`);
+                // console.log(`socket.on accept_friend_request success`);
                 setState(state => !state);
-            }
-            else
-                console.log(`socket.on accept_friend_request fail ${response.msg}`);
+            // }
+            // else
+            //     console.log(`socket.on accept_friend_request fail ${response.msg}`);
         })
 
         socket.on("un_friend", response => {
             if (response.success) {
-                console.log(`socket.on un_friend success`);
+                // console.log(`socket.on un_friend success`);
                 setState(state => !state);
             }
-            else
-                console.log(`socket.on un_friend fail ${response.msg}`);
+            // else
+            //     console.log(`socket.on un_friend fail ${response.msg}`);
         })
 
         socket.on("game.create", response => {
             if (response.success) {
-                console.log("socket.on game.create success " + window.location.pathname);
+                // console.log("socket.on game.create success " + window.location.pathname);
                 if (window.location.pathname != "/game" && window.location.pathname != "/") {
                     if (document.getElementById("myDropdown")?.classList.contains("show"))
                         document.getElementById("myDropdown")?.classList.toggle("show");
-                    console.log("socket.on game.create success " + response.msg);
+                    // console.log("socket.on game.create success " + response.msg);
                     navigate('/game');
                 }
             }
@@ -116,10 +116,6 @@ const ProfileNav: React.FC = () => {
 
         socket.on("remove_game_invite", response => {
             setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != response.inviter_id));
-        });
-
-        socket.on("accept_invite_game_user", response => {
-            console.log("socket.on accept game invite " + response.success + " " + response.msg);
         });
 
         socket.on("get_active_invites", response => {
@@ -150,7 +146,6 @@ const ProfileNav: React.FC = () => {
             socket.off("un_friend");
             socket.off("game.create");
             socket.off("remove_game_invite");
-            socket.off("accept_invite_game_user");
             socket.off("get_active_invites");
             socket.off("channel_invite")
         }
@@ -180,7 +175,7 @@ const ProfileNav: React.FC = () => {
                 if (document.getElementById("myDropdown")?.classList.contains("show") == false)
                     document.getElementById("myDropdown")?.classList.toggle("show");
             }
-            console.log("socket.on invite_game_user from " + response.user + " to " + response.request_user_id + " " + response.msg);
+            // console.log("socket.on invite_game_user from " + response.user + " to " + response.request_user_id + " " + response.msg);
         })
 
         return () => {
@@ -202,7 +197,7 @@ const ProfileNav: React.FC = () => {
             eventPattern: "accept_invite_game_user", 
             data: {user_id: cookies.userID, request_user_id: inviteId}
         })
-        console.log(`emiting accept_invite_game_user`);
+        // console.log(`emiting accept_invite_game_user`);
         setGameInvites(gameInvites => gameInvites.filter((element) => element.fromUserId != inviteId));
         document.getElementById("myDropdown")?.classList.toggle("show");
     }

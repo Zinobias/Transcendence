@@ -43,7 +43,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                 let lost : number = 0;
                 let won : number = 0;
                 let ids : number[] = [];
-                console.log("get game history success");
+                // console.log("get game history success");
                 response.history.forEach((e : any) => {
                     setGamehistory(gamehistory => [...gamehistory, {
                         createAt: e.createAt, 
@@ -59,7 +59,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
                             eventPattern: "get_name", 
                             data: { user_id: cookies.userID, requested_user_id: e.userId1 == user.userId ? e.userId2 : e.userId1 }
                         });
-                        console.log("emit to get_name " + (e.userId1 == user.userId ? e.userId2 : e.userId1));
+                        // console.log("emit to get_name " + (e.userId1 == user.userId ? e.userId2 : e.userId1));
                     }
                     e.winnerId == user.userId ? won++ : lost++;
                 })
@@ -105,12 +105,12 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     function gameIsInGameInProfile (response : any) {
         if (response.success)
             setIngame(inGame => true);
-        console.log(response.msg);
+        // console.log(response.msg);
     }
 
     function getNameInProfile (response : any) {
         if (response.success) {
-            console.log("get_name success " + response.requested_name);
+            // console.log("get_name success " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
     }

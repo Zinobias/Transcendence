@@ -28,7 +28,7 @@ const   Leaderboard: React.FC = () => {
             eventPattern: "game.get.leaderboard", 
             data: {userId: cookies.userID}
         });
-        console.log("emiting game.get.leaderboard");
+        // console.log("emiting game.get.leaderboard");
 
         socket.on("game.get.leaderboard", response => {
             if (response.success && response.leaderboard.length > 0) {
@@ -46,13 +46,13 @@ const   Leaderboard: React.FC = () => {
                             eventPattern: "get_name", 
                             data: { user_id: cookies.userID, requested_user_id: entry.winnerId }
                         });
-                        console.log("emitting get name");
+                        // console.log("emitting get name");
                     }
 
                 });
             }
-            else 
-                console.log(response.msg);
+            // else 
+            //     console.log(response.msg);
         })
 
         socket.on("get_name", getNameInLeaderboard);
@@ -66,7 +66,7 @@ const   Leaderboard: React.FC = () => {
     // get_name event listener function
     function getNameInLeaderboard (response : any) {
         if (response.success) {
-            console.log("get_name success leaderboard " + response.requested_name);
+            // console.log("get_name success leaderboard " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
     }

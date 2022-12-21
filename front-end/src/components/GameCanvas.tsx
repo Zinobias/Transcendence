@@ -51,7 +51,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressUp }
                 });
-                // console.log(`socket.emit ${event.key} is being pressed for user ${cookies.userID}`);
             }
             if (event.key === "ArrowDown" && down === false) {
                 setDown(down => true);
@@ -61,7 +60,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyPressDown }
                 });
-                // console.log(`socket.emit ${event.key} is being pressed for user ${cookies.userID}`);
             }
         };
 
@@ -74,7 +72,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseUp }
                 });             
-                // console.log(`socket.emit ${event.key} is being released for user ${cookies.userID}`)
             }
             if (event.key === "ArrowDown") {
                 setDown(down => false);
@@ -84,7 +81,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
                     eventPattern: "game.player.move", 
                     data: { userId: cookies.userID, keyEvent: Move.keyReleaseDown }
                 });
-                // console.log(`socket.emit ${event.key} is being released for user ${cookies.userID}`)
             }
         };
 
@@ -100,8 +96,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
    
     // event listener for game events & get_name
     useEffect(() => {
-        console.log("Canvas component did mount with gameId " + gameInfo.gameId);
-
         // request player names on mount
         socket.emit("chat", {
             userId: cookies.userID,
@@ -146,7 +140,6 @@ const GameCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     }
 
     function gameEnded (response : any) {
-        console.log("socket.on game.ended winner " + response.winner);
         setWinner(winner => (response.winner == gameInfo.players.player1 ? p1 : p2));
     }
 

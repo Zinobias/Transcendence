@@ -51,19 +51,19 @@ const Friendslist: React.FC<Props> = ({user}) => {
             eventPattern: "accept_friend_request", 
             data: {user_id: cookies.userID, friend_id: friendId}
         })
-        console.log(`emiting accept_friend_request for users ` + friendId + ` ` + cookies.userID);
+        // console.log(`emiting accept_friend_request for users ` + friendId + ` ` + cookies.userID);
     }
 
     const handleDecline = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, friendId: number) => {
         e.preventDefault();
-        console.log("click decline");
+        // console.log("click decline");
         socket.emit("chat", {
             userId: cookies.userID,
             authToken: cookies.user,
             eventPattern: "decline_friend_request", 
             data: {user_id: cookies.userID, friend_id: friendId}
         })
-        console.log(`emiting decline_friend_request`);
+        // console.log(`emiting decline_friend_request`);
     }
 
     const goToProfile = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, friendId : number) => {

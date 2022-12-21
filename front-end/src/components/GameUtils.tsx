@@ -15,7 +15,7 @@ export const DefaultMatchmaking: React.FC = () => {
             eventPattern: "game.join.queue", 
             data: { userId: cookies.userID, gameMode: "DEFAULT" }
         });
-        console.log(`socket.emit game.join.queue default`);
+        // console.log(`socket.emit game.join.queue default`);
     };
 
     return (
@@ -40,7 +40,7 @@ export const DiscoMatchmaking: React.FC = () => {
             eventPattern: "game.join.queue", 
             data: { userId: cookies.userID, gameMode: "DISCOPONG" }
         });
-        console.log(`socket.emit game.join.queue default`);
+        // console.log(`socket.emit game.join.queue default`);
     };
 
     return (
@@ -64,7 +64,7 @@ export const LeavetMatchmaking: React.FC = () => {
             eventPattern: "game.leave.queue", 
             data: { userId: cookies.userID }
         });
-        console.log(`socket.emit game.leave.queue`);
+        // console.log(`socket.emit game.leave.queue`);
     };
 
     return (

@@ -35,8 +35,6 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
       
     // event listener for game events & get_name
     useEffect(() => {
-        console.log("Canvas component did mount with gameId " + gameInfo.gameId);
-
         // request player names on mount
         socket.emit("chat", {
             userId: cookies.userID,
@@ -81,7 +79,6 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
     }
 
     function gameEndedSpectate (response : any) {
-        console.log("socket.on game.ended winner " + response.winner);
         setWinner(winner => (response.winner == gameInfo.players.player1 ? p1 : p2));
     }
 
@@ -153,7 +150,6 @@ const SpectateCanvas : React.FC<Props> = ({gameInfo, setGameinfo}) => {
             eventPattern: "game.spectate.stop", 
             data: { userId: cookies.userID, targetGameId: gameInfo.gameId }
         });
-        console.log("emitting game.spectate.sttop for game " + gameInfo.gameId);
     }
     
     return (

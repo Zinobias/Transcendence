@@ -31,14 +31,14 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
             eventPattern: "get_channels_user",
             data: {user_id: cookies.userID}
         })
-        console.log("emiting get_channels_user");
+        // console.log("emiting get_channels_user");
     }, [state])
 
 
     // EVENT LISTENERS
     useEffect(() => {
         socket.on("get_channels_user", response  => {
-            console.log(`socket.on get_channels_user success`);
+            // console.log(`socket.on get_channels_user success`);
             setChannels([]);
             response.channels.forEach((element : IChannelInfo) => {
                 setChannels(channels => [...channels, element]);
@@ -50,7 +50,7 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
                         data: { user_id: cookies.userID, requested_user_id: element.otherOwnderId }
                     });
                 }
-                console.log(`${element.channelName} ${element.channelId}`);
+                // console.log(`${element.channelName} ${element.channelId}`);
             });
         });
 
@@ -77,7 +77,7 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
     function channelJoinInSidebar (response : any) {
         // if current user joined a channel update side channels
         if (response.success && response.user_id == cookies.userID) {
-            console.log("socket.on channel join success");
+            // console.log("socket.on channel join success");
             if (document.getElementById("footerDropdown")?.classList.contains("footerChat__show") == false)
                 document.getElementById("footerDropdown")?.classList.toggle("footerChat__show");
             setState(state => !state);
@@ -109,7 +109,7 @@ const ChatSidebar: React.FC<Props> = ({channelId, setChannelId, channel, setChan
 
     function getNameInSidebar (response : any) {
         if (response.success) {
-            console.log("get_name success " + response.requested_name);
+            // console.log("get_name success " + response.requested_name);
             setNames(names => [...names, {userId: response.requested_id, name: response.requested_name}]);
         }
     }

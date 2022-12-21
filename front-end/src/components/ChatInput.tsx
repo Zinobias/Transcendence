@@ -25,7 +25,7 @@ const ChatInput: React.FC<Props> = ({channelId}) => {
                     channel_id: channelId,
                     message: message }
         });
-        console.log(`emiting channel_message message:[${message}]`);
+        // console.log(`emiting channel_message message:[${message}]`);
     }
 
     return (
