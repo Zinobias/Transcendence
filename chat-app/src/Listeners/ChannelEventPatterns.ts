@@ -23,6 +23,7 @@ import {Setting} from '../Objects/Setting';
 import {SettingType} from '../Enums/SettingType';
 import {Message} from '../Objects/Message';
 import {Util} from './Util';
+import { channel } from 'diagnostics_channel';
 
 @Controller()
 export class ChannelEventPatterns {
@@ -590,14 +591,13 @@ export class ChannelEventPatterns {
             return;
         }
 
-        this.channel_invites.push({inviter_id: data.user_id, invited_id: data.invited_id, channel_id: data.channel_id})
+        this.channel_invites.push({inviter_id: data.user_id, invited_id: data.invited_id, channel_id: data.channel_id, channel_name: channel.channelName})
         this.util.notify([data.invited_id], 'channel_invite', {
             success: true,
             msg: undefined,
             inviter_id: data.user_id,
             channel_id: data.channel_id,
             channel_name: channel.channelName,
-            has_password: channel.password == undefined ? false : true
         });
     }
 
@@ -610,7 +610,7 @@ export class ChannelEventPatterns {
         if (!(await this.parseInviteData(data.channel_id, data.inviter_id, data.user_id, data.user_id, 'channel_invite_accept'))) {
             return;
         }
-        const tmp: invites = {inviter_id: data.inviter_id, invited_id: data.user_id, channel_id: data.channel_id};
+        const tmp: invites = {inviter_id: data.inviter_id, invited_id: data.user_id, channel_id: data.channel_id, channel_name: data.channel_name};
         if (this.channel_invites.find(abc => abc == tmp) == null) {
             this.util.emitFailedObject(data.user_id, 'channel_invite_accept', `You don't have this invite`);
             return;
@@ -631,7 +631,7 @@ export class ChannelEventPatterns {
         if (!(await this.parseInviteData(data.channel_id, data.inviter_id, data.user_id, data.user_id, 'channel_invite_deny'))) {
             return;
         }
-        const tmp: invites = {inviter_id: data.inviter_id, invited_id: data.user_id, channel_id: data.channel_id};
+        const tmp: invites = {inviter_id: data.inviter_id, invited_id: data.user_id, channel_id: data.channel_id, channel_name: data.channel_name};
         if (this.channel_invites.find(abc => abc == tmp) == null) {
             this.util.emitFailedObject(data.user_id, 'channel_invite_deny', `You don't have this invite`);
             return;
@@ -753,4 +753,5 @@ interface invites {
     inviter_id: number
     invited_id: number
     channel_id: number
+    channel_name: string
 }
