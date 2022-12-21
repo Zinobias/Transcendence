@@ -50,7 +50,7 @@ export class Game {
 	};
 
 	private gameFinishedHandler() {
-		logger.log(`GAME INSTANCE GAME ID : ${this.gameId}`);
+		//logger.log(`GAME INSTANCE GAME ID : ${this.gameId}`);
 		this.eventEmitter.emit('game.ended', {gameId : this.gameId, payload: this.results });
 		this.eventEmitter.removeAllListeners("game.player.move." + this.gameId); 
 		return ;
@@ -307,7 +307,7 @@ export class Game {
 		const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 		let powerUptimer : number = 0; // time since last powerup
 		let powerUpInterval : number = 5000; // every 5 seconds
-		logger.debug(`GameMode for new gameInstance is : ${this.gameMode}`);
+		//logger.debug(`GameMode for new gameInstance is : ${this.gameMode}`);
 
 		while (loopState === true) {
 			if (this._toServe === true)

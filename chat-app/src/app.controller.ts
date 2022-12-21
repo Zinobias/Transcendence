@@ -15,11 +15,6 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @EventPattern('testMsg')
-  receiveInit(@Payload() payload: any) {
-    this.gateway.emit('testMsg', 'msg from chat-app');
-    // this.logger.log('chat msg from gateway received');
-  }
 }
 
 export interface microServiceDTO {

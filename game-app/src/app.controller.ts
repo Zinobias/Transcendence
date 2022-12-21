@@ -61,7 +61,7 @@ export class AppController {
 		const gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
 
 		if (gameInfo === undefined) {
-			this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
+			//this.logger.debug(`game.frame.update cant find the gameInfo, game: [${payload.gameId}] might be over`);
 			return ;
 		}
 		this.gatewayClient.emit<string, outDTO>('game', {
@@ -80,16 +80,16 @@ export class AppController {
 	 */
 	@OnEvent('game.ended')
 	async gameEndedEvent(@Payload() payload : GameEndedData) {
-		this.logger.log("Game : {" + payload.gameId + "} has ended.");
+		//this.logger.log("Game : {" + payload.gameId + "} has ended.");
 
 		let gameInfo = this.matchMakingService.getGameInfo(payload.gameId);
-		this.logger.debug("Game-ended event caught & emitted to frontend");
+		//this.logger.debug("Game-ended event caught & emitted to frontend");
 		if (gameInfo === undefined) {
-			this.logger.debug('game.frame.update cant find the gameInfo');
+			//this.logger.debug('game.frame.update cant find the gameInfo');
 			return ;
 		}
 		await this.matchMakingService.addGameResultToDatabase(payload.payload);
-		this.logger.debug(`Player1UID : ${gameInfo.player1} player2UID ${gameInfo.player2}`);
+		//this.logger.debug(`Player1UID : ${gameInfo.player1} player2UID ${gameInfo.player2}`);
 		this.gatewayClient.emit('game', {
 			eventPattern : 'game.ended.' + gameInfo.gameId,
 			userIds : gameInfo.frameSubscribers,
@@ -101,15 +101,6 @@ export class AppController {
 		}); // Forwarding entities of the game. to render in frontend.
 		this.matchMakingService.removeGameFromList(payload.gameId);
 	}
-
-	@EventPattern("testMsg")
-	async testFunc(@Payload() payload : any) {
-		this.logger.log(payload);
-		this.logger.log("connected to the game");
-		this.evenEmitter.emit('testEvent', 'test string');
-		this.gatewayClient.emit<string, string>('testMsg', "testmsg from game");
-	}
-
 	/**
 	 * Tries to add the user to the matchmaking queue for chosen Gamemode.
 	 * If the player is already in a game or in the queue, it will return an error.
@@ -119,7 +110,7 @@ export class AppController {
 	 */
 	@EventPattern("game.join.queue")
 	joinMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
-		this.logger.log("User : {" + payload.userId + "} has joined the matchmaking queue for : " + payload.gameMode);
+		//this.logger.log("User : {" + payload.userId + "} has joined the matchmaking queue for : " + payload.gameMode);
 		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.join.queue',
@@ -142,7 +133,7 @@ export class AppController {
 			});
 			return ;
 		}
-		this.logger.log(`before success emit`);
+		//this.logger.log(`before success emit`);
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.join.queue',
 			userIds		: [payload.userId],
@@ -166,10 +157,10 @@ export class AppController {
 	@EventPattern("game.leave.queue")
 	leaveMatchmakingQueue(@Payload() payload : gameMatchmakingEntity) {
 	let success = this.matchMakingService.removeFromQueue(payload.userId);
-	if (success === true)
-			this.logger.debug("User : {" + payload.userId + "} has left the queue.");
-	else
-		this.logger.debug(`User : [${payload.userId}] has failed to leave the queue.`);
+	//if (success === true)
+	//		this.logger.debug("User : {" + payload.userId + "} has left the queue.");
+	//else
+	//	this.logger.debug(`User : [${payload.userId}] has failed to leave the queue.`);
 
 	this.gatewayClient.emit<string, outDTO>('game', {
 		userIds : [payload.userId],
@@ -190,10 +181,10 @@ export class AppController {
 	@EventPattern('game.spectate.start')
 	async startSpectateGame(@Payload() payload : addSpectatorDTO) {
 		let success = await this.matchMakingService.addSpectator(payload.userId, payload.targetGameId);
-		if (success === true)
-			this.logger.debug("User : {" + payload.userId + "} has started spectating game: " + payload.targetGameId);
-		else
-			this.logger.debug(`User : [${payload.userId}] has failed spectating game: ${payload.targetGameId}`);
+		//if (success === true)
+		//	this.logger.debug("User : {" + payload.userId + "} has started spectating game: " + payload.targetGameId);
+		//else
+		//	this.logger.debug(`User : [${payload.userId}] has failed spectating game: ${payload.targetGameId}`);
 
 	
 		this.gatewayClient.emit<string, outDTO>('game', {
@@ -215,10 +206,10 @@ export class AppController {
 	@EventPattern('game.spectate.stop')
 	async stopSpectateGame(@Payload() payload : addSpectatorDTO) {
 		let success = await this.matchMakingService.removeSpectator(payload.userId, payload.targetGameId);
-		if (success === true)
-			this.logger.debug("User : {" + payload.userId + "} has stopped spectating game: " + payload.targetGameId);
-		else
-			this.logger.debug(`User : [${payload.userId}] has failed to stop spectating game: ${payload.targetGameId}`);
+		//if (success === true)
+		//	this.logger.debug("User : {" + payload.userId + "} has stopped spectating game: " + payload.targetGameId);
+		//else
+		//	this.logger.debug(`User : [${payload.userId}] has failed to stop spectating game: ${payload.targetGameId}`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			userIds : [payload.userId],
@@ -289,7 +280,7 @@ export class AppController {
 	 */
 	@EventPattern('game.isInQueue')
 	async isInQueue(@Payload() payload : any) {
-		this.logger.log("isInQueue called");
+		//this.logger.log("isInQueue called");
 
 		let success : boolean = this.matchMakingService.isInQueue(payload.userId);
 
@@ -310,7 +301,7 @@ export class AppController {
 	 */
 	@EventPattern('game.get.gameList')
 	async getGameList(@Payload() payload : any) {
-		this.logger.log("getGameList called");
+		//this.logger.log("getGameList called");
 
 		let gameListRet = this.matchMakingService.getIGameInfoList();
 
@@ -379,11 +370,11 @@ export class AppController {
 	 */
 	@EventPattern('internal.game.create')
 	async createGame(@Payload() payload : CreateGameDTO) {
-		this.logger.log("a game is beeing created for users : {" + payload.player1UID + "} and + {" + payload.player2UID +"}");
+		//this.logger.log("a game is beeing created for users : {" + payload.player1UID + "} and + {" + payload.player2UID +"}");
 
-		this.logger.debug("Game create payload:" + payload.gameMode);
-		this.logger.debug("Game create payload:" + payload.player1UID);
-		this.logger.debug("Game create payload:" + payload.player2UID);
+		//this.logger.debug("Game create payload:" + payload.gameMode);
+		//this.logger.debug("Game create payload:" + payload.player1UID);
+		//this.logger.debug("Game create payload:" + payload.player2UID);
 		if (this.matchMakingService.isInGame(payload.player1UID) || this.matchMakingService.isInGame(payload.player2UID)) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				eventPattern : 'game.create',
@@ -395,7 +386,7 @@ export class AppController {
 			})
 		}
 		if (this.matchMakingService.isValidGamemode(payload.gameMode) === false) {
-			this.logger.debug(`gameMode in payload is invalid : [${payload.gameMode}]`);
+			//this.logger.debug(`gameMode in payload is invalid : [${payload.gameMode}]`);
 			return ;
 		}
 
@@ -408,7 +399,7 @@ export class AppController {
 		}
 		this.matchMakingService
 		.emitEvent('game.create', gameDTO);
-		this.logger.debug(`Game created for users ${gameDTO.player1UID} and ${gameDTO.player2UID}]`);
+		//this.logger.debug(`Game created for users ${gameDTO.player1UID} and ${gameDTO.player2UID}]`);
 
 		this.gatewayClient.emit<string, outDTO>('game', {
 			eventPattern : 'game.create',
@@ -428,7 +419,7 @@ export class AppController {
 	async getLeaderBoard(@Payload() payload : any) {
 		const res = await this.queries.getLeaderboard();
 
-		this.logger.debug(`Retrieved the leaderboard ${res}.`)
+		//this.logger.debug(`Retrieved the leaderboard ${res}.`)
 		if (res === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				eventPattern : 'game.get.leaderboard',
@@ -460,7 +451,7 @@ export class AppController {
 	async getMatchHistory(@Payload() payload : any) {
 		const res = await this.queries.getUserGameHistory(payload.requestedId);
 
-		this.logger.debug(`Retrieved the matchistory for user ${payload.requestedId}`)
+		//this.logger.debug(`Retrieved the matchistory for user ${payload.requestedId}`)
 		if (res === undefined) {
 			this.gatewayClient.emit<string, outDTO>('game', {
 				eventPattern : 'game.user.get.history',
