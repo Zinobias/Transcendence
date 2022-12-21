@@ -22,4 +22,4 @@ COPY . .
 EXPOSE 8081 8082 8084
 RUN npm run build
 #CMD ["npm", "run", "start:prod"]
-CMD ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "start:prod"]
+CMD ["./wait-for-it.sh", "game-app:3001", "--", "npm", "run", "start:prod"]

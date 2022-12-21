@@ -21,6 +21,6 @@ COPY . .
 RUN npm run build
 EXPOSE 8080 9000 3001
 #wait-for-it.sh ${POSTGRES_HOST}:5432 -s -t 0 -- npm run start:prod
-CMD ["./wait-for-it.sh", "db:5432", "--", "npm", "run", "start:prod"]
+CMD ["./wait-for-it.sh", "chat-app:8080", "--", "npm", "run", "start:prod"]
 #command: ["./wait-for-it.sh", "db:5432", "--", "python", "app.py"]
 #CMD ["npm", "run", "start:prod"]

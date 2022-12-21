@@ -93,9 +93,10 @@ const   Game: React.FC = () => {
                 eventPattern: "game.get.activeGameId", 
                 data: { userId: cookies.userID, requestedId: cookies.userID }
             });
+            // console.log(response.msg);
             // console.log(`socket.emit game.get.activeGameId`);
         }
-        // console.log(response.msg);
+        console.log(response.msg);
     }
 
     function getGameInfoInGame (response : any) {

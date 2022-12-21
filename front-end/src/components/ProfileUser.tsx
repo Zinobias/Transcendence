@@ -35,9 +35,6 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
     // get user stats and update on user change
     useEffect(() => {
         
-        setGamehistory([]);
-        setNames([]);
-
         socket.on("game.user.get.history", response => {
             if (response.success) {
                 let lost : number = 0;
@@ -92,7 +89,7 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
             eventPattern: "game.user.get.history", 
             data: { userId: cookies.userID, requestedId: user.userId }
         });
-        console.log("emit get game history success");
+        console.log("emit get game history");
 
         return () => {
             socket.off("game.user.get.history");
@@ -104,8 +101,12 @@ const ProfileUser : React.FC<Props> = ({user, queryId}) => {
 
     // event listener functions
     function gameIsInGameInProfile (response : any) {
-        if (response.success)
+        if (response.success) {
+            console.log("game in game " + response.msg);
             setIngame(inGame => true);
+        }
+        else
+            setIngame(inGame => false);
         // console.log(response.msg);
     }
 

@@ -19,11 +19,11 @@ const FriendslistUtils : React.FC<Props> = ({friend}) => {
     useEffect(() => {
 
         socket.on("check_online", checkOnlineFriendslist);
-        socket.on("game.isInGame", checkInGameFriendslist);
+        socket.on("game.isInGameArray", checkInGameFriendslist);
 
         return () => {
             socket.off("check_online", checkOnlineFriendslist);
-            socket.off("game.isInGame", checkInGameFriendslist);
+            socket.off("game.isInGameArray", checkInGameFriendslist);
         }
         
     }, [friend])
