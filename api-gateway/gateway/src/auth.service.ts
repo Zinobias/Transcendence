@@ -13,7 +13,7 @@ export class Auth {
         @Inject(Queries) private readonly queries: Queries,
 		@Inject(TwoFactorAuthService) private readonly TFA : TwoFactorAuthService,
     ) {
-        this.logger.debug(`Creating Auth Class`)
+        // this.logger.debug(`Creating Auth Class`)
         this.map = new Map<number, string[]>();
     }
 
@@ -45,7 +45,7 @@ export class Auth {
     public async updateAuth(userId: number) {
         const accessToken: string[] | undefined = await this.queries.loadSession(userId);
         if (accessToken != undefined) {
-            this.logger.debug(`Storing session token for user: [${userId}] token: [${accessToken}]`)
+            // this.logger.debug(`Storing session token for user: [${userId}] token: [${accessToken}]`)
             this.map.set(userId, accessToken);
         }
         // else
@@ -53,7 +53,7 @@ export class Auth {
     }
 
     private async auth(token: string, signup: boolean): Promise<number | undefined> {
-        this.logger.log(`Received ${signup ? 'signup' : 'login'} event with token [${token}]`);
+        // this.logger.log(`Received ${signup ? 'signup' : 'login'} event with token [${token}]`);
         const oauthResponse = await fetch(
             'https://api.intra.42.fr/v2/oauth/token',
             {
@@ -71,11 +71,11 @@ export class Auth {
             },
         );
         if (!oauthResponse.ok || oauthResponse.status !== 200) {
-            this.logger.warn(`Failed to get an oauth response`)
+            // this.logger.warn(`Failed to get an oauth response`)
             return undefined;
         }
         const json: AuthToken = await oauthResponse.json();
-        this.logger.debug(`Oauth response is:\n${json}`);
+        // this.logger.debug(`Oauth response is:\n${json}`);
         return await this.retrieveUserId(json);
     }
 
@@ -121,7 +121,7 @@ export class Auth {
     };
 
     private async retrieveUserId(authToken: AuthToken): Promise<number> {
-        this.logger.log(authToken.access_token);
+        // this.logger.log(authToken.access_token);
         const response = await fetch('https://api.intra.42.fr/v2/me', {
             method: 'Get',
             headers: {
@@ -130,7 +130,7 @@ export class Auth {
             },
         });
         const json = await response.json();
-        this.logger.log(json.id);
+        // this.logger.log(json.id);
         return json.id;
     }
 
@@ -139,13 +139,13 @@ export class Auth {
 
         if (isSuccessful)
             await this.updateAuth(userId);
-        else
-            this.logger.warn(`Unable to store auth for user id [${userId}]`)
+        // else
+        //     this.logger.warn(`Unable to store auth for user id [${userId}]`)
         return isSuccessful;
     }
 
     public async createAccount(client: Socket, payload: any): Promise<any | string> {
-        this.logger.log(`Creating an account for [${payload.userName}]`);
+        // this.logger.log(`Creating an account for [${payload.userName}]`);
         const userId = await this.auth(payload.token, true);
 		
         if (userId === undefined)

@@ -9,7 +9,7 @@ export class Sockets {
     private logger = new Logger('Sockets');
 
     constructor() {
-        this.logger.debug(`Creating new socketMap`);
+        // this.logger.debug(`Creating new socketMap`);
         this.socketMap = new Map<number, Socket[]>();
     }
 
@@ -25,7 +25,7 @@ export class Sockets {
 
     public storeSocket(userId: number, socket: Socket) {
 		if (socket === undefined) {
-			this.logger.error(`SOCKET UNDEFINED. fnc STORESOCKET`)
+			// this.logger.error(`SOCKET UNDEFINED. fnc STORESOCKET`)
 			return;
 		}
 		let socketArray : Socket[] = mapGetter(userId, this.socketMap);
@@ -66,13 +66,13 @@ export class Sockets {
 		let sockets : Socket[] | undefined = mapGetter(userId, this.socketMap);
 		if (sockets != undefined) {
 			sockets.forEach(a => this.removeSocket(a));
-			this.logger.warn(sockets.length);
+			// this.logger.warn(sockets.length);
 		}
 	}
 
     public sendData(users: number[], pattern: string, payload: object) {
 		if (users.length < 1 || users[0] === null) {
-			this.logger.error(`USERS ARRAY EMPTY`);
+			// this.logger.error(`USERS ARRAY EMPTY`);
 			return ;
 		}
         for (const user of users) {
@@ -84,7 +84,7 @@ export class Sockets {
 					e?.emit(pattern, payload);})
 				}
             } else {
-                this.logger.debug(`No socket for userId: [${user}] found when emitting to front end`);
+                // this.logger.debug(`No socket for userId: [${user}] found when emitting to front end`);
             }
         }
     }

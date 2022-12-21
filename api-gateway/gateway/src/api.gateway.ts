@@ -44,7 +44,7 @@ export class ApiGateway
     private logger: Logger = new Logger('ApiGateway');
 
     async onApplicationBootstrap() {
-        this.logger.log(`Starting bootstrap gateway...`);
+        // this.logger.log(`Starting bootstrap gateway...`);
     }
 
     //private clientList: { userID: number };
@@ -61,17 +61,17 @@ export class ApiGateway
     }
 
     afterInit(server: Server) {
-        this.logger.log(`Initialized gateway`);
+        // this.logger.log(`Initialized gateway`);
     }
 
     // TODO: make sure it is storing the userID
     handleConnection(client: Socket, ...args: any[]) {
-        this.logger.log(`Client connected: ${client.id} ${args[0]}`);
+        // this.logger.log(`Client connected: ${client.id} ${args[0]}`);
     }
 
     handleDisconnect(client: Socket) {
 		this.sockets.removeSocket(client);
-        this.logger.log(`Client disconnected: ${client.id}`);
+        // this.logger.log(`Client disconnected: ${client.id}`);
     }
 
     @UseGuards(AuthGuard)
@@ -175,7 +175,7 @@ export class ApiGateway
                 payload.data,
             );
             if (typeof createAccountDTO == 'string') {
-                this.logger.debug(`msg: ${createAccountDTO as string}`)
+                // this.logger.debug(`msg: ${createAccountDTO as string}`)
                 return ({
                     event: 'create_account', data: {
                         success: false,
@@ -183,7 +183,7 @@ export class ApiGateway
                     }
                 });
             }
-            this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
+            // this.logger.debug(`Creating account for [${createAccountDTO.user_id}] with cookie [${createAccountDTO.auth_cookie}]`);
             return {
                 event: 'create_account',
                 data: {
@@ -193,7 +193,7 @@ export class ApiGateway
 				}
             };
         }
-        this.logger.debug(`Received invalid pattern on auth channel, Auth token: [${payload.data.token}], Event pattern: [${payload.eventPattern}]`);
+        // this.logger.debug(`Received invalid pattern on auth channel, Auth token: [${payload.data.token}], Event pattern: [${payload.eventPattern}]`);
         return false;
     }
 
@@ -236,7 +236,7 @@ export class ApiGateway
 				qrCode 	:	undefined,
 			}});
 		}
-		this.logger.log(`user [${payload.userId}] calling enable 2fa`);
+		// this.logger.log(`user [${payload.userId}] calling enable 2fa`);
 		let qrCode : string | undefined = await this.TFA.generateSecret(payload.userId);
 		let success : boolean = qrCode !== undefined;
 		return ({event : 'enable_2fa', data : {
@@ -267,7 +267,7 @@ export class ApiGateway
 				msg 	: 'enabling 2fa failed, invalid userId : undefined'
 			}
 		});
-		this.logger.log(`user [${payload.userId}] calling verify_2fa`);
+		// this.logger.log(`user [${payload.userId}] calling verify_2fa`);
 		if (!payload.data.TFAToken)
 			success = false;
 		else
@@ -294,7 +294,7 @@ export class ApiGateway
 		let success : Has2FA;
 
 		success = await this.TFA.hasTwoFA(payload.userId!);
-		this.logger.log(`user [${payload.userId}] calling isEnabled2fa`);
+		// this.logger.log(`user [${payload.userId}] calling isEnabled2fa`);
 		let msg: string = "";
 		switch (success) {
 			case Has2FA.ERROR:
@@ -357,7 +357,7 @@ export class ApiGateway
 		}
 		
 		success = await this.TFA.deleteTwoFA(payload.userId!);
-		this.logger.log(`user [${payload.userId}] calling remove2fa`);
+		// this.logger.log(`user [${payload.userId}] calling remove2fa`);
 		return ({
 			event : 'remove_2fa',
 			data : {

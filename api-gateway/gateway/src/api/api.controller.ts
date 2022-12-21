@@ -49,7 +49,7 @@ export class ApiController {
 
     @EventPattern('chat_to_game')
     chatToGame(@Payload() payload: microServiceDTO) {
-        this.logger.log("chat_to_game gatway event");
+        // this.logger.log("chat_to_game gatway event");
         this.game_client.emit('internal.game.create', payload);
     }
 

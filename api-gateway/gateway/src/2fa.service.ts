@@ -35,7 +35,7 @@ export class TwoFactorAuthService {
 			return undefined ;
 		}
 		else {
-			this.logger.log(`Generated secret : ${secret}`);
+			// this.logger.log(`Generated secret : ${secret}`);
 			this.toBeValidatedMap.set(uid, secret.ascii);
 		}
 		let qrCodeResult : string | void;
@@ -88,19 +88,19 @@ export class TwoFactorAuthService {
 		let clientSecret = mapGetter(uid,this.toBeValidatedMap);
 
 		if (clientSecret !== undefined) {
-			this.logger.log(`adding ${uid} 2fasecret to db a.k.a validating.`);
+			// this.logger.log(`adding ${uid} 2fasecret to db a.k.a validating.`);
 			if (await this.dbAddUser2FASecret(uid, clientSecret) === false) {
 				return false;
 			}
 			this.toBeValidatedMap.delete(uid);
-			this.logger.log(`deleting ${uid} 2fasecret from tobevalidated map`);
+			// this.logger.log(`deleting ${uid} 2fasecret from tobevalidated map`);
 
 		}
 		else {
-			this.logger.log(`client : [${uid}] not in map `);
+			// this.logger.log(`client : [${uid}] not in map `);
 			clientSecret = await this.dbGetUser2FASecret(uid);
 			if (clientSecret === true) {
-				this.logger.log(`client : [${uid}] not in map & database `);
+				// this.logger.log(`client : [${uid}] not in map & database `);
 				return false;
 			}
 		}
