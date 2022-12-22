@@ -164,11 +164,11 @@ export const UserSettings : React.FC<Props> = ({user}) => {
             }
             <div className='twoFA' id="verify_TwoFA">
                 <img src={qrcode} alt="qrCode" className="profileQR"/>
-                <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="twoFA_input"/>
+                <input type="text" value={token} onChange={(e)=> setToken(e.target.value)} className="twoFA_input" maxLength={50}/>
                 <button className="profileButton" onClick={(e) => verifyTwoFA(e)}>submit 2fa token</button>
             </div>
             <div className='twoFA' id="disable_TwoFA">
-                <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="twoFA_input"/>
+                <input type="text" value={token} onChange={(e)=> setToken(e.target.value)} className="twoFA_input" maxLength={50}/>
                 <button className="profileButton" onClick={(e) => disableTwoFA(e)}>submit 2fa token</button>
             </div>
         </>

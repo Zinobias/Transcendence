@@ -129,7 +129,7 @@ const ChannelSettings : React.FC<Props> = ({channel}) => {
                 </>
 			}
             <div className="settingsPassword" id="settingsPasswordDropDown">
-                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} className="settingsInput"/>
+                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} className="settingsInput" maxLength={16}/>
                 <button className="settingsButton" onClick={(e) => submitPassword(e)}>submit new pw</button>
             </div>
             MEMBERS:

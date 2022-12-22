@@ -283,8 +283,8 @@ const ProfileNav: React.FC = () => {
                         {
                             <>
                                 <p>you got invited to chatroom <b>{element.channelName}</b></p>
-                                <span>password is optional</span>
-                                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} style={{borderBottom: "solid 1px black"}} className="settingsInput"/>
+                                <span>password (not always needed)</span>
+                                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} style={{borderBottom: "solid 1px black"}} className="settingsInput" maxLength={16}/>
                                 <button className="friendslistButton" onClick={(e) => channelInviteAccept(e, element.channelId)}>Join</button>
                                 <button className="friendslistButton" onClick={(e) => channelInviteDecline(e, element.channelId, element.fromUserId, element.channelName)}>Decline</button>
                             </>

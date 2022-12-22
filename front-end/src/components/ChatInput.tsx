@@ -36,9 +36,10 @@ const ChatInput: React.FC<Props> = ({channelId}) => {
                 <input 
                     className="chatroom__form--input" 
                     ref={inputRef}
-                    type="input"
+                    type="text"
                     value={message} 
                     onChange={(e) => setMessage(e.target.value)}  
+					maxLength={1000}
                 />
             </form>
         </>

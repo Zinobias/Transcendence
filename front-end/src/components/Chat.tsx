@@ -172,14 +172,14 @@ const   Chat: React.FC = () => {
         <div className="newPwChannel" id="pwChannel">
             <form className="loginform">
                 <label className="loginform__label">Enter password for {pwName}</label>
-                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input"/>
+                <input type="password" value={pw} onChange={(e)=>setPw(e.target.value)} className="loginform__input" maxLength={16}/>
                 <button className="loginform__button" onClick={(e) => handlePassword(e)}>SUBMIT</button>
             </form> 
         </div>
         <div className="newChannel" id="Channel">
             <form className="loginform">
                     <label className="loginform__label">Name</label>
-                    <input type="input" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input"/>
+                    <input type="text" value={chatroomName} onChange={(e)=>setChatroomName(e.target.value)} className="loginform__input" maxLength={12}/>
                     <label className="loginform__label">password</label>
                     <input type="checkbox" checked={passwordCheck} onChange={e => setPasswordCheck(!passwordCheck)}/>
                     <label className="loginform__label">public</label>

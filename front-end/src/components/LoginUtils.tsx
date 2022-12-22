@@ -125,7 +125,7 @@ export const    SignupButton: React.FC = () => {
         <>
             <form className="loginform">
                 <label className="loginform__label">Name</label>
-                <input type="input" onChange={(e)=>setUserName(e.target.value)} placeholder="name" className="loginform__input"/>
+                <input type="text" onChange={(e)=>setUserName(e.target.value)} placeholder="name" className="loginform__input" maxLength={12}/>
                 <button className="loginform__button"  onClick={(e) => handleClick(e)}>CREATE ACCOUNT</button>
             </form>
             <br/><span>Already have an account? Go to <Link to="/login" style={{ textDecoration: "none", color: "black" }}><b>Login!</b></Link></span>
@@ -243,7 +243,7 @@ export const    LoginButton: React.FC = () => {
     if (showTwoFA) {
         return (
             <div className="loginButtonDIV">
-                <input type="input" value={token} onChange={(e)=> setToken(e.target.value)} className="loginTwoFA_input"/>
+                <input type="text" value={token} onChange={(e)=> setToken(e.target.value)} className="loginTwoFA_input" maxLength={1000}/>
                 <button className="loginButton" onClick={(e) => handleTwoFA(e)}>submit 2fa token</button>
                 <br/><span>Go back to <b style={{cursor: "pointer"}} onClick={(e) => backToLogin(e)}>Login!</b></span>
             </div>
