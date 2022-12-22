@@ -533,13 +533,34 @@ p.chatp {
     right: 3%;
     text-align: right;
     margin: 0;
+    /* overflow-y: auto; 
+    scrollbar-gutter: stable;
+    word-break: break-word; */
+}
 
-    word-break: break-word;
+.profileNavButton {
+    margin-bottom: 10px;
+    width: 80%;
+    font-size: large;
+    border: 2px solid black;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Silkscreen', cursive;
+    background-color: transparent;
+}
+
+.profileNavInput {
+    width:80%;
+    height: 28px;
+    background: transparent;
+    border: 2px solid black;
+    border-bottom: none;
+    box-sizing: border-box;
 }
 
 .profileNav__dropdown {
     display: none;
-    /* height: 200px; */
+    max-height: 500px;
     width: 200px;
     /* margin: auto; */
     line-height: 1;
@@ -547,6 +568,10 @@ p.chatp {
     text-align:center;
     background-color: #646464;
     border: 2px solid black;
+    line-height: normal;
+    overflow-y: scroll; 
+    scrollbar-gutter: stable;
+    word-break: break-word;
 }
 
 .profileNav__avatar {
